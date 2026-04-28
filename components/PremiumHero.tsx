@@ -179,23 +179,24 @@ export function PremiumHero() {
               <motion.span
                 style={{
                   display: 'inline-block',
-                  transformStyle: 'preserve-3d',
-                  transform: `rotateX(${rotation3D.rotateX * 0.2}deg) rotateY(${rotation3D.rotateY * 0.2}deg) rotateZ(-2deg)`,
-                  background: activeView === 0 
-                    ? 'linear-gradient(135deg, #FF8C64 0%, #FF6B47 50%, #FF5E3A 100%)'
+                  background: activeView === 0
+                    ? 'linear-gradient(135deg, #FFE9C7 0%, #F5C78A 50%, #E7A868 100%)'
                     : activeView === 1
-                    ? 'linear-gradient(135deg, #64B4FF 0%, #4796FF 50%, #3A7FFF 100%)'
-                    : 'linear-gradient(135deg, #B464FF 0%, #9647FF 50%, #7F3AFF 100%)',
+                    ? 'linear-gradient(135deg, #B8FFF5 0%, #7EF0DF 50%, #4AF2E5 100%)'
+                    : 'linear-gradient(135deg, #E4D8FF 0%, #BFA8F5 50%, #9A86E8 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
                   textShadow: 'none',
                   filter: activeView === 0
-                    ? 'drop-shadow(0 4px 20px rgba(255, 107, 71, 0.4))'
+                    ? 'drop-shadow(0 4px 24px rgba(231, 168, 104, 0.25))'
                     : activeView === 1
-                    ? 'drop-shadow(0 4px 20px rgba(71, 150, 255, 0.4))'
-                    : 'drop-shadow(0 4px 20px rgba(150, 71, 255, 0.4))',
-                  transition: 'transform 0.3s ease-out'
+                    ? 'drop-shadow(0 4px 24px rgba(74, 242, 229, 0.28))'
+                    : 'drop-shadow(0 4px 24px rgba(154, 134, 232, 0.25))',
+                  fontStyle: 'italic',
+                  fontFamily: "'Fraunces', 'Times New Roman', serif",
+                  fontWeight: 600,
+                  letterSpacing: '-0.02em',
                 }}
               >
                 {currentView.headline[0]}

@@ -128,62 +128,81 @@ export function Projects({ onProjectClick }: ProjectsProps) {
         }}
       />
 
-      {/* Section header — centered, premium animated treatment */}
+      {/* ── DISTINGUISHED CASE STUDIES HEADER ─────────────────────────────
+         Intentionally unique vs. unified SectionHeader used elsewhere:
+         • Pill-style eyebrow carrying the case count
+         • Oversized display title with multi-color gradient flourish
+           that draws from the project accent palette (amber → gold → teal)
+         • Layered dual-glow backdrop (warm amber + signature teal)
+         • Single pulsing accent dot closer (no twin-rule flanking)
+         ──────────────────────────────────────────────────────────────── */}
       <div
         style={{
-          maxWidth: '960px',
+          maxWidth: '1120px',
           margin: '0 auto',
           padding: '0 24px',
-          marginBottom: '64px',
+          marginBottom: '96px',
           textAlign: 'center',
           position: 'relative',
         }}
       >
-        {/* Soft radial glow behind title for depth */}
+        {/* Layered dual radial glow — amber + teal */}
         <motion.div
           aria-hidden="true"
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.85 }}
           whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
           style={{
             position: 'absolute',
-            inset: 0,
+            inset: '-60px -40px',
             pointerEvents: 'none',
             background:
-              'radial-gradient(ellipse 60% 80% at 50% 50%, rgba(74,242,229,0.06) 0%, rgba(74,242,229,0.02) 40%, transparent 70%)',
+              'radial-gradient(ellipse 42% 70% at 28% 55%, rgba(200,140,70,0.13) 0%, transparent 65%), radial-gradient(ellipse 42% 70% at 72% 55%, rgba(74,242,229,0.11) 0%, transparent 65%)',
+            filter: 'blur(4px)',
             zIndex: 0,
           }}
         />
 
-        {/* Eyebrow with flanking rules */}
+        {/* Pill eyebrow — case count + label, with warm border */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           style={{
-            display: 'flex',
+            display: 'inline-flex',
             alignItems: 'center',
-            justifyContent: 'center',
             gap: '14px',
-            marginBottom: '22px',
+            padding: '8px 20px',
+            borderRadius: '100px',
+            border: '1px solid rgba(200,140,70,0.22)',
+            background:
+              'linear-gradient(90deg, rgba(200,140,70,0.06) 0%, rgba(74,242,229,0.05) 100%)',
+            backdropFilter: 'blur(10px)',
+            marginBottom: '32px',
             position: 'relative',
             zIndex: 1,
           }}
         >
-          <motion.span
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          <span
             style={{
-              width: '40px',
-              height: '1px',
-              background:
-                'linear-gradient(to right, transparent, rgba(255,255,255,0.28))',
-              transformOrigin: 'right',
-              display: 'inline-block',
+              fontSize: '10px',
+              fontWeight: 700,
+              letterSpacing: '0.32em',
+              textTransform: 'uppercase' as const,
+              color: 'rgba(228,184,120,0.9)',
+              fontFamily: 'Inter, system-ui, sans-serif',
+            }}
+          >
+            No. 01 — 04
+          </span>
+          <span
+            aria-hidden="true"
+            style={{
+              width: '1px',
+              height: '10px',
+              background: 'rgba(255,255,255,0.14)',
             }}
           />
           <span
@@ -192,133 +211,113 @@ export function Projects({ onProjectClick }: ProjectsProps) {
               fontWeight: 700,
               letterSpacing: '0.32em',
               textTransform: 'uppercase' as const,
-              color: 'rgba(255,255,255,0.62)',
+              color: 'rgba(255,255,255,0.78)',
               fontFamily: 'Inter, system-ui, sans-serif',
             }}
           >
             Selected Work
           </span>
-          <motion.span
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            style={{
-              width: '40px',
-              height: '1px',
-              background:
-                'linear-gradient(to left, transparent, rgba(255,255,255,0.28))',
-              transformOrigin: 'left',
-              display: 'inline-block',
-            }}
-          />
         </motion.div>
 
-        {/* Title + subtitle, centered */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
+        {/* Oversized title + vibrant italic flourish */}
+        <motion.h2
+          initial={{ opacity: 0, y: 28 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.9, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1.0, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '18px',
-            marginBottom: '32px',
+            fontSize: 'clamp(48px, 7vw, 88px)',
+            fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+            fontWeight: 800,
+            letterSpacing: '-0.045em',
+            lineHeight: 1.0,
+            margin: '0 0 22px 0',
+            textAlign: 'center',
             position: 'relative',
             zIndex: 1,
           }}
         >
-          <h2
+          <span
             style={{
-              fontSize: 'clamp(36px, 4.5vw, 60px)',
-              fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-              fontWeight: 800,
-              color: '#FFFFFF',
-              letterSpacing: '-0.04em',
-              lineHeight: 1.04,
-              margin: 0,
-              textAlign: 'center',
               backgroundImage:
-                'linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.78) 100%)',
+                'linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.82) 100%)',
               WebkitBackgroundClip: 'text',
               backgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}
           >
-            Case Studies
-          </h2>
-          <p
+            Case
+          </span>{' '}
+          <span
             style={{
-              fontSize: '16px',
-              lineHeight: 1.65,
-              color: 'rgba(255,255,255,0.52)',
-              maxWidth: '560px',
-              margin: '0 auto',
-              textAlign: 'center',
-              fontFamily: 'Inter, system-ui, sans-serif',
+              fontFamily: "'Fraunces', 'Times New Roman', serif",
+              fontStyle: 'italic',
+              fontWeight: 400,
+              backgroundImage:
+                'linear-gradient(120deg, #E4B878 0%, #C88A3C 35%, #8E6CB4 65%, #4AF2E5 100%)',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              paddingRight: '0.05em',
             }}
           >
-            A consistent methodology applied across fintech, SaaS, and B2B
-            marketplaces — strategy that ships.
-          </p>
-        </motion.div>
+            studies.
+          </span>
+        </motion.h2>
 
-        {/* Centered animated rule with accent dot */}
+        {/* Subtitle — slightly larger than unified sections for hierarchy */}
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.9, delay: 0.22, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            fontSize: '15px',
+            lineHeight: 1.65,
+            color: 'rgba(255,255,255,0.56)',
+            maxWidth: '580px',
+            margin: '0 auto 30px',
+            textAlign: 'center',
+            fontFamily: 'Inter, system-ui, sans-serif',
+            position: 'relative',
+            zIndex: 1,
+          }}
+        >
+          A consistent methodology applied across fintech, SaaS, and B2B
+          marketplaces — strategy that ships.
+        </motion.p>
+
+        {/* Single pulsing accent dot — signature closer (no flanking rules) */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.6, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
           style={{
             display: 'flex',
-            alignItems: 'center',
             justifyContent: 'center',
-            gap: '12px',
             position: 'relative',
             zIndex: 1,
           }}
         >
           <motion.span
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 1.1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            style={{
-              width: '120px',
-              height: '1px',
-              background:
-                'linear-gradient(to right, transparent, rgba(255,255,255,0.22))',
-              transformOrigin: 'right',
-              display: 'inline-block',
+            animate={{
+              boxShadow: [
+                '0 0 14px rgba(74,242,229,0.55)',
+                '0 0 22px rgba(74,242,229,0.85)',
+                '0 0 14px rgba(74,242,229,0.55)',
+              ],
             }}
-          />
-          <motion.span
-            initial={{ scale: 0, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.5, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            transition={{
+              duration: 2.4,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
             style={{
               width: '6px',
               height: '6px',
               borderRadius: '9999px',
               background: '#4AF2E5',
-              boxShadow: '0 0 14px rgba(74,242,229,0.55)',
-              display: 'inline-block',
-            }}
-          />
-          <motion.span
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 1.1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            style={{
-              width: '120px',
-              height: '1px',
-              background:
-                'linear-gradient(to left, transparent, rgba(255,255,255,0.22))',
-              transformOrigin: 'left',
               display: 'inline-block',
             }}
           />

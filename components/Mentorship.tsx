@@ -1,5 +1,6 @@
 import { ArrowRight, ClipboardCheck, Briefcase, MessageSquare, Layers, Calendar } from 'lucide-react';
 import { motion } from 'motion/react';
+import { SectionHeader } from './SectionHeader';
 
 export function Mentorship() {
   const benefits = [
@@ -47,39 +48,12 @@ export function Mentorship() {
   return (
     <section className="px-6 py-24" id="mentorship">
       <div className="mx-auto max-w-7xl">
-        {/* Section Title */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="mb-16 text-center"
-        >
-          <h2 
-            className="mb-6 uppercase"
-            style={{ 
-              fontSize: 'clamp(48px, 6vw, 72px)',
-              fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-              fontWeight: '900',
-              lineHeight: '0.9',
-              letterSpacing: '-0.05em',
-              color: 'rgba(255, 255, 255, 0.98)'
-            }}
-          >
-            ADPList<br />Mentorship
-          </h2>
-          <p 
-            className="mx-auto max-w-3xl"
-            style={{ 
-              fontSize: '18px',
-              lineHeight: '1.6',
-              color: 'rgba(255, 255, 255, 0.55)'
-            }}
-          >
-            Join hundreds of designers I've mentored through ADPList—portfolio reviews, career guidance, 
-            and real-world product strategy insights.
-          </p>
-        </motion.div>
+        <SectionHeader
+          eyebrow="ADPList Mentorship"
+          title="Designers I've"
+          flourish="mentored."
+          subtitle="Hundreds of designers through ADPList — portfolio reviews, career guidance, and real-world product strategy insights."
+        />
 
         {/* Two Column Layout */}
         <motion.div 

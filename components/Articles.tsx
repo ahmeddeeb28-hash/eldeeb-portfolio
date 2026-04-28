@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { ArrowRight, Calendar } from 'lucide-react';
+import { SectionHeader } from './SectionHeader';
 
 /* ────────────────────────────────────────────────────────────────────────
  * ARTICLE IMAGES
@@ -21,46 +22,12 @@ export function Articles() {
   return (
     <section id="articles-activities" className="bg-[#0A0A0A] py-[88px] border-t border-white/[0.03]">
       <div className="container mx-auto px-10 max-w-[1560px]">
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1 }}
-            className="max-w-2xl"
-          >
-            <div className="flex items-center gap-4 mb-6 opacity-40">
-              <div className="w-8 h-[1px] bg-[#4AF2E5]" />
-              <span className="text-[#4AF2E5] text-[10px] font-black tracking-[0.5em] uppercase">
-                Perspectives
-              </span>
-            </div>
-            <h2 
-              className="text-white uppercase leading-[0.95] tracking-[-0.05em]"
-              style={{ 
-                fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-                fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
-                fontWeight: '900'
-              }}
-            >
-              Articles &<br />
-              <span className="text-white/20 italic">Activities.</span>
-            </h2>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="flex items-center gap-6"
-          >
-            <button className="text-white/40 hover:text-white transition-colors uppercase text-[10px] font-black tracking-widest border-b border-white/10 pb-1">
-              View All Insights
-            </button>
-          </motion.div>
-        </div>
+        <SectionHeader
+          eyebrow="Perspectives"
+          title="Articles &"
+          flourish="activities."
+          subtitle="Essays and field notes on design critique, research, and what it takes to lead product teams through ambiguity."
+        />
 
         {/* Articles Grid - Editorial Strip */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-16">

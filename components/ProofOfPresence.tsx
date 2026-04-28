@@ -1,6 +1,7 @@
 import { motion, useInView } from 'motion/react';
 import { useRef, useState } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { SectionHeader } from './SectionHeader';
 
 /* ──────────────────────────────────────────────────────────────
  * PROOF-OF-PRESENCE IMAGES
@@ -188,9 +189,6 @@ function PresenceCard({
 }
 
 export function ProofOfPresence() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const headerInView = useInView(sectionRef, { once: true, margin: '-80px' });
-
   return (
     <section
       id="proof-of-presence-section-lock"
@@ -198,82 +196,12 @@ export function ProofOfPresence() {
       style={{ paddingTop: '88px', paddingBottom: '88px' }}
     >
       <div className="container mx-auto px-10 max-w-[1560px]">
-        {/* Section Header */}
-        <div ref={sectionRef}>
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={headerInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="mb-6"
-          >
-            <div className="flex items-center gap-4 opacity-40">
-              <div className="w-8 h-[1px] bg-white" />
-              <span
-                style={{
-                  fontSize: '11px',
-                  fontWeight: '700',
-                  letterSpacing: '0.15em',
-                  textTransform: 'uppercase' as const,
-                  color: 'rgba(255,255,255,0.5)',
-                  fontFamily: 'Inter, system-ui, sans-serif',
-                }}
-              >
-                Beyond the Screens
-              </span>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={headerInView ? { opacity: 1, y: 0 } : {}}
-            transition={{
-              duration: 0.9,
-              delay: 0.1,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-            className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-6"
-          >
-            <h2
-              style={{
-                fontSize: 'clamp(40px, 5vw, 64px)',
-                fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-                fontWeight: '800',
-                color: 'white',
-                letterSpacing: '-0.04em',
-                lineHeight: '1.05',
-                maxWidth: '650px',
-              }}
-            >
-              Where the Work{' '}
-              <span style={{ color: 'rgba(255,255,255,0.2)', fontStyle: 'italic' }}>
-                Becomes Real.
-              </span>
-            </h2>
-          </motion.div>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={headerInView ? { opacity: 1, y: 0 } : {}}
-            transition={{
-              duration: 0.9,
-              delay: 0.2,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-            className="mb-20"
-            style={{
-              fontSize: '17px',
-              lineHeight: '1.7',
-              color: 'rgba(255,255,255,0.35)',
-              fontWeight: '400',
-              maxWidth: '560px',
-            }}
-          >
-            Design doesn't end at the screen. It happens in the room — presenting
-            ideas, aligning teams, mentoring designers, and translating complex
-            systems into strategy that ships. Over 10+ years, the work has always
-            been about presence, craft, and communication.
-          </motion.p>
-        </div>
+        <SectionHeader
+          eyebrow="Beyond the Screens"
+          title="Where the work"
+          flourish="becomes real."
+          subtitle="Design doesn't end at the screen. It happens in the room — presenting ideas, aligning teams, mentoring designers, and translating complex systems into strategy that ships."
+        />
 
         {/* Decorative grid line */}
         <motion.div

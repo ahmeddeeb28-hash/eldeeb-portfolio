@@ -1,45 +1,26 @@
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
+import { SectionHeader } from "./SectionHeader";
 
 /* ──────────────────────────────────────────────────────────────
  * BRAND LOGOS
- * By default we use live Clearbit logos (no local file needed).
- * To override with a local asset, drop an SVG/PNG in
- *   public/images/brands/
- * and replace the URL below, e.g.
- *   sary: '/images/brands/sary.svg',
+ * Local PNG/SVG assets in public/images/brands/. To swap a logo,
+ * drop a new file in that folder and update the `src` below.
  * See public/images/brands/README.md for format & sizing specs.
  * ──────────────────────────────────────────────────────────── */
-const BRAND_LOGOS = {
-  nafas: 'https://logo.clearbit.com/nafas.io',
-  zain: 'https://logo.clearbit.com/zain.com',
-  sampo: 'https://logo.clearbit.com/sampo.fi',
-  healthigo: 'https://logo.clearbit.com/healthigo.com',
-  shorefield: 'https://logo.clearbit.com/shorefield.co.uk',
-  deliveroo: 'https://logo.clearbit.com/deliveroo.co.uk',
-  sary: 'https://logo.clearbit.com/sary.sa',
-  careem: 'https://logo.clearbit.com/careem.com',
-  tabby: 'https://logo.clearbit.com/tabby.ai',
-  noon: 'https://logo.clearbit.com/noon.com',
-  souq: 'https://logo.clearbit.com/souq.com',
-  bayut: 'https://logo.clearbit.com/bayut.com',
-} as const;
-
-// Brand list rendered in the logo wall. Display name is shown as a
-// text wordmark today; the `logo` URL is available if you want to
-// switch to <img /> rendering later.
-const brandLogos = [
-  { name: "Nafas",              logo: BRAND_LOGOS.nafas,      maxHeight: 44, maxWidth: 140 },
-  { name: "Zain",               logo: BRAND_LOGOS.zain,       maxHeight: 44, maxWidth: 140 },
-  { name: "Sampo",              logo: BRAND_LOGOS.sampo,      maxHeight: 44, maxWidth: 140 },
-  { name: "Auto Store",         logo: BRAND_LOGOS.healthigo,  maxHeight: 44, maxWidth: 140 },
-  { name: "Saudi Central Bank", logo: BRAND_LOGOS.shorefield, maxHeight: 44, maxWidth: 140 },
-  { name: "Aqarmap",            logo: BRAND_LOGOS.deliveroo,  maxHeight: 60, maxWidth: 140 },
-  { name: "Sary",               logo: BRAND_LOGOS.sary,       maxHeight: 44, maxWidth: 140 },
-  { name: "Zyda",               logo: BRAND_LOGOS.careem,     maxHeight: 44, maxWidth: 140 },
-  { name: "Hakbah",             logo: BRAND_LOGOS.tabby,      maxHeight: 44, maxWidth: 140 },
-  { name: "Majara",             logo: BRAND_LOGOS.noon,       maxHeight: 44, maxWidth: 140 },
-  { name: "Brand Logo",         logo: BRAND_LOGOS.souq,       maxHeight: 44, maxWidth: 140 },
+const brandLogos: { name: string; src: string }[] = [
+  { name: 'Nafas',              src: '/images/brands/image 1.png' },
+  { name: 'Zain',               src: '/images/brands/image 6.png' },
+  { name: 'Sampo',              src: '/images/brands/image 8.png' },
+  { name: 'Auto Store',         src: '/images/brands/image 13.png' },
+  { name: 'Saudi Central Bank', src: '/images/brands/English Logo.png' },
+  { name: 'Aqarmap',            src: '/images/brands/Layer 2.png' },
+  { name: 'Sary',               src: '/images/brands/g8.png' },
+  { name: 'Zyda',               src: '/images/brands/Group 1000005970.png' },
+  { name: 'Hakbah',             src: '/images/brands/Group 1000005971.png' },
+  { name: 'Majara',             src: '/images/brands/Group 1000005972.png' },
+  { name: 'Brand Logo',         src: '/images/brands/Group 1000005973.png' },
+  { name: 'Brand',              src: '/images/brands/Component 6 \u2013 1.png' },
 ];
 
 const stats = [
@@ -95,53 +76,12 @@ export function BrandsStats() {
       />
 
       <div className="relative mx-auto max-w-7xl">
-        {/* Section Header */}
-        <div className="mb-16 text-center">
-          {/* Eyebrow */}
-          <div className="mb-4 flex justify-center">
-            <div
-              style={{
-                fontSize: "13px",
-                fontWeight: "600",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                color: "rgba(255, 255, 255, 0.5)",
-              }}
-            >
-              IMPACT
-            </div>
-          </div>
-
-          {/* Heading */}
-          <h2
-            className="mx-auto mb-4 max-w-6xl"
-            style={{
-              fontSize: "clamp(2.5rem, 4vw, 3.5rem)",
-              fontFamily:
-                "Inter, system-ui, -apple-system, sans-serif",
-              fontWeight: "800",
-              letterSpacing: "-0.04em",
-              color: "#F5F7FF",
-              lineHeight: "1.1",
-            }}
-          >
-            Designing products that drive real results
-          </h2>
-
-          {/* Sub-line */}
-          <p
-            className="mx-auto max-w-2xl"
-            style={{
-              fontSize: "20px",
-              color: "#A7B0C3",
-              lineHeight: "1.6",
-              fontWeight: "500",
-            }}
-          >
-            A decade of designing high-performing products used
-            by millions.
-          </p>
-        </div>
+        <SectionHeader
+          eyebrow="Impact"
+          title="Designing products that drive"
+          flourish="real results."
+          subtitle="A decade of designing high-performing products used by millions."
+        />
 
         {/* Brands & Social Proof Subsection */}
         <div
@@ -154,347 +94,67 @@ export function BrandsStats() {
           {/* Label */}
           {/* ... remove this code ... */}
 
-          {/* Logos Grid */}
+          {/*
+            Full-bleed flowing logo strip. Breaks out of `max-w-7xl + px-6`
+            to span full viewport width, then masks edges so logos appear to
+            flow into the black background on left and right.
+          */}
           <div
-            className="flex flex-wrap justify-center items-center gap-x-2 gap-y-2 px-4"
+            className="group/strip"
             style={{
-              maxWidth: "1000px",
+              width: '100vw',
+              marginLeft: 'calc(50% - 50vw)',
+              marginRight: 'calc(50% - 50vw)',
+              overflow: 'hidden',
+              paddingTop: '20px',
+              paddingBottom: '20px',
+              WebkitMaskImage:
+                'linear-gradient(to right, transparent 0%, transparent 18%, black 32%, black 68%, transparent 82%, transparent 100%)',
+              maskImage:
+                'linear-gradient(to right, transparent 0%, transparent 18%, black 32%, black 68%, transparent 82%, transparent 100%)',
             }}
           >
-            {/* Brand Logo: Nafas */}
             <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="group relative flex items-center justify-center p-2 rounded-xl transition-all duration-500"
-              style={{
-                height: "80px",
-                width: "160px",
+              animate={{ x: ['0%', '-50%'] }}
+              transition={{
+                duration: 60,
+                repeat: Infinity,
+                ease: 'linear',
               }}
-            >
-              <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl pointer-events-none overflow-hidden"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.02)",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                }}
-              >
-                <div 
-                  className="absolute inset-0 opacity-[0.15] mix-blend-overlay"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                  }}
-                />
-              </div>
-              <div className="relative z-10">
-                <span style={{ fontSize: '16px', fontWeight: '700', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.02em', fontFamily: 'Inter, system-ui, sans-serif' }} className="group-hover:!text-white transition-colors duration-300">Nafas</span>
-              </div>
-            </motion.div>
-
-            {/* Brand Logo: Zain */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="group relative flex items-center justify-center p-2 rounded-xl transition-all duration-500"
               style={{
-                height: "80px",
-                width: "160px",
+                display: 'flex',
+                alignItems: 'center',
+                gap: '88px',
+                width: 'max-content',
               }}
+              className="group-hover/strip:[animation-play-state:paused]"
             >
-              <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl pointer-events-none overflow-hidden"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.02)",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                }}
-              >
-                <div 
-                  className="absolute inset-0 opacity-[0.15] mix-blend-overlay"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                  }}
-                />
-              </div>
-              <div className="relative z-10">
-                <span style={{ fontSize: '16px', fontWeight: '700', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.02em', fontFamily: 'Inter, system-ui, sans-serif' }} className="group-hover:!text-white transition-colors duration-300">Zain</span>
-              </div>
-            </motion.div>
-
-            {/* Brand Logo: Sampo */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="group relative flex items-center justify-center p-2 rounded-xl transition-all duration-500"
-              style={{
-                height: "80px",
-                width: "160px",
-              }}
-            >
-              <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl pointer-events-none overflow-hidden"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.02)",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                }}
-              >
-                <div 
-                  className="absolute inset-0 opacity-[0.15] mix-blend-overlay"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                  }}
-                />
-              </div>
-              <div className="relative z-10">
-                <span style={{ fontSize: '16px', fontWeight: '700', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.02em', fontFamily: 'Inter, system-ui, sans-serif' }} className="group-hover:!text-white transition-colors duration-300">Sampo</span>
-              </div>
-            </motion.div>
-
-            {/* Brand Logo: Auto Store */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="group relative flex items-center justify-center p-2 rounded-xl transition-all duration-500"
-              style={{
-                height: "80px",
-                width: "160px",
-              }}
-            >
-              <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl pointer-events-none overflow-hidden"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.02)",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                }}
-              >
-                <div 
-                  className="absolute inset-0 opacity-[0.15] mix-blend-overlay"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                  }}
-                />
-              </div>
-              <div className="relative z-10">
-                <span style={{ fontSize: '16px', fontWeight: '700', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.02em', fontFamily: 'Inter, system-ui, sans-serif' }} className="group-hover:!text-white transition-colors duration-300">Auto Store</span>
-              </div>
-            </motion.div>
-
-            {/* Brand Logo: Saudi Central Bank */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="group relative flex items-center justify-center p-2 rounded-xl transition-all duration-500"
-              style={{
-                height: "80px",
-                width: "160px",
-              }}
-            >
-              <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl pointer-events-none overflow-hidden"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.02)",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                }}
-              >
-                <div 
-                  className="absolute inset-0 opacity-[0.15] mix-blend-overlay"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                  }}
-                />
-              </div>
-              <div className="relative z-10">
-                <span style={{ fontSize: '16px', fontWeight: '700', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.02em', fontFamily: 'Inter, system-ui, sans-serif' }} className="group-hover:!text-white transition-colors duration-300">Saudi Central Bank</span>
-              </div>
-            </motion.div>
-
-            {/* Brand Logo: Aqarmap */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="group relative flex items-center justify-center p-2 rounded-xl transition-all duration-500"
-              style={{
-                height: "80px",
-                width: "160px",
-              }}
-            >
-              <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl pointer-events-none overflow-hidden"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.02)",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                }}
-              >
-                <div 
-                  className="absolute inset-0 opacity-[0.15] mix-blend-overlay"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                  }}
-                />
-              </div>
-              <div className="relative z-10">
-                <span style={{ fontSize: '16px', fontWeight: '700', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.02em', fontFamily: 'Inter, system-ui, sans-serif' }} className="group-hover:!text-white transition-colors duration-300">Aqarmap</span>
-              </div>
-            </motion.div>
-
-            {/* Brand Logo: Sary */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="group relative flex items-center justify-center p-2 rounded-xl transition-all duration-500"
-              style={{
-                height: "80px",
-                width: "160px",
-              }}
-            >
-              <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl pointer-events-none overflow-hidden"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.02)",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                }}
-              >
-                <div 
-                  className="absolute inset-0 opacity-[0.15] mix-blend-overlay"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                  }}
-                />
-              </div>
-              <div className="relative z-10">
-                <span style={{ fontSize: '16px', fontWeight: '700', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.02em', fontFamily: 'Inter, system-ui, sans-serif' }} className="group-hover:!text-white transition-colors duration-300">Sary</span>
-              </div>
-            </motion.div>
-
-            {/* Brand Logo: Zyda */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="group relative flex items-center justify-center p-2 rounded-xl transition-all duration-500"
-              style={{
-                height: "80px",
-                width: "160px",
-              }}
-            >
-              <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl pointer-events-none overflow-hidden"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.02)",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                }}
-              >
-                <div 
-                  className="absolute inset-0 opacity-[0.15] mix-blend-overlay"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                  }}
-                />
-              </div>
-              <div className="relative z-10">
-                <span style={{ fontSize: '16px', fontWeight: '700', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.02em', fontFamily: 'Inter, system-ui, sans-serif' }} className="group-hover:!text-white transition-colors duration-300">Zyda</span>
-              </div>
-            </motion.div>
-
-            {/* Brand Logo: Hakbah */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="group relative flex items-center justify-center p-2 rounded-xl transition-all duration-500"
-              style={{
-                height: "80px",
-                width: "160px",
-              }}
-            >
-              <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl pointer-events-none overflow-hidden"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.02)",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                }}
-              >
-                <div 
-                  className="absolute inset-0 opacity-[0.15] mix-blend-overlay"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                  }}
-                />
-              </div>
-              <div className="relative z-10">
-                <span style={{ fontSize: '16px', fontWeight: '700', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.02em', fontFamily: 'Inter, system-ui, sans-serif' }} className="group-hover:!text-white transition-colors duration-300">Hakbah</span>
-              </div>
-            </motion.div>
-
-            {/* Brand Logo: Majara */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="group relative flex items-center justify-center p-2 rounded-xl transition-all duration-500"
-              style={{
-                height: "80px",
-                width: "160px",
-              }}
-            >
-              <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl pointer-events-none overflow-hidden"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.02)",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                }}
-              >
-                <div 
-                  className="absolute inset-0 opacity-[0.15] mix-blend-overlay"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                  }}
-                />
-              </div>
-              <div className="relative z-10">
-                <span style={{ fontSize: '16px', fontWeight: '700', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.02em', fontFamily: 'Inter, system-ui, sans-serif' }} className="group-hover:!text-white transition-colors duration-300">Majara</span>
-              </div>
-            </motion.div>
-
-            {/* Brand Logo: Brand Logo */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="group relative flex items-center justify-center p-2 rounded-xl transition-all duration-500"
-              style={{
-                height: "80px",
-                width: "160px",
-              }}
-            >
-              <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl pointer-events-none overflow-hidden"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.02)",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                }}
-              >
-                <div 
-                  className="absolute inset-0 opacity-[0.15] mix-blend-overlay"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                  }}
-                />
-              </div>
-              <div className="relative z-10">
-                <span style={{ fontSize: '16px', fontWeight: '700', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.02em', fontFamily: 'Inter, system-ui, sans-serif' }} className="group-hover:!text-white transition-colors duration-300">Brand Logo</span>
-              </div>
-            </motion.div>
-
-            {/* Brand Logo 12: (unused image_0da921fdc887fcbde9a8c8f7068133a599248cde) */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="group relative flex items-center justify-center p-2 rounded-xl transition-all duration-500"
-              style={{
-                height: "80px",
-                width: "160px",
-              }}
-            >
-              <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl pointer-events-none overflow-hidden"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.02)",
-                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                }}
-              >
-                <div 
-                  className="absolute inset-0 opacity-[0.15] mix-blend-overlay"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                  }}
-                />
-              </div>
-              <div className="relative z-10">
-                <span style={{ fontSize: '16px', fontWeight: '700', color: 'rgba(255,255,255,0.5)', letterSpacing: '-0.02em', fontFamily: 'Inter, system-ui, sans-serif' }} className="group-hover:!text-white transition-colors duration-300">Brand</span>
-              </div>
+              {[...brandLogos, ...brandLogos].map((brand, i) => (
+                <div
+                  key={`${brand.name}-${i}`}
+                  className="group/logo flex-shrink-0 flex items-center justify-center"
+                  style={{ height: '52px', width: '128px' }}
+                  aria-hidden={i >= brandLogos.length ? true : undefined}
+                >
+                  <img
+                    src={brand.src}
+                    alt={i >= brandLogos.length ? '' : brand.name}
+                    loading="lazy"
+                    draggable={false}
+                    style={{
+                      maxHeight: '32px',
+                      maxWidth: '108px',
+                      width: 'auto',
+                      height: 'auto',
+                      objectFit: 'contain',
+                      opacity: 0.55,
+                      filter: 'grayscale(1) brightness(1.9) contrast(0.85)',
+                      transition: 'opacity 400ms ease, filter 400ms ease, transform 400ms ease',
+                    }}
+                    className="group-hover/logo:!opacity-100 group-hover/logo:![filter:none] group-hover/logo:scale-105"
+                  />
+                </div>
+              ))}
             </motion.div>
           </div>
 

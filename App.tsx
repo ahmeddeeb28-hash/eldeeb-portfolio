@@ -5,7 +5,6 @@ import { Features } from './components/Features';
 import { About } from './components/About';
 import { WorkLanguage } from './components/WorkLanguage';
 import { Projects } from './components/Projects';
-import { DesignServices } from './components/DesignServices';
 import { Mentorship } from './components/Mentorship';
 import { BrandsStats } from './components/BrandsStats';
 import { Results } from './components/Results';
@@ -85,7 +84,6 @@ export default function App() {
         <Navigation />
         <PremiumHero />
         <BrandsStats />
-        <DesignServices />
         <Projects onProjectClick={openProject} />
         <About />
         <WorkLanguage />

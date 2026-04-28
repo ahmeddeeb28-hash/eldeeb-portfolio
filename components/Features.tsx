@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { SectionHeader } from './SectionHeader';
 
 /* ────────────────────────────────────────────────────────────────────────
  * FEATURE IMAGES
@@ -44,34 +45,13 @@ export function Features() {
   return (
     <section className="relative w-full min-h-screen flex items-center bg-[#0A0A0A] overflow-hidden py-24 md:py-32">
       <div className="container mx-auto px-10 max-w-[1560px] w-full">
-        {/* Editorial Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-16 md:mb-24 flex flex-col items-center text-center"
-        >
-          <div className="flex items-center gap-4 mb-8 opacity-40">
-            <div className="w-8 h-[1px] bg-[#4AF2E5]" />
-            <span className="text-[#4AF2E5] text-[10px] font-black tracking-[0.5em] uppercase">
-              Leadership Spectrum
-            </span>
-            <div className="w-8 h-[1px] bg-[#4AF2E5]" />
-          </div>
-          
-          <h2 
-            className="uppercase leading-[0.95] tracking-[-0.05em] text-white max-w-4xl"
-            style={{ 
-              fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-              fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
-              fontWeight: '900'
-            }}
-          >
-            Design Leadership<br />
-            Framework.
-          </h2>
-        </motion.div>
+        <SectionHeader
+          eyebrow="Leadership Spectrum"
+          title="A framework for"
+          flourish="design leadership."
+          subtitle="Three disciplines that compound into product outcomes — execution speed, strategic precision, and measurable impact."
+          marginBottom={96}
+        />
 
         {/* Horizontal Scrollable Framework - Explicitly rendered for unique manual overrides */}
         <div 

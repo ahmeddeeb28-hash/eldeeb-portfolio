@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { SectionHeader } from './SectionHeader';
 
 /* ────────────────────────────────────────────────────────────────────────
  * TESTIMONIAL AVATARS
@@ -21,27 +22,13 @@ export function Testimonials() {
   return (
     <section className="bg-[#0A0A0A] py-[88px] overflow-hidden border-t border-white/[0.03]">
       <div className="container mx-auto px-10 max-w-[1560px] min-h-[80vh] flex flex-col justify-center py-24">
-        
-        {/* Editorial Header - Simplified & Quiet */}
-        <div className="mb-20">
-          <div className="flex items-center gap-4 mb-6 opacity-40">
-            <div className="w-8 h-[1px] bg-white" />
-            <span className="text-white text-[10px] font-black tracking-[0.5em] uppercase">
-              Verbatim
-            </span>
-          </div>
-          <h2 
-            className="text-white uppercase leading-[0.95] tracking-[-0.05em]"
-            style={{ 
-              fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-              fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
-              fontWeight: '900'
-            }}
-          >
-            Client Success<br />
-            <span className="text-white/20 italic">Perspective.</span>
-          </h2>
-        </div>
+
+        <SectionHeader
+          eyebrow="Verbatim"
+          title="Client success"
+          flourish="perspective."
+          subtitle="What teams say after shipping work together — unscripted."
+        />
 
         {/* 3-Column Editorial Grid - Fixed 32px Spacing */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
