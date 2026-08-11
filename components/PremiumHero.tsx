@@ -146,7 +146,7 @@ export function PremiumHero() {
             color: '#FFFFFF',
             lineHeight: '1.2',
             textShadow: '0 4px 24px rgba(0, 0, 0, 0.5)',
-            minHeight: '140px',
+            minHeight: '220px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -155,12 +155,30 @@ export function PremiumHero() {
           }}
         >
           {/* Fixed Header - Never Changes */}
-          <span style={{ 
-            opacity: 0.95,
-            fontWeight: '800'
-          }}>
+          <motion.span
+            animate={{
+              opacity: [0.88, 1, 0.88],
+              textShadow: [
+                '0 0 0px rgba(255, 255, 255, 0)',
+                '0 0 28px rgba(255, 200, 160, 0.55)',
+                '0 0 0px rgba(255, 255, 255, 0)'
+              ]
+            }}
+            transition={{
+              duration: 3.2,
+              repeat: Infinity,
+              ease: 'easeInOut'
+            }}
+            style={{
+              display: 'inline-block',
+              fontSize: 'clamp(2.2rem, 5.4vw, 4.4rem)',
+              fontWeight: '900',
+              letterSpacing: '-0.04em',
+              lineHeight: '1.05'
+            }}
+          >
             Leading Product Designer
-          </span>
+          </motion.span>
 
           {/* 3D Rotating Dynamic Text Switcher - Only This Animates */}
           <AnimatePresence mode="wait">

@@ -12,15 +12,14 @@ import { Testimonials } from './components/Testimonials';
 import { ProofOfPresence } from './components/ProofOfPresence';
 import { Articles } from './components/Articles';
 import { Footer } from './components/Footer';
-import { CaseStudyDetail } from './components/CaseStudyDetail';
-import { CASE_STUDIES } from './data/projects';
+import { CASE_STUDY_REGISTRY } from './components/case-studies/registry';
 import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { useRef, useState, useEffect } from 'react';
 
 export default function App() {
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
@@ -51,32 +50,37 @@ export default function App() {
     window.history.back();
   };
 
+  const ActiveCase = activeProjectId ? CASE_STUDY_REGISTRY[activeProjectId] : null;
+  const goToNextCase = () => {
+    if (!activeProjectId) return;
+    const keys = Object.keys(CASE_STUDY_REGISTRY);
+    const currentIndex = keys.indexOf(activeProjectId);
+    const nextKey = keys[(currentIndex + 1) % keys.length];
+    setActiveProjectId(nextKey);
+    window.history.pushState({ project: nextKey }, '');
+  };
+
   return (
     <div ref={containerRef} className="relative min-h-screen bg-[#0A0A0A] selection:bg-[#4AF2E5] selection:text-[#0A0A0A]" style={{ position: 'relative', overflowX: 'clip' }}>
       <AnimatePresence>
-        {activeProjectId && CASE_STUDIES[activeProjectId] && (
-          <CaseStudyDetail 
-            project={CASE_STUDIES[activeProjectId]} 
+        {ActiveCase && (
+          <ActiveCase
+            key={activeProjectId}
             onBack={closeProject}
-            onNext={() => {
-              const keys = Object.keys(CASE_STUDIES);
-              const currentIndex = keys.indexOf(activeProjectId);
-              const nextKey = keys[(currentIndex + 1) % keys.length];
-              openProject(nextKey);
-            }}
+            onNext={goToNextCase}
           />
         )}
       </AnimatePresence>
 
       {/* Dynamic Background Parallax Layers */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <motion.div 
+        <motion.div
           style={{ y: bgY1, rotate: bgRotate }}
-          className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-[#4AF2E5]/[0.02] rounded-full blur-[160px]" 
+          className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-[#4AF2E5]/[0.02] rounded-full blur-[160px]"
         />
-        <motion.div 
+        <motion.div
           style={{ y: bgY2 }}
-          className="absolute top-[40%] -right-[15%] w-[50%] h-[50%] bg-[#4AF2E5]/[0.01] rounded-full blur-[140px]" 
+          className="absolute top-[40%] -right-[15%] w-[50%] h-[50%] bg-[#4AF2E5]/[0.01] rounded-full blur-[140px]"
         />
       </div>
 

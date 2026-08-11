@@ -206,3 +206,10 @@ html {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(74, 242, 229, 0.4);
 }
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

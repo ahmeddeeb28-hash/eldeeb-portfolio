@@ -4,9 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "npm run prefetch && vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prefetch": "npx tsx scripts/prefetch-case-studies.ts",
+    "migrate:sary": "npx tsx scripts/migrate-sary.ts",
+    "studio:dev": "npm --prefix studio run dev",
+    "studio:build": "npm --prefix studio run build",
+    "studio:deploy": "npm --prefix studio run deploy"
   },
   "dependencies": {
     "react": "^19.0.0",
@@ -52,7 +57,9 @@
     "sonner": "^1.7.1",
     "vaul": "^1.1.2",
     "zod": "^3.24.1",
-    "@hookform/resolvers": "^3.9.1"
+    "@hookform/resolvers": "^3.9.1",
+    "@sanity/client": "^6.22.0",
+    "@sanity/image-url": "^1.1.0"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
@@ -61,6 +68,8 @@
     "tailwindcss": "^4.0.0",
     "@tailwindcss/vite": "^4.0.0",
     "typescript": "^5.7.0",
-    "vite": "^6.0.0"
+    "vite": "^6.0.0",
+    "tsx": "^4.19.2",
+    "dotenv": "^16.4.5"
   }
 }
