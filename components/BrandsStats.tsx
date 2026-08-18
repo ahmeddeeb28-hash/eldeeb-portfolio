@@ -59,7 +59,7 @@ export function BrandsStats() {
       className="relative px-6"
       style={{
         background: "#0A0A0A",
-        paddingTop: "0px",
+        paddingTop: "120px",
         paddingBottom: "120px",
       }}
     >

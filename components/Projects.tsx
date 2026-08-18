@@ -18,18 +18,14 @@ const CASE_STUDY_IMAGES = {
   globalPayments:
     'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1200',
 } as const;
+
 import { ArrowUpRight } from 'lucide-react';
-import { motion, useScroll, useTransform } from 'motion/react';
-import { useRef, useState } from 'react';
+import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
+import { useEffect, useRef, useState } from 'react';
 
 interface ProjectsProps {
   onProjectClick?: (id: string) => void;
 }
-
-// Mirrors sayedelmohamady.me case-card sticky stacking pattern
-const NAV_HEIGHT = 72;   // px — nav bar height
-const STACK_OFFSET = 32; // px — each successive card stacks this far lower
-const PEEK_GAP = 140;    // px — space below each card so next card peeks through
 
 const projects = [
   {
@@ -38,16 +34,11 @@ const projects = [
     year: '2024',
     category: 'Fintech / Marketplace',
     title: 'Repeat Purchase Engine for B2B Retail',
-    summary: 'Designed a behavioral loop that turned one-time buyers into repeat customers, increasing reorder rate by 34% across 12K+ merchants.',
-    tags: ['Product Strategy', 'UX Design', 'Behavioral Design'],
-    accentColor: 'rgba(200,140,70,0.8)',
-    accentBorder: 'rgba(200,140,70,0.18)',
-    accentBg: 'rgba(200,140,70,0.07)',
-    contextGlow: {
-      primary: 'radial-gradient(ellipse 90% 70% at 30% 15%, rgba(210,130,55,0.10) 0%, rgba(180,100,40,0.04) 40%, transparent 75%)',
-      secondary: 'radial-gradient(ellipse 70% 50% at 80% 65%, rgba(200,110,45,0.05) 0%, transparent 60%)',
-    },
-    imageGlow: 'radial-gradient(ellipse 70% 55% at 15% 20%, rgba(200,120,50,0.09) 0%, transparent 70%)',
+    summary:
+      'Designed a behavioral loop that turned one-time buyers into repeat customers, lifting reorder rate 34% across 12K+ merchants.',
+    accentColor: 'rgba(200,140,70,0.9)',
+    imageGlow:
+      'radial-gradient(ellipse 70% 55% at 15% 20%, rgba(200,120,50,0.09) 0%, transparent 70%)',
   },
   {
     id: 'health-ladder',
@@ -55,16 +46,11 @@ const projects = [
     year: '2024',
     category: 'Growth',
     title: 'Behavior-Driven Retention Strategy',
-    summary: 'Built a health-scoring framework that identified at-risk users 3 weeks earlier, reducing churn by 22% through targeted intervention flows.',
-    tags: ['Retention', 'Data-Informed UX', 'Growth'],
-    accentColor: 'rgba(190,100,80,0.8)',
-    accentBorder: 'rgba(190,100,80,0.18)',
-    accentBg: 'rgba(190,100,80,0.07)',
-    contextGlow: {
-      primary: 'radial-gradient(ellipse 85% 65% at 25% 20%, rgba(180,70,60,0.09) 0%, rgba(160,60,50,0.03) 45%, transparent 75%)',
-      secondary: 'radial-gradient(ellipse 60% 55% at 70% 70%, rgba(220,120,60,0.05) 0%, transparent 60%)',
-    },
-    imageGlow: 'radial-gradient(ellipse 65% 50% at 80% 70%, rgba(180,80,60,0.08) 0%, transparent 70%)',
+    summary:
+      'Built a health-scoring framework that flagged at-risk users 3 weeks earlier — cutting churn by 22% through targeted intervention flows.',
+    accentColor: 'rgba(190,100,80,0.9)',
+    imageGlow:
+      'radial-gradient(ellipse 65% 50% at 80% 70%, rgba(180,80,60,0.08) 0%, transparent 70%)',
   },
   {
     id: 'shorefield-holidays',
@@ -72,16 +58,11 @@ const projects = [
     year: '2023',
     category: 'SaaS',
     title: 'Lifecycle-Based Upsell System for SaaS',
-    summary: 'Crafted a contextual upsell experience tied to user milestones, driving a 28% lift in plan upgrades without increasing friction.',
-    tags: ['Design System', 'Conversion', 'SaaS'],
-    accentColor: 'rgba(140,110,180,0.8)',
-    accentBorder: 'rgba(140,110,180,0.18)',
-    accentBg: 'rgba(140,110,180,0.07)',
-    contextGlow: {
-      primary: 'radial-gradient(ellipse 80% 70% at 35% 25%, rgba(95,65,130,0.10) 0%, rgba(80,55,110,0.04) 45%, transparent 75%)',
-      secondary: 'radial-gradient(ellipse 65% 50% at 75% 60%, rgba(140,90,160,0.04) 0%, transparent 60%)',
-    },
-    imageGlow: 'radial-gradient(ellipse 60% 55% at 50% 40%, rgba(100,70,120,0.07) 0%, transparent 70%)',
+    summary:
+      'Contextual upsell tied to real user milestones — a 28% lift in plan upgrades without adding a single point of friction.',
+    accentColor: 'rgba(160,125,195,0.9)',
+    imageGlow:
+      'radial-gradient(ellipse 60% 55% at 50% 40%, rgba(100,70,120,0.07) 0%, transparent 70%)',
   },
   {
     id: 'global-payments',
@@ -89,26 +70,62 @@ const projects = [
     year: '2025',
     category: 'Fintech',
     title: 'Frictionless Global Payments Flow',
-    summary: 'Redesigned a cross-border payment experience that reduced drop-off by 41% and brought transaction completion time under 90 seconds.',
-    tags: ['Fintech', 'UX Research', 'Interaction Design'],
-    accentColor: 'rgba(180,130,60,0.8)',
-    accentBorder: 'rgba(180,130,60,0.18)',
-    accentBg: 'rgba(180,130,60,0.07)',
-    contextGlow: {
-      primary: 'radial-gradient(ellipse 85% 75% at 40% 30%, rgba(170,95,40,0.09) 0%, rgba(140,80,35,0.03) 45%, transparent 75%)',
-      secondary: 'radial-gradient(ellipse 55% 60% at 15% 75%, rgba(180,110,50,0.05) 0%, transparent 60%)',
-    },
-    imageGlow: 'radial-gradient(ellipse 70% 60% at 25% 75%, rgba(160,100,40,0.08) 0%, transparent 70%)',
+    summary:
+      'Redesigned a cross-border payment experience — drop-off down 41%, transaction completion under 90 seconds.',
+    accentColor: 'rgba(200,150,80,0.9)',
+    imageGlow:
+      'radial-gradient(ellipse 70% 60% at 25% 75%, rgba(160,100,40,0.08) 0%, transparent 70%)',
   },
 ];
 
+/* ─────────────────────────────────────────────────────────────────────── */
+
 export function Projects({ onProjectClick }: ProjectsProps) {
-  // Refs for the reading spacers between cards — used to drive the dim effect
-  // on the card that's being stacked over by the next one.
-  const spacerRef0 = useRef<HTMLDivElement>(null);
-  const spacerRef1 = useRef<HTMLDivElement>(null);
-  const spacerRef2 = useRef<HTMLDivElement>(null);
-  const spacerRefs = [spacerRef0, spacerRef1, spacerRef2];
+  const rowRefs = useRef<Array<HTMLElement | null>>([]);
+  const stackRef = useRef<HTMLDivElement | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const reduced = useReducedMotion();
+
+  /*
+    Active-project tracking via IntersectionObserver — the "active zone"
+    is a thin horizontal band sitting ~40% from the top of the viewport
+    (the "central area" per spec). Whichever row's box intersects that
+    band is the current focus.
+  */
+  useEffect(() => {
+    const rows = rowRefs.current.filter(Boolean) as HTMLElement[];
+    if (rows.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const idx = rows.indexOf(entry.target as HTMLElement);
+            if (idx >= 0) setActiveIndex(idx);
+          }
+        });
+      },
+      {
+        // Active band ≈ middle 20% of viewport (central area).
+        rootMargin: '-40% 0px -40% 0px',
+        threshold: [0, 0.01, 0.5, 1],
+      }
+    );
+
+    rows.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  /*
+    Whole-stack scroll progress (0 → 1 across the entire projects
+    stack). Drives the sticky rail's progressive teal fill line —
+    smooth, continuous, no scroll-hijacking.
+  */
+  const { scrollYProgress: stackProgress } = useScroll({
+    target: stackRef,
+    offset: ['start 65%', 'end 35%'],
+  });
+  const railFillScaleY = useTransform(stackProgress, [0, 1], [0, 1]);
 
   return (
     <section
@@ -124,32 +141,24 @@ export function Projects({ onProjectClick }: ProjectsProps) {
           left: 0,
           right: 0,
           height: '120px',
-          background: 'linear-gradient(to bottom, rgba(10,10,10,0.6) 0%, transparent 100%)',
+          background:
+            'linear-gradient(to bottom, rgba(10,10,10,0.6) 0%, transparent 100%)',
         }}
       />
 
-      {/* ── DISTINGUISHED CASE STUDIES HEADER ─────────────────────────────
-         Intentionally unique vs. unified SectionHeader used elsewhere:
-         • Pill-style eyebrow carrying the case count
-         • Oversized display title with multi-color gradient flourish
-           that draws from the project accent palette (amber → gold → teal)
-         • Layered dual-glow backdrop (warm amber + signature teal)
-         • Single pulsing accent dot closer (no twin-rule flanking)
-         ──────────────────────────────────────────────────────────────── */}
+      {/* ── SECTION HEADER ─────────────────────────────────────────────── */}
       <div
         style={{
           maxWidth: '1120px',
-          margin: '0 auto',
+          margin: '0 auto 96px',
           padding: '0 24px',
-          marginBottom: '96px',
           textAlign: 'center',
           position: 'relative',
         }}
       >
-        {/* Layered dual radial glow — amber + teal */}
         <motion.div
           aria-hidden="true"
-          initial={{ opacity: 0, scale: 0.85 }}
+          initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
@@ -158,13 +167,12 @@ export function Projects({ onProjectClick }: ProjectsProps) {
             inset: '-60px -40px',
             pointerEvents: 'none',
             background:
-              'radial-gradient(ellipse 42% 70% at 28% 55%, rgba(200,140,70,0.13) 0%, transparent 65%), radial-gradient(ellipse 42% 70% at 72% 55%, rgba(74,242,229,0.11) 0%, transparent 65%)',
+              'radial-gradient(ellipse 42% 70% at 28% 55%, rgba(200,140,70,0.09) 0%, transparent 65%), radial-gradient(ellipse 42% 70% at 72% 55%, rgba(74,242,229,0.08) 0%, transparent 65%)',
             filter: 'blur(4px)',
             zIndex: 0,
           }}
         />
 
-        {/* Pill eyebrow — case count + label, with warm border */}
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -178,7 +186,7 @@ export function Projects({ onProjectClick }: ProjectsProps) {
             borderRadius: '100px',
             border: '1px solid rgba(200,140,70,0.22)',
             background:
-              'linear-gradient(90deg, rgba(200,140,70,0.06) 0%, rgba(74,242,229,0.05) 100%)',
+              'linear-gradient(90deg, rgba(200,140,70,0.05) 0%, rgba(74,242,229,0.04) 100%)',
             backdropFilter: 'blur(10px)',
             marginBottom: '32px',
             position: 'relative',
@@ -190,7 +198,7 @@ export function Projects({ onProjectClick }: ProjectsProps) {
               fontSize: '10px',
               fontWeight: 700,
               letterSpacing: '0.32em',
-              textTransform: 'uppercase' as const,
+              textTransform: 'uppercase',
               color: 'rgba(228,184,120,0.9)',
               fontFamily: 'Inter, system-ui, sans-serif',
             }}
@@ -210,7 +218,7 @@ export function Projects({ onProjectClick }: ProjectsProps) {
               fontSize: '10px',
               fontWeight: 700,
               letterSpacing: '0.32em',
-              textTransform: 'uppercase' as const,
+              textTransform: 'uppercase',
               color: 'rgba(255,255,255,0.78)',
               fontFamily: 'Inter, system-ui, sans-serif',
             }}
@@ -219,19 +227,18 @@ export function Projects({ onProjectClick }: ProjectsProps) {
           </span>
         </motion.div>
 
-        {/* Oversized title + vibrant italic flourish */}
         <motion.h2
-          initial={{ opacity: 0, y: 28 }}
+          initial={{ opacity: 0, y: 26 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 1.0, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1.0, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           style={{
-            fontSize: 'clamp(48px, 7vw, 88px)',
+            fontSize: 'clamp(44px, 6.4vw, 80px)',
             fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
             fontWeight: 800,
             letterSpacing: '-0.045em',
             lineHeight: 1.0,
-            margin: '0 0 22px 0',
+            margin: '0 0 20px 0',
             textAlign: 'center',
             position: 'relative',
             zIndex: 1,
@@ -265,18 +272,17 @@ export function Projects({ onProjectClick }: ProjectsProps) {
           </span>
         </motion.h2>
 
-        {/* Subtitle — slightly larger than unified sections for hierarchy */}
         <motion.p
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.9, delay: 0.22, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           style={{
             fontSize: '15px',
             lineHeight: 1.65,
             color: 'rgba(255,255,255,0.56)',
-            maxWidth: '580px',
-            margin: '0 auto 30px',
+            maxWidth: '560px',
+            margin: '0 auto',
             textAlign: 'center',
             fontFamily: 'Inter, system-ui, sans-serif',
             position: 'relative',
@@ -286,555 +292,511 @@ export function Projects({ onProjectClick }: ProjectsProps) {
           A consistent methodology applied across fintech, SaaS, and B2B
           marketplaces — strategy that ships.
         </motion.p>
-
-        {/* Single pulsing accent dot — signature closer (no flanking rules) */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            position: 'relative',
-            zIndex: 1,
-          }}
-        >
-          <motion.span
-            animate={{
-              boxShadow: [
-                '0 0 14px rgba(74,242,229,0.55)',
-                '0 0 22px rgba(74,242,229,0.85)',
-                '0 0 14px rgba(74,242,229,0.55)',
-              ],
-            }}
-            transition={{
-              duration: 2.4,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-            style={{
-              width: '6px',
-              height: '6px',
-              borderRadius: '9999px',
-              background: '#4AF2E5',
-              display: 'inline-block',
-            }}
-          />
-        </motion.div>
       </div>
 
-      {/*
-        ── Single sticky-stacking container ──────────────────────────────────
-        All cards live here as sticky siblings with cascading top offsets and
-        z-indices, exactly like sayedelmohamady.me's .case-card-sticky-wrap.
-        Reading spacers between cards give each card dwell time before the
-        next one slides in from below.
-      */}
+      {/* ── PROJECTS STACK ──────────────────────────────────────────────
+         Sticky timeline rail (left) sits beside the content column of
+         project rows (right). The rail's teal fill line progresses as
+         the whole section scrolls; year+node markers highlight when
+         their project enters the central active band. Each row still
+         has its own big inline year + hairline rule + category label
+         header, and its own subtle image parallax so the scroll reads
+         continuous — not snapped.
+         ────────────────────────────────────────────────────────────────── */}
       <div
+        ref={stackRef}
+        className="relative mx-auto flex flex-col"
         style={{
-          maxWidth: '960px',
-          margin: '0 auto',
-          padding: '0 24px',
-          position: 'relative',
-          paddingBottom: '120px',
+          maxWidth: 1240,
+          padding: '0 24px 120px',
         }}
       >
-        {projects.map((project, i) => (
-          // Fragment — cards and spacers must be DIRECT siblings in this container.
-          // If each card is wrapped in its own div, that div becomes the sticky
-          // constraint and cards cannot be simultaneously sticky.
-          <div key={project.id} style={{ display: 'contents' }}>
-            <StackCard
-              project={project}
-              index={i}
-              total={projects.length}
-              onClick={() => onProjectClick?.(project.id)}
-              nextSpacerRef={i < projects.length - 1 ? spacerRefs[i] : null}
-            />
-            {/* Reading space: card is sticky while we scroll through this */}
-            {i < projects.length - 1 && (
-              <div ref={spacerRefs[i]} style={{ height: '85vh' }} />
-            )}
-          </div>
-        ))}
+        {/* ── CONNECTING RAIL — continuous, spans the whole stack ────
+           A single grey hairline runs top-to-bottom behind every rail
+           marker, so the years read as one connected timeline instead
+           of four disconnected labels. The teal fill scales down the
+           same line, driven by the whole-stack scroll progress — so
+           the fill grows naturally as you move through the section
+           and never leaves a gap between markers.
+           ────────────────────────────────────────────────────────────── */}
+        <div
+          aria-hidden
+          className="hidden md:block"
+          style={{
+            position: 'absolute',
+            left: 24 + 5, // outer padding (24) + dot half-width offset
+            top: 4,
+            bottom: 124, // clears the section's bottom padding
+            width: 1,
+            background: 'rgba(255,255,255,0.08)',
+            pointerEvents: 'none',
+          }}
+        />
+        <motion.div
+          aria-hidden
+          className="hidden md:block"
+          style={{
+            position: 'absolute',
+            left: 24 + 5,
+            top: 4,
+            bottom: 124,
+            width: 1,
+            background:
+              'linear-gradient(180deg, rgba(74,242,229,0.85) 0%, rgba(74,242,229,0.55) 45%, rgba(200,140,70,0.35) 100%)',
+            transformOrigin: 'top',
+            scaleY: reduced ? 1 : railFillScaleY,
+            boxShadow: '0 0 12px rgba(74,242,229,0.35)',
+            pointerEvents: 'none',
+          }}
+        />
+
+        {/* ── PROJECT ROWS: each row is its OWN two-column flex ────────
+           Ben Shih's rail pattern relies on each sticky year label being
+           bounded by ITS project's row — not one big shared container.
+           That's why we render one per-project row here, each a flex row
+           with [sticky marker | content]. The sticky element's containing
+           block is this row, so the year pins at top:96 for exactly as
+           long as its project is scrolling past, then hands off cleanly
+           to the next row's year. The continuous grey line + progressive
+           teal fill above are still absolute-positioned over the stack,
+           so the rail visually reads as one line the entire way down.
+           ────────────────────────────────────────────────────────────── */}
+        {projects.map((p, i) => {
+          const isRailActive = activeIndex === i;
+          const rowMarginTop = i === 0 ? 0 : 128;
+          return (
+            <div
+              key={p.id}
+              className="flex flex-col md:flex-row"
+              style={{
+                marginTop: rowMarginTop,
+                columnGap: 36,
+                alignItems: 'flex-start',
+              }}
+            >
+              {/* Rail marker cell — STICKY, bounded by this row.
+                 As the reader scrolls into this project the year pins at
+                 top:96; when the row's bottom passes the sticky point it
+                 releases and the next project's year begins its own
+                 journey. This is the exact Ben Shih pattern. */}
+              <div
+                className="hidden md:flex"
+                style={{
+                  flex: '0 0 120px',
+                  alignSelf: 'flex-start',
+                  alignItems: 'center',
+                  gap: 18,
+                  // No marginLeft — cell starts flush with the section
+                  // padding-left (24px). Dot is 11px wide → its centre lands
+                  // at 24 + 5.5 = 29.5px, which is exactly the centre of the
+                  // 1px vertical line at left:29. Pixel-perfect handshake.
+                  paddingTop: 4,
+                  position: 'sticky',
+                  top: 96, // clears the ~80px nav + a little breathing room
+                  zIndex: 2,
+                }}
+              >
+                {/* Node dot — a filled teal disc when the row is active,
+                   a hollow ring when idle. Same 11px footprint in either
+                   state so the vertical line threads cleanly through
+                   every node (no bounce, no size shift, no drift). */}
+                <motion.span
+                  aria-hidden
+                  initial={false}
+                  animate={{
+                    backgroundColor: isRailActive
+                      ? '#4AF2E5'
+                      : '#0A0A0A', // sit on top of the line
+                    borderColor: isRailActive
+                      ? '#4AF2E5'
+                      : 'rgba(255,255,255,0.55)',
+                    boxShadow: isRailActive
+                      ? '0 0 0 4px rgba(74,242,229,0.16), 0 0 18px rgba(74,242,229,0.55)'
+                      : '0 0 0 0 rgba(74,242,229,0)',
+                  }}
+                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  style={{
+                    display: 'inline-block',
+                    width: 11,
+                    height: 11,
+                    borderRadius: '50%',
+                    border: '1.5px solid rgba(255,255,255,0.55)',
+                    backgroundColor: '#0A0A0A',
+                    boxSizing: 'border-box',
+                    flexShrink: 0,
+                  }}
+                />
+                {/* Year label — Fraunces display cut at weight 900 with
+                   'opsz' 60 optical sizing for editorial dateline gravitas
+                   that matches the site's serif wordmark on the dark
+                   canvas. Tabular numerics keep the column of digits
+                   aligned down the rail. */}
+                <motion.span
+                  initial={false}
+                  animate={{
+                    color: isRailActive
+                      ? 'rgba(255,255,255,0.98)'
+                      : 'rgba(255,255,255,0.42)',
+                    fontSize: isRailActive ? 34 : 30,
+                  }}
+                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  style={{
+                    fontFamily:
+                      "'Fraunces', 'Times New Roman', Georgia, serif",
+                    fontFeatureSettings: '"tnum" 1, "lnum" 1',
+                    fontVariationSettings: "'opsz' 60, 'SOFT' 0",
+                    fontStyle: 'normal',
+                    fontWeight: 900,
+                    fontSize: 30,
+                    letterSpacing: '-0.035em',
+                    lineHeight: 1,
+                    color: 'rgba(255,255,255,0.42)',
+                    display: 'inline-block',
+                  }}
+                >
+                  {p.year}
+                </motion.span>
+              </div>
+
+              {/* Content cell — the project itself. Flex-1 so it fills the
+                 remaining width of this row's two-column layout. */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <ProjectRow
+                  project={p}
+                  index={i}
+                  isActive={activeIndex === i}
+                  reduced={!!reduced}
+                  onClick={
+                    onProjectClick ? () => onProjectClick(p.id) : undefined
+                  }
+                  rowRef={(el) => (rowRefs.current[i] = el)}
+                />
+              </div>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
 }
 
-interface StackCardProps {
+/* ── PROJECT ROW ────────────────────────────────────────────────────────
+   A single project moment. Reveals with opacity + subtle rise on entry
+   (unless reduced-motion), dims to ~0.48 when not the active focus.
+   ─────────────────────────────────────────────────────────────────────── */
+
+interface ProjectRowProps {
   project: (typeof projects)[number];
   index: number;
-  total: number;
-  onClick: () => void;
-  nextSpacerRef: React.RefObject<HTMLDivElement> | null;
+  isActive: boolean;
+  reduced: boolean;
+  onClick?: () => void;
+  rowRef: (el: HTMLElement | null) => void;
 }
 
-function StackCard({ project, index, total, onClick, nextSpacerRef }: StackCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
-  const isLast = index === total - 1;
-
-  const stickyTop = NAV_HEIGHT + index * STACK_OFFSET;
-  // Card height leaves PEEK_GAP px below so the next card's header is visible
-  const cardHeight = `calc(100dvh - ${stickyTop + PEEK_GAP}px)`;
+function ProjectRow({
+  project,
+  index,
+  isActive,
+  reduced,
+  onClick,
+  rowRef,
+}: ProjectRowProps) {
+  // Inter-project spacing now lives on the outer per-row flex wrapper in
+  // Projects.tsx (so the sticky rail marker's containing block matches
+  // the project's own row bounds). ProjectRow stays flush at 0 here.
 
   /*
-    Track the reading spacer AFTER this card (when it exists).
-    As the spacer scrolls through the viewport, the next card slides from
-    below. We use this to dim & slightly scale this card down — reinforcing
-    the "stacked under" feel.
-
-    offset: 'start end' → spacer top hits viewport bottom (next card entering)
-            'end end'   → spacer bottom hits viewport bottom (next card near sticky)
-
-    NOTE: transforms are applied to an inner wrapper, NOT the sticky element
-    itself. Applying will-change:transform to a sticky element creates a new
-    stacking context that breaks position:sticky in Chrome/Safari.
+    Per-row scroll-linked progress (0 → 1 as the row travels from
+    entering the viewport bottom to leaving the top). Drives the
+    image parallax and a subtle upward year-rise on entry, so the
+    scroll motion reads continuous — not snapped or hijacked.
   */
+  const localRef = useRef<HTMLElement | null>(null);
+  const setRefs = (el: HTMLElement | null) => {
+    localRef.current = el;
+    rowRef(el);
+  };
   const { scrollYProgress } = useScroll({
-    target: isLast ? undefined : (nextSpacerRef ?? undefined),
-    offset: ['start end', 'end end'],
+    target: localRef,
+    offset: ['start end', 'end start'],
   });
-
-  const scale = useTransform(
+  const imageParallaxY = useTransform(
     scrollYProgress,
     [0, 1],
-    isLast ? [1, 1] : [1, 0.96]
+    reduced ? [0, 0] : [46, -46]
   );
-  const brightness = useTransform(
-    scrollYProgress,
-    [0, 1],
-    isLast ? [1, 1] : [1, 0.58]
-  );
-  const filterStyle = useTransform(brightness, (b) => `brightness(${b})`);
 
   return (
-    /*
-      Pure sticky positioner — NO transforms here.
-      will-change:transform on the sticky element breaks sticky in browsers.
-    */
-    <div
+    <motion.article
+      ref={setRefs}
       style={{
-        position: 'sticky',
-        top: `${stickyTop}px`,
-        zIndex: index + 1,
-        height: cardHeight,
+        /*
+          Content defines row height — no viewport min-height, so the
+          sticky year marker (in the sibling cell of this row) has a
+          natural travel window equal to this project's content height.
+        */
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        paddingTop: 4,
       }}
     >
-      {/* Transform wrapper — scale/dim live here, safely inside the sticky div */}
       <motion.div
-        style={{
-          scale,
-          filter: filterStyle,
-          transformOrigin: 'center top',
-          height: '100%',
-        }}
+        initial={reduced ? false : { opacity: 0, y: 30 }}
+        whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-12% 0px -8% 0px' }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
       >
-        {/* Card shell */}
+        {/* ── CONTENT: TEXT LEFT · IMAGE RIGHT ─────────────────────────
+           Two-column on desktop; single column stack on mobile. Inner
+           focus wrapper gently dims to 0.55 when not active — the
+           previous project remains readable, not hidden. The year now
+           lives only in the sticky rail; a quiet category kicker sits
+           above the title as the sole project-level meta line here.
+           ────────────────────────────────────────────────────────────── */}
         <motion.div
-          onClick={onClick}
-          onHoverStart={() => setIsHovered(true)}
-          onHoverEnd={() => setIsHovered(false)}
-          animate={{
-            boxShadow: isHovered
-              ? '0 40px 100px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.10)'
-              : '0 16px 48px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05)',
-            y: isHovered ? -6 : 0,
-          }}
-          transition={{ duration: 0.45, ease: [0.33, 1.35, 0.48, 1] }}
-          style={{
-            height: '100%',
-            borderRadius: '20px',
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            cursor: 'pointer',
-            background: 'linear-gradient(160deg, rgba(22,20,18,1) 0%, rgba(13,12,11,1) 100%)',
-            position: 'relative',
-          }}
+          animate={{ opacity: reduced ? 1 : isActive ? 1 : 0.55 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]"
+          style={{ columnGap: 72, rowGap: 40 }}
         >
-          {/* ── Shimmer sweep on hover ────────────────────────────────── */}
-          <motion.div
-            animate={{
-              backgroundPosition: isHovered ? '-40% 0' : '130% 0',
-              opacity: isHovered ? 1 : 0,
-            }}
-            transition={{ duration: 0.75, ease: 'easeInOut' }}
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background:
-                'linear-gradient(105deg, transparent 25%, rgba(255,255,255,0.055) 50%, transparent 75%)',
-              backgroundSize: '250% 100%',
-              backgroundRepeat: 'no-repeat',
-              pointerEvents: 'none',
-              zIndex: 20,
-              borderRadius: '20px',
-            }}
-          />
-
-          {/* ── Visual mesh noise overlay ─────────────────────────────── */}
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              opacity: 0.12,
-              mixBlendMode: 'soft-light' as const,
-              pointerEvents: 'none',
-              zIndex: 19,
-              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' /%3E%3C/svg%3E")`,
-              backgroundSize: '180px 180px',
-            }}
-          />
-
-          {/* ── Content zone ─────────────────────────────────────────── */}
-          <div
-            style={{
-              flexShrink: 0,
-              height: '260px',
-              padding: '28px 36px 20px',
-              position: 'relative',
-              overflow: 'hidden',
-            }}
-          >
-            {/* Project color atmospheres */}
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background: project.contextGlow.primary,
-                pointerEvents: 'none',
-              }}
-            />
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background: project.contextGlow.secondary,
-                pointerEvents: 'none',
-              }}
-            />
-
-            {/* Hover glow boost */}
+          {/* Left — text block */}
+          <div>
+            {/* Category kicker — small, quiet, sits above the title as the
+               sole meta line (the year lives in the rail now). */}
             <motion.div
-              animate={{ opacity: isHovered ? 1 : 0 }}
-              transition={{ duration: 0.5 }}
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background: project.contextGlow.primary
-                  .replace('0.10)', '0.18)')
-                  .replace('0.09)', '0.17)'),
-                pointerEvents: 'none',
+              aria-hidden
+              animate={{
+                color: isActive
+                  ? project.accentColor
+                  : 'rgba(255,255,255,0.36)',
               }}
-            />
-
-            {/* Decorative ghost index number */}
-            <div
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               style={{
-                position: 'absolute',
-                top: '-12px',
-                right: '28px',
-                fontSize: '140px',
-                fontWeight: '900',
-                fontFamily: 'Inter, system-ui, sans-serif',
-                color: 'rgba(255,255,255,0.028)',
-                lineHeight: 1,
-                letterSpacing: '-0.06em',
-                pointerEvents: 'none',
-                userSelect: 'none',
-              }}
-            >
-              {(index + 1).toString().padStart(2, '0')}
-            </div>
-
-            {/* Bottom fade into image */}
-            <div
-              style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: '40px',
-                background: 'linear-gradient(to bottom, transparent, rgba(10,10,10,0.5))',
-                pointerEvents: 'none',
-              }}
-            />
-
-            {/* Inner border */}
-            <div
-              style={{
-                position: 'absolute',
-                inset: '4px',
-                borderRadius: '16px',
-                border: '1px solid rgba(255,255,255,0.032)',
-                pointerEvents: 'none',
-              }}
-            />
-
-            {/* Content */}
-            <div
-              style={{
-                position: 'relative',
-                zIndex: 2,
-                height: '100%',
                 display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: 12,
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: '0.32em',
+                textTransform: 'uppercase',
+                fontFamily: 'Inter, system-ui, sans-serif',
+                margin: '0 0 22px 0',
               }}
             >
-              {/* Meta row */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
+              <motion.span
+                aria-hidden
+                animate={{
+                  width: isActive ? 28 : 14,
+                  background: isActive
+                    ? project.accentColor
+                    : 'rgba(255,255,255,0.22)',
                 }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <motion.div
-                    animate={{ width: isHovered ? '22px' : '14px' }}
-                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                    style={{ height: '1px', background: project.accentColor }}
-                  />
-                  <span
-                    style={{
-                      fontSize: '10px',
-                      fontWeight: '700',
-                      letterSpacing: '0.14em',
-                      textTransform: 'uppercase' as const,
-                      color: project.accentColor,
-                      fontFamily: 'Inter, system-ui, sans-serif',
-                    }}
-                  >
-                    {project.year}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: '10px',
-                      color: 'rgba(255,255,255,0.18)',
-                      fontWeight: '400',
-                    }}
-                  >
-                    ·
-                  </span>
-                  <span
-                    style={{
-                      fontSize: '10px',
-                      fontWeight: '500',
-                      letterSpacing: '0.1em',
-                      textTransform: 'uppercase' as const,
-                      color: 'rgba(255,255,255,0.30)',
-                      fontFamily: 'Inter, system-ui, sans-serif',
-                    }}
-                  >
-                    {project.category}
-                  </span>
-                </div>
-                <span
-                  style={{
-                    fontSize: '10px',
-                    fontWeight: '600',
-                    color: 'rgba(255,255,255,0.12)',
-                    fontFamily: 'Inter, system-ui, sans-serif',
-                    letterSpacing: '0.04em',
-                  }}
-                >
-                  {(index + 1).toString().padStart(2, '0')}&thinsp;/&thinsp;
-                  {total.toString().padStart(2, '0')}
-                </span>
-              </div>
-
-              {/* Title + Summary */}
-              <div>
-                <motion.h3
-                  animate={{ color: isHovered ? '#FFFFFF' : 'rgba(255,255,255,0.92)' }}
-                  transition={{ duration: 0.4 }}
-                  style={{
-                    fontSize: 'clamp(22px, 2.4vw, 32px)',
-                    fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-                    fontWeight: '700',
-                    lineHeight: '1.15',
-                    letterSpacing: '-0.03em',
-                    margin: '0 0 10px 0',
-                  }}
-                >
-                  {project.title}
-                </motion.h3>
-                <p
-                  style={{
-                    fontSize: '14px',
-                    lineHeight: '1.68',
-                    color: 'rgba(255,255,255,0.37)',
-                    fontWeight: '400',
-                    maxWidth: '600px',
-                    margin: 0,
-                    fontFamily: 'Inter, system-ui, sans-serif',
-                  }}
-                >
-                  {project.summary}
-                </p>
-              </div>
-
-              {/* Tags + CTA */}
-              <div
+                transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '12px',
+                  display: 'inline-block',
+                  height: 1,
+                  flexShrink: 0,
                 }}
-              >
-                <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: '6px' }}>
-                  {project.tags.map((tag) => (
-                    <motion.span
-                      key={tag}
-                      animate={{
-                        color: isHovered ? project.accentColor : 'rgba(255,255,255,0.28)',
-                        borderColor: isHovered
-                          ? project.accentBorder
-                          : 'rgba(255,255,255,0.07)',
-                        background: isHovered
-                          ? project.accentBg
-                          : 'rgba(255,255,255,0.025)',
-                      }}
-                      transition={{ duration: 0.4 }}
-                      style={{
-                        fontSize: '9px',
-                        fontWeight: '600',
-                        letterSpacing: '0.1em',
-                        textTransform: 'uppercase' as const,
-                        padding: '4px 12px',
-                        borderRadius: '100px',
-                        border: '1px solid',
-                        fontFamily: 'Inter, system-ui, sans-serif',
-                      }}
-                    >
-                      {tag}
-                    </motion.span>
-                  ))}
-                </div>
+              />
+              <span>{project.category}</span>
+            </motion.div>
 
-                {/* CTA */}
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    flexShrink: 0,
-                  }}
-                >
-                  <motion.span
-                    animate={{
-                      color: isHovered ? project.accentColor : 'rgba(255,255,255,0.35)',
-                    }}
-                    transition={{ duration: 0.4 }}
-                    style={{
-                      fontSize: '10px',
-                      fontWeight: '600',
-                      letterSpacing: '0.12em',
-                      textTransform: 'uppercase' as const,
-                      fontFamily: 'Inter, system-ui, sans-serif',
-                      whiteSpace: 'nowrap' as const,
-                    }}
-                  >
-                    View Case Study
-                  </motion.span>
-                  <motion.div
-                    animate={{
-                      background: isHovered
-                        ? project.accentBg
-                        : 'rgba(255,255,255,0.04)',
-                      borderColor: isHovered
-                        ? project.accentBorder
-                        : 'rgba(255,255,255,0.08)',
-                    }}
-                    transition={{ duration: 0.4 }}
-                    style={{
-                      width: '30px',
-                      height: '30px',
-                      borderRadius: '50%',
-                      border: '1px solid',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <ArrowUpRight
-                      style={{
-                        width: 13,
-                        height: 13,
-                        color: isHovered
-                          ? project.accentColor
-                          : 'rgba(255,255,255,0.35)',
-                        transition: 'color 0.4s',
-                      }}
-                    />
-                  </motion.div>
-                </div>
-              </div>
-            </div>
+            <h3
+              style={{
+                fontSize: 'clamp(32px, 3.8vw, 52px)',
+                fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+                fontWeight: 700,
+                letterSpacing: '-0.035em',
+                lineHeight: 1.06,
+                margin: '0 0 22px 0',
+                color: 'rgba(255,255,255,0.97)',
+                maxWidth: 540,
+              }}
+            >
+              {project.title}
+            </h3>
+
+            <p
+              style={{
+                fontSize: 16,
+                lineHeight: 1.62,
+                color: 'rgba(255,255,255,0.6)',
+                maxWidth: 520,
+                margin: '0 0 34px 0',
+                fontFamily: 'Inter, system-ui, sans-serif',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
+            >
+              {project.summary}
+            </p>
+
+            {onClick && (
+              <ProjectCTA
+                project={project}
+                isActive={isActive}
+                onClick={onClick}
+              />
+            )}
           </div>
 
-          {/* ── Image zone ───────────────────────────────────────────── */}
-          <div style={{ flex: '1 1 0', position: 'relative', overflow: 'hidden' }}>
+          {/* Right — 16:9 image, minimal corners, restrained glow */}
+          <div
+            style={{
+              position: 'relative',
+              width: '100%',
+              aspectRatio: '16 / 9',
+              overflow: 'hidden',
+              borderRadius: 4,
+              background: 'rgba(255,255,255,0.02)',
+              boxShadow: isActive
+                ? '0 32px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.05)'
+                : '0 16px 44px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.04)',
+              transition: 'box-shadow 0.6s ease',
+            }}
+          >
             <motion.img
               src={project.image}
               alt={project.title}
-              animate={{
-                scale: isHovered ? 1.04 : 1,
-                filter: isHovered ? 'brightness(0.9)' : 'brightness(0.82)',
-              }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              loading="lazy"
               style={{
                 position: 'absolute',
-                inset: 0,
+                inset: '-8% 0',
                 width: '100%',
-                height: '100%',
+                height: '116%',
                 objectFit: 'cover',
+                filter: isActive ? 'brightness(0.94)' : 'brightness(0.82)',
+                transition: 'filter 0.6s ease',
+                y: imageParallaxY,
+                willChange: 'transform',
               }}
             />
 
-            {/* Top gradient bleed */}
+            {/* Soft project-tinted bloom */}
             <div
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '72px',
-                background: 'linear-gradient(to bottom, rgba(10,10,10,0.72), transparent)',
-                pointerEvents: 'none',
-              }}
-            />
-
-            {/* Project color bloom over image */}
-            <div
+              aria-hidden
               style={{
                 position: 'absolute',
                 inset: 0,
                 background: project.imageGlow,
-                mixBlendMode: 'soft-light' as const,
+                mixBlendMode: 'soft-light',
                 pointerEvents: 'none',
               }}
             />
 
-            {/* Grain texture */}
+            {/* Subtle vertical vignette */}
             <div
+              aria-hidden
               style={{
                 position: 'absolute',
                 inset: 0,
-                opacity: 0.018,
-                mixBlendMode: 'overlay' as const,
+                background:
+                  'linear-gradient(180deg, rgba(10,10,10,0.28) 0%, transparent 22%, transparent 78%, rgba(10,10,10,0.28) 100%)',
                 pointerEvents: 'none',
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' /%3E%3C/svg%3E")`,
               }}
             />
           </div>
         </motion.div>
       </motion.div>
-    </div>
+    </motion.article>
+  );
+}
+
+/* ── PROJECT CTA ───────────────────────────────────────────────────────
+   A single, semantic button. Text underline animates on hover; arrow
+   circle brightens to project accent.
+   ─────────────────────────────────────────────────────────────────────── */
+
+function ProjectCTA({
+  project,
+  isActive,
+  onClick,
+}: {
+  project: (typeof projects)[number];
+  isActive: boolean;
+  onClick: () => void;
+}) {
+  const [hover, setHover] = useState(false);
+  const accent = project.accentColor;
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
+      style={{
+        appearance: 'none',
+        background: 'transparent',
+        border: 'none',
+        padding: 0,
+        cursor: 'pointer',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 14,
+        fontFamily: 'Inter, system-ui, sans-serif',
+      }}
+      aria-label={`View case study — ${project.title}`}
+    >
+      <span
+        style={{
+          position: 'relative',
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: '0.22em',
+          textTransform: 'uppercase',
+          color:
+            hover || isActive ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.55)',
+          transition: 'color 0.35s ease',
+        }}
+      >
+        View case study
+        <motion.span
+          aria-hidden
+          animate={{ scaleX: hover ? 1 : 0.35 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: -6,
+            height: 1,
+            background: accent,
+            transformOrigin: 'left',
+            opacity: hover ? 1 : 0.55,
+          }}
+        />
+      </span>
+      <motion.span
+        aria-hidden
+        animate={{
+          background: hover ? accent : 'rgba(255,255,255,0.04)',
+          borderColor: hover ? accent : 'rgba(255,255,255,0.14)',
+          x: hover ? 2 : 0,
+        }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: '50%',
+          border: '1px solid',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <ArrowUpRight
+          size={14}
+          color={hover ? '#0A0A0A' : 'rgba(255,255,255,0.65)'}
+          style={{ transition: 'color 0.35s ease' }}
+        />
+      </motion.span>
+    </button>
   );
 }

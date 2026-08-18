@@ -1,8 +1,14 @@
 import { useState, useEffect } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { Mail, Linkedin } from 'lucide-react';
 import { motion } from 'motion/react';
 
-export function Navigation() {
+const LINKEDIN_URL = 'https://www.linkedin.com/in/el-deeb-39032b131/';
+
+interface NavigationProps {
+  onOpenAboutPage?: () => void;
+}
+
+export function Navigation({ onOpenAboutPage }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -21,9 +27,9 @@ export function Navigation() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navItems = [
+  const navItems: { label: string; href?: string; onClick?: () => void }[] = [
     { label: 'Work', href: '#work' },
-    { label: 'About', href: '#about' },
+    { label: 'About', onClick: onOpenAboutPage },
     { label: 'Services', href: '#services' },
     { label: 'Mentorship', href: '#mentorship' },
     { label: 'Articles', href: '#articles' },
@@ -41,42 +47,147 @@ export function Navigation() {
         style={{
           borderRadius: '9999px',
           padding: '10px 10px 10px 22px',
-          backdropFilter: isScrolled ? 'blur(28px)' : 'blur(16px)',
-          WebkitBackdropFilter: isScrolled ? 'blur(28px)' : 'blur(16px)',
-          background: isScrolled ? 'rgba(10,10,10,0.85)' : 'rgba(10,10,10,0.55)',
-          border: isScrolled ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.06)',
-          boxShadow: isScrolled ? '0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)' : '0 4px 24px rgba(0,0,0,0.3)',
+          backdropFilter: isScrolled ? 'blur(28px)' : 'blur(18px)',
+          WebkitBackdropFilter: isScrolled ? 'blur(28px)' : 'blur(18px)',
+          background: isScrolled ? 'rgba(10,10,10,0.88)' : 'rgba(10,10,10,0.7)',
+          border: isScrolled ? '1px solid rgba(220,190,140,0.22)' : '1px solid rgba(220,190,140,0.18)',
+          boxShadow: isScrolled
+            ? '0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)'
+            : '0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(220,190,140,0.06) inset',
           gap: '28px',
           transition: 'background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease',
           whiteSpace: 'nowrap',
+          position: 'relative',
         }}
       >
-        <a href="#" style={{ fontSize: '17px', fontWeight: '800', color: '#fff', letterSpacing: '-0.03em', textDecoration: 'none' }}>
-          AE.
-        </a>
+        {/* Whole-pill pulsing outline — an unmistakable heartbeat around the entire mark */}
+        <motion.span
+          aria-hidden="true"
+          animate={{ opacity: [0, 0.55, 0], scale: [1, 1.02, 1] }}
+          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+          style={{
+            position: 'absolute',
+            inset: '-1px',
+            borderRadius: '9999px',
+            border: '1px solid rgba(220,190,140,0.7)',
+            pointerEvents: 'none',
+          }}
+        />
+
+        {/* Monogram seal — bordered mark with a pulsing ring for an official, premium signature */}
+        <div style={{ position: 'relative', width: '34px', height: '34px', flexShrink: 0 }}>
+          <a
+            href="#"
+            style={{
+              position: 'relative',
+              zIndex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+              height: '100%',
+              borderRadius: '9px',
+              border: '1px solid rgba(220,190,140,0.4)',
+              background: 'linear-gradient(160deg, rgba(240,217,168,0.14), rgba(201,168,118,0.05))',
+              fontSize: '14px',
+              fontWeight: '800',
+              color: '#fff',
+              letterSpacing: '-0.02em',
+              textDecoration: 'none',
+            }}
+          >
+            AE.
+          </a>
+          <motion.span
+            animate={{
+              opacity: [0.7, 0, 0.7],
+              scale: [1, 1.4, 1],
+              boxShadow: [
+                '0 0 0px rgba(220,190,140,0)',
+                '0 0 14px rgba(220,190,140,0.7)',
+                '0 0 0px rgba(220,190,140,0)',
+              ],
+            }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeOut' }}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: '9px',
+              border: '1px solid rgba(220,190,140,0.85)',
+              pointerEvents: 'none',
+            }}
+          />
+        </div>
+
         <div style={{ width: '1px', height: '18px', background: 'rgba(255,255,255,0.12)' }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-          {navItems.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              style={{ fontSize: '14px', fontWeight: '500', color: 'rgba(255,255,255,0.65)', textDecoration: 'none', letterSpacing: '0.01em', transition: 'color 200ms ease' }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.65)'; }}
-            >
-              {item.label}
-            </a>
-          ))}
+          {navItems.map((item) =>
+            item.onClick ? (
+              <button
+                key={item.label}
+                onClick={item.onClick}
+                style={{ fontSize: '14px', fontWeight: '500', color: 'rgba(255,255,255,0.65)', background: 'none', border: 'none', padding: 0, cursor: 'pointer', letterSpacing: '0.01em', transition: 'color 200ms ease', fontFamily: 'inherit' }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.65)'; }}
+              >
+                {item.label}
+              </button>
+            ) : (
+              <a
+                key={item.label}
+                href={item.href}
+                style={{ fontSize: '14px', fontWeight: '500', color: 'rgba(255,255,255,0.65)', textDecoration: 'none', letterSpacing: '0.01em', transition: 'color 200ms ease' }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.65)'; }}
+              >
+                {item.label}
+              </a>
+            )
+          )}
         </div>
-        <motion.a
-          href="mailto:hello@ahmadeldeeb.com"
-          whileHover={{ scale: 1.04 }}
-          whileTap={{ scale: 0.97 }}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 20px', borderRadius: '9999px', background: '#fff', color: '#0A0A0A', fontSize: '13px', fontWeight: '600', textDecoration: 'none', letterSpacing: '0.01em', boxShadow: '0 2px 12px rgba(255,120,80,0.18)' }}
-        >
-          Let's Talk
-          <ArrowRight size={13} strokeWidth={2.5} />
-        </motion.a>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <motion.a
+            href="mailto:hello@ahmadeldeeb.com"
+            animate={{
+              boxShadow: [
+                '0 2px 14px rgba(220,190,140,0.22)',
+                '0 4px 36px rgba(220,190,140,0.6)',
+                '0 2px 14px rgba(220,190,140,0.22)',
+              ],
+              scale: [1, 1.015, 1],
+            }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.97 }}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 20px', borderRadius: '9999px', background: '#fff', border: '1px solid rgba(220,190,140,0.6)', color: '#0A0A0A', fontSize: '13px', fontWeight: '600', textDecoration: 'none', letterSpacing: '0.01em' }}
+          >
+            <Mail size={13} strokeWidth={2.5} />
+            Say Hello
+          </motion.a>
+          <motion.a
+            href={LINKEDIN_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn"
+            whileHover={{ scale: 1.08, boxShadow: '0 4px 20px rgba(74,242,229,0.55)' }}
+            whileTap={{ scale: 0.95 }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '36px',
+              height: '36px',
+              flexShrink: 0,
+              borderRadius: '9999px',
+              background: 'rgba(74,242,229,1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              color: '#0A0A0A',
+              boxShadow: '0 2px 10px rgba(74,242,229,0.35)',
+            }}
+          >
+            <Linkedin size={16} strokeWidth={2} fill="currentColor" />
+          </motion.a>
+        </div>
       </motion.nav>
       </div>
 
@@ -88,7 +199,49 @@ export function Navigation() {
         className="fixed top-0 left-0 right-0 z-50 flex md:hidden items-center justify-between px-5 py-4"
         style={{ backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', background: 'rgba(10,10,10,0.75)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}
       >
-        <a href="#" style={{ fontSize: '17px', fontWeight: '800', color: '#fff', textDecoration: 'none', letterSpacing: '-0.03em' }}>AE.</a>
+        <div style={{ position: 'relative', width: '30px', height: '30px' }}>
+          <a
+            href="#"
+            style={{
+              position: 'relative',
+              zIndex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+              height: '100%',
+              borderRadius: '8px',
+              border: '1px solid rgba(220,190,140,0.4)',
+              background: 'linear-gradient(160deg, rgba(240,217,168,0.14), rgba(201,168,118,0.05))',
+              fontSize: '13px',
+              fontWeight: '800',
+              color: '#fff',
+              letterSpacing: '-0.02em',
+              textDecoration: 'none',
+            }}
+          >
+            AE.
+          </a>
+          <motion.span
+            animate={{
+              opacity: [0.7, 0, 0.7],
+              scale: [1, 1.4, 1],
+              boxShadow: [
+                '0 0 0px rgba(220,190,140,0)',
+                '0 0 12px rgba(220,190,140,0.7)',
+                '0 0 0px rgba(220,190,140,0)',
+              ],
+            }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeOut' }}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: '8px',
+              border: '1px solid rgba(220,190,140,0.85)',
+              pointerEvents: 'none',
+            }}
+          />
+        </div>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
@@ -110,22 +263,55 @@ export function Navigation() {
           className="fixed top-[57px] left-0 right-0 z-40 flex flex-col px-5 py-4 md:hidden"
           style={{ background: 'rgba(10,10,10,0.97)', backdropFilter: 'blur(24px)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}
         >
-          {navItems.map((item) => (
+          {navItems.map((item) =>
+            item.onClick ? (
+              <button
+                key={item.label}
+                onClick={() => { setMobileOpen(false); item.onClick?.(); }}
+                style={{ padding: '13px 0', fontSize: '16px', fontWeight: '500', color: 'rgba(255,255,255,0.75)', background: 'none', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)', textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit' }}
+              >
+                {item.label}
+              </button>
+            ) : (
+              <a
+                key={item.label}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                style={{ padding: '13px 0', fontSize: '16px', fontWeight: '500', color: 'rgba(255,255,255,0.75)', textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+              >
+                {item.label}
+              </a>
+            )
+          )}
+          <div style={{ marginTop: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <a
-              key={item.label}
-              href={item.href}
-              onClick={() => setMobileOpen(false)}
-              style={{ padding: '13px 0', fontSize: '16px', fontWeight: '500', color: 'rgba(255,255,255,0.75)', textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+              href="mailto:hello@ahmadeldeeb.com"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '11px 20px', borderRadius: '9999px', background: '#fff', color: '#0A0A0A', fontSize: '14px', fontWeight: '600', textDecoration: 'none' }}
             >
-              {item.label}
+              <Mail size={14} /> Say Hello
             </a>
-          ))}
-          <a
-            href="mailto:hello@ahmadeldeeb.com"
-            style={{ marginTop: '14px', display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '11px 20px', borderRadius: '9999px', background: '#fff', color: '#0A0A0A', fontSize: '14px', fontWeight: '600', textDecoration: 'none' }}
-          >
-            Let's Talk <ArrowRight size={14} />
-          </a>
+            <a
+              href={LINKEDIN_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '42px',
+                height: '42px',
+                flexShrink: 0,
+                borderRadius: '9999px',
+                background: 'rgba(74,242,229,1)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                color: '#0A0A0A',
+                boxShadow: '0 2px 10px rgba(74,242,229,0.35)',
+              }}
+            >
+              <Linkedin size={19} strokeWidth={2} fill="currentColor" />
+            </a>
+          </div>
         </motion.div>
       )}
     </>

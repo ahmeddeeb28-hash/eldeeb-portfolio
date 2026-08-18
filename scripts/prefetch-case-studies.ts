@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { createClient } from '@sanity/client';
 import imageUrlBuilder from '@sanity/image-url';
 import type { CaseStudy, CaseStudyMap } from '../lib/sanity/types';
+import { FALLBACK_CASE_STUDIES } from '../lib/sanity/fallbackCaseStudies';
 
 const projectId = process.env.SANITY_PROJECT_ID || process.env.VITE_SANITY_PROJECT_ID;
 const dataset = process.env.SANITY_DATASET || process.env.VITE_SANITY_DATASET || 'production';
@@ -27,10 +28,11 @@ function writeMap(map: CaseStudyMap) {
 
 if (!projectId) {
   console.warn(
-    '[prefetch] SANITY_PROJECT_ID not set — writing empty generated/case-studies.json. ' +
-      'Set VITE_SANITY_PROJECT_ID in .env.local once Sanity is configured.',
+    '[prefetch] SANITY_PROJECT_ID not set — writing generated/case-studies.json from the ' +
+      'local fallback (lib/sanity/fallbackCaseStudies.ts). Set VITE_SANITY_PROJECT_ID in ' +
+      '.env.local once Sanity is configured to author real content there instead.',
   );
-  writeMap({});
+  writeMap(FALLBACK_CASE_STUDIES);
   process.exit(0);
 }
 

@@ -1,189 +1,245 @@
 import { motion, useInView } from 'motion/react';
 import { useRef, useState } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { SectionHeader } from './SectionHeader';
 
 /* ──────────────────────────────────────────────────────────────
- * PROOF-OF-PRESENCE IMAGES
- * Drop files in:  public/images/proof-of-presence/
- * Then replace the URL(s) below, e.g.
- *   inTheRoom: '/images/proof-of-presence/01-in-the-room.jpg',
- * See public/images/proof-of-presence/README.md for slot specs.
+ * BEYOND THE SCREEN — Public talks, workshops & community activities.
+ *
+ * IMAGES live in:  public/images/beyond-the-screen/
+ * See that folder's README.md for slot specs.
+ * Swap the paths below to point at your own photos.
  * ──────────────────────────────────────────────────────────── */
-const PROOF_IMAGES = {
-  // Slot 1 — HERO (large, 16:10) — "In the Room"
-  inTheRoom:
-    'https://images.unsplash.com/photo-1680459575515-d6018a39a6e0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkZXNpZ25lciUyMHByZXNlbnRpbmclMjB3aGl0ZWJvYXJkJTIwbWVldGluZ3xlbnwxfHx8fDE3NzYyNTc1NDB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-  // Slot 2 — small — "Craft"
-  craft:
-    'https://images.unsplash.com/photo-1562813733-b31f71025d54?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYW4lMjB3b3JraW5nJTIwbGFwdG9wJTIwZGFyayUyMGRlc2slMjBjcmVhdGl2ZXxlbnwxfHx8fDE3NzYyNTc1NDB8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-  // Slot 3 — small — "On Stage"
-  onStage:
-    'https://images.unsplash.com/photo-1762968269894-1d7e1ce8894e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcGVha2VyJTIwc3RhZ2UlMjBjb25mZXJlbmNlJTIwcHJlc2VudGF0aW9ufGVufDF8fHx8MTc3NjI1NzU0MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-  // Slot 4 — medium (4:3) — "Team Room"
-  teamRoom:
-    'https://images.unsplash.com/photo-1773270196888-0cdacb07edae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkZXNpZ24lMjB3b3Jrc2hvcCUyMHRlYW0lMjBjb2xsYWJvcmF0aW9ufGVufDF8fHx8MTc3NjI1NzU0MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-  // Slot 5 — tall (3:4) — "Mentorship"
-  mentorship:
-    'https://images.unsplash.com/photo-1760346546718-cf729117d7f9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtZW50b3IlMjBjb2FjaGluZyUyMG9uZS1vbi1vbmUlMjBvZmZpY2V8ZW58MXx8fHwxNzc2MjU3NTQ1fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-  // Slot 6 — medium (4:3) — "Review Mode"
-  reviewMode:
-    'https://images.unsplash.com/photo-1761122827167-159d1d272313?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx1eCUyMGRlc2lnbmVyJTIwcmV2aWV3aW5nJTIwaW50ZXJmYWNlJTIwc2NyZWVufGVufDF8fHx8MTc3NjI1NzU0MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+/* Each image maps to the slot whose CAPTION matches its actual vibe.
+ * Aspect ratios in the JSX below match each file's NATURAL ratio so
+ * the full image is always visible — no crops.
+ *
+ * File                          Natural   →  Slot
+ * ─────────────────────────────  ────────    ───────────────────────
+ * PoadCasting.jpeg               9:16       Hero · Podcast / On Air
+ * Observing.jpeg                 4:3        Speaking · Talk
+ * teamwork.jpeg                  3:4        Workshop
+ * malmo-castle-corridor.jpeg     3:4        Between the Talks
+ * Looking.jpeg                   16:9       Audience · Listening
+ * Community.jpeg                 ~9:20      Community · Meetup
+ */
+const IMAGES = {
+  heroTalk: '/images/beyond-the-screen/PoadCasting.jpeg',
+  talk: '/images/beyond-the-screen/Observing.jpeg',
+  workshop: '/images/beyond-the-screen/teamwork.jpeg',
+  between: '/images/beyond-the-screen/malmo-castle-corridor.jpeg',
+  audience: '/images/beyond-the-screen/Looking.jpeg',
+  meetup: '/images/beyond-the-screen/Community.jpeg',
+  gathering: '/images/beyond-the-screen/Gathering.jpeg',
 } as const;
 
-const images = [
-  {
-    src: PROOF_IMAGES.inTheRoom,
-    alt: 'Leading a product design review',
-    label: 'In the Room',
-    span: 'large', // hero image
-  },
-  {
-    src: PROOF_IMAGES.craft,
-    alt: 'Deep work at the desk',
-    label: 'Craft',
-    span: 'small',
-  },
-  {
-    src: PROOF_IMAGES.onStage,
-    alt: 'Presenting on stage',
-    label: 'On Stage',
-    span: 'small',
-  },
-  {
-    src: PROOF_IMAGES.teamRoom,
-    alt: 'Workshop facilitation with the team',
-    label: 'Team Room',
-    span: 'medium',
-  },
-  {
-    src: PROOF_IMAGES.mentorship,
-    alt: 'Mentoring a junior designer',
-    label: 'Mentorship',
-    span: 'small',
-  },
-  {
-    src: PROOF_IMAGES.reviewMode,
-    alt: 'Reviewing interface details',
-    label: 'Review Mode',
-    span: 'medium',
-  },
-];
-
-function PresenceCard({
-  image,
+/* ── Editorial photo tile ──────────────────────────────────── */
+function PhotoTile({
+  src,
+  alt,
+  caption,
+  aspect,
+  maxWidth,
+  objectPosition = 'center',
   index,
 }: {
-  image: (typeof images)[number];
+  src: string;
+  alt: string;
+  caption: string;
+  /** Container aspect ratio (e.g. "4/3", "9/16"). Set to match each image's
+   *  NATURAL aspect so `object-cover` fills the frame with zero crop AND
+   *  zero letterbox — the two failure modes we want to avoid. */
+  aspect: string;
+  /** Optional cap on tile width in px. Prevents extreme-portrait images
+   *  (9:16, 9:20) from becoming unreasonably tall in wide columns. The
+   *  tile centers horizontally within its grid column when capped. */
+  maxWidth?: number;
+  /** Where object-cover crops from when aspects don't perfectly match. */
+  objectPosition?: string;
   index: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-60px' });
+  const inView = useInView(ref, { once: true, margin: '-80px' });
   const [hovered, setHovered] = useState(false);
 
   return (
-    <motion.div
+    <motion.figure
       ref={ref}
-      initial={{ opacity: 0, y: 40, scale: 0.97 }}
-      animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+      initial={{ opacity: 0, y: 32 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{
         duration: 0.9,
-        delay: 0.08 * index,
+        delay: 0.06 * index,
         ease: [0.22, 1, 0.36, 1],
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="relative overflow-hidden group cursor-default"
-      style={{ borderRadius: '20px', height: '100%' }}
+      style={{
+        margin: '0 auto',
+        position: 'relative',
+        width: '100%',
+        maxWidth,
+        aspectRatio: aspect,
+        cursor: 'default',
+      }}
     >
-      {/* Outer glow border */}
+      {/* Offset gold matte frame — a thin hairline sitting behind + right */}
       <div
-        className="absolute -inset-[1px] transition-all duration-600"
+        aria-hidden
+        className="hidden md:block"
         style={{
-          borderRadius: '21px',
-          background: hovered
-            ? 'linear-gradient(135deg, rgba(200,130,60,0.18) 0%, rgba(255,255,255,0.06) 40%, rgba(200,130,60,0.12) 100%)'
-            : 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+          position: 'absolute',
+          inset: 0,
+          transform: hovered ? 'translate(14px, 14px)' : 'translate(10px, 10px)',
+          borderWidth: 1,
+          borderStyle: 'solid',
+          borderColor: hovered
+            ? 'rgba(220,190,140,0.4)'
+            : 'rgba(220,190,140,0.22)',
+          transition: 'transform 700ms cubic-bezier(0.22,1,0.36,1), border-color 700ms',
         }}
       />
 
       <div
-        className="relative overflow-hidden h-full"
         style={{
-          borderRadius: '20px',
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          overflow: 'hidden',
           background: '#111',
         }}
       >
         <ImageWithFallback
-          src={image.src}
-          alt={image.alt}
-          className="w-full h-full object-cover transition-all duration-700 ease-out absolute inset-0"
+          src={src}
+          alt={alt}
+          className="w-full h-full object-cover absolute inset-0"
           style={{
-            transform: hovered ? 'scale(1.04)' : 'scale(1)',
-            filter: hovered ? 'brightness(1.0)' : 'brightness(0.8)',
+            objectPosition,
+            transform: hovered ? 'scale(1.045)' : 'scale(1)',
+            filter: hovered ? 'brightness(1)' : 'brightness(0.88)',
+            transition: 'transform 900ms cubic-bezier(0.22,1,0.36,1), filter 700ms',
           }}
         />
 
-        {/* Gradient overlay */}
+        {/* Fine grain overlay */}
         <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none mix-blend-overlay"
+          style={{
+            opacity: 0.22,
+            backgroundImage:
+              'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' /%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'0.5\'/%3E%3C/svg%3E")',
+          }}
+        />
+
+        {/* Warm gradient bottom */}
+        <div
+          aria-hidden
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              'linear-gradient(to top, rgba(10,10,10,0.85) 0%, rgba(10,10,10,0.3) 40%, transparent 70%)',
+              'linear-gradient(to top, rgba(10,10,10,0.7) 0%, rgba(10,10,10,0.15) 40%, transparent 70%)',
           }}
         />
 
-        {/* Warm atmospheric tint */}
+        {/* Bottom hover caption reveal */}
         <div
-          className="absolute inset-0 pointer-events-none mix-blend-soft-light transition-opacity duration-600"
+          className="absolute bottom-4 left-4 right-4 z-10"
           style={{
-            background:
-              'linear-gradient(150deg, rgba(200,120,50,0.08) 0%, transparent 50%)',
-            opacity: hovered ? 1.5 : 1,
-          }}
-        />
-
-        {/* Label tag */}
-        <div
-          className="absolute bottom-5 left-5 z-10 transition-all duration-500"
-          style={{
-            transform: hovered ? 'translateY(0)' : 'translateY(0)',
+            transform: hovered ? 'translateY(0)' : 'translateY(4px)',
+            opacity: hovered ? 1 : 0.68,
+            transition: 'transform 500ms cubic-bezier(0.22,1,0.36,1), opacity 500ms',
           }}
         >
           <span
-            className="transition-all duration-500"
             style={{
               display: 'inline-block',
-              fontSize: '10px',
-              fontWeight: '700',
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase' as const,
-              color: hovered ? 'rgba(200,150,80,0.9)' : 'rgba(255,255,255,0.5)',
-              padding: '6px 16px',
-              borderRadius: '100px',
-              background: hovered
-                ? 'rgba(200,140,70,0.1)'
-                : 'rgba(255,255,255,0.06)',
-              border: hovered
-                ? '1px solid rgba(200,140,70,0.2)'
-                : '1px solid rgba(255,255,255,0.08)',
-              backdropFilter: 'blur(12px)',
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: '0.28em',
+              textTransform: 'uppercase',
+              color: hovered ? 'rgba(220,190,140,0.9)' : 'rgba(255,255,255,0.62)',
+              padding: '5px 10px',
+              borderWidth: 1,
+              borderStyle: 'solid',
+              borderColor: hovered
+                ? 'rgba(220,190,140,0.35)'
+                : 'rgba(255,255,255,0.18)',
+              background: 'rgba(10,10,10,0.55)',
+              backdropFilter: 'blur(8px)',
+              transition: 'color 500ms, border-color 500ms',
             }}
           >
-            {image.label}
+            {caption}
           </span>
         </div>
-
-        {/* Top accent line on hover */}
-        <div
-          className="absolute top-0 left-[10%] right-[10%] h-[1px] transition-opacity duration-600 pointer-events-none"
-          style={{
-            background:
-              'linear-gradient(90deg, transparent, rgba(200,140,70,0.15) 50%, transparent)',
-            opacity: hovered ? 1 : 0,
-          }}
-        />
       </div>
+    </motion.figure>
+  );
+}
+
+/* ── Italic Fraunces "beat" line ───────────────────────────── */
+function QuoteBeat({
+  text,
+  align,
+  index,
+}: {
+  text: string;
+  align: 'left' | 'right';
+  index: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{
+        duration: 1,
+        delay: 0.06 * index,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: align === 'right' ? 'flex-end' : 'flex-start',
+        textAlign: align,
+        gap: 14,
+        padding: '0 8px',
+        height: '100%',
+      }}
+    >
+      {/* Small teal marker */}
+      <span
+        aria-hidden
+        style={{
+          display: 'inline-block',
+          width: 28,
+          height: 1,
+          background:
+            align === 'right'
+              ? 'linear-gradient(to left, rgba(74,242,229,0.7), transparent)'
+              : 'linear-gradient(to right, rgba(74,242,229,0.7), transparent)',
+        }}
+      />
+      <p
+        style={{
+          margin: 0,
+          fontFamily: "'Fraunces', 'Times New Roman', Georgia, serif",
+          fontStyle: 'italic',
+          fontWeight: 400,
+          fontSize: 'clamp(20px, 2.4vw, 34px)',
+          lineHeight: 1.18,
+          letterSpacing: '-0.01em',
+          color: 'rgba(255,255,255,0.82)',
+          maxWidth: '22ch',
+          fontVariationSettings: "'opsz' 48, 'SOFT' 100",
+        }}
+      >
+        {text}
+      </p>
     </motion.div>
   );
 }
@@ -193,73 +249,359 @@ export function ProofOfPresence() {
     <section
       id="proof-of-presence-section-lock"
       className="proof-of-presence-locked bg-[#0A0A0A] relative"
-      style={{ paddingTop: '88px', paddingBottom: '88px' }}
+      style={{ paddingTop: 112, paddingBottom: 112 }}
     >
-      <div className="container mx-auto px-10 max-w-[1560px]">
-        <SectionHeader
-          eyebrow="Beyond the Screens"
-          title="Where the work"
-          flourish="becomes real."
-          subtitle="Design doesn't end at the screen. It happens in the room — presenting ideas, aligning teams, mentoring designers, and translating complex systems into strategy that ships."
-        />
+      {/* Ambient warm glow */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          top: '10%',
+          right: '-8%',
+          width: '55%',
+          height: '55%',
+          background:
+            'radial-gradient(closest-side, rgba(220,190,140,0.06) 0%, transparent 70%)',
+          filter: 'blur(80px)',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
 
-        {/* Decorative grid line */}
+      <div
+        className="container mx-auto max-w-[1560px] relative"
+        style={{ paddingLeft: 40, paddingRight: 40, zIndex: 1 }}
+      >
+        {/* ═══════════════════════════════════════════════════════
+             HEADER ROW — Hero portrait (left) + Headline (right)
+           ═════════════════════════════════════════════════════ */}
+        <div
+          className="grid gap-y-8 lg:gap-12 items-center"
+          style={{
+            gridTemplateColumns: 'repeat(12, minmax(0, 1fr))',
+            marginBottom: 96,
+          }}
+        >
+          {/* Hero image — 5 cols on desktop. Podcast portrait uses its
+              natural 9:16 aspect with object-cover — no letterbox, no crop —
+              capped at 340px wide so the print reads at a comfortable
+              600px tall alongside the headline block. */}
+          <div className="col-span-12 lg:col-span-5">
+            <PhotoTile
+              src={IMAGES.heroTalk}
+              alt="On-air — recording a podcast episode"
+              caption="Podcast · On Air"
+              aspect="9 / 16"
+              maxWidth={340}
+              index={0}
+            />
+          </div>
+
+          {/* Headline block — 7 cols */}
+          <div className="col-span-12 lg:col-span-7">
+            {/* Eyebrow */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 14,
+                marginBottom: 24,
+              }}
+            >
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: 36,
+                  height: 1,
+                  background:
+                    'linear-gradient(to right, transparent, rgba(220,190,140,0.5))',
+                }}
+              />
+              <span
+                style={{
+                  fontFamily: 'Inter, system-ui, sans-serif',
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: '0.34em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(220,190,140,0.85)',
+                }}
+              >
+                Beyond the Screen
+              </span>
+            </motion.div>
+
+            {/* Big headline */}
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                margin: 0,
+                fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+                fontSize: 'clamp(38px, 5.4vw, 76px)',
+                fontWeight: 800,
+                lineHeight: 1.02,
+                letterSpacing: '-0.04em',
+                color: '#fff',
+                backgroundImage:
+                  'linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.78) 100%)',
+                backgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              I share what
+              <br />
+              the work{' '}
+              <span
+                style={{
+                  fontFamily: "'Fraunces', 'Times New Roman', serif",
+                  fontStyle: 'italic',
+                  fontWeight: 500,
+                  color: '#4AF2E5',
+                  WebkitTextFillColor: '#4AF2E5',
+                  fontVariationSettings: "'opsz' 144, 'SOFT' 100",
+                  letterSpacing: '-0.03em',
+                }}
+              >
+                taught me.
+              </span>
+            </motion.h2>
+
+            {/* Meta line */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                marginTop: 30,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 18,
+              }}
+            >
+              <span
+                aria-hidden
+                style={{
+                  display: 'inline-block',
+                  width: 6,
+                  height: 6,
+                  borderRadius: '50%',
+                  background: '#4AF2E5',
+                  boxShadow: '0 0 12px rgba(74,242,229,0.6)',
+                }}
+              />
+              <span
+                style={{
+                  fontFamily: 'Inter, system-ui, sans-serif',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: '0.32em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.58)',
+                }}
+              >
+                Talks · Workshops · Community
+              </span>
+            </motion.div>
+
+            {/* Short lead-in paragraph */}
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                marginTop: 26,
+                maxWidth: '52ch',
+                fontFamily: 'Inter, system-ui, sans-serif',
+                fontSize: 15,
+                lineHeight: 1.65,
+                color: 'rgba(255,255,255,0.62)',
+              }}
+            >
+              Beyond client work, I speak at conferences, run design workshops,
+              and show up for the community — mentoring, panels, and rooms
+              where product decisions actually get made.
+            </motion.p>
+          </div>
+        </div>
+
+        {/* Horizontal dateline rule */}
         <motion.div
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-16"
           style={{
-            height: '1px',
+            height: 1,
+            marginBottom: 72,
             background:
-              'linear-gradient(90deg, transparent, rgba(255,255,255,0.1) 20%, rgba(255,255,255,0.1) 80%, transparent)',
+              'linear-gradient(90deg, transparent, rgba(220,190,140,0.22) 20%, rgba(220,190,140,0.22) 80%, transparent)',
             transformOrigin: 'left',
           }}
         />
 
-        {/* Editorial Image Grid — Asymmetric Curated Layout */}
+        {/* ═══════════════════════════════════════════════════════
+             ROW A — [Quote] [Speaking landscape 4:3] [Workshop portrait 3:4]
+             Each tile keeps its image's natural aspect (no crop, no black
+             matte). `items-end` anchors tiles to a common baseline so the
+             portrait naturally rises above the landscape — editorial rhythm.
+           ═════════════════════════════════════════════════════ */}
         <div
-          className="grid gap-5"
+          className="grid gap-y-6 lg:gap-10 items-end"
           style={{
-            gridTemplateColumns: 'repeat(12, 1fr)',
-            gridTemplateRows: 'auto',
+            gridTemplateColumns: 'repeat(12, minmax(0, 1fr))',
+            marginBottom: 72,
           }}
         >
-          {/* Row 1: Hero image (large) + two stacked small cards */}
-          <div
-            className="col-span-12 lg:col-span-7"
-            style={{ aspectRatio: '16/10' }}
-          >
-            <PresenceCard image={images[0]} index={0} />
+          <div className="col-span-12 lg:col-span-3 lg:pb-4">
+            <QuoteBeat
+              text="Some ideas begin quietly."
+              align="right"
+              index={0}
+            />
           </div>
-          <div className="col-span-12 lg:col-span-5 flex flex-col gap-5">
-            <div className="flex-1" style={{ minHeight: '0' }}>
-              <PresenceCard image={images[1]} index={1} />
-            </div>
-            <div className="flex-1" style={{ minHeight: '0' }}>
-              <PresenceCard image={images[2]} index={2} />
-            </div>
+          <div className="col-span-12 lg:col-span-6">
+            <PhotoTile
+              src={IMAGES.talk}
+              alt="On stage — welcoming attendees to the session"
+              caption="Speaking · Talk"
+              aspect="4 / 3"
+              index={1}
+            />
           </div>
+          <div className="col-span-12 lg:col-span-3">
+            <PhotoTile
+              src={IMAGES.workshop}
+              alt="Workshop — hands-on collaboration"
+              caption="Workshop"
+              aspect="3 / 4"
+              index={2}
+            />
+          </div>
+        </div>
 
-          {/* Row 2: medium + small + medium — editorial rhythm */}
-          <div
-            className="col-span-12 md:col-span-5"
-            style={{ aspectRatio: '4/3' }}
-          >
-            <PresenceCard image={images[3]} index={3} />
+        {/* ═══════════════════════════════════════════════════════
+             ROW B — [Between portrait 3:4] [Audience landscape 16:9] [Quote]
+             Widths chosen so the portrait (col-3) and landscape (col-6)
+             land at nearly matching heights — clean baseline band.
+           ═════════════════════════════════════════════════════ */}
+        <div
+          className="grid gap-y-6 lg:gap-10 items-end"
+          style={{
+            gridTemplateColumns: 'repeat(12, minmax(0, 1fr))',
+            marginBottom: 72,
+          }}
+        >
+          <div className="col-span-12 lg:col-span-3">
+            <PhotoTile
+              src={IMAGES.between}
+              alt="Malmö castle corridor — a quiet moment between talks"
+              caption="Between the Talks"
+              aspect="3 / 4"
+              index={3}
+            />
           </div>
-          <div
-            className="col-span-12 md:col-span-3"
-            style={{ aspectRatio: '3/4' }}
-          >
-            <PresenceCard image={images[4]} index={4} />
+          <div className="col-span-12 lg:col-span-6">
+            <PhotoTile
+              src={IMAGES.audience}
+              alt="Audience listening in on a panel"
+              caption="Audience · Listening"
+              aspect="16 / 9"
+              index={4}
+            />
           </div>
-          <div
-            className="col-span-12 md:col-span-4"
-            style={{ aspectRatio: '4/3' }}
-          >
-            <PresenceCard image={images[5]} index={5} />
+          <div className="col-span-12 lg:col-span-3 lg:pb-4">
+            <QuoteBeat
+              text="They become clearer in the room."
+              align="left"
+              index={5}
+            />
+          </div>
+        </div>
+
+        {/* ═══════════════════════════════════════════════════════
+             ROW C — [Community · Meetup] [Gathering] [Closing quote + kicker]
+             Two compact 4:5 print plates sit side-by-side (a "diptych"),
+             giving the closing row two visual anchors instead of one
+             oversized tile. The quote + gold-hairline kicker fill the
+             right half so nothing reads as empty space.
+           ═════════════════════════════════════════════════════ */}
+        <div
+          className="grid gap-y-6 lg:gap-10 items-center"
+          style={{
+            gridTemplateColumns: 'repeat(12, minmax(0, 1fr))',
+          }}
+        >
+          {/* Left plate — Community */}
+          <div className="col-span-12 lg:col-span-3">
+            <PhotoTile
+              src={IMAGES.meetup}
+              alt="At a Salon community meetup — capturing the moment"
+              caption="Community · Meetup"
+              aspect="4 / 5"
+              maxWidth={260}
+              objectPosition="center 22%"
+              index={6}
+            />
+          </div>
+          {/* Right plate — Gathering (paired diptych with Community) */}
+          <div className="col-span-12 lg:col-span-3">
+            <PhotoTile
+              src={IMAGES.gathering}
+              alt="Group gathering after a session — the room, together"
+              caption="Gathering"
+              aspect="4 / 5"
+              maxWidth={260}
+              objectPosition="center center"
+              index={7}
+            />
+          </div>
+          {/* Closing quote + kicker */}
+          <div className="col-span-12 lg:col-span-6">
+            <QuoteBeat
+              text="And stronger when shared."
+              align="left"
+              index={8}
+            />
+            <div
+              style={{
+                marginTop: 18,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 14,
+                paddingLeft: 2,
+              }}
+            >
+              <span
+                aria-hidden="true"
+                style={{
+                  display: 'inline-block',
+                  width: 48,
+                  height: 1,
+                  background:
+                    'linear-gradient(to right, rgba(220,190,140,0.55), rgba(220,190,140,0))',
+                }}
+              />
+              <span
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: 11,
+                  letterSpacing: '0.22em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(220,190,140,0.7)',
+                }}
+              >
+                A quiet thread across every talk, workshop, and meetup.
+              </span>
+            </div>
           </div>
         </div>
       </div>

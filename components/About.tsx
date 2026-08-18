@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, ArrowRight } from 'lucide-react';
 
 interface Achievement {
   company: string;
@@ -138,7 +138,11 @@ function ExperienceCard({ role, company, domain, period, type, description, isPr
   );
 }
 
-export function About() {
+interface AboutProps {
+  onOpenAboutPage?: () => void;
+}
+
+export function About({ onOpenAboutPage }: AboutProps) {
   const [showMore, setShowMore] = useState(false);
   return (
     <section id="about" className="relative px-6 py-32 bg-[#0A0A0A] overflow-hidden">
@@ -170,6 +174,15 @@ export function About() {
                 Leading product design at the intersection of <span className="text-[#4AF2E5]">complex systems</span> and high-performance user experiences.
                 Over <span className="text-[#4AF2E5]">9+ years</span>, I’ve led and scaled <span className="text-[#4AF2E5]">multinational design teams</span> across <span className="text-[#4AF2E5]">Europe and global markets</span>, driving clarity, execution, and measurable business impact across gaming, fintech, SaaS, and AI-driven platforms.
               </p>
+              {onOpenAboutPage && (
+                <button
+                  onClick={onOpenAboutPage}
+                  className="inline-flex items-center gap-2 text-[#4AF2E5] hover:text-white transition-colors font-mono text-[11px] tracking-widest uppercase group/cta"
+                >
+                  Read the Director's Cut
+                  <ArrowRight className="w-3.5 h-3.5 group-hover/cta:translate-x-1 transition-transform" />
+                </button>
+              )}
             </div>
           </div>
           

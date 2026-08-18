@@ -2,7 +2,7 @@ import { Navigation } from './components/Navigation';
 import { PremiumHero } from './components/PremiumHero';
 import { Hero } from './components/Hero';
 import { Features } from './components/Features';
-import { About } from './components/About';
+import { AboutPage } from './components/AboutPage';
 import { WorkLanguage } from './components/WorkLanguage';
 import { Projects } from './components/Projects';
 import { Mentorship } from './components/Mentorship';
@@ -18,6 +18,7 @@ import { useRef, useState, useEffect } from 'react';
 
 export default function App() {
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
+  const [aboutPageOpen, setAboutPageOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({
@@ -34,11 +35,12 @@ export default function App() {
   useEffect(() => {
     const handlePopState = () => {
       if (activeProjectId) setActiveProjectId(null);
+      if (aboutPageOpen) setAboutPageOpen(false);
     };
     window.history.pushState(null, '', window.location.pathname);
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [activeProjectId]);
+  }, [activeProjectId, aboutPageOpen]);
 
   const openProject = (id: string) => {
     setActiveProjectId(id);
@@ -47,6 +49,16 @@ export default function App() {
 
   const closeProject = () => {
     setActiveProjectId(null);
+    window.history.back();
+  };
+
+  const openAboutPage = () => {
+    setAboutPageOpen(true);
+    window.history.pushState({ about: true }, '');
+  };
+
+  const closeAboutPage = () => {
+    setAboutPageOpen(false);
     window.history.back();
   };
 
@@ -70,6 +82,7 @@ export default function App() {
             onNext={goToNextCase}
           />
         )}
+        {aboutPageOpen && <AboutPage key="about-page" onBack={closeAboutPage} />}
       </AnimatePresence>
 
       {/* Dynamic Background Parallax Layers */}
@@ -84,16 +97,17 @@ export default function App() {
         />
       </div>
 
-      <main className={`relative z-10 transition-opacity duration-500 ${activeProjectId ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-        <Navigation />
+      <main className={`relative z-10 transition-opacity duration-500 ${activeProjectId || aboutPageOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+        <Navigation onOpenAboutPage={openAboutPage} />
         <PremiumHero />
         <BrandsStats />
         <Projects onProjectClick={openProject} />
-        <About />
-        <WorkLanguage />
+        {/* Hidden but preserved — restore by uncommenting the line below */}
+        {false && <WorkLanguage />}
         <Mentorship />
         <ProofOfPresence />
-        <Features />
+        {/* Hidden but preserved — restore by flipping the guard below */}
+        {false && <Features />}
         <Results />
         <Articles />
         <Footer />

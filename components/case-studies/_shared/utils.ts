@@ -1,7 +1,20 @@
 /* ── Shared case-study utilities ───────────────────────────────── */
 
+/* Ease-out cubic — used by the manual scroll animation below. */
+function easeOutCubic(t: number) {
+  return 1 - Math.pow(1 - t, 3);
+}
+
 /* Smoothly scroll the case-study container so the chapter lands
-   under the sticky tabs (offset accounts for header + tabs). */
+   under the sticky tabs (offset accounts for header + tabs).
+
+   Deliberately hand-rolled instead of `scrollTo({ behavior: 'smooth' })`:
+   the native smooth-scroll can be silently truncated by the browser when
+   the main thread is busy (e.g. sticky-header backdrop-filter repaints +
+   concurrent whileInView IntersectionObservers firing as sections are
+   scrolled past), which leaves the container short of its target and
+   downstream scroll-triggered reveals permanently un-fired. Driving the
+   scroll ourselves via rAF guarantees it always reaches `top`. */
 export function scrollToChapter(
   rootEl: HTMLElement | null,
   id: string,
@@ -9,7 +22,24 @@ export function scrollToChapter(
 ) {
   if (!rootEl) return;
   const el = rootEl.querySelector(`#${id}`) as HTMLElement | null;
-  if (el) rootEl.scrollTo({ top: el.offsetTop - offset, behavior: 'smooth' });
+  if (!el) return;
+
+  const startTop = rootEl.scrollTop;
+  const maxScroll = rootEl.scrollHeight - rootEl.clientHeight;
+  const targetTop = Math.max(0, Math.min(el.offsetTop - offset, maxScroll));
+  const distance = targetTop - startTop;
+  if (Math.abs(distance) < 1) return;
+
+  const duration = 600; // ms
+  const startTime = performance.now();
+
+  function step(now: number) {
+    const elapsed = now - startTime;
+    const t = Math.min(1, elapsed / duration);
+    rootEl!.scrollTop = startTop + distance * easeOutCubic(t);
+    if (t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
 }
 
 /* Mockups data convention: index 0 = After (intervention),
