@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Ahmad Eldeeb — Lead Product Designer">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F0D9A8"/>
+      <stop offset="0.55" stop-color="#DCBE8C"/>
+      <stop offset="1" stop-color="#A98757"/>
+    </linearGradient>
+    <linearGradient id="ivory" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F5F0E6"/>
+      <stop offset="1" stop-color="#D8CEB8"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="0.2" cy="0.3" r="0.6">
+      <stop offset="0" stop-color="#4AF2E5" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#4AF2E5" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="0.85" cy="0.75" r="0.55">
+      <stop offset="0" stop-color="#DCBE8C" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#DCBE8C" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="1" seed="9"/>
+      <feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.05 0"/>
+    </filter>
+    <linearGradient id="hair" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#DCBE8C" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#DCBE8C" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#DCBE8C" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Base -->
+  <rect width="1200" height="630" fill="#0A0A0A"/>
+  <rect width="1200" height="630" fill="url(#glow1)"/>
+  <rect width="1200" height="630" fill="url(#glow2)"/>
+  <rect width="1200" height="630" filter="url(#grain)" opacity="0.55"/>
+
+  <!-- Hairline frame -->
+  <rect x="32" y="32" width="1136" height="566" fill="none"
+        stroke="#DCBE8C" stroke-opacity="0.22" stroke-width="1"/>
+
+  <!-- Top-left monogram badge -->
+  <g transform="translate(72, 72)">
+    <rect width="70" height="70" rx="14" fill="#0A0A0A"/>
+    <rect x="0.5" y="0.5" width="69" height="69" rx="13.5"
+          fill="none" stroke="#DCBE8C" stroke-opacity="0.4" stroke-width="1"/>
+    <text x="35" y="49" text-anchor="middle"
+          font-family="'Fraunces', Georgia, serif"
+          font-style="italic" font-weight="700" font-size="32"
+          letter-spacing="-1" fill="url(#gold)">AE</text>
+    <circle cx="51" cy="51" r="2.4" fill="#4AF2E5"/>
+  </g>
+
+  <!-- Top-right kicker -->
+  <text x="1128" y="108" text-anchor="end"
+        font-family="'Inter', system-ui, sans-serif"
+        font-weight="500" font-size="13" letter-spacing="4"
+        fill="#DCBE8C" fill-opacity="0.75">PORTFOLIO · 2026</text>
+
+  <!-- Kicker line under badge -->
+  <text x="72" y="220"
+        font-family="'Inter', system-ui, sans-serif"
+        font-weight="600" font-size="14" letter-spacing="5"
+        fill="#DCBE8C" fill-opacity="0.85">— LEAD PRODUCT DESIGNER · DATA SCIENCE</text>
+
+  <!-- Name -->
+  <text x="72" y="316"
+        font-family="'Fraunces', Georgia, 'Times New Roman', serif"
+        font-weight="600" font-size="96" letter-spacing="-3"
+        fill="url(#ivory)">Ahmad Eldeeb</text>
+
+  <!-- Headline -->
+  <text x="72" y="400"
+        font-family="'Fraunces', Georgia, serif"
+        font-weight="400" font-style="italic" font-size="46" letter-spacing="-1"
+        fill="#F5F0E6" fill-opacity="0.92">Driving growth and AI.</text>
+
+  <!-- Sub -->
+  <text x="72" y="452"
+        font-family="'Inter', system-ui, sans-serif"
+        font-weight="400" font-size="22" letter-spacing="-0.2"
+        fill="#F5F0E6" fill-opacity="0.55">Research-driven product design at the intersection of design,</text>
+  <text x="72" y="482"
+        font-family="'Inter', system-ui, sans-serif"
+        font-weight="400" font-size="22" letter-spacing="-0.2"
+        fill="#F5F0E6" fill-opacity="0.55">artificial intelligence, and human-centered thinking.</text>
+
+  <!-- Hairline separator -->
+  <line x1="72" y1="540" x2="1128" y2="540" stroke="url(#hair)" stroke-width="1"/>
+
+  <!-- Footer row -->
+  <g font-family="'Inter', system-ui, sans-serif" font-size="14" letter-spacing="2">
+    <text x="72" y="580" font-weight="500" fill="#F5F0E6" fill-opacity="0.7">
+      SELECTED WORK · MENTORSHIP · SPEAKING
+    </text>
+    <text x="1128" y="580" text-anchor="end" font-weight="500" fill="#4AF2E5" fill-opacity="0.95">
+      ahmadeldeeb.com
+    </text>
+  </g>
+</svg>

@@ -1,0 +1,26 @@
+{
+  "name": "Ahmad Eldeeb — Lead Product Designer",
+  "short_name": "Eldeeb",
+  "description": "Research-driven product design at the intersection of design, artificial intelligence, and human-centered thinking.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A0A0A",
+  "theme_color": "#0A0A0A",
+  "categories": ["design", "portfolio", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.svg",
+      "sizes": "180x180",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
