@@ -11,29 +11,76 @@ interface NavigationProps {
 export function Navigation({ onOpenAboutPage }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
+  // Smart show/hide: reveal on scroll up, tuck away on scroll down (after a threshold).
   useEffect(() => {
     let ticking = false;
+    let lastY = window.scrollY;
     const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setIsScrolled(window.scrollY > 40);
-          ticking = false;
-        });
-        ticking = true;
-      }
+      if (ticking) return;
+      window.requestAnimationFrame(() => {
+        const y = window.scrollY;
+        const delta = y - lastY;
+        setIsScrolled(y > 40);
+        // Always show near the very top; also clear stale active highlight
+        if (y < 80) {
+          setHidden(false);
+          setActiveId(null);
+        } else if (delta > 6) {
+          // Scrolling down past threshold → hide
+          setHidden(true);
+          if (mobileOpen) setMobileOpen(false);
+        } else if (delta < -6) {
+          // Scrolling up → show
+          setHidden(false);
+        }
+        lastY = y;
+        ticking = false;
+      });
+      ticking = true;
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, [mobileOpen]);
+
+  const navItems: { label: string; targetId?: string; onClick?: () => void }[] = [
+    { label: 'Work', targetId: 'selected-work-section-lock' },
+    { label: 'About', onClick: onOpenAboutPage },
+    { label: 'Mentorship', targetId: 'mentorship' },
+    { label: 'Speaking', targetId: 'proof-of-presence-section-lock' },
+    { label: 'Articles', targetId: 'articles-activities' },
+  ];
+
+  // Track active section for the underline indicator
+  useEffect(() => {
+    const ids = navItems.map((i) => i.targetId).filter(Boolean) as string[];
+    const nodes = ids
+      .map((id) => document.getElementById(id))
+      .filter((n): n is HTMLElement => Boolean(n));
+    if (nodes.length === 0) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) setActiveId(visible.target.id);
+      },
+      { rootMargin: '-40% 0px -50% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] }
+    );
+    nodes.forEach((n) => observer.observe(n));
+    return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const navItems: { label: string; href?: string; onClick?: () => void }[] = [
-    { label: 'Work', href: '#work' },
-    { label: 'About', onClick: onOpenAboutPage },
-    { label: 'Services', href: '#services' },
-    { label: 'Mentorship', href: '#mentorship' },
-    { label: 'Articles', href: '#articles' },
-  ];
+  // Smooth-scroll click handler that accounts for the floating pill height
+  const scrollToId = (id: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const y = el.getBoundingClientRect().top + window.scrollY - 96;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  };
 
   return (
     <>
@@ -41,8 +88,8 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
       <div className="fixed z-50 hidden md:flex top-0 left-0 right-0 justify-center pointer-events-none" style={{ top: '20px' }}>
       <motion.nav
         initial={{ opacity: 0, y: -24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        animate={{ opacity: hidden ? 0 : 1, y: hidden ? -32 : 0 }}
+        transition={{ duration: hidden ? 0.35 : 0.5, ease: [0.22, 1, 0.36, 1] }}
         className="flex items-center pointer-events-auto"
         style={{
           borderRadius: '9999px',
@@ -120,34 +167,115 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
         </div>
 
         <div style={{ width: '1px', height: '18px', background: 'rgba(255,255,255,0.12)' }} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-          {navItems.map((item) =>
-            item.onClick ? (
-              <button
-                key={item.label}
-                onClick={item.onClick}
-                style={{ fontSize: '14px', fontWeight: '500', color: 'rgba(255,255,255,0.65)', background: 'none', border: 'none', padding: 0, cursor: 'pointer', letterSpacing: '0.01em', transition: 'color 200ms ease', fontFamily: 'inherit' }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.65)'; }}
-              >
-                {item.label}
-              </button>
-            ) : (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '22px' }}>
+          {navItems.map((item) => {
+            const isActive = item.targetId ? activeId === item.targetId : false;
+            const baseStyle: React.CSSProperties = {
+              position: 'relative',
+              fontSize: '14px',
+              fontWeight: 500,
+              color: isActive ? '#fff' : 'rgba(255,255,255,0.65)',
+              background: 'none',
+              border: 'none',
+              padding: '4px 0',
+              cursor: 'pointer',
+              letterSpacing: '0.01em',
+              transition: 'color 200ms ease',
+              fontFamily: 'inherit',
+              textDecoration: 'none',
+            };
+            const Underline = (
+              <motion.span
+                aria-hidden
+                initial={false}
+                animate={{ scaleX: isActive ? 1 : 0, opacity: isActive ? 1 : 0 }}
+                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  bottom: -2,
+                  height: 1,
+                  background:
+                    'linear-gradient(90deg, rgba(220,190,140,0) 0%, rgba(220,190,140,0.85) 50%, rgba(220,190,140,0) 100%)',
+                  transformOrigin: 'center',
+                }}
+              />
+            );
+            const enterHover = (el: HTMLElement) => {
+              el.style.color = '#fff';
+              const dash = el.querySelector<HTMLElement>('[data-hover-dash]');
+              if (dash && !isActive) {
+                dash.style.transform = 'scaleX(1)';
+                dash.style.opacity = '0.55';
+              }
+            };
+            const leaveHover = (el: HTMLElement) => {
+              el.style.color = isActive ? '#fff' : 'rgba(255,255,255,0.65)';
+              const dash = el.querySelector<HTMLElement>('[data-hover-dash]');
+              if (dash && !isActive) {
+                dash.style.transform = 'scaleX(0)';
+                dash.style.opacity = '0';
+              }
+            };
+            const HoverDash = (
+              <span
+                data-hover-dash
+                aria-hidden
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  bottom: -2,
+                  height: 1,
+                  background: 'rgba(255,255,255,0.6)',
+                  transform: 'scaleX(0)',
+                  opacity: 0,
+                  transformOrigin: 'center',
+                  transition: 'transform 260ms ease, opacity 260ms ease',
+                }}
+              />
+            );
+
+            if (item.onClick) {
+              return (
+                <button
+                  key={item.label}
+                  onClick={item.onClick}
+                  style={baseStyle}
+                  onMouseEnter={(e) => enterHover(e.currentTarget)}
+                  onMouseLeave={(e) => leaveHover(e.currentTarget)}
+                >
+                  {item.label}
+                  {HoverDash}
+                  {Underline}
+                </button>
+              );
+            }
+            return (
               <a
                 key={item.label}
-                href={item.href}
-                style={{ fontSize: '14px', fontWeight: '500', color: 'rgba(255,255,255,0.65)', textDecoration: 'none', letterSpacing: '0.01em', transition: 'color 200ms ease' }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.65)'; }}
+                href={`#${item.targetId}`}
+                onClick={(e) => {
+                  if (item.targetId) {
+                    e.preventDefault();
+                    scrollToId(item.targetId);
+                  }
+                }}
+                style={baseStyle}
+                onMouseEnter={(e) => enterHover(e.currentTarget)}
+                onMouseLeave={(e) => leaveHover(e.currentTarget)}
               >
                 {item.label}
+                {HoverDash}
+                {Underline}
               </a>
-            )
-          )}
+            );
+          })}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <motion.a
-            href="mailto:hello@ahmadeldeeb.com"
+            href="mailto:ahmeddeeb28@gmail.com"
             animate={{
               boxShadow: [
                 '0 2px 14px rgba(220,190,140,0.22)',
@@ -194,8 +322,8 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
       {/* Mobile top bar */}
       <motion.div
         initial={{ opacity: 0, y: -16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        animate={{ opacity: hidden ? 0 : 1, y: hidden ? -24 : 0 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         className="fixed top-0 left-0 right-0 z-50 flex md:hidden items-center justify-between px-5 py-4"
         style={{ backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', background: 'rgba(10,10,10,0.75)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}
       >
@@ -275,8 +403,15 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
             ) : (
               <a
                 key={item.label}
-                href={item.href}
-                onClick={() => setMobileOpen(false)}
+                href={`#${item.targetId}`}
+                onClick={(e) => {
+                  setMobileOpen(false);
+                  if (item.targetId) {
+                    e.preventDefault();
+                    // small delay so the panel collapses before scrolling
+                    setTimeout(() => scrollToId(item.targetId!), 60);
+                  }
+                }}
                 style={{ padding: '13px 0', fontSize: '16px', fontWeight: '500', color: 'rgba(255,255,255,0.75)', textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)' }}
               >
                 {item.label}
@@ -285,7 +420,7 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
           )}
           <div style={{ marginTop: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <a
-              href="mailto:hello@ahmadeldeeb.com"
+              href="mailto:ahmeddeeb28@gmail.com"
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '11px 20px', borderRadius: '9999px', background: '#fff', color: '#0A0A0A', fontSize: '14px', fontWeight: '600', textDecoration: 'none' }}
             >
               <Mail size={14} /> Say Hello

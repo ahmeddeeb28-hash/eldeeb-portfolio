@@ -514,7 +514,7 @@ export function PremiumHero() {
             </motion.a>
 
             <a
-              href="mailto:hello@ahmadeldeeb.com"
+              href="mailto:ahmeddeeb28@gmail.com"
               className="group flex items-center gap-2"
               style={{
                 fontSize: '13px',

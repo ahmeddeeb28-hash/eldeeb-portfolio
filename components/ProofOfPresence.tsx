@@ -41,6 +41,7 @@ function PhotoTile({
   maxWidth,
   objectPosition = 'center',
   index,
+  priority = false,
 }: {
   src: string;
   alt: string;
@@ -56,6 +57,9 @@ function PhotoTile({
   /** Where object-cover crops from when aspects don't perfectly match. */
   objectPosition?: string;
   index: number;
+  /** Above-the-fold hero tile — decode eagerly and paint with fetch priority
+   *  so it never renders soft/scaled on first paint. */
+  priority?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
@@ -112,32 +116,40 @@ function PhotoTile({
           src={src}
           alt={alt}
           className="w-full h-full object-cover absolute inset-0"
+          loading={priority ? 'eager' : 'lazy'}
+          decoding="async"
           style={{
             objectPosition,
             transform: hovered ? 'scale(1.045)' : 'scale(1)',
-            filter: hovered ? 'brightness(1)' : 'brightness(0.88)',
+            // Native brightness at rest; a barely-perceptible warm lift on hover.
+            filter: hovered ? 'brightness(1.04) saturate(1.05)' : 'brightness(1)',
             transition: 'transform 900ms cubic-bezier(0.22,1,0.36,1), filter 700ms',
+            imageRendering: 'auto',
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+            transformStyle: 'preserve-3d',
           }}
         />
 
-        {/* Fine grain overlay */}
+        {/* Ultra-fine grain — visible only as texture, not noise. Finer
+            frequency (1.6) + soft-light blend so it doesn't crush shadows. */}
         <div
           aria-hidden
-          className="absolute inset-0 pointer-events-none mix-blend-overlay"
+          className="absolute inset-0 pointer-events-none mix-blend-soft-light"
           style={{
-            opacity: 0.22,
+            opacity: 0.06,
             backgroundImage:
-              'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' /%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'0.5\'/%3E%3C/svg%3E")',
+              'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'1.6\' /%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'0.5\'/%3E%3C/svg%3E")',
           }}
         />
 
-        {/* Warm gradient bottom */}
+        {/* Soft caption scrim — narrow and light so it doesn't dim the frame */}
         <div
           aria-hidden
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              'linear-gradient(to top, rgba(10,10,10,0.7) 0%, rgba(10,10,10,0.15) 40%, transparent 70%)',
+              'linear-gradient(to top, rgba(10,10,10,0.42) 0%, rgba(10,10,10,0.05) 30%, transparent 55%)',
           }}
         />
 
@@ -294,6 +306,7 @@ export function ProofOfPresence() {
               aspect="9 / 16"
               maxWidth={340}
               index={0}
+              priority
             />
           </div>
 

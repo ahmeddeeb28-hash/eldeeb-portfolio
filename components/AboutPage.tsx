@@ -2173,7 +2173,7 @@ function ConnectSection() {
         </p>
         <div className="flex items-center justify-center gap-3">
           <a
-            href="mailto:hello@ahmadeldeeb.com"
+            href="mailto:ahmeddeeb28@gmail.com"
             className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full"
             style={{ background: '#fff', border: '1px solid rgba(220,190,140,0.6)', color: '#0A0A0A', fontSize: '14px', fontWeight: 600, textDecoration: 'none' }}
           >
