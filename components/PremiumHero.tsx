@@ -538,7 +538,7 @@ export function PremiumHero() {
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="relative hidden lg:block"
+          className="relative mx-auto w-full max-w-[360px] lg:max-w-none lg:mx-0"
           style={{ aspectRatio: '4 / 5' }}
         >
           {/* Persona-tinted glow behind the frame */}
@@ -644,17 +644,19 @@ export function PremiumHero() {
             </div>
           </div>
 
-          {/* Floating stat cards */}
-          {stickyNotes.map((note, i) => (
-            <StickyNote
-              key={note.id}
-              note={note}
-              index={i}
-              hovered={hoveredNote === note.id}
-              onHoverStart={() => setHoveredNote(note.id)}
-              onHoverEnd={() => setHoveredNote((current) => (current === note.id ? null : current))}
-            />
-          ))}
+          {/* Floating stat cards — desktop only, they use off-canvas offsets */}
+          <div className="hidden lg:block">
+            {stickyNotes.map((note, i) => (
+              <StickyNote
+                key={note.id}
+                note={note}
+                index={i}
+                hovered={hoveredNote === note.id}
+                onHoverStart={() => setHoveredNote(note.id)}
+                onHoverEnd={() => setHoveredNote((current) => (current === note.id ? null : current))}
+              />
+            ))}
+          </div>
 
           {/* Gold corner seal echoing the nav identity */}
           <div

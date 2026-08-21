@@ -7,6 +7,7 @@ import { ChapterTitle } from './_shared/ChapterTitle';
 import { ProblemStatement } from './_shared/ProblemStatement';
 import { CriticalProcess } from './_shared/CriticalProcess';
 import { ProofRow } from './_shared/ProofRow';
+import { BeforeAfter } from './_shared/BeforeAfter';
 import { Meta } from './_shared/Meta';
 import { DEFAULT_CHAPTERS, type CaseStudyComponentProps } from './_shared/types';
 import { orderedMockups } from './_shared/utils';
@@ -52,10 +53,15 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
               {SARY.description}
             </p>
 
-            {/* Compact meta strip */}
-            <div className="flex flex-wrap gap-x-10 gap-y-4 py-6 border-y border-white/10 mb-12">
+            {/* Meta strip — Ben Shih-style 4-field grid (Role / Team / Timeline / Company).
+                Sourced from Sanity: role, collaboration.teams, duration, company. */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-6 py-6 border-y border-white/10 mb-12">
               <Meta label="Role" value={SARY.role} />
-              <Meta label="Duration" value={SARY.duration} />
+              <Meta
+                label="Team"
+                value={SARY.collaboration.teams.slice(0, 3).join(' · ')}
+              />
+              <Meta label="Timeline" value={SARY.duration} />
               <Meta label="Company" value={SARY.company} />
             </div>
 
@@ -105,6 +111,64 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         {/* ── 02 TENSION ── */}
         <ChapterTitle chapter={DEFAULT_CHAPTERS[1]} tone="red" />
         <section id="tension" className="mb-32 scroll-mt-24">
+          {/* Quantified friction — the specific damage, laid out first as
+              evidence before the framed problem statement lands. Mirrors
+              Ben Shih's pattern (big number, short pain label, one-line
+              explanation) in the site's own dark editorial language. */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#FF5F5F] animate-pulse" />
+              <span className="text-[#FF5F5F]/70 text-[10px] font-black uppercase tracking-[0.32em]">
+                Quantified friction
+              </span>
+              <span className="flex-1 h-px bg-gradient-to-r from-[#FF5F5F]/20 to-transparent" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {[
+                {
+                  stat: '85%',
+                  label: 'Silent drop-off',
+                  detail:
+                    "left the moment 'Confirm Order' clicked — the 'You might also like' sidebar was invisible to them.",
+                },
+                {
+                  stat: '60%',
+                  label: 'Wrong shelf',
+                  detail:
+                    'of what café owners saw was irrelevant — household essentials pushed at commercial buyers.',
+                },
+                {
+                  stat: '14%',
+                  label: 'Bought once, gone',
+                  detail:
+                    'retention baseline — customers completed one order and never came back for a second.',
+                },
+              ].map((f, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-10% 0px' }}
+                  transition={{ delay: i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  className="group relative p-6 rounded-[20px] border border-[#FF5F5F]/12 bg-gradient-to-b from-[#FF5F5F]/[0.04] to-transparent overflow-hidden"
+                >
+                  <div className="absolute top-0 left-6 w-8 h-[2px] bg-[#FF5F5F]/70 rounded-full opacity-70 group-hover:w-14 transition-all duration-500" />
+                  <div className="flex items-baseline gap-2 mb-2 mt-3">
+                    <span className="text-white text-4xl md:text-5xl font-black tracking-[-0.04em] leading-none">
+                      {f.stat}
+                    </span>
+                    <span className="text-[#FF5F5F]/80 text-[9px] font-black uppercase tracking-[0.28em]">
+                      {f.label}
+                    </span>
+                  </div>
+                  <p className="text-white/50 text-[13px] leading-relaxed mt-3">
+                    {f.detail}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
           <ProblemStatement
             problem={SARY.problem}
             context={SARY.context}
@@ -197,6 +261,31 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         {/* ── 05 PROOF ── */}
         <ChapterTitle chapter={DEFAULT_CHAPTERS[4]} />
         <section id="proof" className="mb-32 scroll-mt-24">
+          {/* Before/After transformation — the change up front, before
+              the alternating scroll-through. Drag or arrow-key the seam
+              to compare states; auto-wipes to 50% on scroll-in. */}
+          {SARY.mockups[0]?.url && SARY.mockups[1]?.url && (
+            <div className="mb-24">
+              <div className="max-w-2xl mb-6">
+                <span className="inline-block text-[#4AF2E5] text-[10px] font-black tracking-[0.32em] uppercase mb-3">
+                  The Transformation
+                </span>
+                <h3 className="text-white text-2xl md:text-3xl font-black leading-tight tracking-tight mb-2">
+                  Drag to compare — before the loop, after the loop.
+                </h3>
+                <p className="text-white/45 text-sm leading-relaxed">
+                  The seam wipes in on scroll. Drag the handle, or use ← / → to
+                  step through, to see the shift end-to-end.
+                </p>
+              </div>
+              <BeforeAfter
+                beforeSrc={SARY.mockups[1].url}
+                afterSrc={SARY.mockups[0].url}
+                caption="Drag · arrow keys · Home / End"
+              />
+            </div>
+          )}
+
           {/* Stacked scroll sequence: each mockup is its own moment */}
           <div className="space-y-24 mb-20">
             {orderedMockups(SARY.mockups).map((m, i, arr) => (

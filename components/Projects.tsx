@@ -5,18 +5,24 @@
  * the full URL. See `public/images/case-studies/README.md` for slots.
  * ──────────────────────────────────────────────────────────────────────── */
 const CASE_STUDY_IMAGES = {
-  // Slot 1 — amber accent — "Repeat Purchase Engine for B2B Retail"
-  repeatPurchase:
+  // Slot 1 — amber — Sary Grocery App
+  saryGrocery:
     'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=1200',
-  // Slot 2 — rust red accent — "Behavior-Driven Retention Strategy"
-  healthLadder:
+  // Slot 2 — teal — Landing Page & Use-Case System
+  landingPage:
     'https://images.unsplash.com/photo-1553484771-371a605b060b?auto=format&fit=crop&q=80&w=1200',
-  // Slot 3 — lavender accent — "Lifecycle-Based Upsell System for SaaS"
-  shorefieldSaas:
+  // Slot 3 — lavender — Vendor & Product SaaS Management Dashboard
+  saasDashboard:
     'https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&q=80&w=1200',
-  // Slot 4 — warm gold accent — "Frictionless Global Payments Flow"
-  globalPayments:
+  // Slot 4 — warm gold — Hakbah Fintech Growth
+  hakbahFintech:
     'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1200',
+  // Slot 5 — cool cyan — SAMPO AI Pricing Tool
+  sampoAi:
+    'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200',
+  // Slot 6 — fiery red — Jackaroo Gaming UI
+  jackarooGaming:
+    'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=1200',
 } as const;
 
 import { ArrowUpRight } from 'lucide-react';
@@ -27,54 +33,96 @@ interface ProjectsProps {
   onProjectClick?: (id: string) => void;
 }
 
+/*
+   Ordered chronologically — the sticky rail reads as one continuous
+   timeline (2020 → 2022 → 2023 → 2024 → 2025 → 2026), each year mapped
+   to the career era the case study belongs to (Zyda SaaS → Sary B2B →
+   Landing/product story → Hakbah growth → SAMPO AI → Lobah gaming).
+   Distinct years per row so the rail's year labels never repeat.
+
+   `hasStudy` gates the "Explore →" CTA and the row's click handler.
+   Rows whose id is *not* registered in App.tsx's CASE_STUDY_REGISTRY
+   set `hasStudy: false` so they read as inline chapters rather than
+   opening a blank overlay.
+*/
 const projects = [
   {
-    id: 'sary-repeat-customers',
-    image: CASE_STUDY_IMAGES.repeatPurchase,
-    year: '2024',
-    category: 'Fintech / Marketplace',
-    title: 'Repeat Purchase Engine for B2B Retail',
-    summary:
-      'Designed a behavioral loop that turned one-time buyers into repeat customers, lifting reorder rate 34% across 12K+ merchants.',
-    accentColor: 'rgba(200,140,70,0.9)',
-    imageGlow:
-      'radial-gradient(ellipse 70% 55% at 15% 20%, rgba(200,120,50,0.09) 0%, transparent 70%)',
-  },
-  {
-    id: 'health-ladder',
-    image: CASE_STUDY_IMAGES.healthLadder,
-    year: '2024',
-    category: 'Growth',
-    title: 'Behavior-Driven Retention Strategy',
-    summary:
-      'Built a health-scoring framework that flagged at-risk users 3 weeks earlier — cutting churn by 22% through targeted intervention flows.',
-    accentColor: 'rgba(190,100,80,0.9)',
-    imageGlow:
-      'radial-gradient(ellipse 65% 50% at 80% 70%, rgba(180,80,60,0.08) 0%, transparent 70%)',
-  },
-  {
     id: 'shorefield-holidays',
-    image: CASE_STUDY_IMAGES.shorefieldSaas,
-    year: '2023',
-    category: 'SaaS',
-    title: 'Lifecycle-Based Upsell System for SaaS',
+    image: CASE_STUDY_IMAGES.saasDashboard,
+    year: '2020',
+    category: 'SaaS · Zyda era',
+    title: 'Vendor & Product SaaS Management Dashboard',
     summary:
-      'Contextual upsell tied to real user milestones — a 28% lift in plan upgrades without adding a single point of friction.',
+      'A single command surface for vendor operators — one dashboard to run catalogue, pricing, and fulfilment. Cut time-to-resolve by 43%.',
     accentColor: 'rgba(160,125,195,0.9)',
     imageGlow:
       'radial-gradient(ellipse 60% 55% at 50% 40%, rgba(100,70,120,0.07) 0%, transparent 70%)',
+    hasStudy: true,
+  },
+  {
+    id: 'sary-repeat-customers',
+    image: CASE_STUDY_IMAGES.saryGrocery,
+    year: '2022',
+    category: 'Grocery Marketplace · Sary era',
+    title: 'Sary Grocery Ordering App',
+    summary:
+      'One use case, one obsession: turn first-time buyers into repeat customers. A behavioural loop that lifted reorder rate 34% across 12K+ merchants.',
+    accentColor: 'rgba(200,140,70,0.9)',
+    imageGlow:
+      'radial-gradient(ellipse 70% 55% at 15% 20%, rgba(200,120,50,0.09) 0%, transparent 70%)',
+    hasStudy: true,
+  },
+  {
+    id: 'health-ladder',
+    image: CASE_STUDY_IMAGES.landingPage,
+    year: '2023',
+    category: 'Product Story · Marketing',
+    title: 'Landing Page & Use-Case System',
+    summary:
+      'A modular landing framework — hero, use-case gallery, proof rails — engineered so the same product could speak to five buyer types without a rebuild.',
+    accentColor: 'rgba(120,205,195,0.9)',
+    imageGlow:
+      'radial-gradient(ellipse 65% 50% at 80% 70%, rgba(90,175,165,0.08) 0%, transparent 70%)',
+    hasStudy: true,
   },
   {
     id: 'global-payments',
-    image: CASE_STUDY_IMAGES.globalPayments,
-    year: '2025',
-    category: 'Fintech',
-    title: 'Frictionless Global Payments Flow',
+    image: CASE_STUDY_IMAGES.hakbahFintech,
+    year: '2024',
+    category: 'Fintech Growth · Hakbah era',
+    title: 'Behavior-Driven Retention for Saudi Fintech',
     summary:
-      'Redesigned a cross-border payment experience — drop-off down 41%, transaction completion under 90 seconds.',
+      'A health-scoring framework that flagged at-risk savers 3 weeks earlier — cutting churn 22% through targeted intervention flows.',
     accentColor: 'rgba(200,150,80,0.9)',
     imageGlow:
       'radial-gradient(ellipse 70% 60% at 25% 75%, rgba(160,100,40,0.08) 0%, transparent 70%)',
+    hasStudy: true,
+  },
+  {
+    id: 'sampo-ai-pricing',
+    image: CASE_STUDY_IMAGES.sampoAi,
+    year: '2025',
+    category: 'Enterprise AI · SAMPO',
+    title: 'SAMPO AI Pricing & Insights Platform',
+    summary:
+      'A pricing-intelligence surface for enterprise revenue teams — real-time model outputs translated into a decision UI operators can actually read.',
+    accentColor: 'rgba(120,180,215,0.9)',
+    imageGlow:
+      'radial-gradient(ellipse 65% 55% at 30% 30%, rgba(80,145,190,0.09) 0%, transparent 70%)',
+    hasStudy: false,
+  },
+  {
+    id: 'jackaroo-game-ui',
+    image: CASE_STUDY_IMAGES.jackarooGaming,
+    year: '2026',
+    category: 'Gaming UI/UX · Lobah',
+    title: 'Jackaroo — Real-Time Multiplayer Game UI',
+    summary:
+      'The classic board reimagined for touch — an interface that stays out of the game, with motion, feedback, and turn-state clarity tuned for competitive play.',
+    accentColor: 'rgba(215,110,90,0.9)',
+    imageGlow:
+      'radial-gradient(ellipse 70% 60% at 70% 40%, rgba(190,80,60,0.09) 0%, transparent 70%)',
+    hasStudy: false,
   },
 ];
 
@@ -203,7 +251,7 @@ export function Projects({ onProjectClick }: ProjectsProps) {
               fontFamily: 'Inter, system-ui, sans-serif',
             }}
           >
-            No. 01 — 04
+2020 — 2026
           </span>
           <span
             aria-hidden="true"
@@ -289,8 +337,10 @@ export function Projects({ onProjectClick }: ProjectsProps) {
             zIndex: 1,
           }}
         >
-          A consistent methodology applied across fintech, SaaS, and B2B
-          marketplaces — strategy that ships.
+          Six eras, one methodology — Zyda SaaS operators, Sary grocery
+          marketplaces, a modular landing framework, Hakbah's Saudi fintech
+          rails, SAMPO's enterprise AI, and today's Jackaroo game UI at
+          Lobah. Strategy that ships across every category.
         </motion.p>
       </div>
 
@@ -467,7 +517,9 @@ export function Projects({ onProjectClick }: ProjectsProps) {
                   isActive={activeIndex === i}
                   reduced={!!reduced}
                   onClick={
-                    onProjectClick ? () => onProjectClick(p.id) : undefined
+                    onProjectClick && p.hasStudy
+                      ? () => onProjectClick(p.id)
+                      : undefined
                   }
                   rowRef={(el) => (rowRefs.current[i] = el)}
                 />
