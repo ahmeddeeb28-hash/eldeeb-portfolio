@@ -185,6 +185,124 @@ function IntroSection() {
 }
 
 /* ── 02 · Story ───────────────────────────────────────────────────── */
+/* First Lead milestone — the success story that caps the Story chapter.
+   Sits under the closing line of the bio as its proof point: a ruled
+   callout with a teal spine and a faint wash so it reads as a distinct
+   beat against the body copy, without growing into a slab.
+
+   Reads top-to-bottom as one sentence a recruiter can scan in ~4s:
+   what the milestone was (dated stamp) → what got built (headline verb,
+   not a job title) → the surfaces it covered → who it shipped with.
+   The studio names sit behind a "co-developed with" lead-in so they
+   read as proof rather than loose logos. */
+const CODEV_STUDIOS = ['Wargaming', 'MY.GAMES', 'Sandsoft'];
+
+function FirstLeadHighlight() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="group relative overflow-hidden pl-6 md:pl-7 pr-5 py-5"
+      style={{
+        background:
+          'linear-gradient(to right, rgba(74,242,229,0.055) 0%, rgba(74,242,229,0.012) 55%, rgba(74,242,229,0) 100%)',
+        borderTop: '1px solid rgba(255,255,255,0.07)',
+        borderBottom: '1px solid rgba(255,255,255,0.07)',
+      }}
+    >
+      {/* Teal spine — full-bleed on the left edge. */}
+      <span
+        aria-hidden
+        className="absolute left-0 top-0 bottom-0"
+        style={{
+          width: 2,
+          background:
+            'linear-gradient(to bottom, rgba(74,242,229,0.95) 0%, rgba(74,242,229,0.35) 100%)',
+        }}
+      />
+
+      {/* Dated stamp: names the milestone plainly, then anchors it in time. */}
+      <div className="flex items-center gap-2.5">
+        <span
+          className="font-mono font-black uppercase shrink-0"
+          style={{ fontSize: 9.5, letterSpacing: '0.3em', color: '#4AF2E5' }}
+        >
+          First time leading
+        </span>
+        <span
+          aria-hidden
+          className="h-px flex-1 max-w-[64px]"
+          style={{ background: 'rgba(74,242,229,0.28)' }}
+        />
+        <span
+          className="font-mono font-black uppercase shrink-0 text-white/40"
+          style={{ fontSize: 9.5, letterSpacing: '0.22em' }}
+        >
+          2024
+        </span>
+      </div>
+
+      {/* Headline carries the achievement, not the job title. */}
+      <h3
+        className="text-white font-black tracking-tight leading-[1.2] mt-2.5"
+        style={{ fontSize: 'clamp(17px, 1.95vw, 23px)' }}
+      >
+        Built the game UI/UX practice at Lobah: the team, the system,
+        the standards.
+      </h3>
+
+      <p
+        className="mt-2"
+        style={{
+          fontFamily: ds.font.serif,
+          color: 'rgba(220,190,140,0.92)',
+          fontSize: 'clamp(14px, 1.25vw, 16px)',
+          fontStyle: 'italic',
+        }}
+      >
+        HUD, progression, store and live-ops, across cross-platform AAA
+        titles.
+      </p>
+
+      {/* Studio chips, given a lead-in so the names read as proof. */}
+      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 mt-4">
+        <span
+          className="text-white/45 font-mono uppercase shrink-0 transition-colors duration-300 group-hover:text-white/70"
+          style={{ fontSize: 8.5, letterSpacing: '0.22em' }}
+        >
+          Co-developed with
+        </span>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {CODEV_STUDIOS.map((studio) => (
+            <motion.span
+              key={studio}
+              whileHover={{
+                y: -2,
+                color: '#4AF2E5',
+                borderColor: 'rgba(74,242,229,0.6)',
+                backgroundColor: 'rgba(74,242,229,0.1)',
+              }}
+              transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+              className="inline-flex items-center px-2 py-1 rounded-sm font-mono font-black uppercase cursor-default"
+              style={{
+                fontSize: 9,
+                letterSpacing: '0.2em',
+                color: 'rgba(255,255,255,0.82)',
+                backgroundColor: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.2)',
+              }}
+            >
+              {studio}
+            </motion.span>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 function StorySection() {
   return (
     <section id="story" className="relative px-6 py-24 md:py-32 border-t border-white/5">
@@ -194,24 +312,29 @@ function StorySection() {
           <div className="space-y-6 max-w-2xl">
             <p className="text-white/70 text-base md:text-lg leading-[1.7]">
               I grew up in the Egyptian countryside, in a small town where the nearest computer lab
-              was a bus ride away and "designer" wasn't a career anyone around me had heard of. What
-              we had instead was patience, and the kind of resourcefulness that comes from having
-              to build things yourself, because nobody was going to hand them to you.
+              was a bus ride away and &ldquo;designer&rdquo; wasn&rsquo;t a career anyone around me
+              had heard of. What we had instead was patience, and the kind of resourcefulness that
+              comes from having to build things yourself, because nobody was going to hand them to
+              you.
             </p>
             <p className="text-white/70 text-base md:text-lg leading-[1.7]">
-              That's where the obsession started, not with software, but with noticing when
-              something didn't work. I taught myself everything I know about design and code late
-              at night, piecing it together from tutorials and forum threads, because there was no
-              formal path from where I was to where I wanted to be. Every skill I have was earned in
-              the gap between what I had and what I needed.
+              That&rsquo;s where the obsession started, not with software, but with noticing when
+              something didn&rsquo;t work. I taught myself everything I know about design and code
+              late at night, piecing it together from tutorials and forum threads, because there was
+              no formal path from where I was to where I wanted to be. Every skill I have was earned
+              in the gap between what I had and what I needed.
             </p>
             <p className="text-white/70 text-base md:text-lg leading-[1.7]">
               Nine years later, that same kid from the countryside is leading design for teams
-              across gaming, fintech, and AI. These are companies and cities I'd only read about
-              growing up. The résumé reads like a straight line. It wasn't. It was a long climb,
-              one late night and one hard-won opportunity at a time. That's the part of the story
-              I'm proudest of.
+              across gaming, fintech, and AI. These are companies and cities I&rsquo;d only read
+              about growing up. The résumé reads like a straight line. It wasn&rsquo;t. It was a
+              long climb, one late night and one hard-won opportunity at a time. That&rsquo;s the
+              part of the story I&rsquo;m proudest of.
             </p>
+
+            <div className="pt-6 md:pt-8">
+              <FirstLeadHighlight />
+            </div>
           </div>
           <div className="shrink-0 md:sticky md:top-32">
             <div
@@ -257,20 +380,25 @@ type Role = {
   current?: boolean;
 };
 
+/* Each line is one shipped outcome, written outcome-first so the verb and
+   the number land before the context does. Corporates read the top of each
+   card for scope — team size, systems, cross-functional ownership. Startups
+   read for velocity and lift. Every role carries both, in that order, and
+   every claim traces back to the CV rather than to adjectives. */
 const CURRENT_ROLE: Role = {
   role: 'Lead Game UI/UX Designer',
   company: 'Lobah Gaming',
   domain: 'Gaming',
-  period: '2024 — Present',
+  period: '2024 to Present',
   location: 'Poland & Saudi Arabia',
   stamps: [
     { city: 'Warsaw', country: 'PL', flag: 'PL' },
     { city: 'Riyadh', country: 'SA', flag: 'SA' },
   ],
   lines: [
-    'Leading UI/UX for real-time multiplayer titles across mobile and console.',
-    'Building the design language, componentry, and moment-to-moment feel from first principles.',
-    'Partnering with engineering, art, and product to ship live features that hold up under real player load.',
+    'Directing design across three titles (Samlah, IceBreaker, Jackaroo) on one shared game design system.',
+    'Rebuilt onboarding and progression, cutting time-to-play by 40% and reducing early-session drop-off.',
+    'Run UX review, game QA, and roadmap alignment across product, engineering, and art.',
   ],
   current: true,
 };
@@ -280,15 +408,16 @@ const PAST_ROLES: Role[] = [
     role: 'Principal Product Designer',
     company: 'SAMPO · AI Pricing Tool',
     domain: 'AI · SaaS',
-    period: '2024 — 2025',
+    period: '2024 to 2025',
     location: 'Dubai & Finland',
     stamps: [
       { city: 'Dubai',    country: 'AE', flag: 'AE' },
       { city: 'Helsinki', country: 'FI', flag: 'FI' },
     ],
     lines: [
-      'Shaped the interface layer of an AI pricing engine used by enterprise revenue teams.',
-      'Translated statistical models and forecasts into decisions people could actually trust and defend.',
+      'Owned end-to-end design for an early-stage AI pricing engine: vision, structure, and launch UX.',
+      'Shipped the analysis dashboard and Alliance Perks UI: +40% pilot usage, +34% partner engagement, +28% sign-up intent.',
+      'Cut onboarding friction 22% and worked directly with founders on GTM and roadmap.',
     ],
   },
   {
@@ -299,132 +428,134 @@ const PAST_ROLES: Role[] = [
     location: 'Riyadh, Saudi Arabia',
     stamps: [{ city: 'Riyadh', country: 'SA', flag: 'SA' }],
     lines: [
-      'Led product design for a savings-circles platform reframing how people build trust with money together.',
-      'Set the design foundations — system, patterns, rituals — for a young team scaling into new markets.',
+      'Redesigned the core savings experience for a Saudi fintech, lifting weekly active users 22%.',
+      'Built segmented notifications and a visual savings tracker: +35% open rate, +27% feature adoption.',
+      'Co-authored the Tawuniya partnership BRD (+15% lead generation) and mentored the team to 20% faster delivery.',
     ],
   },
   {
     role: 'Design Lead',
     company: 'Sary',
     domain: 'B2B E-commerce',
-    period: '2021 — 2024',
+    period: '2021 to 2024',
     location: 'Riyadh, Saudi Arabia',
     stamps: [{ city: 'Riyadh', country: 'SA', flag: 'SA' }],
     lines: [
-      'Led design across a B2B marketplace serving thousands of small retailers across the Gulf.',
-      'Owned discovery, checkout, and merchant tooling from strategy through pixel-level polish.',
+      'Promoted from Senior to Lead; managed 8 designers across 3 squads and raised design velocity 40%.',
+      'Rolled out a tokenized design system to 25+ engineers, cutting handoff time 30%.',
+      'Redesigned driver delivery and B2B checkout: +36% order-closure accuracy, 20% fewer delivery failures.',
     ],
   },
   {
     role: 'Senior Product Designer',
     company: 'Zyda',
-    domain: 'SaaS',
-    period: '2019 — 2021',
+    domain: 'SaaS · F&B Commerce',
+    period: '2020 to 2021',
     location: 'Kuwait City, Kuwait',
     stamps: [{ city: 'Kuwait', country: 'KW', flag: 'KW' }],
     lines: [
-      'Designed the ordering and storefront experience for a fast-growing F&B SaaS in the Gulf.',
-      'Shipped merchant dashboards, consumer flows, and internal tooling alongside a small, fast team.',
+      'Shipped 10+ features across web and app for a Gulf commerce platform, accelerating delivery 25%.',
+      'Redesigned the marketing site (+22% visitor-to-signup) and storefront checkout (+15% completed orders).',
+      'Launched dine-in and subscription tooling, lifting repeat order frequency 28%.',
     ],
   },
   {
     role: 'Senior Product Designer',
     company: 'AqarMap',
     domain: 'Real Estate',
-    period: '2019 — 2021',
+    period: '2019 to 2021',
     location: 'Cairo, Egypt',
     stamps: [{ city: 'Cairo', country: 'EG', flag: 'EG' }],
     lines: [
-      'Redesigned one of Egypt\u2019s largest online real-estate marketplaces end-to-end.',
-      'Balanced practical filters and dense listings with a warmer, more human way of finding a home.',
+      'Rebuilt consumer search for Egypt\u2019s largest real-estate marketplace, lifting result relevance from 54% to 80%.',
+      'Revamped onboarding and notifications, driving a 28% increase in new-user activation.',
     ],
   },
 ];
 
-/* One role card. Two columns on desktop: left is the narrative
-   (meta row → role → company · domain → 2–3 line summary); right is
-   a small stack of passport stamps for the cities where the company
-   operated — reusing the same mark language as the Beyond Work strip
-   so location reads as a designed artifact, not a label. */
-function RoleCard({ role, index }: { role: Role; index: number }) {
+/* Numbers are what the eye actually stops on when someone is skimming ten
+   résumés, so metrics get lifted out of the sentence with weight and the
+   accent colour while the rest stays body copy. Splitting on a capturing
+   group puts every match at an odd index, which avoids the stateful
+   lastIndex trap that comes with reusing a /g regex.
+   Matches percentages (40%, +34%), counts (10+, 25+), and bare
+   team-scale figures (8 designers, 3 squads). */
+const METRIC = /([+−-]?\d+(?:\.\d+)?%|\b\d+\+|\b\d+(?=\s(?:designers|engineers|squads|titles|features)))/g;
+
+/* Twenty-five permanent underlines would turn a page of achievements into a
+   page of stripes, so the line is treated as an instrument rather than a mark.
+   It wipes in beneath the number, holds for a beat, then clears off to the
+   right and leaves nothing behind. What stays is the colour, which the line
+   appears to deposit on its way past.
+   That split is the whole idea: the movement is what catches the eye, the
+   colour is what keeps it, and because no rule ever settles the section can
+   carry any number of metrics without accumulating clutter.
+   The exit is a second scaleX collapse rather than a fade, with originX
+   flipped to the right edge while the bar is still at full width, so the
+   switch is invisible and the whole gesture stays on the compositor.
+   `order` staggers figures inside one sentence so a line carrying three
+   numbers reads as a sequence instead of a flash. */
+function Metric({ children, order }: { children: React.ReactNode; order: number }) {
+  const reveal = { once: true, margin: '-40px' } as const;
+  const ease = [0.22, 1, 0.36, 1] as const;
+  const delay = 0.1 + order * 0.13;
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 14 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.5, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
-      className="p-4 md:p-5"
-      style={{
-        border: role.current ? '1px solid rgba(74,242,229,0.18)' : '1px solid rgba(255,255,255,0.08)',
-        borderRadius: ds.shape.radius.lg,
-        background: role.current
-          ? 'linear-gradient(160deg, rgba(74,242,229,0.035) 0%, rgba(255,255,255,0.02) 55%, rgba(255,255,255,0.015) 100%)'
-          : 'rgba(255,255,255,0.02)',
-        boxShadow: role.current ? '0 16px 44px -28px rgba(74,242,229,0.25)' : 'none',
-      }}
+    <motion.span
+      className="relative inline-block font-bold"
+      initial={{ color: 'rgba(255,255,255,0.72)' }}
+      whileInView={{ color: 'rgba(74,242,229,0.95)' }}
+      viewport={reveal}
+      transition={{ duration: 0.55, delay: delay + 0.14, ease }}
     >
-      <div className="grid md:grid-cols-[1fr_auto] gap-3 md:gap-6 items-start">
-        {/* Left column — narrative. */}
-        <div>
-          <div className="flex items-center gap-2.5 mb-2 flex-wrap">
-            {role.current && (
-              <span
-                className="font-mono text-[9px] font-black tracking-[0.28em] uppercase px-1.5 py-0.5 rounded-sm"
-                style={{
-                  color: '#4AF2E5',
-                  background: 'rgba(74,242,229,0.08)',
-                  border: '1px solid rgba(74,242,229,0.25)',
-                }}
-              >
-                Current
-              </span>
-            )}
-            <span className="text-white/30 font-mono text-[9.5px] tracking-[0.24em] uppercase">
-              {role.period}
-            </span>
-          </div>
+      {children}
+      <motion.span
+        aria-hidden
+        className="absolute left-0 right-0 block"
+        style={{
+          bottom: -2,
+          height: 1.5,
+          borderRadius: 1,
+          background: 'rgba(74,242,229,0.5)',
+        }}
+        initial={{ scaleX: 0, originX: 0 }}
+        whileInView={{ scaleX: [0, 1, 1, 0], originX: [0, 0, 1, 1] }}
+        viewport={reveal}
+        transition={{ duration: 1.2, delay, times: [0, 0.3, 0.55, 1], ease }}
+      />
+    </motion.span>
+  );
+}
 
-          <h3
-            className="text-white font-bold tracking-tight mb-0.5"
-            style={{ fontSize: 'clamp(15px, 1.1vw, 17px)' }}
-          >
-            {role.role}
-          </h3>
-
-          <p
-            className="italic mb-2"
-            style={{
-              fontFamily: ds.font.serif,
-              color: 'rgba(220,190,140,0.85)',
-              fontSize: '13px',
-            }}
-          >
-            {role.company}
-            <span className="text-white/25 not-italic" style={{ fontFamily: 'inherit', margin: '0 0.4em' }}>·</span>
-            <span className="text-white/45 not-italic text-[11.5px]" style={{ fontFamily: 'inherit', letterSpacing: '0.02em' }}>
-              {role.domain}
-            </span>
-          </p>
-
-          <div className="flex flex-col gap-1">
-            {role.lines.map((line, i) => (
-              <p key={i} className="text-white/55 text-[12.5px] leading-snug">
-                {line}
-              </p>
-            ))}
-          </div>
-        </div>
-
-        {/* Right column — simple emoji-flag chips (city · code), stacked
-             on desktop, wrapping inline on mobile. No boxes, no "Now" —
-             the Current pill on the meta row already carries that meaning. */}
-        <div className="flex md:flex-col flex-row flex-wrap gap-x-3 gap-y-1.5 md:gap-2 shrink-0 md:items-end md:pl-4 md:border-l md:border-white/[0.06] md:pt-1">
-          {role.stamps.map((stamp, i) => (
-            <CountryChip key={`${stamp.city}-${i}`} city={stamp.city} code={stamp.country} size="sm" />
-          ))}
-        </div>
-      </div>
-    </motion.article>
+/* Rendered as a real list item with its own marker. Bare stacked paragraphs
+   collapse into one soft grey block; the marker column gives the achievements
+   a repeating left edge so the eye can count them without reading them.
+   Teal is spent only on the numbers, so the marker stays neutral and each
+   block has exactly one thing competing for attention. `lg` is the current
+   role, which should sit a half-step above the timeline entries below it. */
+function AchievementLine({ text, size = 'sm' }: { text: string; size?: 'sm' | 'lg' }) {
+  const lg = size === 'lg';
+  return (
+    <li className="grid grid-cols-[auto_1fr] gap-x-3 items-start">
+      <span
+        aria-hidden
+        className="h-[4px] w-[4px] rounded-full shrink-0"
+        style={{ marginTop: lg ? 8 : 7, background: 'rgba(255,255,255,0.28)' }}
+      />
+      <span
+        className="text-white/70"
+        style={{ fontSize: lg ? 14 : 13, lineHeight: 1.6 }}
+      >
+        {text.split(METRIC).map((part, i) =>
+          i % 2 === 1 ? (
+            <Metric key={i} order={(i - 1) / 2}>
+              {part}
+            </Metric>
+          ) : (
+            part
+          ),
+        )}
+      </span>
+    </li>
   );
 }
 
@@ -819,13 +950,13 @@ function CurrentRoleRow({ role }: { role: Role }) {
       {/* Middle: role title + company + description */}
       <div className="min-w-0">
         <h3
-          className="text-white font-bold tracking-tight mb-1"
+          className="text-white font-black tracking-tight mb-1"
           style={{ fontSize: 'clamp(22px, 1.8vw, 26px)', lineHeight: 1.15 }}
         >
           {role.role}
         </h3>
         <p
-          className="mb-3"
+          className="mb-4"
           style={{
             fontFamily: ds.font.serif,
             color: 'rgba(220,190,140,0.9)',
@@ -842,13 +973,11 @@ function CurrentRoleRow({ role }: { role: Role }) {
             {role.domain}
           </span>
         </p>
-        <div className="flex flex-col gap-1.5">
+        <ul className="flex flex-col gap-2">
           {role.lines.map((line, i) => (
-            <p key={i} className="text-white/60 text-[13.5px] leading-relaxed">
-              {line}
-            </p>
+            <AchievementLine key={i} text={line} size="lg" />
           ))}
-        </div>
+        </ul>
       </div>
 
       {/* Right: locations, stacked on desktop */}
@@ -891,7 +1020,7 @@ function PreviouslyTimeline({ roles }: { roles: Role[] }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.45, delay: i * 0.05, ease: [0.22, 1, 0.36, 1] }}
-            className={`relative grid grid-cols-1 md:grid-cols-[minmax(120px,160px)_1fr_auto] gap-4 md:gap-10 py-5 md:py-6 ${
+            className={`relative grid grid-cols-1 md:grid-cols-[minmax(120px,160px)_1fr_auto] gap-4 md:gap-10 py-6 md:py-7 ${
               i > 0 ? 'border-t border-white/[0.06]' : ''
             }`}
           >
@@ -921,13 +1050,13 @@ function PreviouslyTimeline({ roles }: { roles: Role[] }) {
             {/* Middle: role details */}
             <div className="min-w-0">
               <h4
-                className="text-white font-bold tracking-tight mb-0.5"
-                style={{ fontSize: '17px', lineHeight: 1.25 }}
+                className="text-white font-black tracking-tight mb-0.5"
+                style={{ fontSize: '18px', lineHeight: 1.25 }}
               >
                 {role.role}
               </h4>
               <p
-                className="mb-2"
+                className="mb-3"
                 style={{
                   fontFamily: ds.font.serif,
                   color: 'rgba(220,190,140,0.85)',
@@ -944,13 +1073,11 @@ function PreviouslyTimeline({ roles }: { roles: Role[] }) {
                   {role.domain}
                 </span>
               </p>
-              <div className="flex flex-col gap-1">
+              <ul className="flex flex-col gap-2">
                 {role.lines.map((line, li) => (
-                  <p key={li} className="text-white/55 text-[12.5px] leading-snug">
-                    {line}
-                  </p>
+                  <AchievementLine key={li} text={line} />
                 ))}
-              </div>
+              </ul>
             </div>
 
             {/* Right: locations */}
@@ -1078,7 +1205,7 @@ function HorizontalMilestone({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         >
-          — You are here
+          You are here
         </motion.span>
       )}
       <motion.span
@@ -1381,7 +1508,7 @@ function TimelineSection() {
                               textShadow: '0 0 10px rgba(74,242,229,0.6)',
                             }}
                           >
-                            — YOU ARE HERE
+                            YOU ARE HERE
                           </span>
                         ) : (
                           <span className="text-white/30 font-mono text-[9px] font-black tracking-[0.3em]">
@@ -1644,7 +1771,7 @@ function BeyondWorkSection() {
             }}
           >
             I chase new cities
-            <span style={{ color: '#4AF2E5' }}>—</span>
+            <span style={{ color: '#4AF2E5' }}>,</span>
             <br className="hidden md:block" />
             but I stay for the stories.
           </p>
@@ -2156,7 +2283,7 @@ function PassportStrip({
           letterSpacing: '0.06em',
         }}
       >
-        — and wherever next.
+        and wherever next.
       </motion.p>
     </div>
   );
