@@ -25,34 +25,39 @@ const brandLogos: { name: string; src: string }[] = [
 
 /* ──────────────────────────────────────────────────────────────
  * IMPACT METRICS
- * These three read as one set, so each label states its own scope
- * explicitly and they climb in that order: one metric → one product
- * → the whole body of work. Without the scope wording, "100K+" sitting
- * beside "12M+" looks like the same quantity counted twice. It isn't:
- * the 100K is users added to a single platform, and it is a subset of
- * the 12M cumulative reach. Keep the scope phrasing if you swap the
- * figures, otherwise the contradiction comes straight back.
+ * One rule here: every figure traces to a named product in the CV.
+ * The three are held together by being the same kind of measurement,
+ * a percentage change on one named product, one per industry, so they
+ * can be read side by side without doing mental conversion. Mixing a
+ * percentage next to a raw headcount is what made the old set look
+ * self-contradictory: "100K+" beside "12M+" invited the reader to
+ * treat them as the same quantity. If a figure gets swapped, keep it
+ * a percentage on a single named product or the set stops cohering.
+ *
+ *   +22% WAU        Hakbah   AboutPage.tsx:431
+ *   +27% AOV        Sary     lib/sanity/fallbackCaseStudies.ts:32
+ *   40% faster TTP  Lobah    AboutPage.tsx:400
  * ──────────────────────────────────────────────────────────── */
 const stats = [
   {
-    number: "35%",
-    label: "Lift in Customer Spending",
+    number: "+22%",
+    label: "Weekly Active Users",
     description:
-      "Average order value on a single marketplace, after I rebuilt the browsing and checkout experience.",
+      "Hakbah, fintech. Rebuilding the core savings experience and the notifications around it brought people back week after week.",
     glowColor: "#4EF0D9",
   },
   {
-    number: "100K+",
-    label: "New Users on One Platform",
+    number: "+27%",
+    label: "Average Order Value",
     description:
-      "Active users added to a single product once onboarding and retention were redesigned around real behaviour.",
+      "Sary, B2B commerce. Buyers reached the right products faster once browsing and checkout were redesigned around how they actually shop.",
     glowColor: "#BA7CFF",
   },
   {
-    number: "12M+",
-    label: "Reached Across Every Product",
+    number: "40%",
+    label: "Faster Time to Play",
     description:
-      "Cumulative audience of everything shipped so far, spanning gaming, fintech, AI, and SaaS.",
+      "Lobah Gaming. Rebuilt onboarding and progression across three titles, cutting the wait between opening the app and the first match.",
     glowColor: "#4EF0D9",
   },
 ];
@@ -90,7 +95,7 @@ export function BrandsStats() {
           eyebrow="Impact"
           title="Designing products that drive"
           flourish="real results."
-          subtitle="A decade of designing high-performing products used by millions."
+          subtitle="A decade of design work, measured by what changed after launch."
         />
 
         {/* Brands & Social Proof Subsection */}
