@@ -10,7 +10,7 @@ export function GlobalPaymentsCaseStudy(props: CaseStudyComponentProps) {
     <StubCaseStudy
       title="Frictionless Global Payments"
       company="Global Payments"
-      year="2025"
+      year="2024"
       category="Fintech · UX Research"
       accent="rgba(180,130,60,0.85)"
       {...props}

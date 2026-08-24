@@ -10,7 +10,7 @@ export function ShorefieldHolidaysCaseStudy(props: CaseStudyComponentProps) {
     <StubCaseStudy
       title="Lifecycle Upsell System"
       company="Shorefield Holidays"
-      year="2023"
+      year="2020"
       category="SaaS · Conversion"
       accent="rgba(140,110,180,0.85)"
       {...props}

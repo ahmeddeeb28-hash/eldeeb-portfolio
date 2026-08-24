@@ -45,7 +45,7 @@ const SARY_NARRATIVE = {
     'Rethinking upselling placement and personalization to unlock real business impact.',
   role: 'Product / Innovation Designer',
   company: 'Sary',
-  duration: '2024',
+  duration: '2022',
   context:
     'Sary is a leading B2B marketplace. While surface numbers looked good, a deeper look revealed a quiet failure: customers were buying once then disappearing. I led the effort to understand and fix this retention gap.',
   problem:

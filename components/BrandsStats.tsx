@@ -23,26 +23,36 @@ const brandLogos: { name: string; src: string }[] = [
   { name: 'Brand',              src: '/images/brands/Component 6 \u2013 1.png' },
 ];
 
+/* ──────────────────────────────────────────────────────────────
+ * IMPACT METRICS
+ * These three read as one set, so each label states its own scope
+ * explicitly and they climb in that order: one metric → one product
+ * → the whole body of work. Without the scope wording, "100K+" sitting
+ * beside "12M+" looks like the same quantity counted twice. It isn't:
+ * the 100K is users added to a single platform, and it is a subset of
+ * the 12M cumulative reach. Keep the scope phrasing if you swap the
+ * figures, otherwise the contradiction comes straight back.
+ * ──────────────────────────────────────────────────────────── */
 const stats = [
   {
     number: "35%",
-    label: "Increase in Customer Spending",
+    label: "Lift in Customer Spending",
     description:
-      "People purchased more per order after simplifying the browsing and buying experience.",
+      "Average order value on a single marketplace, after I rebuilt the browsing and checkout experience.",
     glowColor: "#4EF0D9",
   },
   {
     number: "100K+",
-    label: "New Active Users",
+    label: "New Users on One Platform",
     description:
-      "More people started using the product regularly after key experience improvements.",
+      "Active users added to a single product once onboarding and retention were redesigned around real behaviour.",
     glowColor: "#BA7CFF",
   },
   {
     number: "12M+",
-    label: "People Using My Designs",
+    label: "Reached Across Every Product",
     description:
-      "Products I designed are used by millions across fintech, gaming, and SaaS platforms.",
+      "Cumulative audience of everything shipped so far, spanning gaming, fintech, AI, and SaaS.",
     glowColor: "#4EF0D9",
   },
 ];

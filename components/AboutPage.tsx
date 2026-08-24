@@ -325,7 +325,7 @@ function StorySection() {
               in the gap between what I had and what I needed.
             </p>
             <p className="text-white/70 text-base md:text-lg leading-[1.7]">
-              Nine years later, that same kid from the countryside is leading design for teams
+              Ten years later, that same kid from the countryside is leading design for teams
               across gaming, fintech, and AI. These are companies and cities I&rsquo;d only read
               about growing up. The résumé reads like a straight line. It wasn&rsquo;t. It was a
               long climb, one late night and one hard-won opportunity at a time. That&rsquo;s the
@@ -348,7 +348,7 @@ function StorySection() {
                 <Meta label="Role" value="Lead Product Designer" />
                 <Meta label="Based" value="Remote / MENA" />
                 <Meta label="Focus" value="Systems & Growth" />
-                <Meta label="Years" value="9+" />
+                <Meta label="Years" value="10+" />
               </div>
             </div>
           </div>
@@ -561,8 +561,8 @@ function AchievementLine({ text, size = 'sm' }: { text: string; size?: 'sm' | 'l
 
 /* ── Seniority Seal ──────────────────────────────────────────────────
    Circular decorative badge. Dark filled disc, hairline gold rings,
-   ONE clean loop of curved teal outer text ("· VALIDATED IMPACT · 9+
-   YEARS SENIOR PRODUCT LEADERSHIP"), center "9+" numeral, filled teal
+   ONE clean loop of curved teal outer text ("· VALIDATED IMPACT · 10+
+   YEARS SENIOR PRODUCT LEADERSHIP"), center "10+" numeral, filled teal
    "AUTHENTICATED" pill, "SENIORITY SEAL" caption *below* the disc so
    it never collides with the ring. Three continuously expanding
    concentric rings give the seal a subtle radial pulse. */
@@ -637,7 +637,7 @@ function SeniorityStamp() {
                 <stop offset="65%" stopColor="#0C0B0A" />
                 <stop offset="100%" stopColor="#0A0A0A" />
               </radialGradient>
-              {/* Heavy elevation stack for the "9+" numeral — three
+              {/* Heavy elevation stack for the "10+" numeral — three
                    layered drop-shadows (contact / ambient / room) that
                    simulate real physical lift off the seal surface */}
               <filter
@@ -670,7 +670,7 @@ function SeniorityStamp() {
                 />
               </filter>
               {/* Soft dark elevation halo painted behind the numeral —
-                   deepens the recessed background so the "9+" pops
+                   deepens the recessed background so the "10+" pops
                    forward off the disc */}
               <radialGradient id="seniority-9-halo" cx="50%" cy="50%" r="50%">
                 <stop offset="0%" stopColor="rgba(0,0,0,0.72)" />
@@ -828,25 +828,28 @@ function SeniorityStamp() {
                 }}
               >
                 <textPath href="#seniority-arc" startOffset="0%">
-                  · VALIDATED IMPACT · 9+ YEARS SENIOR PRODUCT LEADERSHIP
+                  · VALIDATED IMPACT · 10+ YEARS SENIOR PRODUCT LEADERSHIP
                 </textPath>
               </text>
             </motion.g>
 
             {/* Elevation halo — a soft dark disc directly behind the
-                 numeral so the "9+" reads as physically lifted off
-                 the seal surface */}
+                 numeral so the "10+" reads as physically lifted off
+                 the seal surface. Widened from rx 30 to 37 because the
+                 numeral carries three glyphs, not two. */}
             <ellipse
               cx={cx}
               cy={cy - 8}
-              rx={30}
+              rx={37}
               ry={22}
               fill="url(#seniority-9-halo)"
             />
 
-            {/* "9+" centrepiece numeral — slightly lifted above true center
+            {/* "10+" centrepiece numeral — slightly lifted above true center
                  to balance the pill below, wearing a heavy layered
-                 drop-shadow stack for a true stamped-relief feel */}
+                 drop-shadow stack for a true stamped-relief feel. Size
+                 steps down from 40 to 35 so the extra glyph still clears
+                 the inner ring instead of crowding it. */}
             <text
               x={cx}
               y={cy - 9}
@@ -856,17 +859,17 @@ function SeniorityStamp() {
               filter="url(#seniority-9-lift)"
               style={{
                 fontFamily: 'Inter, system-ui, sans-serif',
-                fontSize: 40,
+                fontSize: 35,
                 fontWeight: 900,
-                letterSpacing: '-1.8px',
+                letterSpacing: '-2.2px',
               }}
             >
-              9+
+              10+
             </text>
 
             {/* Thin gold divider separating the numeral from the pill —
                  widened + pushed down so it sits at the true midpoint
-                 between the elevated "9+" and the AUTHENTICATED pill */}
+                 between the elevated "10+" and the AUTHENTICATED pill */}
             <line
               x1={cx - 22}
               y1={cy + 17}

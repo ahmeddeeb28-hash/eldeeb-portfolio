@@ -18,7 +18,7 @@ export const FALLBACK_CASE_STUDIES: CaseStudyMap = {
       'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=2000',
     role: 'Product / Innovation Designer',
     company: 'Sary',
-    duration: '2024',
+    duration: '2022',
     context:
       'Sary is a leading B2B marketplace. While surface numbers looked good, a deeper look revealed a quiet failure: customers were buying once then disappearing. I led the effort to understand and fix this retention gap.',
     problem:

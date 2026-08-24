@@ -125,7 +125,7 @@ export function PremiumHero() {
       label: 'The Strategist',
       index: '01',
       headline: 'Strategy that ships.',
-      description: '9+ years building scalable product systems across gaming, AI, fintech, and SaaS platforms. Translating complex requirements into clarity, execution, and measurable business impact.',
+      description: '10+ years building scalable product systems across gaming, AI, fintech, and SaaS platforms. Translating complex requirements into clarity, execution, and measurable business impact.',
       accent: 'rgba(255, 140, 100, 1)',
       accentDim: 'rgba(255, 140, 100, 0.5)',
       gradient: 'linear-gradient(135deg, #FFE9C7 0%, #F5C78A 50%, #E7A868 100%)',
@@ -159,7 +159,7 @@ export function PremiumHero() {
   const stickyNotes: StickyNoteData[] = [
     {
       id: 'years',
-      value: '9+ Years',
+      value: '10+ Years',
       label: 'Shaping products',
       rotate: -7,
       style: { top: '4%', left: '-13%' },

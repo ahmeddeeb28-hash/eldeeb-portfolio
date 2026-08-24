@@ -11,7 +11,7 @@ export function HealthLadderCaseStudy(props: CaseStudyComponentProps) {
     <StubCaseStudy
       title="Behavior-Driven Retention"
       company="Health Ladder"
-      year="2024"
+      year="2023"
       category="Growth · Retention"
       accent="rgba(190,100,80,0.85)"
       {...props}

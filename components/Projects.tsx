@@ -66,7 +66,7 @@ const projects = [
     category: 'Grocery Marketplace · Sary era',
     title: 'Sary Grocery Ordering App',
     summary:
-      'One use case, one obsession: turn first-time buyers into repeat customers. A behavioural loop that lifted reorder rate 34% across 12K+ merchants.',
+      'One use case, one obsession: turn first-time buyers into repeat customers. A behavioural loop that lifted repeat purchases 28% and doubled retention.',
     accentColor: 'rgba(200,140,70,0.9)',
     imageGlow:
       'radial-gradient(ellipse 70% 55% at 15% 20%, rgba(200,120,50,0.09) 0%, transparent 70%)',
