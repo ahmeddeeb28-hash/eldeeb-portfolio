@@ -44,6 +44,11 @@ const brandLogos: { name: string; src: string }[] = [
  * one family. Lobah has no logo file in public/images/brands/, so it falls
  * back to a monogram tile built from `brand`. Never invent a logo file for
  * a brand we don't have a real asset for, add the asset or leave it null.
+ *
+ * `accent` is the card's identity colour. Keep all three distinct, they are
+ * what separates the cards from each other at a glance. It is only ever used
+ * at low alpha (rule, ambient wash, underline), never as fill or text, so the
+ * cards stay readable and the section stays quiet.
  * ──────────────────────────────────────────────────────────── */
 const stats = [
   {
@@ -54,7 +59,7 @@ const stats = [
     logo: "/images/brands/g8.png",
     description:
       "Rebuilding the core savings experience and the notifications around it brought people back week after week.",
-    glowColor: "#4EF0D9",
+    accent: "#4EF0D9",
   },
   {
     number: "+27%",
@@ -64,7 +69,7 @@ const stats = [
     logo: "/images/brands/image 8.png",
     description:
       "Buyers reached the right products faster once browsing and checkout were redesigned around how they actually shop.",
-    glowColor: "#BA7CFF",
+    accent: "#BA7CFF",
   },
   {
     number: "40%",
@@ -74,7 +79,7 @@ const stats = [
     logo: null,
     description:
       "Rebuilt onboarding and progression across three titles, cutting the wait between opening the app and the first match.",
-    glowColor: "#4EF0D9",
+    accent: "#FFB454",
   },
 ];
 
@@ -193,9 +198,15 @@ export function BrandsStats() {
           {/* ... remove this code ... */}
         </div>
 
-        {/* Statistics Row */}
+        {/*
+          Statistics Row.
+          Runs the full width of the section container rather than sitting
+          inset in a narrower max-w-6xl. Cards that are narrower than the
+          heading above them read as a footnote to it, full width reads as
+          the point of the section.
+        */}
         <div
-          className="grid gap-8 grid-cols-1 md:grid-cols-3 max-w-6xl mx-auto"
+          className="grid gap-6 grid-cols-1 md:grid-cols-3"
           style={{
             marginTop: "80px",
           }}
@@ -218,18 +229,31 @@ export function BrandsStats() {
                 ease: [0.16, 1, 0.3, 1],
               }}
               whileHover={{
-                scale: 1.02,
-                y: -12,
-                borderColor: "rgba(255, 255, 255, 0.15)",
-                boxShadow: `0 30px 60px rgba(0, 0, 0, 0.8), 0 0 40px ${stat.glowColor}15`,
+                y: -10,
+                borderColor: "rgba(255, 255, 255, 0.16)",
+                boxShadow: `0 40px 80px -32px rgba(0, 0, 0, 0.95), 0 0 60px -20px ${stat.accent}30, inset 0 1px 0 rgba(255, 255, 255, 0.10)`,
                 transition: { duration: 0.4, ease: [0.25, 1, 0.5, 1] },
               }}
-              className="group relative flex flex-col justify-between overflow-hidden transition-all duration-500"
+              className="group relative flex flex-col justify-between overflow-hidden"
               style={{
-                minHeight: "380px",
-                borderRadius: "24px",
-                background: "#0F0F0F",
-                border: "1px solid rgba(255, 255, 255, 0.04)",
+                minHeight: "440px",
+                borderRadius: "28px",
+                /*
+                  Three stacked layers, top to bottom:
+                  1. a wash of the card's accent anchored to the top-left corner
+                  2. a soft top-lit sheen so the surface reads as physical
+                  3. the base fill
+                  The old flat #0F0F0F sat 5 points off the #0A0A0A section, so
+                  the cards had almost no edge until you hovered them.
+                */
+                background: `
+                  radial-gradient(130% 100% at 0% 0%, ${stat.accent}14, transparent 58%),
+                  linear-gradient(168deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.018) 26%, rgba(255,255,255,0) 60%),
+                  #101010
+                `,
+                border: "1px solid rgba(255, 255, 255, 0.09)",
+                boxShadow:
+                  "0 24px 48px -28px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.06)",
                 padding: "40px",
               }}
             >
@@ -237,16 +261,24 @@ export function BrandsStats() {
               <div
                 className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                 style={{
-                  background: `radial-gradient(1000px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${stat.glowColor}15, transparent 40%)`,
+                  background: `radial-gradient(1000px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${stat.accent}15, transparent 40%)`,
                   zIndex: 1,
                 }}
               />
-              
-              {/* Top Highlight Stroke */}
+
+              {/*
+                Accent rule along the top edge. Unlike the old version this is
+                visible at rest, it is the thing that makes a card look
+                deliberately featured instead of merely present. Left anchored
+                and fading out to the right so it reads editorial, not like a
+                progress bar.
+              */}
               <div
-                className="pointer-events-none absolute top-0 left-0 right-0 h-[1px] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                className="pointer-events-none absolute top-0 left-0 right-0 transition-opacity duration-500 group-hover:!opacity-100"
                 style={{
-                  background: `linear-gradient(90deg, transparent, ${stat.glowColor}40, transparent)`,
+                  height: "2px",
+                  background: `linear-gradient(90deg, ${stat.accent} 0%, ${stat.accent}66 34%, transparent 78%)`,
+                  opacity: 0.6,
                   zIndex: 2,
                 }}
               />
@@ -268,8 +300,17 @@ export function BrandsStats() {
                   strip above so the card reads as part of the same family.
                 */}
                 <div
-                  className="flex items-center"
-                  style={{ gap: "10px", marginBottom: "28px", height: "26px" }}
+                  className="inline-flex items-center transition-colors duration-500 group-hover:!border-white/20"
+                  style={{
+                    gap: "10px",
+                    marginBottom: "30px",
+                    height: "38px",
+                    paddingLeft: "10px",
+                    paddingRight: "15px",
+                    borderRadius: "999px",
+                    border: "1px solid rgba(255, 255, 255, 0.09)",
+                    background: "rgba(255, 255, 255, 0.035)",
+                  }}
                 >
                   {stat.logo ? (
                     <img
@@ -350,30 +391,54 @@ export function BrandsStats() {
                 {/* Big Number Value */}
                 <motion.p
                   style={{
-                    fontSize: "clamp(64px, 8vw, 88px)",
+                    fontSize: "clamp(72px, 9vw, 104px)",
                     fontFamily: "Inter, system-ui, -apple-system, sans-serif",
                     fontWeight: "900",
                     color: "#FFFFFF",
-                    lineHeight: "0.85",
-                    letterSpacing: "-0.06em",
+                    lineHeight: "0.82",
+                    letterSpacing: "-0.065em",
                     textShadow: `0 10px 30px rgba(0,0,0,0.5)`,
                   }}
                 >
                   {stat.number}
                 </motion.p>
+
+                {/*
+                  Accent underline. Anchors the figure and carries the card's
+                  identity colour at the one place the eye already is. Grows on
+                  hover, which is the only motion the card needs to feel alive.
+                */}
+                <div
+                  aria-hidden="true"
+                  className="transition-all duration-500 ease-out group-hover:!w-[72px]"
+                  style={{
+                    width: "44px",
+                    height: "3px",
+                    borderRadius: "999px",
+                    marginTop: "24px",
+                    background: stat.accent,
+                    opacity: 0.9,
+                  }}
+                />
               </div>
 
-              <div className="relative z-10 text-left transition-transform duration-700 group-hover:translate-y-[-2px]">
+              <div
+                className="relative z-10 text-left transition-transform duration-700 group-hover:translate-y-[-2px]"
+                style={{
+                  borderTop: "1px solid rgba(255, 255, 255, 0.07)",
+                  paddingTop: "26px",
+                }}
+              >
                 {/* Label */}
                 <p
-                  className="mb-4"
+                  className="mb-3"
                   style={{
-                    fontSize: "18px",
+                    fontSize: "20px",
                     fontFamily: "Inter, system-ui, -apple-system, sans-serif",
                     fontWeight: "700",
                     color: "#FFFFFF",
                     lineHeight: "1.2",
-                    letterSpacing: "-0.02em",
+                    letterSpacing: "-0.025em",
                   }}
                 >
                   {stat.label}
@@ -383,10 +448,9 @@ export function BrandsStats() {
                 <p
                   style={{
                     fontSize: "15px",
-                    color: "rgba(255, 255, 255, 0.45)",
-                    lineHeight: "1.6",
+                    color: "rgba(255, 255, 255, 0.52)",
+                    lineHeight: "1.62",
                     fontWeight: "400",
-                    maxWidth: "90%",
                   }}
                 >
                   {stat.description}
