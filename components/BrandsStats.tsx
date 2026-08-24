@@ -9,18 +9,18 @@ import { SectionHeader } from "./SectionHeader";
  * See public/images/brands/README.md for format & sizing specs.
  * ──────────────────────────────────────────────────────────── */
 const brandLogos: { name: string; src: string }[] = [
-  { name: 'Nafas',              src: '/images/brands/image 1.png' },
-  { name: 'Zain',               src: '/images/brands/image 6.png' },
-  { name: 'Sampo',              src: '/images/brands/image 8.png' },
-  { name: 'Auto Store',         src: '/images/brands/image 13.png' },
-  { name: 'Saudi Central Bank', src: '/images/brands/English Logo.png' },
-  { name: 'Aqarmap',            src: '/images/brands/Layer 2.png' },
-  { name: 'Sary',               src: '/images/brands/g8.png' },
-  { name: 'Zyda',               src: '/images/brands/Group 1000005970.png' },
-  { name: 'Hakbah',             src: '/images/brands/Group 1000005971.png' },
-  { name: 'Majara',             src: '/images/brands/Group 1000005972.png' },
-  { name: 'Brand Logo',         src: '/images/brands/Group 1000005973.png' },
-  { name: 'Brand',              src: '/images/brands/Component 6 \u2013 1.png' },
+  { name: 'Zain',                     src: '/images/brands/image 1.png' },
+  { name: 'Majara',                   src: '/images/brands/image 6.png' },
+  { name: 'Sary',                     src: '/images/brands/image 8.png' },
+  { name: 'Elcoach',                  src: '/images/brands/image 13.png' },
+  { name: 'Aqarmap',                  src: '/images/brands/English Logo.png' },
+  { name: 'Auto Store',               src: '/images/brands/Layer 2.png' },
+  { name: 'Hakbah',                   src: '/images/brands/g8.png' },
+  { name: 'Zyda',                     src: '/images/brands/Group 1000005970.png' },
+  { name: 'Harvard Business Review',  src: '/images/brands/Group 1000005971.png' },
+  { name: 'Mrsool',                   src: '/images/brands/Group 1000005972.png' },
+  { name: 'Saudi Central Bank',       src: '/images/brands/Group 1000005973.png' },
+  { name: 'Nafas',                    src: '/images/brands/Component 6 \u2013 1.png' },
 ];
 
 /* ──────────────────────────────────────────────────────────────
@@ -37,27 +37,43 @@ const brandLogos: { name: string; src: string }[] = [
  *   +22% WAU        Hakbah   AboutPage.tsx:431
  *   +27% AOV        Sary     lib/sanity/fallbackCaseStudies.ts:32
  *   40% faster TTP  Lobah    AboutPage.tsx:400
+ *
+ * Each card carries its brand mark so the figure is attached to a company
+ * instead of the company name being buried in the description sentence.
+ * `logo` points at the same asset the strip above uses, so the two read as
+ * one family. Lobah has no logo file in public/images/brands/, so it falls
+ * back to a monogram tile built from `brand`. Never invent a logo file for
+ * a brand we don't have a real asset for, add the asset or leave it null.
  * ──────────────────────────────────────────────────────────── */
 const stats = [
   {
     number: "+22%",
     label: "Weekly Active Users",
+    brand: "Hakbah",
+    sector: "Fintech",
+    logo: "/images/brands/g8.png",
     description:
-      "Hakbah, fintech. Rebuilding the core savings experience and the notifications around it brought people back week after week.",
+      "Rebuilding the core savings experience and the notifications around it brought people back week after week.",
     glowColor: "#4EF0D9",
   },
   {
     number: "+27%",
     label: "Average Order Value",
+    brand: "Sary",
+    sector: "B2B Commerce",
+    logo: "/images/brands/image 8.png",
     description:
-      "Sary, B2B commerce. Buyers reached the right products faster once browsing and checkout were redesigned around how they actually shop.",
+      "Buyers reached the right products faster once browsing and checkout were redesigned around how they actually shop.",
     glowColor: "#BA7CFF",
   },
   {
     number: "40%",
     label: "Faster Time to Play",
+    brand: "Lobah",
+    sector: "Gaming",
+    logo: null,
     description:
-      "Lobah Gaming. Rebuilt onboarding and progression across three titles, cutting the wait between opening the app and the first match.",
+      "Rebuilt onboarding and progression across three titles, cutting the wait between opening the app and the first match.",
     glowColor: "#4EF0D9",
   },
 ];
@@ -246,6 +262,91 @@ export function BrandsStats() {
               />
 
               <div className="relative z-10 transition-transform duration-700 group-hover:translate-y-[-4px]">
+                {/*
+                  Brand mark. Ties the figure to the company that produced it,
+                  using the same asset and desaturation treatment as the logo
+                  strip above so the card reads as part of the same family.
+                */}
+                <div
+                  className="flex items-center"
+                  style={{ gap: "10px", marginBottom: "28px", height: "26px" }}
+                >
+                  {stat.logo ? (
+                    <img
+                      src={stat.logo}
+                      alt=""
+                      loading="lazy"
+                      draggable={false}
+                      style={{
+                        maxHeight: "24px",
+                        maxWidth: "76px",
+                        width: "auto",
+                        height: "auto",
+                        objectFit: "contain",
+                        opacity: 0.6,
+                        filter: "grayscale(1) brightness(1.9) contrast(0.85)",
+                        transition: "opacity 400ms ease, filter 400ms ease",
+                      }}
+                      className="group-hover:!opacity-100 group-hover:![filter:none]"
+                    />
+                  ) : (
+                    <span
+                      aria-hidden="true"
+                      className="flex items-center justify-center transition-all duration-500 group-hover:!border-white/25"
+                      style={{
+                        width: "24px",
+                        height: "24px",
+                        borderRadius: "7px",
+                        border: "1px solid rgba(255, 255, 255, 0.12)",
+                        background: "rgba(255, 255, 255, 0.04)",
+                        fontSize: "12px",
+                        fontWeight: "700",
+                        color: "rgba(255, 255, 255, 0.6)",
+                        letterSpacing: "0",
+                      }}
+                    >
+                      {stat.brand.charAt(0)}
+                    </span>
+                  )}
+
+                  <span
+                    style={{
+                      fontSize: "12px",
+                      fontWeight: "600",
+                      letterSpacing: "0.09em",
+                      textTransform: "uppercase",
+                      color: "rgba(255, 255, 255, 0.72)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {stat.brand}
+                  </span>
+
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      width: "3px",
+                      height: "3px",
+                      borderRadius: "50%",
+                      background: "rgba(255, 255, 255, 0.22)",
+                      flexShrink: 0,
+                    }}
+                  />
+
+                  <span
+                    style={{
+                      fontSize: "12px",
+                      fontWeight: "500",
+                      letterSpacing: "0.06em",
+                      textTransform: "uppercase",
+                      color: "rgba(255, 255, 255, 0.34)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {stat.sector}
+                  </span>
+                </div>
+
                 {/* Big Number Value */}
                 <motion.p
                   style={{
