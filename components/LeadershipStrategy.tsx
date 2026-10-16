@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { ArrowUpRight, Compass, Users, Boxes, BarChart3, FlaskConical, BookOpen, Lock, X, Mail, Check, Copy, Linkedin, KeyRound } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Compass, Users, Boxes, BarChart3, FlaskConical, BookOpen, Lock, X, Mail, Check, Copy, Linkedin, KeyRound } from 'lucide-react';
 import { motion } from 'motion/react';
 import { SectionHeader } from './SectionHeader';
 
@@ -195,7 +195,7 @@ function AccessDialog({
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-[100]" style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(6px)' }} />
         <Dialog.Content
-          className="fixed left-1/2 top-1/2 z-[101] max-h-[calc(100dvh-32px)] w-[calc(100%-32px)] max-w-[460px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-[26px] focus:outline-none"
+          className="fixed left-1/2 top-1/2 z-[101] max-h-[calc(100dvh-32px)] w-[calc(100%-32px)] max-w-[440px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-[26px] focus:outline-none"
           aria-describedby={undefined}
         >
           {area && (
@@ -211,31 +211,30 @@ function AccessDialog({
                 boxShadow: '0 40px 80px -20px rgba(0,0,0,0.8)',
               }}
             >
-              {/* Cover strip: the visitor sees what they asked for */}
-              <div className="relative h-[120px] overflow-hidden">
-                {area.image ? (
-                  <img src={area.image} alt="" className="h-full w-full object-cover object-[88%_40%]" />
-                ) : (
-                  <PlaceholderArt />
-                )}
-                <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(17,17,17,0.05) 0%, rgba(17,17,17,0.35) 45%, #111111 98%)' }} />
-              </div>
+              <div className="p-5 sm:p-6">
+                {/* Header: the whole cover as a small thumbnail, never cropped */}
+                <div className="flex items-center gap-4 pr-10">
+                  <div className="relative aspect-video w-[104px] shrink-0 overflow-hidden rounded-xl" style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
+                    {area.image ? <img src={area.image} alt="" className="h-full w-full object-cover" /> : <PlaceholderArt />}
+                  </div>
+                  <div className="min-w-0">
+                    <Dialog.Title className="font-semibold" style={{ fontSize: '17px', lineHeight: 1.3, color: 'rgba(255,255,255,0.96)' }}>
+                      {area.title}
+                    </Dialog.Title>
+                    <p className="mt-0.5" style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.45)' }}>
+                      {area.keywords}
+                    </p>
+                  </div>
+                </div>
 
-              <Dialog.Close
-                className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-white/80 transition-colors hover:text-white"
-                style={{ background: 'rgba(10,10,10,0.65)', backdropFilter: 'blur(8px)' }}
-                aria-label="Close"
-              >
-                <X className="h-4 w-4" />
-              </Dialog.Close>
+                <Dialog.Close
+                  className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-white/50 transition-colors hover:bg-white/[0.06] hover:text-white"
+                  aria-label="Close"
+                >
+                  <X className="h-4 w-4" />
+                </Dialog.Close>
 
-              <div className="px-6 pb-6 sm:px-7 sm:pb-7">
-                <Dialog.Title className="font-semibold" style={{ fontSize: '20px', lineHeight: 1.25, color: 'rgba(255,255,255,0.96)' }}>
-                  {area.title}
-                </Dialog.Title>
-                <p className="mt-1" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)' }}>
-                  {area.keywords}
-                </p>
+                <div className="my-5 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
 
                 {links ? (
                   <div className="mt-6">
@@ -264,79 +263,69 @@ function AccessDialog({
                   </div>
                 ) : (
                   <>
-                    {/* Why it's locked, in one honest breath */}
-                    <div
-                      className="mt-5 rounded-2xl p-4"
-                      style={{ background: 'rgba(220,190,140,0.06)', border: '1px solid rgba(220,190,140,0.22)' }}
+                    {/* The invitation leads; the reason follows as a quiet note */}
+                    <p className="font-semibold" style={{ fontSize: '20px', lineHeight: 1.3, letterSpacing: '-0.01em', color: 'rgba(255,255,255,0.97)' }}>
+                      We're UXers, we talk to{' '}
+                      <span className="whitespace-nowrap">people. <span aria-hidden="true">👋</span></span>
+                    </p>
+                    <p className="mt-1.5" style={{ fontSize: '14.5px', lineHeight: 1.5, color: 'rgba(255,255,255,0.62)' }}>
+                      Hop on a quick chat with me and the password is yours.{' '}
+                      <span style={{ color: GOLD, fontWeight: 600 }}>Guaranteed.</span>
+                    </p>
+
+                    <ol
+                      className="mt-4 flex flex-wrap items-center gap-x-1.5 gap-y-2 rounded-2xl px-3 py-2"
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
+                      aria-label="How to get access"
                     >
-                      <p className="flex items-center gap-2 font-semibold" style={{ fontSize: '13px', color: GOLD }}>
-                        <Lock className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                        Why it's private
-                      </p>
-                      <p className="mt-1.5" style={{ fontSize: '14px', lineHeight: 1.55, color: 'rgba(255,255,255,0.72)' }}>
-                        It holds real work from real teams: internal frameworks, decisions and numbers I can't post publicly. I share it person to person instead.
-                      </p>
-                    </div>
-
-                    {/* The promise */}
-                    <p className="mt-5 font-semibold" style={{ fontSize: '17px', lineHeight: 1.35, color: 'rgba(255,255,255,0.95)' }}>
-                      We're UXers, we talk to people.{' '}
-                      <span aria-hidden="true">👋</span>
-                    </p>
-                    <p className="mt-1" style={{ fontSize: '14px', lineHeight: 1.55, color: 'rgba(255,255,255,0.6)' }}>
-                      Hop on a quick chat with me and the password is yours. Guaranteed.
-                    </p>
-
-                    <ol className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-2" aria-label="How to get access">
-                      {STEPS.map((step, i) => (
-                        <li key={step} className="flex items-center gap-2">
-                          <span
-                            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
-                            style={{
-                              fontSize: '11px',
-                              fontWeight: 700,
-                              color: i === STEPS.length - 1 ? '#0A0A0A' : GOLD,
-                              background: i === STEPS.length - 1 ? GOLD : 'rgba(220,190,140,0.1)',
-                              border: '1px solid rgba(220,190,140,0.4)',
-                            }}
-                          >
-                            {i === STEPS.length - 1 ? <Check className="h-3.5 w-3.5" /> : i + 1}
-                          </span>
-                          <span className="whitespace-nowrap" style={{ fontSize: '12.5px', fontWeight: 500, color: 'rgba(255,255,255,0.75)' }}>
-                            {step}
-                          </span>
-                          {i < STEPS.length - 1 && <span aria-hidden="true" className="h-px w-3 shrink-0 bg-white/20" />}
-                        </li>
-                      ))}
+                      {STEPS.map((step, i) => {
+                        const last = i === STEPS.length - 1;
+                        return (
+                          <li key={step} className="flex items-center gap-1.5">
+                            <span
+                              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
+                              style={{
+                                fontSize: '10.5px',
+                                fontWeight: 700,
+                                color: last ? '#0A0A0A' : GOLD,
+                                background: last ? GOLD : 'rgba(220,190,140,0.12)',
+                              }}
+                            >
+                              {last ? <Check className="h-3 w-3" /> : i + 1}
+                            </span>
+                            <span className="whitespace-nowrap" style={{ fontSize: '12.5px', fontWeight: 500, color: last ? GOLD : 'rgba(255,255,255,0.72)' }}>
+                              {step}
+                            </span>
+                            {!last && <ArrowRight aria-hidden="true" className="mx-0.5 h-3 w-3 shrink-0 text-white/25" />}
+                          </li>
+                        );
+                      })}
                     </ol>
 
-                    <div className="mt-5 grid gap-2 sm:grid-cols-[1fr_auto]">
-                      <a
-                        href={introEmail(area)}
-                        className="flex items-center justify-center gap-2 rounded-full bg-white px-5 font-bold text-black transition-transform hover:-translate-y-0.5"
-                        style={{ height: '48px', fontSize: '14px' }}
-                      >
-                        <Mail className="h-4 w-4" />
-                        Say hi & get the password
-                      </a>
+                    <a
+                      href={introEmail(area)}
+                      className="mt-5 flex items-center justify-center gap-2 rounded-full bg-white px-5 font-bold text-black transition-transform hover:-translate-y-0.5"
+                      style={{ height: '46px', fontSize: '14px' }}
+                    >
+                      <Mail className="h-4 w-4" />
+                      Say hi & get the password
+                    </a>
+                    <div className="mt-2.5 flex items-center justify-center gap-1" style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.5)' }}>
                       <a
                         href={LINKEDIN_URL}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2 rounded-full px-5 transition-colors hover:bg-white/[0.06]"
-                        style={{ height: '48px', fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.88)', border: '1px solid rgba(255,255,255,0.16)' }}
+                        className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-colors hover:bg-white/[0.06] hover:text-white"
                       >
-                        <Linkedin className="h-4 w-4" />
+                        <Linkedin className="h-3.5 w-3.5" />
                         LinkedIn
                       </a>
-                    </div>
-
-                    <div className="mt-3 flex items-center justify-center gap-2" style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.45)' }}>
-                      <span className="select-all">{ACCESS_EMAIL}</span>
+                      <span aria-hidden="true" className="text-white/20">·</span>
+                      <span className="select-all px-1">{ACCESS_EMAIL}</span>
                       <button
                         type="button"
                         onClick={copyEmail}
-                        className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 transition-colors hover:bg-white/[0.06] hover:text-white"
+                        className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-[12.5px] transition-colors hover:bg-white/[0.06] hover:text-white"
                         aria-label="Copy email address"
                       >
                         {copied ? <Check className="h-3.5 w-3.5" style={{ color: GOLD }} /> : <Copy className="h-3.5 w-3.5" />}
@@ -344,8 +333,16 @@ function AccessDialog({
                       </button>
                     </div>
 
+                    <p className="mt-5 flex gap-2" style={{ fontSize: '12.5px', lineHeight: 1.5, color: 'rgba(255,255,255,0.45)' }}>
+                      <Lock className="mt-[3px] h-3 w-3 shrink-0" style={{ color: GOLD }} aria-hidden="true" />
+                      <span>
+                        <span style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Why it's private: </span>
+                        it holds real work from real teams, internal frameworks, decisions and numbers I can't post publicly. I share it person to person instead.
+                      </span>
+                    </p>
+
                     {/* Second path: visitors who already chatted */}
-                    <div className="mt-6 border-t pt-4" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+                    <div className="mt-4 border-t pt-4" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
                       {!showPassword ? (
                         <button
                           type="button"
