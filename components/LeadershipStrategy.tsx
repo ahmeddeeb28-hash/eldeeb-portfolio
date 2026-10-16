@@ -76,27 +76,33 @@ function PlaceholderArt() {
   );
 }
 
-function AreaImage({ area }: { area: Area }) {
+function AreaImage({ area, featured }: { area: Area; featured?: boolean }) {
   const [failed, setFailed] = useState(false);
   const showImage = area.image && !failed;
   return (
-    <div className="relative aspect-video overflow-hidden rounded-[18px]">
+    <div className={`relative aspect-video overflow-hidden rounded-[20px] ${featured ? 'lg:aspect-auto lg:h-full' : ''}`}>
       {showImage ? (
         <img
           src={area.image}
           alt=""
           loading="lazy"
           onError={() => setFailed(true)}
-          className="absolute inset-0 h-full w-full object-cover brightness-[0.88] transition-[transform,filter] duration-700 group-hover:scale-[1.04] group-hover:brightness-100"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
         />
       ) : (
         <PlaceholderArt />
       )}
+      {/* Lock chip: bottom-right so it never covers the cover's series number.
+          It widens to "Unlock" on hover, hinting at what a click does. */}
       <span
-        className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full"
-        style={{ background: 'rgba(10,10,10,0.7)', border: '1px solid rgba(220,190,140,0.35)', backdropFilter: 'blur(8px)' }}
+        aria-hidden="true"
+        className="absolute bottom-3 right-3 flex h-8 items-center gap-1.5 overflow-hidden rounded-full px-[9px] text-[12px] font-semibold transition-all duration-300"
+        style={{ background: 'rgba(10,10,10,0.78)', border: '1px solid rgba(220,190,140,0.45)', backdropFilter: 'blur(8px)', color: GOLD }}
       >
-        <Lock className="h-3.5 w-3.5" style={{ color: GOLD }} aria-hidden="true" />
+        <Lock className="h-3.5 w-3.5 shrink-0" />
+        <span className="max-w-0 opacity-0 transition-all duration-300 group-hover:max-w-[60px] group-hover:opacity-100 group-focus-visible:max-w-[60px] group-focus-visible:opacity-100">
+          Unlock
+        </span>
       </span>
     </div>
   );
@@ -280,54 +286,103 @@ export function LeadershipStrategy() {
   const [links, setLinks] = useState<Record<string, WorkspaceLink[]> | null>(null);
 
   return (
-    <section className="relative px-6 py-24" id="leadership-strategy">
+    <section className="relative px-4 sm:px-6 py-24" id="leadership-strategy">
       <div className="relative mx-auto max-w-7xl">
-        <SectionHeader
-          eyebrow="Private Workspace"
-          title="Leadership &"
-          flourish="strategy."
-          subtitle="Beyond designing experiences, I focus on building the teams, strategies, and systems that make great products possible. Explore how I approach leadership, product decisions, operational excellence, and measurable business impact."
-        />
+        {/* Featured panel: a soft pastel border drawn from the covers' own
+            palette (mint, lavender, peach) marks this as the spotlight. */}
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          className="relative rounded-[36px] p-px"
+          style={{
+            background:
+              'linear-gradient(135deg, rgba(166,232,212,0.55), rgba(186,170,255,0.45) 35%, rgba(255,196,170,0.40) 65%, rgba(220,190,140,0.55))',
+            boxShadow: '0 40px 120px -40px rgba(166,150,255,0.25), 0 30px 80px -40px rgba(120,220,200,0.20)',
+          }}
+        >
+          <div
+            className="relative overflow-hidden rounded-[35px] px-4 pb-8 pt-12 sm:px-8 sm:pb-10 lg:px-12 lg:pt-14"
+            style={{
+              background: `
+                radial-gradient(60% 50% at 0% 0%, rgba(140,220,200,0.10), transparent 70%),
+                radial-gradient(50% 50% at 100% 0%, rgba(170,150,255,0.12), transparent 70%),
+                radial-gradient(70% 60% at 50% 110%, rgba(255,180,150,0.08), transparent 70%),
+                #0D0D0F
+              `,
+            }}
+          >
+            <div className="mb-2 flex justify-center">
+              <span
+                className="inline-flex items-center gap-2 rounded-full px-4 py-1.5"
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: GOLD,
+                  background: 'rgba(220,190,140,0.08)',
+                  border: '1px solid rgba(220,190,140,0.35)',
+                }}
+              >
+                <span aria-hidden="true">✦</span> Featured<span className="hidden sm:inline"> · Design Leadership Series</span>
+              </span>
+            </div>
 
-        <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-          {AREAS.map((area, index) => (
-            <motion.button
-              key={area.id}
-              type="button"
-              onClick={() => setOpenArea(area)}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ delay: index * 0.06, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="group flex flex-col gap-4 rounded-[20px] text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4AF2E5]"
-              aria-haspopup="dialog"
-            >
-              <div className="w-full rounded-[20px] p-[1px] transition-colors duration-500" style={{ background: 'rgba(255,255,255,0.08)' }}>
-                <div className="transition-transform duration-500 group-hover:-translate-y-1">
-                  <AreaImage area={area} />
-                </div>
-              </div>
-              <div className="flex items-baseline gap-3 px-1">
-                <span style={{ fontSize: '12px', fontWeight: 600, color: GOLD, fontVariantNumeric: 'tabular-nums' }}>
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-                <div className="min-w-0">
-                  <h3 className="font-semibold transition-colors duration-300 group-hover:text-white" style={{ fontSize: '18px', lineHeight: 1.3, color: 'rgba(255,255,255,0.9)' }}>
-                    {area.title}
-                  </h3>
-                  <p className="mt-1" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.42)' }}>
-                    {area.keywords}
-                  </p>
-                </div>
-              </div>
-            </motion.button>
-          ))}
-        </div>
+            <SectionHeader
+              eyebrow="Private Workspace"
+              title="Leadership &"
+              flourish="strategy."
+              subtitle="Beyond designing experiences, I focus on building the teams, strategies, and systems that make great products possible. Explore how I approach leadership, product decisions, operational excellence, and measurable business impact."
+            />
 
-        <p className="mt-12 flex items-center justify-center gap-2 text-center" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)' }}>
-          <Lock className="h-3.5 w-3.5 shrink-0" style={{ color: GOLD }} aria-hidden="true" />
-          {links ? 'Workspace unlocked for this visit.' : 'Password protected. Select an area to unlock it or request access.'}
-        </p>
+            {/* Magazine layout: 01 leads as the large cover, the other five
+                fill around it. Each cover already carries its title,
+                number and keywords, so no caption repeats them. */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+              {AREAS.map((area, index) => {
+                const featured = index === 0;
+                return (
+                  <motion.button
+                    key={area.id}
+                    type="button"
+                    onClick={() => setOpenArea(area)}
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-60px' }}
+                    transition={{ delay: index * 0.06, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                    whileHover={{ y: -6 }}
+                    className={`group relative rounded-[20px] text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4AF2E5] ${
+                      featured ? 'sm:col-span-2 lg:row-span-2' : ''
+                    }`}
+                    style={{ boxShadow: '0 18px 40px -22px rgba(0,0,0,0.9)' }}
+                    aria-haspopup="dialog"
+                    aria-label={`${String(index + 1).padStart(2, '0')} ${area.title}: ${area.keywords}. Private, unlock or request access.`}
+                  >
+                    <div
+                      className="h-full rounded-[20px] p-px transition-[background] duration-500"
+                      style={{ background: 'rgba(255,255,255,0.10)' }}
+                    >
+                      <AreaImage area={area} featured={featured} />
+                    </div>
+                    {/* Soft glow that blooms on hover */}
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute -inset-px rounded-[20px] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                      style={{ boxShadow: '0 0 0 1px rgba(220,190,140,0.55), 0 24px 60px -18px rgba(186,170,255,0.45)' }}
+                    />
+                  </motion.button>
+                );
+              })}
+            </div>
+
+            <p className="mt-8 flex items-center justify-center gap-2 text-center" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>
+              <Lock className="h-3.5 w-3.5 shrink-0" style={{ color: GOLD }} aria-hidden="true" />
+              {links ? 'Workspace unlocked for this visit.' : 'Password protected. Select a cover to unlock it or request access.'}
+            </p>
+          </div>
+        </motion.div>
       </div>
 
       <AccessDialog area={openArea} links={links} onUnlocked={setLinks} onClose={() => setOpenArea(null)} />
