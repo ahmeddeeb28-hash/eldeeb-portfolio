@@ -1,88 +1,283 @@
-import { ArrowRight, ArrowUpRight, Compass, Users, Boxes, BarChart3, FlaskConical, BookOpen, Lock } from 'lucide-react';
-import { motion, useReducedMotion } from 'motion/react';
+import { useState, type FormEvent } from 'react';
+import * as Dialog from '@radix-ui/react-dialog';
+import { ArrowUpRight, Compass, Users, Boxes, BarChart3, FlaskConical, BookOpen, Lock, X, Mail } from 'lucide-react';
+import { motion } from 'motion/react';
 import { SectionHeader } from './SectionHeader';
 
 /* ────────────────────────────────────────────────────────────────────────
- * LEADERSHIP WORKSPACE LINKS — edit these, no other code needs to change.
+ * LEADERSHIP & STRATEGY
  *
- * WORKSPACE_URL  Your private, password-protected workspace (Notion,
- *                Google Drive, Figma, etc.). While it is empty the button
- *                reads "Request Workspace Access" and opens an email to you
- *                instead, so the page never shows a dead link.
+ * Images: drop files in public/images/leadership/ and set `image` below,
+ * e.g. image: '/images/leadership/01-strategy.jpg'. An empty or missing
+ * image shows the built-in placeholder.
  *
- * Each category's `links` list takes as many entries as you like:
- *   { label: 'Design review framework', href: 'https://…' }
- *   { label: 'Referral — Head of Product, Sary', href: 'https://…' }
- * A category with no links shows only its keywords.
+ * The password and the private links are NOT set here: this code is
+ * public. They live in Vercel environment variables and are checked by
+ * api/workspace-unlock.ts, which explains the setup.
  * ──────────────────────────────────────────────────────────────────────── */
-const WORKSPACE_URL = '';
-const ACCESS_REQUEST_URL =
-  'mailto:ahmeddeeb28@gmail.com?subject=Leadership%20workspace%20access';
+const ACCESS_EMAIL = 'ahmeddeeb28@gmail.com';
 
 type WorkspaceLink = { label: string; href: string };
 
-/* Each card carries its own identity colour, the same way the impact cards
-   above do, so six areas can be told apart at a glance. Keywords replace
-   sentences: three words per card read in one pass. */
-const CATEGORIES: {
+type Area = {
+  id: string;
   icon: typeof Compass;
   title: string;
-  keywords: [string, string, string];
-  accent: string;
-  links: WorkspaceLink[];
-}[] = [
-  {
-    icon: Compass,
-    title: 'Product & Design Strategy',
-    keywords: ['Vision', 'Roadmaps', 'Prioritization'],
-    accent: '#4EF0D9',
-    links: [],
-  },
-  {
-    icon: Users,
-    title: 'Design Operations & Leadership',
-    keywords: ['Teams', 'Workflows', 'Mentorship'],
-    accent: '#BA7CFF',
-    links: [],
-  },
-  {
-    icon: Boxes,
-    title: 'Design Systems & Governance',
-    keywords: ['Architecture', 'Tokens', 'Standards'],
-    accent: '#FFB454',
-    links: [],
-  },
-  {
-    icon: BarChart3,
-    title: 'Product Analytics & Business Impact',
-    keywords: ['KPIs', 'Retention', 'ROI'],
-    accent: '#6C9BFF',
-    links: [],
-  },
-  {
-    icon: FlaskConical,
-    title: 'Research & Decision Frameworks',
-    keywords: ['Discovery', 'Testing', 'Trade-offs'],
-    accent: '#FF76D6',
-    links: [],
-  },
-  {
-    icon: BookOpen,
-    title: 'Leadership Playbooks & Case Studies',
-    keywords: ['Challenges', 'Scaling', 'Lessons'],
-    accent: '#DCBE8C',
-    links: [],
-  },
+  keywords: string;
+  image: string;
+};
+
+const AREAS: Area[] = [
+  { id: 'strategy', icon: Compass, title: 'Product & Design Strategy', keywords: 'Vision · Roadmaps · Prioritization', image: '' },
+  { id: 'operations', icon: Users, title: 'Design Operations & Leadership', keywords: 'Teams · Workflows · Mentorship', image: '' },
+  { id: 'systems', icon: Boxes, title: 'Design Systems & Governance', keywords: 'Architecture · Tokens · Standards', image: '' },
+  { id: 'analytics', icon: BarChart3, title: 'Product Analytics & Business Impact', keywords: 'KPIs · Retention · ROI', image: '' },
+  { id: 'research', icon: FlaskConical, title: 'Research & Decision Frameworks', keywords: 'Discovery · Testing · Trade-offs', image: '' },
+  { id: 'playbooks', icon: BookOpen, title: 'Leadership Playbooks & Case Studies', keywords: 'Challenges · Scaling · Lessons', image: '' },
 ];
 
 const GOLD = '#DCBE8C';
-const TEAL = '#4AF2E5';
+
+/* Stand-in until a real image is added: a blurred document silhouette, so
+   the card already hints at "private material inside". */
+function PlaceholderArt() {
+  return (
+    <div
+      className="absolute inset-0"
+      style={{
+        background:
+          'radial-gradient(90% 80% at 20% 0%, rgba(220,190,140,0.10), transparent 60%), linear-gradient(160deg, #161616, #0E0E0E)',
+      }}
+    >
+      <div
+        aria-hidden="true"
+        className="absolute left-[14%] right-[14%] top-[18%] bottom-[-10%] rounded-t-xl"
+        style={{
+          background: 'rgba(255,255,255,0.035)',
+          border: '1px solid rgba(255,255,255,0.06)',
+          filter: 'blur(0.6px)',
+          padding: '18px 20px',
+        }}
+      >
+        {[62, 88, 74, 40, 80, 56].map((w, i) => (
+          <div
+            key={i}
+            style={{
+              width: `${w}%`,
+              height: i === 0 ? '9px' : '6px',
+              marginBottom: i === 0 ? '16px' : '10px',
+              borderRadius: '4px',
+              background: i === 0 ? 'rgba(220,190,140,0.28)' : 'rgba(255,255,255,0.08)',
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AreaImage({ area }: { area: Area }) {
+  const [failed, setFailed] = useState(false);
+  const showImage = area.image && !failed;
+  return (
+    <div className="relative aspect-[16/10] overflow-hidden rounded-[18px]">
+      {showImage ? (
+        <img
+          src={area.image}
+          alt=""
+          loading="lazy"
+          onError={() => setFailed(true)}
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+        />
+      ) : (
+        <PlaceholderArt />
+      )}
+      <span
+        className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full"
+        style={{ background: 'rgba(10,10,10,0.7)', border: '1px solid rgba(220,190,140,0.35)', backdropFilter: 'blur(8px)' }}
+      >
+        <Lock className="h-3.5 w-3.5" style={{ color: GOLD }} aria-hidden="true" />
+      </span>
+    </div>
+  );
+}
+
+type UnlockState = 'idle' | 'checking' | 'wrong' | 'unavailable';
+
+function AccessDialog({
+  area,
+  links,
+  onUnlocked,
+  onClose,
+}: {
+  area: Area | null;
+  links: Record<string, WorkspaceLink[]> | null;
+  onUnlocked: (links: Record<string, WorkspaceLink[]>) => void;
+  onClose: () => void;
+}) {
+  const [password, setPassword] = useState('');
+  const [status, setStatus] = useState<UnlockState>('idle');
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!password || status === 'checking') return;
+    setStatus('checking');
+    try {
+      const res = await fetch('/api/workspace-unlock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (res.status === 401) return setStatus('wrong');
+      if (!res.ok) return setStatus('unavailable');
+      const data = await res.json();
+      setPassword('');
+      setStatus('idle');
+      onUnlocked(data.links ?? {});
+    } catch {
+      setStatus('unavailable');
+    }
+  };
+
+  const requestHref = area
+    ? `mailto:${ACCESS_EMAIL}?subject=${encodeURIComponent(`Leadership workspace access: ${area.title}`)}`
+    : '#';
+  const areaLinks = area && links ? links[area.id] ?? [] : [];
+
+  return (
+    <Dialog.Root
+      open={!!area}
+      onOpenChange={(open) => {
+        if (!open) {
+          setStatus('idle');
+          onClose();
+        }
+      }}
+    >
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-[100]" style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(6px)' }} />
+        <Dialog.Content
+          className="fixed left-1/2 top-1/2 z-[101] w-[calc(100%-32px)] max-w-[420px] -translate-x-1/2 -translate-y-1/2 focus:outline-none"
+          aria-describedby={undefined}
+        >
+          {area && (
+            <motion.div
+              initial={{ opacity: 0, y: 12, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="relative"
+              style={{
+                borderRadius: '24px',
+                padding: '28px',
+                background: '#111111',
+                border: '1px solid rgba(255,255,255,0.1)',
+                boxShadow: '0 40px 80px -20px rgba(0,0,0,0.8)',
+              }}
+            >
+              <Dialog.Close
+                className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full text-white/50 transition-colors hover:bg-white/5 hover:text-white"
+                aria-label="Close"
+              >
+                <X className="h-4 w-4" />
+              </Dialog.Close>
+
+              <span className="flex h-11 w-11 items-center justify-center rounded-full" style={{ background: 'rgba(220,190,140,0.1)', border: '1px solid rgba(220,190,140,0.35)' }}>
+                {links ? <area.icon className="h-5 w-5" style={{ color: GOLD }} /> : <Lock className="h-5 w-5" style={{ color: GOLD }} />}
+              </span>
+              <Dialog.Title className="mt-5 pr-8 font-semibold" style={{ fontSize: '20px', lineHeight: 1.25, color: 'rgba(255,255,255,0.96)' }}>
+                {area.title}
+              </Dialog.Title>
+              <p className="mt-1" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)' }}>
+                {area.keywords}
+              </p>
+
+              {links ? (
+                <div className="mt-6">
+                  {areaLinks.length > 0 ? (
+                    <ul className="space-y-2">
+                      {areaLinks.map((link) => (
+                        <li key={link.href}>
+                          <a
+                            href={link.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group flex items-center justify-between gap-3 rounded-xl px-4 py-3 transition-colors hover:bg-white/[0.06]"
+                            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '14px', fontWeight: 500 }}
+                          >
+                            {link.label}
+                            <ArrowUpRight className="h-4 w-4 shrink-0 text-white/40 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-white" />
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.55)' }}>
+                      Resources for this area are being prepared. Check the other areas, or email me for anything specific.
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <form onSubmit={submit} className="mt-6">
+                  <label htmlFor="workspace-password" style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.04em', color: 'rgba(255,255,255,0.6)' }}>
+                    Password
+                  </label>
+                  <div className="mt-2 flex gap-2">
+                    <input
+                      id="workspace-password"
+                      type="password"
+                      autoComplete="current-password"
+                      autoFocus
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        if (status === 'wrong' || status === 'unavailable') setStatus('idle');
+                      }}
+                      aria-invalid={status === 'wrong'}
+                      aria-describedby="workspace-password-status"
+                      className="min-w-0 flex-1 rounded-full px-4 text-white outline-none transition-colors focus:border-[rgba(220,190,140,0.6)]"
+                      style={{ height: '46px', fontSize: '15px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)' }}
+                    />
+                    <button
+                      type="submit"
+                      disabled={!password || status === 'checking'}
+                      className="shrink-0 rounded-full bg-white px-5 font-bold text-black transition-opacity disabled:opacity-50"
+                      style={{ height: '46px', fontSize: '14px' }}
+                    >
+                      {status === 'checking' ? 'Checking…' : 'Unlock'}
+                    </button>
+                  </div>
+                  <p id="workspace-password-status" role="status" className="mt-2 min-h-[18px]" style={{ fontSize: '13px', color: '#F2A08F' }}>
+                    {status === 'wrong' && "That password didn't work. Check it and try again."}
+                    {status === 'unavailable' && "Couldn't check the password right now. Request access instead."}
+                  </p>
+                </form>
+              )}
+
+              <div className="mt-5 flex items-center gap-3" style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)' }}>
+                <span className="h-px flex-1 bg-white/10" />
+                {links ? 'Need something else?' : "Don't have the password?"}
+                <span className="h-px flex-1 bg-white/10" />
+              </div>
+              <a
+                href={requestHref}
+                className="mt-4 flex items-center justify-center gap-2 rounded-full transition-colors hover:bg-white/[0.05]"
+                style={{ height: '46px', fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.88)', border: '1px solid rgba(255,255,255,0.14)' }}
+              >
+                <Mail className="h-4 w-4" />
+                {links ? 'Email me' : 'Request access'}
+              </a>
+            </motion.div>
+          )}
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}
 
 export function LeadershipStrategy() {
-  const reduceMotion = useReducedMotion();
-  const hasWorkspace = WORKSPACE_URL.trim().length > 0;
-  const ctaHref = hasWorkspace ? WORKSPACE_URL : ACCESS_REQUEST_URL;
-  const ctaLabel = hasWorkspace ? 'Explore My Leadership Workspace' : 'Request Workspace Access';
+  const [openArea, setOpenArea] = useState<Area | null>(null);
+  /* Links stay in memory for this visit only; a reload asks again. */
+  const [links, setLinks] = useState<Record<string, WorkspaceLink[]> | null>(null);
 
   return (
     <section className="relative px-6 py-24" id="leadership-strategy">
@@ -94,236 +289,48 @@ export function LeadershipStrategy() {
           subtitle="Beyond designing experiences, I focus on building the teams, strategies, and systems that make great products possible. Explore how I approach leadership, product decisions, operational excellence, and measurable business impact."
         />
 
-        {/* ── Six areas ─────────────────────────────────────────────── */}
-        <div className="grid gap-4 md:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {CATEGORIES.map((category, index) => (
-            <motion.article
-              key={category.title}
-              initial={{ opacity: 0, y: 28 }}
+        <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          {AREAS.map((area, index) => (
+            <motion.button
+              key={area.id}
+              type="button"
+              onClick={() => setOpenArea(area)}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
-              transition={{ delay: index * 0.07, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={{
-                y: -6,
-                borderColor: `${category.accent}55`,
-                boxShadow: `0 30px 60px -30px rgba(0,0,0,0.9), 0 0 50px -18px ${category.accent}55, inset 0 1px 0 rgba(255,255,255,0.08)`,
-                transition: { duration: 0.35, ease: [0.25, 1, 0.5, 1] },
-              }}
-              className="group relative flex flex-col overflow-hidden"
-              style={{
-                borderRadius: '24px',
-                padding: '26px 26px 24px',
-                background: `
-                  radial-gradient(120% 90% at 0% 0%, ${category.accent}1F, transparent 55%),
-                  linear-gradient(168deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.015) 30%, rgba(255,255,255,0) 60%),
-                  #101010
-                `,
-                border: '1px solid rgba(255,255,255,0.09)',
-                boxShadow: '0 24px 48px -28px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.06)',
-              }}
+              transition={{ delay: index * 0.06, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="group flex flex-col gap-4 rounded-[20px] text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4AF2E5]"
+              aria-haspopup="dialog"
             >
-              {/* Accent rule along the top edge, as on the impact cards */}
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute top-0 left-0 right-0 opacity-70 transition-opacity duration-500 group-hover:opacity-100"
-                style={{
-                  height: '2px',
-                  background: `linear-gradient(90deg, ${category.accent} 0%, ${category.accent}66 40%, transparent 80%)`,
-                }}
-              />
-
-              {/* Oversized ghost number — the card's at-a-glance anchor */}
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute select-none transition-opacity duration-500 group-hover:!opacity-70"
-                style={{
-                  top: '-14px',
-                  right: '14px',
-                  fontFamily: 'Fraunces, Georgia, serif',
-                  fontStyle: 'italic',
-                  fontWeight: 600,
-                  fontSize: '112px',
-                  lineHeight: 1,
-                  color: 'transparent',
-                  WebkitTextStroke: `1px ${category.accent}`,
-                  opacity: 0.32,
-                }}
-              >
-                {String(index + 1).padStart(2, '0')}
-              </span>
-
-              <div
-                className="relative flex h-12 w-12 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3"
-                style={{
-                  background: `linear-gradient(135deg, ${category.accent}26, ${category.accent}0D)`,
-                  border: `1px solid ${category.accent}4D`,
-                  boxShadow: `0 0 24px -6px ${category.accent}66`,
-                }}
-              >
-                <category.icon className="h-6 w-6" style={{ color: category.accent, strokeWidth: 2.25 }} aria-hidden="true" />
+              <div className="w-full rounded-[20px] p-[1px] transition-colors duration-500" style={{ background: 'rgba(255,255,255,0.08)' }}>
+                <div className="transition-transform duration-500 group-hover:-translate-y-1">
+                  <AreaImage area={area} />
+                </div>
               </div>
-
-              <h3
-                className="relative mt-6 font-bold"
-                style={{
-                  fontSize: '21px',
-                  lineHeight: 1.2,
-                  letterSpacing: '-0.02em',
-                  color: 'rgba(255,255,255,0.96)',
-                  maxWidth: '20ch',
-                }}
-              >
-                {category.title}
-              </h3>
-
-              <ul className="relative mt-5 flex flex-wrap gap-2" aria-label={`${category.title} topics`}>
-                {category.keywords.map((keyword) => (
-                  <li
-                    key={keyword}
-                    className="rounded-full"
-                    style={{
-                      padding: '5px 12px',
-                      fontSize: '12.5px',
-                      fontWeight: 600,
-                      color: 'rgba(255,255,255,0.78)',
-                      background: 'rgba(255,255,255,0.04)',
-                      border: `1px solid ${category.accent}33`,
-                    }}
-                  >
-                    {keyword}
-                  </li>
-                ))}
-              </ul>
-
-              {category.links.length > 0 && (
-                <ul
-                  className="relative mt-5 space-y-2 pt-4"
-                  style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}
-                >
-                  {category.links.map((link) => (
-                    <li key={link.href}>
-                      <a
-                        href={link.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group/link inline-flex items-center gap-1.5 transition-opacity duration-300 hover:!opacity-100"
-                        style={{ fontSize: '14px', fontWeight: 600, color: category.accent, opacity: 0.9 }}
-                      >
-                        {link.label}
-                        <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" />
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </motion.article>
+              <div className="flex items-baseline gap-3 px-1">
+                <span style={{ fontSize: '12px', fontWeight: 600, color: GOLD, fontVariantNumeric: 'tabular-nums' }}>
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <div className="min-w-0">
+                  <h3 className="font-semibold transition-colors duration-300 group-hover:text-white" style={{ fontSize: '18px', lineHeight: 1.3, color: 'rgba(255,255,255,0.9)' }}>
+                    {area.title}
+                  </h3>
+                  <p className="mt-1" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.42)' }}>
+                    {area.keywords}
+                  </p>
+                </div>
+              </div>
+            </motion.button>
           ))}
         </div>
 
-        {/* ── The vault: one standout access banner ─────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ delay: 0.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="relative mt-5 overflow-hidden"
-          style={{ borderRadius: '28px', padding: '1px' }}
-        >
-          {/* Slowly rotating gold → teal border; still when motion is reduced */}
-          <motion.div
-            aria-hidden="true"
-            className="pointer-events-none absolute"
-            style={{
-              inset: '-150%',
-              background: `conic-gradient(from 0deg, transparent 0deg, ${GOLD} 60deg, transparent 130deg, transparent 200deg, ${TEAL} 260deg, transparent 330deg)`,
-              opacity: 0.85,
-            }}
-            animate={reduceMotion ? undefined : { rotate: 360 }}
-            transition={reduceMotion ? undefined : { duration: 10, repeat: Infinity, ease: 'linear' }}
-          />
-
-          <div
-            className="relative flex flex-col items-start gap-8 md:flex-row md:items-center md:justify-between"
-            style={{
-              borderRadius: '27px',
-              padding: 'clamp(28px, 4vw, 44px)',
-              background: `
-                radial-gradient(60% 140% at 0% 50%, rgba(220,190,140,0.12), transparent 60%),
-                radial-gradient(50% 120% at 100% 50%, rgba(74,242,229,0.08), transparent 60%),
-                #0D0D0D
-              `,
-            }}
-          >
-            <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center md:gap-6">
-              {/* Lock seal with a soft breathing halo */}
-              <div className="relative shrink-0" style={{ width: 64, height: 64 }}>
-                <motion.span
-                  aria-hidden="true"
-                  className="absolute inset-0 rounded-full"
-                  style={{ border: `1px solid ${GOLD}` }}
-                  animate={reduceMotion ? undefined : { scale: [1, 1.35, 1], opacity: [0.5, 0, 0.5] }}
-                  transition={reduceMotion ? undefined : { duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-                />
-                <span
-                  className="relative flex h-full w-full items-center justify-center rounded-full"
-                  style={{
-                    background: 'linear-gradient(160deg, rgba(240,217,168,0.22), rgba(201,168,118,0.06))',
-                    border: '1px solid rgba(220,190,140,0.5)',
-                    boxShadow: '0 0 40px -6px rgba(220,190,140,0.55)',
-                  }}
-                >
-                  <Lock className="h-6 w-6" style={{ color: GOLD }} aria-hidden="true" />
-                </span>
-              </div>
-
-              <div className="min-w-0">
-                <span
-                  className="block"
-                  style={{
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    letterSpacing: '0.18em',
-                    textTransform: 'uppercase',
-                    color: GOLD,
-                  }}
-                >
-                  Private · Password protected
-                </span>
-                <p
-                  className="mt-2 font-bold"
-                  style={{
-                    fontSize: 'clamp(20px, 2.4vw, 26px)',
-                    lineHeight: 1.25,
-                    letterSpacing: '-0.02em',
-                    color: 'rgba(255,255,255,0.96)',
-                  }}
-                >
-                  6 areas.{' '}
-                  <span style={{ fontFamily: 'Fraunces, Georgia, serif', fontStyle: 'italic', fontWeight: 500, color: TEAL }}>
-                    One workspace.
-                  </span>
-                </p>
-                <p className="mt-1" style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>
-                  Frameworks, playbooks, and case studies, shared on request.
-                </p>
-              </div>
-            </div>
-
-            <motion.a
-              href={ctaHref}
-              {...(hasWorkspace ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-              whileHover={{ y: -3, scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="group relative inline-flex w-full md:w-auto shrink-0 justify-center overflow-hidden rounded-full bg-white px-5 sm:px-7 py-4 text-black shadow-[0_4px_16px_rgba(0,0,0,0.2),0_0_40px_-8px_rgba(220,190,140,0.45)] transition-shadow duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3),0_0_60px_rgba(220,190,140,0.35)]"
-            >
-              <span className="flex items-center justify-center gap-2.5 text-center font-bold tracking-tight">
-                {ctaLabel}
-                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </span>
-            </motion.a>
-          </div>
-        </motion.div>
+        <p className="mt-12 flex items-center justify-center gap-2 text-center" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)' }}>
+          <Lock className="h-3.5 w-3.5 shrink-0" style={{ color: GOLD }} aria-hidden="true" />
+          {links ? 'Workspace unlocked for this visit.' : 'Password protected. Select an area to unlock it or request access.'}
+        </p>
       </div>
+
+      <AccessDialog area={openArea} links={links} onUnlocked={setLinks} onClose={() => setOpenArea(null)} />
     </section>
   );
 }
