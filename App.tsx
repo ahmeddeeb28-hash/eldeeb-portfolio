@@ -167,7 +167,9 @@ export default function App() {
         {/* Hidden but preserved — restore by uncommenting the line below */}
         {false && <WorkLanguage />}
         <LeadershipStrategy />
-        <Mentorship />
+        {/* Hidden but preserved — restore by flipping the guard below, and
+            uncomment the Mentorship links in Navigation.tsx and Footer.tsx */}
+        {false && <Mentorship />}
         <ProofOfPresence />
         {/* Hidden but preserved — restore by flipping the guard below */}
         {false && <Features />}

@@ -134,7 +134,8 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
   const navLinks: { label: string; href: string; onClick?: () => void }[] = [
     { label: 'Work', href: `#${SECTION_IDS.work}`, onClick: () => scrollToSection(SECTION_IDS.work) },
     { label: 'About', href: '/about', onClick: onOpenAboutPage },
-    { label: 'Mentorship', href: `#${SECTION_IDS.mentorship}`, onClick: () => scrollToSection(SECTION_IDS.mentorship) },
+    // Hidden with the Mentorship section in App.tsx — restore together.
+    // { label: 'Mentorship', href: `#${SECTION_IDS.mentorship}`, onClick: () => scrollToSection(SECTION_IDS.mentorship) },
     { label: 'Speaking', href: `#${SECTION_IDS.speaking}`, onClick: () => scrollToSection(SECTION_IDS.speaking) },
     { label: 'Articles', href: `#${SECTION_IDS.articles}`, onClick: () => scrollToSection(SECTION_IDS.articles) },
     { label: 'Contact', href: CONTACT_EMAIL },
