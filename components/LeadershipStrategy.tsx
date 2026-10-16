@@ -8,7 +8,7 @@ import { SectionHeader } from './SectionHeader';
  * LEADERSHIP & STRATEGY
  *
  * Images: drop files in public/images/leadership/ and set `image` below,
- * e.g. image: '/images/leadership/01-strategy.jpg'. An empty or missing
+ * e.g. image: '/images/leadership/01-strategy.webp'. An empty or missing
  * image shows the built-in placeholder.
  *
  * The password and the private links are NOT set here: this code is
@@ -28,12 +28,12 @@ type Area = {
 };
 
 const AREAS: Area[] = [
-  { id: 'strategy', icon: Compass, title: 'Product & Design Strategy', keywords: 'Vision · Roadmaps · Prioritization', image: '' },
-  { id: 'operations', icon: Users, title: 'Design Operations & Leadership', keywords: 'Teams · Workflows · Mentorship', image: '' },
-  { id: 'systems', icon: Boxes, title: 'Design Systems & Governance', keywords: 'Architecture · Tokens · Standards', image: '' },
-  { id: 'analytics', icon: BarChart3, title: 'Product Analytics & Business Impact', keywords: 'KPIs · Retention · ROI', image: '' },
-  { id: 'research', icon: FlaskConical, title: 'Research & Decision Frameworks', keywords: 'Discovery · Testing · Trade-offs', image: '' },
-  { id: 'playbooks', icon: BookOpen, title: 'Leadership Playbooks & Case Studies', keywords: 'Challenges · Scaling · Lessons', image: '' },
+  { id: 'strategy', icon: Compass, title: 'Product & Design Strategy', keywords: 'Vision · Roadmaps · Prioritization', image: '/images/leadership/01-strategy.webp' },
+  { id: 'operations', icon: Users, title: 'Design Operations & Leadership', keywords: 'Teams · Workflows · Mentorship', image: '/images/leadership/02-operations.webp' },
+  { id: 'systems', icon: Boxes, title: 'Design Systems & Governance', keywords: 'Architecture · Tokens · Standards', image: '/images/leadership/03-systems.webp' },
+  { id: 'analytics', icon: BarChart3, title: 'Product Analytics & Business Impact', keywords: 'KPIs · Retention · ROI', image: '/images/leadership/04-analytics.webp' },
+  { id: 'research', icon: FlaskConical, title: 'Research & Decision Frameworks', keywords: 'Discovery · Testing · Trade-offs', image: '/images/leadership/05-research.webp' },
+  { id: 'playbooks', icon: BookOpen, title: 'Leadership Playbooks & Case Studies', keywords: 'Challenges · Scaling · Lessons', image: '/images/leadership/06-playbooks.webp' },
 ];
 
 const GOLD = '#DCBE8C';
@@ -80,14 +80,14 @@ function AreaImage({ area }: { area: Area }) {
   const [failed, setFailed] = useState(false);
   const showImage = area.image && !failed;
   return (
-    <div className="relative aspect-[16/10] overflow-hidden rounded-[18px]">
+    <div className="relative aspect-video overflow-hidden rounded-[18px]">
       {showImage ? (
         <img
           src={area.image}
           alt=""
           loading="lazy"
           onError={() => setFailed(true)}
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+          className="absolute inset-0 h-full w-full object-cover brightness-[0.88] transition-[transform,filter] duration-700 group-hover:scale-[1.04] group-hover:brightness-100"
         />
       ) : (
         <PlaceholderArt />
