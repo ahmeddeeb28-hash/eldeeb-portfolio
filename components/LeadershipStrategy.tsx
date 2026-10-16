@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type ReactNode } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { ArrowRight, ArrowUpRight, Ticket, Compass, Users, Boxes, BarChart3, FlaskConical, BookOpen, Lock, X, Mail, Check, Copy, Linkedin, KeyRound } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -128,6 +128,24 @@ function introEmail(area: Area) {
   return `mailto:${ACCESS_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
+const SECONDARY_BUTTON = {
+  height: '42px',
+  fontSize: '13.5px',
+  fontWeight: 600,
+  color: 'rgba(255,255,255,0.85)',
+  border: '1px solid rgba(255,255,255,0.14)',
+} as const;
+
+/* Small uppercase label that names each part of the ticket. */
+function SectionLabel({ children, icon }: { children: ReactNode; icon?: ReactNode }) {
+  return (
+    <p className="flex items-center gap-1.5" style={{ fontSize: '10.5px', fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: GOLD }}>
+      {icon}
+      {children}
+    </p>
+  );
+}
+
 function AccessDialog({
   area,
   links,
@@ -249,150 +267,158 @@ function AccessDialog({
                 <span className="absolute left-5 right-5 top-1/2 border-t-2 border-dashed" style={{ borderColor: 'rgba(255,255,255,0.12)' }} />
               </div>
 
-              <div className="px-5 pb-5 pt-2 sm:px-6 sm:pb-6">
-                <Dialog.Title className="sr-only">{area.title}</Dialog.Title>
+              <Dialog.Title className="sr-only">{area.title}</Dialog.Title>
 
-                {links ? (
-                  <div>
-                    {areaLinks.length > 0 ? (
-                      <ul className="space-y-2">
-                        {areaLinks.map((link) => (
-                          <li key={link.href}>
-                            <a
-                              href={link.href}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="group flex items-center justify-between gap-3 rounded-xl px-4 py-3 transition-colors hover:bg-white/[0.06]"
-                              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '14px', fontWeight: 500 }}
-                            >
-                              {link.label}
-                              <ArrowUpRight className="h-4 w-4 shrink-0 text-white/40 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-white" />
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.55)' }}>
-                        Resources for this area are being prepared. Check the other areas, or email me for anything specific.
+              {links ? (
+                <div className="px-6 pb-6 pt-2">
+                  <SectionLabel>Your resources</SectionLabel>
+                  {areaLinks.length > 0 ? (
+                    <ul className="mt-3 space-y-2">
+                      {areaLinks.map((link) => (
+                        <li key={link.href}>
+                          <a
+                            href={link.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group flex items-center justify-between gap-3 rounded-xl px-4 py-3 transition-colors hover:bg-white/[0.06]"
+                            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '14px', fontWeight: 500 }}
+                          >
+                            {link.label}
+                            <ArrowUpRight className="h-4 w-4 shrink-0 text-white/40 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-white" />
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="mt-2" style={{ fontSize: '14px', lineHeight: 1.55, color: 'rgba(255,255,255,0.6)' }}>
+                      Resources for this area are being prepared. Check the other areas, or email me for anything specific.
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <div className="px-6 pb-6 pt-2">
+                    {/* 1 · Why: read before anything is asked of the visitor */}
+                    <SectionLabel icon={<Lock className="h-3 w-3" />}>Why it's private</SectionLabel>
+                    <p className="mt-1.5" style={{ fontSize: '13.5px', lineHeight: 1.55, color: 'rgba(255,255,255,0.6)' }}>
+                      It holds real work from real teams: internal frameworks, decisions and numbers I can't post publicly. I share it person to person instead.
+                    </p>
+
+                    {/* 2 · How to get in */}
+                    <div className="mt-5">
+                      <SectionLabel icon={<Ticket className="h-3 w-3" />}>How to get in</SectionLabel>
+                      <p
+                        className="mt-1.5 font-extrabold"
+                        style={{
+                          fontSize: '22px',
+                          lineHeight: 1.2,
+                          letterSpacing: '-0.02em',
+                          background: 'linear-gradient(90deg, #F0D9A8 0%, #DCBE8C 35%, #BAAAFF 70%, #8FE3D0 100%)',
+                          WebkitBackgroundClip: 'text',
+                          backgroundClip: 'text',
+                          color: 'transparent',
+                        }}
+                      >
+                        Your backstage pass is one chat away{' '}
+                        <span style={{ WebkitTextFillColor: 'initial', color: 'initial' }} aria-hidden="true">✨</span>
                       </p>
-                    )}
-                  </div>
-                ) : (
-                  <>
-                    {/* Why first, then the invitation */}
-                    <p className="mb-4 flex gap-2" style={{ fontSize: '12.5px', lineHeight: 1.5, color: 'rgba(255,255,255,0.45)' }}>
-                      <Lock className="mt-[3px] h-3 w-3 shrink-0" style={{ color: GOLD }} aria-hidden="true" />
-                      <span>
-                        <span style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Why it's private: </span>
-                        it holds real work from real teams, internal frameworks, decisions and numbers I can't post publicly. I share it person to person instead.
-                      </span>
-                    </p>
-                    {/* Flashy headline; the line people loved stays right under it */}
-                    <p
-                      className="font-extrabold"
-                      style={{
-                        fontSize: '22px',
-                        lineHeight: 1.2,
-                        textWrap: 'balance',
-                        letterSpacing: '-0.02em',
-                        background: 'linear-gradient(90deg, #F0D9A8 0%, #DCBE8C 30%, #BAAAFF 65%, #8FE3D0 100%)',
-                        WebkitBackgroundClip: 'text',
-                        backgroundClip: 'text',
-                        color: 'transparent',
-                      }}
-                    >
-                      Your backstage pass is one chat away{' '}
-                      <span style={{ WebkitTextFillColor: 'initial', color: 'initial' }} aria-hidden="true">✨</span>
-                    </p>
-                    <p className="mt-1.5" style={{ fontSize: '14.5px', lineHeight: 1.5, color: 'rgba(255,255,255,0.62)' }}>
-                      Hop on a quick chat with me and the password is yours.{' '}
-                      <span style={{ color: GOLD, fontWeight: 600 }}>Guaranteed.</span>
-                    </p>
+                      <p className="mt-1.5" style={{ fontSize: '14.5px', lineHeight: 1.5, color: 'rgba(255,255,255,0.65)' }}>
+                        Hop on a quick chat with me and the password is yours.{' '}
+                        <span style={{ color: GOLD, fontWeight: 600 }}>Guaranteed.</span>
+                      </p>
+                    </div>
 
-
+                    {/* 3 · Actions: one primary, two equal secondaries */}
                     <a
                       href={introEmail(area)}
-                      className="mt-4 flex items-center justify-center gap-2 rounded-full bg-white px-5 font-bold text-black transition-transform hover:-translate-y-0.5"
-                      style={{ height: '46px', fontSize: '14px' }}
+                      className="mt-5 flex items-center justify-center gap-2 rounded-full bg-white px-5 font-bold text-black transition-transform hover:-translate-y-0.5"
+                      style={{ height: '48px', fontSize: '14.5px' }}
                     >
                       <Mail className="h-4 w-4" />
                       Say hi & get the password
                     </a>
-                    <div className="mt-2.5 flex items-center justify-center gap-1" style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.5)' }}>
+                    <div className="mt-2.5 grid grid-cols-2 gap-2.5">
                       <a
                         href={LINKEDIN_URL}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-colors hover:bg-white/[0.06] hover:text-white"
+                        className="flex items-center justify-center gap-2 rounded-full transition-colors hover:bg-white/[0.06] hover:text-white"
+                        style={SECONDARY_BUTTON}
                       >
-                        <Linkedin className="h-3.5 w-3.5" />
+                        <Linkedin className="h-4 w-4" />
                         LinkedIn
                       </a>
-                      <span aria-hidden="true" className="text-white/20">·</span>
-                      <span className="select-all px-1">{ACCESS_EMAIL}</span>
                       <button
                         type="button"
                         onClick={copyEmail}
-                        className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-[12.5px] transition-colors hover:bg-white/[0.06] hover:text-white"
-                        aria-label="Copy email address"
+                        className="flex items-center justify-center gap-2 rounded-full transition-colors hover:bg-white/[0.06] hover:text-white"
+                        style={SECONDARY_BUTTON}
+                        title={ACCESS_EMAIL}
                       >
-                        {copied ? <Check className="h-3.5 w-3.5" style={{ color: GOLD }} /> : <Copy className="h-3.5 w-3.5" />}
-                        {copied ? 'Copied' : 'Copy'}
+                        {copied ? <Check className="h-4 w-4" style={{ color: GOLD }} /> : <Copy className="h-4 w-4" />}
+                        {copied ? 'Email copied' : 'Copy email'}
                       </button>
                     </div>
+                    <p className="mt-2 text-center select-all" style={{ fontSize: '12px', color: 'rgba(255,255,255,0.38)' }}>
+                      {ACCESS_EMAIL}
+                    </p>
+                  </div>
 
-                    {/* Second path: visitors who already chatted */}
-                    <div className="mt-4 border-t pt-4" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
-                      {!showPassword ? (
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(true)}
-                          className="flex w-full items-center justify-center gap-2 transition-colors hover:text-white"
-                          style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}
-                        >
-                          <KeyRound className="h-3.5 w-3.5" />
+                  {/* 4 · Ticket footer: the path for visitors who already chatted */}
+                  <div className="px-6 py-4" style={{ background: 'rgba(255,255,255,0.025)', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+                    {!showPassword ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(true)}
+                        className="group flex w-full items-center justify-between transition-colors hover:text-white"
+                        style={{ fontSize: '13.5px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}
+                      >
+                        <span className="flex items-center gap-2">
+                          <KeyRound className="h-4 w-4" style={{ color: GOLD }} />
                           Already have the password?
-                        </button>
-                      ) : (
-                        <form onSubmit={submit}>
-                          <label htmlFor="workspace-password" style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.04em', color: 'rgba(255,255,255,0.6)' }}>
-                            Password
-                          </label>
-                          <div className="mt-2 flex gap-2">
-                            <input
-                              id="workspace-password"
-                              type="password"
-                              autoComplete="current-password"
-                              autoFocus
-                              value={password}
-                              onChange={(e) => {
-                                setPassword(e.target.value);
-                                if (status === 'wrong' || status === 'unavailable') setStatus('idle');
-                              }}
-                              aria-invalid={status === 'wrong'}
-                              aria-describedby="workspace-password-status"
-                              className="min-w-0 flex-1 rounded-full px-4 text-white outline-none transition-colors focus:border-[rgba(220,190,140,0.6)]"
-                              style={{ height: '46px', fontSize: '15px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)' }}
-                            />
-                            <button
-                              type="submit"
-                              disabled={!password || status === 'checking'}
-                              className="shrink-0 rounded-full px-5 font-bold text-black transition-opacity disabled:opacity-50"
-                              style={{ height: '46px', fontSize: '14px', background: GOLD }}
-                            >
-                              {status === 'checking' ? 'Checking…' : 'Unlock'}
-                            </button>
-                          </div>
-                          <p id="workspace-password-status" role="status" className="mt-2 min-h-[18px]" style={{ fontSize: '13px', color: '#F2A08F' }}>
-                            {status === 'wrong' && "That password didn't work. Check it and try again, or say hi and I'll resend it."}
-                            {status === 'unavailable' && "Couldn't check the password right now. Say hi and I'll send you the links directly."}
-                          </p>
-                        </form>
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
+                        </span>
+                        <ArrowRight className="h-4 w-4 text-white/40 transition-transform group-hover:translate-x-0.5 group-hover:text-white" />
+                      </button>
+                    ) : (
+                      <form onSubmit={submit}>
+                        <label htmlFor="workspace-password" className="flex items-center gap-2" style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
+                          <KeyRound className="h-4 w-4" style={{ color: GOLD }} />
+                          Password
+                        </label>
+                        <div className="mt-2 flex gap-2">
+                          <input
+                            id="workspace-password"
+                            type="password"
+                            autoComplete="current-password"
+                            autoFocus
+                            value={password}
+                            onChange={(e) => {
+                              setPassword(e.target.value);
+                              if (status === 'wrong' || status === 'unavailable') setStatus('idle');
+                            }}
+                            aria-invalid={status === 'wrong'}
+                            aria-describedby="workspace-password-status"
+                            className="min-w-0 flex-1 rounded-full px-4 text-white outline-none transition-colors focus:border-[rgba(220,190,140,0.6)]"
+                            style={{ height: '44px', fontSize: '15px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)' }}
+                          />
+                          <button
+                            type="submit"
+                            disabled={!password || status === 'checking'}
+                            className="shrink-0 rounded-full px-5 font-bold text-black transition-opacity disabled:opacity-50"
+                            style={{ height: '44px', fontSize: '14px', background: GOLD }}
+                          >
+                            {status === 'checking' ? 'Checking…' : 'Unlock'}
+                          </button>
+                        </div>
+                        <p id="workspace-password-status" role="status" className="mt-2 min-h-[18px]" style={{ fontSize: '13px', color: '#F2A08F' }}>
+                          {status === 'wrong' && "That password didn't work. Check it and try again, or say hi and I'll resend it."}
+                          {status === 'unavailable' && "Couldn't check the password right now. Say hi and I'll send you the links directly."}
+                        </p>
+                      </form>
+                    )}
+                  </div>
+                </>
+              )}
             </motion.div>
           )}
         </Dialog.Content>
