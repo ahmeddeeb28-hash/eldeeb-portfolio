@@ -1,6 +1,6 @@
-import { useState, type FormEvent, type ReactNode } from 'react';
+import { useState, type FormEvent } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { ArrowRight, ArrowUpRight, Ticket, Compass, Users, Boxes, BarChart3, FlaskConical, BookOpen, Lock, X, Mail, Check, Copy, Linkedin, KeyRound } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUpRight, Compass, Users, Boxes, BarChart3, FlaskConical, BookOpen, Lock, X, Mail, Check } from 'lucide-react';
 import { motion } from 'motion/react';
 import { SectionHeader } from './SectionHeader';
 
@@ -16,7 +16,6 @@ import { SectionHeader } from './SectionHeader';
  * api/workspace-unlock.ts, which explains the setup.
  * ──────────────────────────────────────────────────────────────────────── */
 const ACCESS_EMAIL = 'ahmeddeeb28@gmail.com';
-const LINKEDIN_URL = 'https://www.linkedin.com/in/el-deeb-39032b131/';
 
 type WorkspaceLink = { label: string; href: string };
 
@@ -110,41 +109,42 @@ function AreaImage({ area, featured }: { area: Area; featured?: boolean }) {
 }
 
 type UnlockState = 'idle' | 'checking' | 'wrong' | 'unavailable';
+type RequestState = 'idle' | 'sending' | 'sent' | 'fallback';
+type View = 'intro' | 'request' | 'password';
 
-/* Pre-filled so a recruiter only fills in the blanks. Brackets mark what
-   they replace; nothing here pretends to know who they are. */
-function introEmail(area: Area) {
-  const subject = `Leadership workspace: ${area.title}`;
+type RequestFields = { name: string; email: string; organization: string };
+
+/* Used only when the request can't be sent automatically: the same
+   details, pre-filled, so the visitor still finishes in one step. */
+function requestEmail(area: Area, f: RequestFields) {
+  const subject = `Workspace access request: ${f.name || '[name]'}, ${f.organization || '[organization]'}`;
   const body = [
     'Hi Ahmad,',
     '',
-    "I'm [name], [role] at [company].",
-    `I'd like to look through your Leadership & Strategy workspace, starting with ${area.title}.`,
+    `I'd like access to your Leadership & Strategy workspace, starting with ${area.title}.`,
     '',
-    'A good time for a quick chat: [day / time / time zone]',
+    `Name: ${f.name || '[name]'}`,
+    `Work email: ${f.email || '[email]'}`,
+    `Organization: ${f.organization || '[organization]'}`,
     '',
     'Thanks!',
   ].join('\n');
   return `mailto:${ACCESS_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
-const SECONDARY_BUTTON = {
-  height: '42px',
-  fontSize: '13.5px',
-  fontWeight: 600,
-  color: 'rgba(255,255,255,0.85)',
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const FIELD_STYLE = {
+  height: '44px',
+  fontSize: '15px',
+  background: 'rgba(255,255,255,0.04)',
   border: '1px solid rgba(255,255,255,0.14)',
 } as const;
 
-/* Small uppercase label that names each part of the ticket. */
-function SectionLabel({ children, icon }: { children: ReactNode; icon?: ReactNode }) {
-  return (
-    <p className="flex items-center gap-1.5" style={{ fontSize: '10.5px', fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: GOLD }}>
-      {icon}
-      {children}
-    </p>
-  );
-}
+const FIELD_CLASS =
+  'w-full rounded-xl px-3.5 text-white outline-none transition-colors placeholder:text-white/35 focus:border-[rgba(220,190,140,0.7)]';
+
+const LABEL_STYLE = { fontSize: '12.5px', fontWeight: 600, color: 'rgba(255,255,255,0.75)' } as const;
 
 function AccessDialog({
   area,
@@ -157,12 +157,22 @@ function AccessDialog({
   onUnlocked: (links: Record<string, WorkspaceLink[]>) => void;
   onClose: () => void;
 }) {
+  const [view, setView] = useState<View>('intro');
   const [password, setPassword] = useState('');
   const [status, setStatus] = useState<UnlockState>('idle');
-  const [showPassword, setShowPassword] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [fields, setFields] = useState<RequestFields>({ name: '', email: '', organization: '' });
+  const [honeypot, setHoneypot] = useState('');
+  const [request, setRequest] = useState<RequestState>('idle');
+  const [touched, setTouched] = useState(false);
 
-  const submit = async (e: FormEvent) => {
+  const fieldErrors = {
+    name: !fields.name.trim() ? 'Add your name.' : '',
+    email: !EMAIL_RE.test(fields.email.trim()) ? 'Add a valid work email.' : '',
+    organization: !fields.organization.trim() ? 'Add your organization.' : '',
+  };
+  const formValid = !fieldErrors.name && !fieldErrors.email && !fieldErrors.organization;
+
+  const unlock = async (e: FormEvent) => {
     e.preventDefault();
     if (!password || status === 'checking') return;
     setStatus('checking');
@@ -183,16 +193,28 @@ function AccessDialog({
     }
   };
 
-  /* Email links do nothing for visitors without a mail app, so the address
-     is always shown and copyable too. */
-  const copyEmail = async () => {
+  const sendRequest = async (e: FormEvent) => {
+    e.preventDefault();
+    setTouched(true);
+    if (!formValid || !area || request === 'sending') return;
+    setRequest('sending');
     try {
-      await navigator.clipboard.writeText(ACCESS_EMAIL);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      const res = await fetch('/api/workspace-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...fields, area: area.title, website: honeypot }),
+      });
+      setRequest(res.ok ? 'sent' : 'fallback');
     } catch {
-      /* Clipboard refused: the address stays visible and selectable. */
+      setRequest('fallback');
     }
+  };
+
+  const reset = () => {
+    setView('intro');
+    setStatus('idle');
+    setRequest('idle');
+    setTouched(false);
   };
 
   const areaLinks = area && links ? links[area.id] ?? [] : [];
@@ -202,8 +224,7 @@ function AccessDialog({
       open={!!area}
       onOpenChange={(open) => {
         if (!open) {
-          setStatus('idle');
-          setShowPassword(false);
+          reset();
           onClose();
         }
       }}
@@ -211,8 +232,8 @@ function AccessDialog({
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-[100]" style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(6px)' }} />
         <Dialog.Content
-          className="fixed left-1/2 top-1/2 z-[101] max-h-[calc(100dvh-32px)] w-[calc(100%-32px)] max-w-[440px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-[26px] focus:outline-none"
-          aria-describedby={undefined}
+          className="fixed left-1/2 top-1/2 z-[101] max-h-[calc(100dvh-32px)] w-[calc(100%-32px)] max-w-[440px] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-[24px] focus:outline-none"
+          aria-describedby="workspace-dialog-description"
         >
           {area && (
             <motion.div
@@ -221,171 +242,169 @@ function AccessDialog({
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
               className="relative overflow-hidden"
               style={{
-                borderRadius: '26px',
+                borderRadius: '24px',
                 background: '#111111',
                 border: '1px solid rgba(255,255,255,0.1)',
                 boxShadow: '0 40px 80px -20px rgba(0,0,0,0.8)',
               }}
             >
-              {/* ── Ticket top: the cover, large and whole ── */}
-              <div className="relative aspect-video w-full overflow-hidden">
+              {/* Hero: trimmed top and bottom so the cover's title and
+                  illustration stay, without dominating the dialog */}
+              <div className="relative h-[150px] overflow-hidden sm:h-[180px]">
                 {area.image ? (
-                  <img src={area.image} alt="" className="h-full w-full object-cover" />
+                  <img src={area.image} alt="" className="h-full w-full object-cover object-[50%_40%]" />
                 ) : (
                   <PlaceholderArt />
                 )}
-                <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(17,17,17,0.55) 100%)' }} />
-                <span
-                  className="absolute bottom-3 right-4 inline-flex items-center gap-1.5 rounded-md px-2.5 py-1"
-                  style={{
-                    fontSize: '10.5px',
-                    fontWeight: 800,
-                    letterSpacing: '0.18em',
-                    textTransform: 'uppercase',
-                    color: '#0A0A0A',
-                    background: GOLD,
-                    transform: 'rotate(2deg)',
-                    boxShadow: '0 6px 16px -6px rgba(0,0,0,0.6)',
-                  }}
-                >
-                  <Ticket className="h-3.5 w-3.5" aria-hidden="true" /> Admit one
-                </span>
+                <div className="absolute inset-x-0 bottom-0 h-6" style={{ background: 'linear-gradient(180deg, rgba(17,17,17,0), #111111)' }} />
               </div>
 
               <Dialog.Close
-                className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-white/85 transition-colors hover:text-white"
-                style={{ background: 'rgba(10,10,10,0.6)', backdropFilter: 'blur(8px)' }}
+                className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full text-white transition-colors hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4AF2E5]"
+                style={{ background: 'rgba(10,10,10,0.7)', backdropFilter: 'blur(8px)' }}
                 aria-label="Close"
               >
                 <X className="h-4 w-4" />
               </Dialog.Close>
 
-              {/* ── Perforation: notched edges and a dashed tear line ── */}
-              <div className="relative h-6" aria-hidden="true">
-                <span className="absolute -left-3 top-0 h-6 w-6 rounded-full" style={{ background: '#060606', border: '1px solid rgba(255,255,255,0.1)' }} />
-                <span className="absolute -right-3 top-0 h-6 w-6 rounded-full" style={{ background: '#060606', border: '1px solid rgba(255,255,255,0.1)' }} />
-                <span className="absolute left-5 right-5 top-1/2 border-t-2 border-dashed" style={{ borderColor: 'rgba(255,255,255,0.12)' }} />
-              </div>
+              <div className="px-6 pb-6 pt-3">
+                <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: GOLD }}>
+                  Selected leadership work
+                </p>
+                <Dialog.Title className="mt-1.5 font-semibold" style={{ fontSize: '21px', lineHeight: 1.25, letterSpacing: '-0.01em', color: '#FFFFFF' }}>
+                  {area.title}
+                </Dialog.Title>
 
-              <Dialog.Title className="sr-only">{area.title}</Dialog.Title>
-
-              {links ? (
-                <div className="px-6 pb-6 pt-2">
-                  <SectionLabel>Your resources</SectionLabel>
-                  {areaLinks.length > 0 ? (
-                    <ul className="mt-3 space-y-2">
-                      {areaLinks.map((link) => (
-                        <li key={link.href}>
-                          <a
-                            href={link.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="group flex items-center justify-between gap-3 rounded-xl px-4 py-3 transition-colors hover:bg-white/[0.06]"
-                            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.9)', fontSize: '14px', fontWeight: 500 }}
-                          >
-                            {link.label}
-                            <ArrowUpRight className="h-4 w-4 shrink-0 text-white/40 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-white" />
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="mt-2" style={{ fontSize: '14px', lineHeight: 1.55, color: 'rgba(255,255,255,0.6)' }}>
-                      Resources for this area are being prepared. Check the other areas, or email me for anything specific.
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <>
-                  <div className="px-6 pb-6 pt-2">
-                    {/* 1 · Why: read before anything is asked of the visitor */}
-                    <SectionLabel icon={<Lock className="h-3 w-3" />}>Why it's private</SectionLabel>
-                    <p className="mt-1.5" style={{ fontSize: '13.5px', lineHeight: 1.55, color: 'rgba(255,255,255,0.6)' }}>
-                      It holds real work from real teams: internal frameworks, decisions and numbers I can't post publicly. I share it person to person instead.
-                    </p>
-
-                    {/* 2 · How to get in */}
-                    <div className="mt-5">
-                      <SectionLabel icon={<Ticket className="h-3 w-3" />}>How to get in</SectionLabel>
-                      <p
-                        className="mt-1.5 font-extrabold"
-                        style={{
-                          fontSize: '22px',
-                          lineHeight: 1.2,
-                          letterSpacing: '-0.02em',
-                          background: 'linear-gradient(90deg, #F0D9A8 0%, #DCBE8C 35%, #BAAAFF 70%, #8FE3D0 100%)',
-                          WebkitBackgroundClip: 'text',
-                          backgroundClip: 'text',
-                          color: 'transparent',
-                        }}
-                      >
-                        Your backstage pass is one chat away{' '}
-                        <span style={{ WebkitTextFillColor: 'initial', color: 'initial' }} aria-hidden="true">✨</span>
+                {links ? (
+                  <div id="workspace-dialog-description" className="mt-4">
+                    {areaLinks.length > 0 ? (
+                      <ul className="space-y-2">
+                        {areaLinks.map((link) => (
+                          <li key={link.href}>
+                            <a
+                              href={link.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="group flex min-h-[48px] items-center justify-between gap-3 rounded-xl px-4 py-3 transition-colors hover:bg-white/[0.06]"
+                              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.92)', fontSize: '14px', fontWeight: 500 }}
+                            >
+                              {link.label}
+                              <ArrowUpRight className="h-4 w-4 shrink-0 text-white/50 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-white" />
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p style={{ fontSize: '14px', lineHeight: 1.55, color: 'rgba(255,255,255,0.72)' }}>
+                        Resources for this area are being prepared. The other areas are open to you in the meantime.
                       </p>
-                      <p className="mt-1.5" style={{ fontSize: '14.5px', lineHeight: 1.5, color: 'rgba(255,255,255,0.65)' }}>
-                        Hop on a quick chat with me and the password is yours.{' '}
-                        <span style={{ color: GOLD, fontWeight: 600 }}>Guaranteed.</span>
-                      </p>
-                    </div>
-
-                    {/* 3 · Actions: one primary, two equal secondaries */}
-                    <a
-                      href={introEmail(area)}
-                      className="mt-5 flex items-center justify-center gap-2 rounded-full bg-white px-5 font-bold text-black transition-transform hover:-translate-y-0.5"
-                      style={{ height: '48px', fontSize: '14.5px' }}
-                    >
-                      <Mail className="h-4 w-4" />
-                      Say hi & get the password
-                    </a>
-                    <div className="mt-2.5 grid grid-cols-2 gap-2.5">
-                      <a
-                        href={LINKEDIN_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2 rounded-full transition-colors hover:bg-white/[0.06] hover:text-white"
-                        style={SECONDARY_BUTTON}
-                      >
-                        <Linkedin className="h-4 w-4" />
-                        LinkedIn
-                      </a>
-                      <button
-                        type="button"
-                        onClick={copyEmail}
-                        className="flex items-center justify-center gap-2 rounded-full transition-colors hover:bg-white/[0.06] hover:text-white"
-                        style={SECONDARY_BUTTON}
-                        title={ACCESS_EMAIL}
-                      >
-                        {copied ? <Check className="h-4 w-4" style={{ color: GOLD }} /> : <Copy className="h-4 w-4" />}
-                        {copied ? 'Email copied' : 'Copy email'}
-                      </button>
-                    </div>
-                    <p className="mt-2 text-center select-all" style={{ fontSize: '12px', color: 'rgba(255,255,255,0.38)' }}>
-                      {ACCESS_EMAIL}
+                    )}
+                  </div>
+                ) : request === 'sent' ? (
+                  /* ── Confirmation ── */
+                  <div id="workspace-dialog-description" className="mt-4" role="status">
+                    <p className="flex items-center gap-2 font-semibold" style={{ fontSize: '15px', color: '#FFFFFF' }}>
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full" style={{ background: GOLD }}>
+                        <Check className="h-3.5 w-3.5 text-black" />
+                      </span>
+                      Request sent
+                    </p>
+                    <p className="mt-2" style={{ fontSize: '14px', lineHeight: 1.55, color: 'rgba(255,255,255,0.72)' }}>
+                      Thanks, {fields.name.trim().split(' ')[0]}. Once approved, the password goes to {fields.email.trim()}.
                     </p>
                   </div>
+                ) : view === 'request' ? (
+                  /* ── Request form ── */
+                  <form id="workspace-dialog-description" className="mt-4 space-y-3" onSubmit={sendRequest} noValidate>
+                    {(['name', 'email', 'organization'] as const).map((key) => {
+                      const label = key === 'name' ? 'Name' : key === 'email' ? 'Work email' : 'Organization';
+                      const error = touched ? fieldErrors[key] : '';
+                      return (
+                        <div key={key}>
+                          <label htmlFor={`request-${key}`} style={LABEL_STYLE}>
+                            {label}
+                          </label>
+                          <input
+                            id={`request-${key}`}
+                            type={key === 'email' ? 'email' : 'text'}
+                            autoComplete={key === 'name' ? 'name' : key === 'email' ? 'email' : 'organization'}
+                            autoFocus={key === 'name'}
+                            value={fields[key]}
+                            onChange={(e) => setFields((f) => ({ ...f, [key]: e.target.value }))}
+                            aria-invalid={!!error}
+                            aria-describedby={error ? `request-${key}-error` : undefined}
+                            className={`mt-1.5 ${FIELD_CLASS}`}
+                            style={FIELD_STYLE}
+                          />
+                          {error && (
+                            <p id={`request-${key}-error`} className="mt-1" style={{ fontSize: '12.5px', color: '#F2A08F' }}>
+                              {error}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                    {/* Honeypot, hidden from people and assistive tech */}
+                    <input
+                      type="text"
+                      name="website"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      aria-hidden="true"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                      className="absolute -left-[9999px] h-0 w-0 opacity-0"
+                    />
 
-                  {/* 4 · Ticket footer: the path for visitors who already chatted */}
-                  <div className="px-6 py-4" style={{ background: 'rgba(255,255,255,0.025)', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-                    {!showPassword ? (
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(true)}
-                        className="group flex w-full items-center justify-between transition-colors hover:text-white"
-                        style={{ fontSize: '13.5px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}
-                      >
-                        <span className="flex items-center gap-2">
-                          <KeyRound className="h-4 w-4" style={{ color: GOLD }} />
-                          Already have the password?
-                        </span>
-                        <ArrowRight className="h-4 w-4 text-white/40 transition-transform group-hover:translate-x-0.5 group-hover:text-white" />
-                      </button>
-                    ) : (
-                      <form onSubmit={submit}>
-                        <label htmlFor="workspace-password" className="flex items-center gap-2" style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
-                          <KeyRound className="h-4 w-4" style={{ color: GOLD }} />
+                    {request === 'fallback' && (
+                      <div className="rounded-xl p-3" role="status" style={{ background: 'rgba(220,190,140,0.08)', border: '1px solid rgba(220,190,140,0.3)' }}>
+                        <p style={{ fontSize: '13.5px', lineHeight: 1.5, color: 'rgba(255,255,255,0.85)' }}>
+                          The request couldn't be sent automatically. Send it by email instead; your details are already filled in.
+                        </p>
+                        <a
+                          href={requestEmail(area, fields)}
+                          className="mt-2 inline-flex items-center gap-1.5 font-semibold underline underline-offset-4"
+                          style={{ fontSize: '13.5px', color: GOLD }}
+                        >
+                          <Mail className="h-4 w-4" /> Email the request to {ACCESS_EMAIL}
+                        </a>
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={request === 'sending'}
+                      className="mt-1 flex w-full items-center justify-center gap-2 rounded-full bg-white px-5 font-bold text-black transition-opacity disabled:opacity-60"
+                      style={{ height: '48px', fontSize: '15px' }}
+                    >
+                      {request === 'sending' ? 'Sending…' : 'Send request'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setView('intro')}
+                      className="flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-full transition-colors hover:text-white"
+                      style={{ fontSize: '13.5px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}
+                    >
+                      <ArrowLeft className="h-4 w-4" /> Back
+                    </button>
+                  </form>
+                ) : (
+                  /* ── Intro: what's inside, why it's restricted, how to get in ── */
+                  <div id="workspace-dialog-description">
+                    <p className="mt-2" style={{ fontSize: '14.5px', lineHeight: 1.55, color: 'rgba(255,255,255,0.78)' }}>
+                      A closer look at how I lead design teams, shape product decisions, and build scalable design practices.
+                    </p>
+                    <p className="mt-3 flex gap-2" style={{ fontSize: '13px', lineHeight: 1.5, color: 'rgba(255,255,255,0.62)' }}>
+                      <Lock className="mt-[3px] h-3.5 w-3.5 shrink-0" style={{ color: GOLD }} aria-hidden="true" />
+                      Approved, sanitized examples of strategy frameworks, design operations, decision-making and business impact, shared on request.
+                    </p>
+
+                    {view === 'password' ? (
+                      <form onSubmit={unlock} className="mt-5">
+                        <label htmlFor="workspace-password" style={LABEL_STYLE}>
                           Password
                         </label>
-                        <div className="mt-2 flex gap-2">
+                        <div className="mt-1.5 flex gap-2">
                           <input
                             id="workspace-password"
                             type="password"
@@ -398,27 +417,54 @@ function AccessDialog({
                             }}
                             aria-invalid={status === 'wrong'}
                             aria-describedby="workspace-password-status"
-                            className="min-w-0 flex-1 rounded-full px-4 text-white outline-none transition-colors focus:border-[rgba(220,190,140,0.6)]"
-                            style={{ height: '44px', fontSize: '15px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)' }}
+                            className={`min-w-0 flex-1 ${FIELD_CLASS}`}
+                            style={FIELD_STYLE}
                           />
                           <button
                             type="submit"
                             disabled={!password || status === 'checking'}
-                            className="shrink-0 rounded-full px-5 font-bold text-black transition-opacity disabled:opacity-50"
-                            style={{ height: '44px', fontSize: '14px', background: GOLD }}
+                            className="shrink-0 rounded-xl bg-white px-5 font-bold text-black transition-opacity disabled:opacity-50"
+                            style={{ height: '44px', fontSize: '14px' }}
                           >
                             {status === 'checking' ? 'Checking…' : 'Unlock'}
                           </button>
                         </div>
                         <p id="workspace-password-status" role="status" className="mt-2 min-h-[18px]" style={{ fontSize: '13px', color: '#F2A08F' }}>
-                          {status === 'wrong' && "That password didn't work. Check it and try again, or say hi and I'll resend it."}
-                          {status === 'unavailable' && "Couldn't check the password right now. Say hi and I'll send you the links directly."}
+                          {status === 'wrong' && "That password didn't work. Check it and try again."}
+                          {status === 'unavailable' && "Couldn't check the password right now. Please try again shortly."}
                         </p>
+                        <button
+                          type="button"
+                          onClick={() => setView('request')}
+                          className="flex min-h-[44px] items-center gap-1.5 transition-colors hover:text-white"
+                          style={{ fontSize: '13.5px', fontWeight: 600, color: 'rgba(255,255,255,0.72)' }}
+                        >
+                          Don't have access? Request it <ArrowRight className="h-4 w-4" />
+                        </button>
                       </form>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setView('request')}
+                          className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-white px-5 font-bold text-black transition-transform hover:-translate-y-0.5"
+                          style={{ height: '48px', fontSize: '15px' }}
+                        >
+                          Request access
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setView('password')}
+                          className="mt-2 flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-full transition-colors hover:text-white"
+                          style={{ fontSize: '13.5px', fontWeight: 600, color: 'rgba(255,255,255,0.72)' }}
+                        >
+                          Already have access? Enter your password <ArrowRight className="h-4 w-4" />
+                        </button>
+                      </>
                     )}
                   </div>
-                </>
-              )}
+                )}
+              </div>
             </motion.div>
           )}
         </Dialog.Content>
@@ -526,7 +572,7 @@ export function LeadershipStrategy() {
 
             <p className="mt-8 flex items-center justify-center gap-2 text-center" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>
               <Lock className="h-3.5 w-3.5 shrink-0" style={{ color: GOLD }} aria-hidden="true" />
-              {links ? 'Workspace unlocked for this visit.' : 'Private by design. Pick a cover, say hi, and the password is yours.'}
+              {links ? 'Workspace unlocked for this visit.' : 'Selected leadership work, shared on request. Choose an area to request access.'}
             </p>
           </div>
         </motion.div>
