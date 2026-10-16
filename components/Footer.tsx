@@ -1,6 +1,9 @@
-import { Twitter, Linkedin, Instagram, Mail, ArrowUpRight } from 'lucide-react';
+import { Linkedin, Mail, ArrowUpRight, PenLine, Users } from 'lucide-react';
 import { motion, useInView } from 'motion/react';
 import { useRef, useState, useEffect } from 'react';
+import { SECTION_IDS, scrollToSection } from '../lib/scrollToSection';
+
+const CONTACT_EMAIL = 'mailto:ahmeddeeb28@gmail.com';
 
 function AnimatedLetters({ text, delay = 0 }: { text: string; delay?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -108,20 +111,34 @@ function PulsingDot() {
   );
 }
 
-export function Footer() {
+interface FooterProps {
+  onOpenAboutPage?: () => void;
+}
+
+export function Footer({ onOpenAboutPage }: FooterProps) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: '-60px' });
   const [hoveredSocial, setHoveredSocial] = useState<number | null>(null);
   const [currentYear] = useState(new Date().getFullYear());
 
   const socialLinks = [
-    { icon: Twitter, href: '#', label: 'Twitter / X' },
-    { icon: Linkedin, href: '#', label: 'LinkedIn' },
-    { icon: Instagram, href: '#', label: 'Instagram' },
-    { icon: Mail, href: '#', label: 'Email' },
+    { icon: Linkedin, href: 'https://www.linkedin.com/in/el-deeb-39032b131/', label: 'LinkedIn' },
+    { icon: PenLine, href: 'https://medium.com/@ahmedmohammedeldeeb', label: 'Medium' },
+    { icon: Users, href: 'https://adplist.org/mentors/ahmad-el-deeb', label: 'ADPList mentorship' },
+    { icon: Mail, href: CONTACT_EMAIL, label: 'Email' },
   ];
 
-  const navLinks = ['Work', 'About', 'Services', 'Articles', 'Contact'];
+  /* Mirrors the top nav so the footer never points somewhere the
+     page does not have. About opens the Director's Cut overlay;
+     Contact is the same mailto as the CTA above. */
+  const navLinks: { label: string; href: string; onClick?: () => void }[] = [
+    { label: 'Work', href: `#${SECTION_IDS.work}`, onClick: () => scrollToSection(SECTION_IDS.work) },
+    { label: 'About', href: '/about', onClick: onOpenAboutPage },
+    { label: 'Mentorship', href: `#${SECTION_IDS.mentorship}`, onClick: () => scrollToSection(SECTION_IDS.mentorship) },
+    { label: 'Speaking', href: `#${SECTION_IDS.speaking}`, onClick: () => scrollToSection(SECTION_IDS.speaking) },
+    { label: 'Articles', href: `#${SECTION_IDS.articles}`, onClick: () => scrollToSection(SECTION_IDS.articles) },
+    { label: 'Contact', href: CONTACT_EMAIL },
+  ];
 
   // Marquee text
   const marqueeText = 'LET\'S CREATE SOMETHING EXTRAORDINARY  ·  OPEN FOR COLLABORATIONS  ·  STRATEGY THAT SHIPS  ·  ';
@@ -248,7 +265,7 @@ export function Footer() {
 
             {/* CTA Button */}
             <motion.a
-              href="mailto:ahmeddeeb28@gmail.com"
+              href={CONTACT_EMAIL}
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.9, delay: 1, ease: [0.22, 1, 0.36, 1] }}
@@ -288,8 +305,13 @@ export function Footer() {
           >
             {navLinks.map((link, i) => (
               <motion.a
-                key={link}
-                href="#"
+                key={link.label}
+                href={link.href}
+                onClick={(e) => {
+                  if (!link.onClick) return;
+                  e.preventDefault();
+                  link.onClick();
+                }}
                 initial={{ opacity: 0, y: 10 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: 1.2 + i * 0.06 }}
@@ -304,7 +326,7 @@ export function Footer() {
                   fontFamily: 'Inter, system-ui, sans-serif',
                 }}
               >
-                {link}
+                {link.label}
               </motion.a>
             ))}
           </motion.div>
@@ -326,6 +348,7 @@ export function Footer() {
                   key={index}
                   href={social.href}
                   aria-label={social.label}
+                  {...(social.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                   onMouseEnter={() => setHoveredSocial(index)}
                   onMouseLeave={() => setHoveredSocial(null)}
                   whileHover={{ scale: 1.1, y: -2 }}
@@ -365,7 +388,7 @@ export function Footer() {
                   fontFamily: 'Inter, system-ui, sans-serif',
                 }}
               >
-                © {currentYear} Portfolio. Crafted with intention.
+                © {currentYear} Ahmad Eldeeb. Crafted with intention.
               </p>
               <p
                 style={{

@@ -1,6 +1,7 @@
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useRef, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
+import { SECTION_IDS, scrollToSection } from '../lib/scrollToSection';
 
 interface StickyNoteData {
   id: string;
@@ -483,7 +484,8 @@ export function PremiumHero() {
             className="flex flex-wrap items-center gap-8"
           >
             <motion.a
-              href="#work"
+              href={`#${SECTION_IDS.work}`}
+              onClick={(e) => { e.preventDefault(); scrollToSection(SECTION_IDS.work); }}
               onMouseMove={handleCtaMove}
               onMouseLeave={() => setCtaOffset({ x: 0, y: 0 })}
               animate={{

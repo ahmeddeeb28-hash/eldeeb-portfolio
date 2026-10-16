@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Mail, Linkedin } from 'lucide-react';
 import { motion } from 'motion/react';
+import { SECTION_IDS, scrollToSection, scrollToTop } from '../lib/scrollToSection';
 
 const LINKEDIN_URL = 'https://www.linkedin.com/in/el-deeb-39032b131/';
 
@@ -46,11 +47,11 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
   }, [mobileOpen]);
 
   const navItems: { label: string; targetId?: string; onClick?: () => void }[] = [
-    { label: 'Work', targetId: 'selected-work-section-lock' },
+    { label: 'Work', targetId: SECTION_IDS.work },
     { label: 'About', onClick: onOpenAboutPage },
-    { label: 'Mentorship', targetId: 'mentorship' },
-    { label: 'Speaking', targetId: 'proof-of-presence-section-lock' },
-    { label: 'Articles', targetId: 'articles-activities' },
+    { label: 'Mentorship', targetId: SECTION_IDS.mentorship },
+    { label: 'Speaking', targetId: SECTION_IDS.speaking },
+    { label: 'Articles', targetId: SECTION_IDS.articles },
   ];
 
   // Track active section for the underline indicator
@@ -74,13 +75,7 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Smooth-scroll click handler that accounts for the floating pill height
-  const scrollToId = (id: string) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const y = el.getBoundingClientRect().top + window.scrollY - 96;
-    window.scrollTo({ top: y, behavior: 'smooth' });
-  };
+  const scrollToId = scrollToSection;
 
   return (
     <>
@@ -124,7 +119,9 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
         {/* Monogram seal — bordered mark with a pulsing ring for an official, premium signature */}
         <div style={{ position: 'relative', width: '34px', height: '34px', flexShrink: 0 }}>
           <a
-            href="#"
+            href="/"
+            aria-label="Ahmad Eldeeb — back to top"
+            onClick={(e) => { e.preventDefault(); scrollToTop(); }}
             style={{
               position: 'relative',
               zIndex: 1,
@@ -329,7 +326,9 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
       >
         <div style={{ position: 'relative', width: '30px', height: '30px' }}>
           <a
-            href="#"
+            href="/"
+            aria-label="Ahmad Eldeeb — back to top"
+            onClick={(e) => { e.preventDefault(); scrollToTop(); }}
             style={{
               position: 'relative',
               zIndex: 1,
