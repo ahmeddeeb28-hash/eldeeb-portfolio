@@ -5,6 +5,7 @@ import { Features } from './components/Features';
 import { WorkLanguage } from './components/WorkLanguage';
 import { Projects } from './components/Projects';
 import { Mentorship } from './components/Mentorship';
+import { LeadershipStrategy } from './components/LeadershipStrategy';
 import { BrandsStats } from './components/BrandsStats';
 import { Results } from './components/Results';
 import { Testimonials } from './components/Testimonials';
@@ -165,6 +166,7 @@ export default function App() {
         <Projects onProjectClick={openProject} />
         {/* Hidden but preserved — restore by uncommenting the line below */}
         {false && <WorkLanguage />}
+        <LeadershipStrategy />
         <Mentorship />
         <ProofOfPresence />
         {/* Hidden but preserved — restore by flipping the guard below */}
