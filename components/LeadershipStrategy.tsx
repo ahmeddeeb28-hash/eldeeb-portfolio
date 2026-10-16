@@ -128,8 +128,6 @@ function introEmail(area: Area) {
   return `mailto:${ACCESS_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
-const STEPS = ['Say hi', 'Quick chat', 'Password is yours'];
-
 function AccessDialog({
   area,
   links,
@@ -254,26 +252,6 @@ function AccessDialog({
               <div className="px-5 pb-5 pt-2 sm:px-6 sm:pb-6">
                 <Dialog.Title className="sr-only">{area.title}</Dialog.Title>
 
-                {/* Boarding-pass row */}
-                <dl className="grid grid-cols-3 gap-3">
-                  {[
-                    ['Pass', `No. ${String(AREAS.indexOf(area) + 1).padStart(2, '0')}`],
-                    ['Access', links ? 'Unlocked' : 'Private'],
-                    ['Entry', links ? 'Welcome in' : '1 quick chat'],
-                  ].map(([label, value]) => (
-                    <div key={label} className="min-w-0">
-                      <dt style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>
-                        {label}
-                      </dt>
-                      <dd className="mt-0.5 truncate font-semibold" style={{ fontSize: '14px', color: label === 'Access' ? GOLD : 'rgba(255,255,255,0.92)', fontVariantNumeric: 'tabular-nums' }}>
-                        {value}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-
-                <div className="my-4 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
-
                 {links ? (
                   <div>
                     {areaLinks.length > 0 ? (
@@ -301,6 +279,14 @@ function AccessDialog({
                   </div>
                 ) : (
                   <>
+                    {/* Why first, then the invitation */}
+                    <p className="mb-4 flex gap-2" style={{ fontSize: '12.5px', lineHeight: 1.5, color: 'rgba(255,255,255,0.45)' }}>
+                      <Lock className="mt-[3px] h-3 w-3 shrink-0" style={{ color: GOLD }} aria-hidden="true" />
+                      <span>
+                        <span style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Why it's private: </span>
+                        it holds real work from real teams, internal frameworks, decisions and numbers I can't post publicly. I share it person to person instead.
+                      </span>
+                    </p>
                     {/* Flashy headline; the line people loved stays right under it */}
                     <p
                       className="font-extrabold"
@@ -323,38 +309,10 @@ function AccessDialog({
                       <span style={{ color: GOLD, fontWeight: 600 }}>Guaranteed.</span>
                     </p>
 
-                    <ol
-                      className="mt-4 flex flex-wrap items-center gap-x-1.5 gap-y-2 rounded-2xl px-3 py-2"
-                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
-                      aria-label="How to get access"
-                    >
-                      {STEPS.map((step, i) => {
-                        const last = i === STEPS.length - 1;
-                        return (
-                          <li key={step} className="flex items-center gap-1.5">
-                            <span
-                              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
-                              style={{
-                                fontSize: '10.5px',
-                                fontWeight: 700,
-                                color: last ? '#0A0A0A' : GOLD,
-                                background: last ? GOLD : 'rgba(220,190,140,0.12)',
-                              }}
-                            >
-                              {last ? <Check className="h-3 w-3" /> : i + 1}
-                            </span>
-                            <span className="whitespace-nowrap" style={{ fontSize: '12.5px', fontWeight: 500, color: last ? GOLD : 'rgba(255,255,255,0.72)' }}>
-                              {step}
-                            </span>
-                            {!last && <ArrowRight aria-hidden="true" className="mx-0.5 h-3 w-3 shrink-0 text-white/25" />}
-                          </li>
-                        );
-                      })}
-                    </ol>
 
                     <a
                       href={introEmail(area)}
-                      className="mt-5 flex items-center justify-center gap-2 rounded-full bg-white px-5 font-bold text-black transition-transform hover:-translate-y-0.5"
+                      className="mt-4 flex items-center justify-center gap-2 rounded-full bg-white px-5 font-bold text-black transition-transform hover:-translate-y-0.5"
                       style={{ height: '46px', fontSize: '14px' }}
                     >
                       <Mail className="h-4 w-4" />
@@ -382,14 +340,6 @@ function AccessDialog({
                         {copied ? 'Copied' : 'Copy'}
                       </button>
                     </div>
-
-                    <p className="mt-5 flex gap-2" style={{ fontSize: '12.5px', lineHeight: 1.5, color: 'rgba(255,255,255,0.45)' }}>
-                      <Lock className="mt-[3px] h-3 w-3 shrink-0" style={{ color: GOLD }} aria-hidden="true" />
-                      <span>
-                        <span style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Why it's private: </span>
-                        it holds real work from real teams, internal frameworks, decisions and numbers I can't post publicly. I share it person to person instead.
-                      </span>
-                    </p>
 
                     {/* Second path: visitors who already chatted */}
                     <div className="mt-4 border-t pt-4" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
