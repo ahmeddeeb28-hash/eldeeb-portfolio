@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { ArrowRight, ArrowUpRight, Compass, Users, Boxes, BarChart3, FlaskConical, BookOpen, Lock, X, Mail, Check, Copy, Linkedin, KeyRound } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Ticket, Compass, Users, Boxes, BarChart3, FlaskConical, BookOpen, Lock, X, Mail, Check, Copy, Linkedin, KeyRound } from 'lucide-react';
 import { motion } from 'motion/react';
 import { SectionHeader } from './SectionHeader';
 
@@ -211,33 +211,71 @@ function AccessDialog({
                 boxShadow: '0 40px 80px -20px rgba(0,0,0,0.8)',
               }}
             >
-              <div className="p-5 sm:p-6">
-                {/* Header: the whole cover as a small thumbnail, never cropped */}
-                <div className="flex items-center gap-4 pr-10">
-                  <div className="relative aspect-video w-[104px] shrink-0 overflow-hidden rounded-xl" style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
-                    {area.image ? <img src={area.image} alt="" className="h-full w-full object-cover" /> : <PlaceholderArt />}
-                  </div>
-                  <div className="min-w-0">
-                    <Dialog.Title className="font-semibold" style={{ fontSize: '17px', lineHeight: 1.3, color: 'rgba(255,255,255,0.96)' }}>
-                      {area.title}
-                    </Dialog.Title>
-                    <p className="mt-0.5" style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.45)' }}>
-                      {area.keywords}
-                    </p>
-                  </div>
-                </div>
-
-                <Dialog.Close
-                  className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-white/50 transition-colors hover:bg-white/[0.06] hover:text-white"
-                  aria-label="Close"
+              {/* ── Ticket top: the cover, large and whole ── */}
+              <div className="relative aspect-video w-full overflow-hidden">
+                {area.image ? (
+                  <img src={area.image} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <PlaceholderArt />
+                )}
+                <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(17,17,17,0.55) 100%)' }} />
+                <span
+                  className="absolute bottom-3 right-4 inline-flex items-center gap-1.5 rounded-md px-2.5 py-1"
+                  style={{
+                    fontSize: '10.5px',
+                    fontWeight: 800,
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    color: '#0A0A0A',
+                    background: GOLD,
+                    transform: 'rotate(2deg)',
+                    boxShadow: '0 6px 16px -6px rgba(0,0,0,0.6)',
+                  }}
                 >
-                  <X className="h-4 w-4" />
-                </Dialog.Close>
+                  <Ticket className="h-3.5 w-3.5" aria-hidden="true" /> Admit one
+                </span>
+              </div>
 
-                <div className="my-5 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
+              <Dialog.Close
+                className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-white/85 transition-colors hover:text-white"
+                style={{ background: 'rgba(10,10,10,0.6)', backdropFilter: 'blur(8px)' }}
+                aria-label="Close"
+              >
+                <X className="h-4 w-4" />
+              </Dialog.Close>
+
+              {/* ── Perforation: notched edges and a dashed tear line ── */}
+              <div className="relative h-6" aria-hidden="true">
+                <span className="absolute -left-3 top-0 h-6 w-6 rounded-full" style={{ background: '#060606', border: '1px solid rgba(255,255,255,0.1)' }} />
+                <span className="absolute -right-3 top-0 h-6 w-6 rounded-full" style={{ background: '#060606', border: '1px solid rgba(255,255,255,0.1)' }} />
+                <span className="absolute left-5 right-5 top-1/2 border-t-2 border-dashed" style={{ borderColor: 'rgba(255,255,255,0.12)' }} />
+              </div>
+
+              <div className="px-5 pb-5 pt-2 sm:px-6 sm:pb-6">
+                <Dialog.Title className="sr-only">{area.title}</Dialog.Title>
+
+                {/* Boarding-pass row */}
+                <dl className="grid grid-cols-3 gap-3">
+                  {[
+                    ['Pass', `No. ${String(AREAS.indexOf(area) + 1).padStart(2, '0')}`],
+                    ['Access', links ? 'Unlocked' : 'Private'],
+                    ['Entry', links ? 'Welcome in' : '1 quick chat'],
+                  ].map(([label, value]) => (
+                    <div key={label} className="min-w-0">
+                      <dt style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)' }}>
+                        {label}
+                      </dt>
+                      <dd className="mt-0.5 truncate font-semibold" style={{ fontSize: '14px', color: label === 'Access' ? GOLD : 'rgba(255,255,255,0.92)', fontVariantNumeric: 'tabular-nums' }}>
+                        {value}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+
+                <div className="my-4 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
 
                 {links ? (
-                  <div className="mt-6">
+                  <div>
                     {areaLinks.length > 0 ? (
                       <ul className="space-y-2">
                         {areaLinks.map((link) => (
@@ -263,10 +301,22 @@ function AccessDialog({
                   </div>
                 ) : (
                   <>
-                    {/* The invitation leads; the reason follows as a quiet note */}
-                    <p className="font-semibold" style={{ fontSize: '20px', lineHeight: 1.3, letterSpacing: '-0.01em', color: 'rgba(255,255,255,0.97)' }}>
-                      We're UXers, we talk to{' '}
-                      <span className="whitespace-nowrap">people. <span aria-hidden="true">👋</span></span>
+                    {/* Flashy headline; the line people loved stays right under it */}
+                    <p
+                      className="font-extrabold"
+                      style={{
+                        fontSize: '22px',
+                        lineHeight: 1.2,
+                        textWrap: 'balance',
+                        letterSpacing: '-0.02em',
+                        background: 'linear-gradient(90deg, #F0D9A8 0%, #DCBE8C 30%, #BAAAFF 65%, #8FE3D0 100%)',
+                        WebkitBackgroundClip: 'text',
+                        backgroundClip: 'text',
+                        color: 'transparent',
+                      }}
+                    >
+                      Your backstage pass is one chat away{' '}
+                      <span style={{ WebkitTextFillColor: 'initial', color: 'initial' }} aria-hidden="true">✨</span>
                     </p>
                     <p className="mt-1.5" style={{ fontSize: '14.5px', lineHeight: 1.5, color: 'rgba(255,255,255,0.62)' }}>
                       Hop on a quick chat with me and the password is yours.{' '}
