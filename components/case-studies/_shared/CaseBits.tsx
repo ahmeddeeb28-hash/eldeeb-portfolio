@@ -1,5 +1,5 @@
-import { motion, AnimatePresence } from 'motion/react';
-import { useRef, useState, type ReactNode } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Play, Volume2 } from 'lucide-react';
 
 /* ── Shared case-study pieces ────────────────────────
@@ -28,7 +28,9 @@ export function Eyebrow({ children, tone }: { children: ReactNode; tone: string 
 /* ── Film ──
    Plays the case film muted on loop with a "Watch the film"
    button that restarts it with sound. If the file is missing,
-   `fallback` (a live phone sequence) shows instead. */
+   `fallback` (a live phone sequence) plays centre stage instead,
+   lit like a film still, over large `decor` lettering and a
+   slow ticker of `ticker` phrases. */
 export function CaseFilm({
   src,
   poster,
@@ -37,7 +39,8 @@ export function CaseFilm({
   buttonTint,
   background,
   fallback,
-  fallbackText,
+  decor,
+  ticker,
 }: {
   src: string;
   poster?: string;
@@ -46,11 +49,18 @@ export function CaseFilm({
   buttonTint: string;
   background: string;
   fallback: ReactNode;
-  fallbackText: string;
+  decor: string;
+  ticker: string[];
 }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [hasFilm, setHasFilm] = useState(true);
   const [playing, setPlaying] = useState(false);
+
+  // A missing file can fail before React attaches onError; catch that too.
+  useEffect(() => {
+    const v = ref.current;
+    if (v && (v.error || v.networkState === HTMLMediaElement.NETWORK_NO_SOURCE)) setHasFilm(false);
+  }, []);
 
   const play = () => {
     const v = ref.current;
@@ -98,16 +108,89 @@ export function CaseFilm({
           )}
         </>
       ) : (
-        <div className="absolute inset-0 flex items-center justify-center gap-10 px-6">
-          <div className="scale-[0.5] sm:scale-75 md:scale-100 origin-center">{fallback}</div>
-          <div className="hidden md:block max-w-[260px]">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-3" style={{ color: accent }}>
-              Live preview
-            </p>
-            <p className="text-white/70 text-sm leading-relaxed">{fallbackText}</p>
-          </div>
-        </div>
+        <CinemaStage accent={accent} decor={decor} ticker={ticker}>
+          {fallback}
+        </CinemaStage>
       )}
+    </div>
+  );
+}
+
+function CinemaStage({
+  children,
+  accent,
+  decor,
+  ticker,
+}: {
+  children: ReactNode;
+  accent: string;
+  decor: string;
+  ticker: string[];
+}) {
+  const reduced = useReducedMotion();
+  const line = Array.from({ length: 4 }, () => ticker.join('   ·   ')).join('   ·   ');
+  const tickerRow = (dir: 1 | -1, top: string) => (
+    <div className="absolute left-0 right-0 overflow-hidden whitespace-nowrap pointer-events-none" style={{ top }} aria-hidden>
+      <motion.div
+        className="inline-block text-[10px] md:text-[11px] font-black uppercase tracking-[0.4em] text-white/25"
+        animate={reduced ? undefined : { x: dir === 1 ? ['0%', '-50%'] : ['-50%', '0%'] }}
+        transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
+      >
+        {line}   ·   {line}
+      </motion.div>
+    </div>
+  );
+
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      {/* spotlight from above */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `radial-gradient(ellipse 38% 70% at 50% 0%, ${accent}38 0%, transparent 70%)`,
+        }}
+      />
+      {/* decorative lettering behind the phone */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden>
+        <span
+          className="font-black uppercase leading-none whitespace-nowrap select-none"
+          style={{
+            fontSize: 'clamp(56px, 13vw, 168px)',
+            letterSpacing: '-0.04em',
+            color: 'transparent',
+            WebkitTextStroke: '1px rgba(255,255,255,0.22)',
+            fontFamily: '"Bricolage Grotesque", Inter, system-ui, sans-serif',
+          }}
+        >
+          {decor}
+        </span>
+      </div>
+      {tickerRow(1, '7%')}
+      {tickerRow(-1, '89%')}
+      {/* floor glow under the phone */}
+      <div
+        className="absolute left-1/2 -translate-x-1/2 bottom-[4%] w-[46%] h-[16%] rounded-[50%] blur-2xl"
+        style={{ background: `${accent}40` }}
+      />
+      {/* the phone, centre stage */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="scale-[0.4] sm:scale-75 md:scale-90 lg:scale-100 origin-center">
+          <motion.div
+            style={{ filter: 'drop-shadow(0 40px 60px rgba(0,0,0,.65))' }}
+            animate={reduced ? undefined : { y: [0, -8, 0] }}
+            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            {children}
+          </motion.div>
+        </div>
+      </div>
+      {/* vignette and letterbox */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse 75% 75% at 50% 50%, transparent 55%, rgba(0,0,0,.55) 100%)' }}
+      />
+      <div className="absolute top-0 left-0 right-0 h-[3%] bg-black/70 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-[3%] bg-black/70 pointer-events-none" />
     </div>
   );
 }

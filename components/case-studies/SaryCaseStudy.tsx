@@ -253,8 +253,9 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
               accent={ACCENT}
               buttonTint="#1D368D"
               background="radial-gradient(ellipse 70% 80% at 50% 30%, #1f3474 0%, #0b1022 70%)"
-              fallback={<SaryAddAllLoop width={190} />}
-              fallbackText="Tap Add all: the usual basket flies into the cart, the total updates, and a weekly reminder is one toggle away."
+              fallback={<SaryAddAllLoop width={200} />}
+              decor="Buy again"
+              ticker={['Restock in one tap', 'Running low', 'Weekly routine', 'Sary', 'Al Amana Grocery · Riyadh']}
             />
           </motion.div>
         </section>

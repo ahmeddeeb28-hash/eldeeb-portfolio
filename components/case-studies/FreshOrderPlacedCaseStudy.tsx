@@ -268,8 +268,9 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
               accent={ACCENT}
               buttonTint="#103F2D"
               background="radial-gradient(ellipse 70% 80% at 50% 30%, #173a2b 0%, #0F1311 70%)"
-              fallback={<LoopingPhone width={196} />}
-              fallbackText="Ring and countdown, confirmation, success, then arrival time, savings and receipt."
+              fallback={<LoopingPhone width={200} />}
+              decor="Order placed"
+              ticker={['5 second window', 'Edit before cancel', 'Sent to Vapiano', 'fresh', 'Arrives 19:45']}
             />
           </motion.div>
         </section>
