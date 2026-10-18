@@ -1,11 +1,10 @@
-import { motion, AnimatePresence } from 'motion/react';
-import { useRef, useState } from 'react';
-import { Play, Volume2 } from 'lucide-react';
+import { motion } from 'motion/react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
 import { Meta } from './_shared/Meta';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 import { FreshPhone, LoopingPhone, type PhoneState } from './fresh/FreshPhone';
+import { CaseFilm, Eyebrow as BaseEyebrow, UseCaseExplorer, reveal, type UseCase as BaseUseCase } from './_shared/CaseBits';
 
 /* ── fresh · Order placed ────────────────────────────
    One moment, end to end: the five seconds after a diner
@@ -109,17 +108,11 @@ const FEATURED = [
   { v: '5s', k: 'Time left', d: 'How long you still have to change your mind.' },
 ];
 
-type UseCase = {
-  id: string;
-  code: string;
-  title: string;
-  state: PhoneState;
-  live?: boolean;
-  what: string;
-  why: string;
-  shown: string;
-  measured: string;
-};
+type UseCase = BaseUseCase & { state: PhoneState; live?: boolean };
+
+const Eyebrow = ({ children, tone = ACCENT }: { children: React.ReactNode; tone?: string }) => (
+  <BaseEyebrow tone={tone}>{children}</BaseEyebrow>
+);
 
 const USE_CASES: UseCase[] = [
   {
@@ -155,7 +148,6 @@ const USE_CASES: UseCase[] = [
   },
   {
     id: 'cancel',
-    code: 'Cancel',
     title: 'Cancel in time',
     state: 'cancelled',
     what: 'The ring rewinds, nothing is charged and the cart comes back.',
@@ -195,7 +187,6 @@ const USE_CASES: UseCase[] = [
   },
   {
     id: 'scheduled',
-    code: 'Scheduled',
     title: 'Scheduled order',
     state: 'scheduled',
     what: 'Shows when it arrives, when the card is charged, and that tracking starts when the kitchen does.',
@@ -205,7 +196,6 @@ const USE_CASES: UseCase[] = [
   },
   {
     id: 'late',
-    code: 'Late',
     title: 'Running late',
     state: 'late',
     what: 'We tell people first: how late, why, and a credit added to their wallet.',
@@ -234,174 +224,6 @@ const SHIPPED = [
   { v: '47s', k: 'launch film' },
   { v: '1', k: 'clock for ring and cancel' },
 ];
-
-/* ── film ── */
-function Film() {
-  const ref = useRef<HTMLVideoElement>(null);
-  const [hasFilm, setHasFilm] = useState(true);
-  const [playing, setPlaying] = useState(false);
-
-  const play = () => {
-    const v = ref.current;
-    if (!v) return;
-    v.muted = false;
-    v.currentTime = 0;
-    v.controls = true;
-    void v.play();
-    setPlaying(true);
-  };
-
-  return (
-    <div
-      className="relative aspect-[16/9] rounded-[32px] overflow-hidden border border-white/5"
-      style={{ background: 'radial-gradient(ellipse 70% 80% at 50% 30%, #173a2b 0%, #0F1311 70%)' }}
-    >
-      {hasFilm ? (
-        <>
-          <video
-            ref={ref}
-            src={FILM}
-            poster={POSTER}
-            muted
-            loop={!playing}
-            autoPlay
-            playsInline
-            preload="metadata"
-            onError={() => setHasFilm(false)}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          {!playing && (
-            <button
-              type="button"
-              onClick={play}
-              className="absolute inset-0 flex items-end justify-start p-6 md:p-8 bg-gradient-to-t from-black/60 via-transparent to-transparent group"
-              aria-label="Play the film with sound"
-            >
-              <span className="flex items-center gap-3 rounded-full bg-white text-black pl-2 pr-5 py-2 text-sm font-bold group-hover:scale-[1.03] transition-transform">
-                <span className="w-9 h-9 rounded-full bg-[#103F2D] text-white grid place-items-center">
-                  <Play className="w-4 h-4 fill-current" />
-                </span>
-                Watch the film
-                <span className="flex items-center gap-1 text-black/50 font-semibold">
-                  <Volume2 className="w-3.5 h-3.5" /> 0:47
-                </span>
-              </span>
-            </button>
-          )}
-        </>
-      ) : (
-        <div className="absolute inset-0 flex items-center justify-center gap-10 px-6">
-          <div className="scale-[0.5] sm:scale-75 md:scale-100 origin-center">
-            <LoopingPhone width={196} />
-          </div>
-          <div className="hidden md:block max-w-[260px]">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-3" style={{ color: ACCENT }}>
-              Live preview</p>
-            <p className="text-white/70 text-sm leading-relaxed">
-              Ring and countdown, confirmation, success, then arrival time, savings and receipt.
-            </p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ── use cases explorer ── */
-function UseCases() {
-  const [active, setActive] = useState(0);
-  const c = USE_CASES[active];
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-10 items-start">
-      <div>
-        <div className="flex flex-wrap gap-2 mb-8" role="tablist" aria-label="Use cases">
-          {USE_CASES.map((u, i) => (
-            <button
-              key={u.id}
-              type="button"
-              role="tab"
-              aria-selected={i === active}
-              onClick={() => setActive(i)}
-              className={`rounded-full px-4 py-2 text-xs font-bold transition-colors border ${
-                i === active
-                  ? 'bg-white text-black border-white'
-                  : 'border-white/10 text-white/60 hover:text-white hover:border-white/30'
-              }`}
-            >
-              {u.code.startsWith('K') && (
-                <span className={i === active ? 'text-black/40' : 'text-white/30'}>{u.code} </span>
-              )}
-              {u.title}
-            </button>
-          ))}
-        </div>
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={c.id}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-3" style={{ color: ACCENT }}>
-              {c.code.startsWith('K') ? c.code : 'Extra case'} · {String(active + 1).padStart(2, '0')} / {String(USE_CASES.length).padStart(2, '0')}
-            </p>
-            <h3 className="text-white text-3xl md:text-4xl font-black tracking-tight mb-4">{c.title}</h3>
-            <p className="text-white/60 text-base md:text-lg leading-relaxed mb-8 max-w-xl">{c.what}</p>
-
-            <dl className="grid gap-px rounded-2xl overflow-hidden border border-white/10 bg-white/10 max-w-xl">
-              {[
-                ['Why it exists', c.why],
-                ['Shown to', c.shown],
-                ['Measured by', c.measured],
-              ].map(([k, v]) => (
-                <div key={k} className="bg-[#0D0D0D] px-5 py-4 grid grid-cols-[110px_1fr] gap-4">
-                  <dt className="text-white/35 text-[10px] font-black uppercase tracking-[0.2em] pt-0.5">{k}</dt>
-                  <dd className="text-white/85 text-sm leading-relaxed">{v}</dd>
-                </div>
-              ))}
-            </dl>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      <div className="flex justify-center lg:sticky lg:top-40">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={c.id}
-            initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.97 }}
-            transition={{ duration: 0.3 }}
-          >
-            {c.live ? <LoopingPhone width={290} only="placing" /> : <FreshPhone state={c.state} width={290} />}
-          </motion.div>
-        </AnimatePresence>
-      </div>
-    </div>
-  );
-}
-
-function Eyebrow({ children, tone = ACCENT }: { children: React.ReactNode; tone?: string }) {
-  return (
-    <div className="flex items-center gap-3 mb-6">
-      <span className="w-1.5 h-1.5 rounded-full" style={{ background: tone }} />
-      <span className="text-[10px] font-black uppercase tracking-[0.32em]" style={{ color: tone, opacity: 0.8 }}>
-        {children}
-      </span>
-      <span className="flex-1 h-px bg-gradient-to-r from-white/10 to-transparent" />
-    </div>
-  );
-}
-
-const reveal = {
-  initial: { opacity: 0, y: 16 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: '-10% 0px' },
-  transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
-};
 
 export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
   return (
@@ -439,7 +261,17 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
               <Meta label="Platform" value="iOS · Android" />
             </div>
 
-            <Film />
+            <CaseFilm
+              src={FILM}
+              poster={POSTER}
+              length="0:47"
+              accent={ACCENT}
+              buttonTint="#103F2D"
+              background="radial-gradient(ellipse 70% 80% at 50% 30%, #173a2b 0%, #0F1311 70%)"
+              fallback={<LoopingPhone width={200} />}
+              decor="Order placed"
+              ticker={['5 second window', 'Edit before cancel', 'Sent to Vapiano', 'fresh', 'Arrives 19:45']}
+            />
           </motion.div>
         </section>
 
@@ -567,7 +399,13 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
         {/* ── 05 USE CASES ── */}
         <ChapterTitle chapter={CHAPTERS[4]} tone="teal" />
         <section id="cases" className="mb-32 scroll-mt-24">
-          <UseCases />
+          <UseCaseExplorer
+            cases={USE_CASES}
+            accent={ACCENT}
+            renderPhone={(c) =>
+              c.live ? <LoopingPhone width={290} only="placing" /> : <FreshPhone state={c.state} width={290} />
+            }
+          />
         </section>
 
         {/* ── 06 IMPACT ── */}
