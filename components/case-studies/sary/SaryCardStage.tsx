@@ -35,7 +35,10 @@ export function SaryCardStage({ active }: { active: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const [w, setW] = useState(0);
   const reduced = useReducedMotion();
-  const moving = active && !reduced;
+  // Small cards (phones) keep the packshots still: only the phone loop
+  // animates, which keeps scrolling smooth on mobile GPUs.
+  const moving = active && !reduced && w >= 560;
+  const looping = active && !reduced;
 
   useEffect(() => {
     const el = ref.current;
@@ -134,7 +137,7 @@ export function SaryCardStage({ active }: { active: boolean }) {
               filter: 'drop-shadow(0 40px 50px rgba(16,33,46,.4))',
             }}
           >
-            <SaryAddAllLoop width={350} playing={moving} />
+            <SaryAddAllLoop width={350} playing={looping} />
           </div>
 
           {/* pinned UI pieces */}

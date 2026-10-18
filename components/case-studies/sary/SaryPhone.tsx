@@ -1,5 +1,5 @@
-import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import { motion, AnimatePresence, useInView, useReducedMotion } from 'motion/react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import {
   ArrowDown,
   ArrowLeft,
@@ -1219,15 +1219,20 @@ const BEATS: Beat[] = [
 export function SaryAddAllLoop({ width = 300, playing = true }: { width?: number; playing?: boolean }) {
   const reduced = useReducedMotion();
   const [i, setI] = useState(0);
+  // Pause while scrolled off screen so hidden loops don't cost frames.
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { margin: '120px' });
+  const run = playing && inView && !reduced;
 
   useEffect(() => {
-    if (!playing || reduced) return;
+    if (!run) return;
     const t = setTimeout(() => setI((n) => (n + 1) % BEATS.length), BEATS[i].ms);
     return () => clearTimeout(t);
-  }, [i, playing, reduced]);
+  }, [i, run]);
 
   const beat = reduced ? BEATS[4] : BEATS[i];
   return (
+    <div ref={ref}>
     <SaryPhone
       state="hub"
       width={width}
@@ -1240,5 +1245,6 @@ export function SaryAddAllLoop({ width = 300, playing = true }: { width?: number
       toast={false}
       {...beat.s}
     />
+    </div>
   );
 }
