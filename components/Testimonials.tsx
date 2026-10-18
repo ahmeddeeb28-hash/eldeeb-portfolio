@@ -27,7 +27,7 @@ export function Testimonials() {
           eyebrow="Verbatim"
           title="Client success"
           flourish="perspective."
-          subtitle="What teams say after shipping work together — unscripted."
+          subtitle="What teams say after shipping work together."
         />
 
         {/* 3-Column Editorial Grid - Fixed 32px Spacing */}
@@ -114,7 +114,7 @@ export function Testimonials() {
                       transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
                     }}
                   >
-                    "Alex brings both innovation and a deep understanding of user needs—an essential part of our creative success. I wholeheartedly endorse their work."
+                    "Alex brings both innovation and a deep understanding of user needs. An essential part of our creative success. I wholeheartedly endorse their work."
                   </motion.p>
                 </div>
                 

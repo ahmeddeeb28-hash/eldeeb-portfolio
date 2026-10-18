@@ -22,7 +22,7 @@ export const FALLBACK_CASE_STUDIES: CaseStudyMap = {
     context:
       'Sary is a leading B2B marketplace. While surface numbers looked good, a deeper look revealed a quiet failure: customers were buying once then disappearing. I led the effort to understand and fix this retention gap.',
     problem:
-      'The buying cycle was breaking after checkout. Customers completed their orders and left, rarely exploring additional products. Upselling existed, but it felt irrelevant and generic—café owners were being shown household essentials instead of bulk coffee or equipment.',
+      'The buying cycle was breaking after checkout. Customers completed their orders and left, rarely exploring additional products. Upselling existed, but it felt irrelevant and generic. Café owners were being shown household essentials instead of bulk coffee or equipment.',
     approach:
       'I moved beyond surface metrics to behavioral evidence. The goal wasn\u2019t to show more products, but to show the right products at the right time. We shifted from a one-size-fits-all model to a segment-driven upselling strategy focused on high-intent moments.',
     whatThisProves:

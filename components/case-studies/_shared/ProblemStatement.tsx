@@ -64,7 +64,7 @@ export function ProblemStatement({
         {baselines && baselines.length > 0 && (
           <div className="md:col-span-4 md:border-l md:border-white/5 md:pl-10 flex flex-col gap-5">
             <span className="text-white/30 text-[9px] font-black uppercase tracking-[0.3em]">
-              Affected metrics — baseline
+              Affected metrics (baseline)
             </span>
             <div className="flex flex-col gap-4">
               {baselines.map((b, i) => (

@@ -2,10 +2,10 @@ import { Navigation } from './components/Navigation';
 import { PremiumHero } from './components/PremiumHero';
 import { Hero } from './components/Hero';
 import { Features } from './components/Features';
-import { AboutPage } from './components/AboutPage';
 import { WorkLanguage } from './components/WorkLanguage';
 import { Projects } from './components/Projects';
 import { Mentorship } from './components/Mentorship';
+import { LeadershipStrategy } from './components/LeadershipStrategy';
 import { BrandsStats } from './components/BrandsStats';
 import { Results } from './components/Results';
 import { Testimonials } from './components/Testimonials';
@@ -14,7 +14,11 @@ import { Articles } from './components/Articles';
 import { Footer } from './components/Footer';
 import { CASE_STUDY_REGISTRY } from './components/case-studies/registry';
 import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, lazy, Suspense } from 'react';
+
+/* The Director's Cut is the heaviest view on the site and only opens
+   on demand, so it ships as its own chunk. */
+const AboutPage = lazy(() => import('./components/AboutPage').then((m) => ({ default: m.AboutPage })));
 
 /* ── Routing ──────────────────────────────────────────
    The overlays used to be pure state, and every pushState call
@@ -129,17 +133,19 @@ export default function App() {
           the incoming one queued behind it, and pressing Next left a black
           screen. Mounting on the project id gives each case a clean fade-in
           and lets the old one leave immediately. */}
-      {ActiveCase && (
-        <ActiveCase
-          key={activeProjectId}
-          onBack={closeProject}
-          onNext={goToNextCase}
-        />
-      )}
+      <Suspense fallback={null}>
+        {ActiveCase && (
+          <ActiveCase
+            key={activeProjectId}
+            onBack={closeProject}
+            onNext={goToNextCase}
+          />
+        )}
 
-      <AnimatePresence>
-        {aboutPageOpen && <AboutPage key="about-page" onBack={closeAboutPage} />}
-      </AnimatePresence>
+        <AnimatePresence>
+          {aboutPageOpen && <AboutPage key="about-page" onBack={closeAboutPage} />}
+        </AnimatePresence>
+      </Suspense>
 
       {/* Dynamic Background Parallax Layers */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
@@ -160,13 +166,16 @@ export default function App() {
         <Projects onProjectClick={openProject} />
         {/* Hidden but preserved — restore by uncommenting the line below */}
         {false && <WorkLanguage />}
-        <Mentorship />
+        <LeadershipStrategy />
+        {/* Hidden but preserved — restore by flipping the guard below, and
+            uncomment the Mentorship links in Navigation.tsx and Footer.tsx */}
+        {false && <Mentorship />}
         <ProofOfPresence />
         {/* Hidden but preserved — restore by flipping the guard below */}
         {false && <Features />}
         <Results />
         <Articles />
-        <Footer />
+        <Footer onOpenAboutPage={openAboutPage} />
       </main>
     </div>
   );

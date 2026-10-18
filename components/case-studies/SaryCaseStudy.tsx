@@ -129,19 +129,19 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
                   stat: '85%',
                   label: 'Silent drop-off',
                   detail:
-                    "left the moment 'Confirm Order' clicked — the 'You might also like' sidebar was invisible to them.",
+                    "left the moment 'Confirm Order' clicked. The 'You might also like' sidebar was invisible to them.",
                 },
                 {
                   stat: '60%',
                   label: 'Wrong shelf',
                   detail:
-                    'of what café owners saw was irrelevant — household essentials pushed at commercial buyers.',
+                    'of what café owners saw was irrelevant: household essentials pushed at commercial buyers.',
                 },
                 {
                   stat: '14%',
                   label: 'Bought once, gone',
                   detail:
-                    'retention baseline — customers completed one order and never came back for a second.',
+                    'retention baseline. Customers completed one order and never came back for a second.',
                 },
               ].map((f, i) => (
                 <motion.div
@@ -271,7 +271,7 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
                   The Transformation
                 </span>
                 <h3 className="text-white text-2xl md:text-3xl font-black leading-tight tracking-tight mb-2">
-                  Drag to compare — before the loop, after the loop.
+                  Drag to compare before and after the loop.
                 </h3>
                 <p className="text-white/45 text-sm leading-relaxed">
                   The seam wipes in on scroll. Drag the handle, or use ← / → to

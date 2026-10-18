@@ -201,7 +201,7 @@ export function WorkLanguage() {
                   Customer Journey Mapping
                 </h3>
                 <p className="text-white/60 text-base md:text-lg leading-snug max-w-lg font-medium">
-                  Mapping end-to-end user journeys to uncover friction points, behavioral patterns, and opportunity areas—ensuring each touchpoint supports clarity, continuity, and conversion.
+                  Mapping end-to-end user journeys to uncover friction points, behavioral patterns, and opportunity areas, so each touchpoint supports clarity, continuity, and conversion.
                 </p>
               </div>
             </motion.div>
@@ -226,7 +226,7 @@ export function WorkLanguage() {
                   Purpose, Positioning, Placement
                 </h3>
                 <p className="text-white/60 text-base md:text-lg leading-snug max-w-lg font-medium">
-                  Defining why a feature exists, how it should be perceived, and where it belongs—aligning user intent, business goals, and product hierarchy into a coherent experience.
+                  Defining why a feature exists, how it should be perceived, and where it belongs, aligning user intent, business goals, and product hierarchy into a coherent experience.
                 </p>
               </div>
             </motion.div>
@@ -251,7 +251,7 @@ export function WorkLanguage() {
                   Functional Framework
                 </h3>
                 <p className="text-white/60 text-base md:text-lg leading-snug max-w-lg font-medium">
-                  Designing structured systems that translate complex logic into clear, scalable interactions—balancing usability, consistency, and long-term product evolution.
+                  Designing structured systems that translate complex logic into clear, scalable interactions that balance usability, consistency, and long-term product evolution.
                 </p>
               </div>
             </motion.div>
