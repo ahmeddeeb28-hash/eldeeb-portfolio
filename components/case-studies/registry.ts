@@ -22,6 +22,7 @@ export const CASE_STUDY_REGISTRY: Record<
   'health-ladder': load(() => import('./HealthLadderCaseStudy'), 'HealthLadderCaseStudy'),
   'shorefield-holidays': load(() => import('./ShorefieldHolidaysCaseStudy'), 'ShorefieldHolidaysCaseStudy'),
   'global-payments': load(() => import('./GlobalPaymentsCaseStudy'), 'GlobalPaymentsCaseStudy'),
+  'fresh-order-placed': load(() => import('./FreshOrderPlacedCaseStudy'), 'FreshOrderPlacedCaseStudy'),
 };
 
 export type CaseStudyId = keyof typeof CASE_STUDY_REGISTRY;

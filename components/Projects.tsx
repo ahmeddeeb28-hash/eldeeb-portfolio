@@ -23,6 +23,14 @@ const CASE_STUDY_IMAGES = {
   // Slot 6 — fiery red — Jackaroo Gaming UI
   jackarooGaming:
     'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=1200',
+  // Slot 7 — fresh green — fresh "Order placed" (poster for the film)
+  freshOrderPlaced: '/images/case-studies/fresh/poster.webp',
+} as const;
+
+/* Thumbnail films. A row with `video` plays it muted on loop in place of
+   the still; if the file is missing the still shows instead. */
+const CASE_STUDY_VIDEOS = {
+  freshOrderPlaced: '/videos/fresh-order-placed.mp4',
 } as const;
 
 import { ArrowUpRight } from 'lucide-react';
@@ -35,7 +43,7 @@ interface ProjectsProps {
 
 /*
    Ordered chronologically — the sticky rail reads as one continuous
-   timeline (2020 → 2022 → 2023 → 2024 → 2025 → 2026), each year mapped
+   timeline (2020 → 2022 → 2023 → 2024 → 2025 → 2026 → Now), each year mapped
    to the career era the case study belongs to (Zyda SaaS → Sary B2B →
    Landing/product story → Hakbah growth → SAMPO AI → Lobah gaming).
    Distinct years per row so the rail's year labels never repeat.
@@ -123,6 +131,20 @@ const projects = [
     imageGlow:
       'radial-gradient(ellipse 70% 60% at 70% 40%, rgba(190,80,60,0.09) 0%, transparent 70%)',
     hasStudy: false,
+  },
+  {
+    id: 'fresh-order-placed',
+    image: CASE_STUDY_IMAGES.freshOrderPlaced,
+    video: CASE_STUDY_VIDEOS.freshOrderPlaced,
+    year: 'Now',
+    category: 'Food Delivery · fresh',
+    title: 'fresh — The Five Seconds After Pay',
+    summary:
+      'The order-placed moment, redesigned: a spinner became an honest five second window to fix the address or items, then a hand-off to tracking with no dead end.',
+    accentColor: 'rgba(95,224,162,0.9)',
+    imageGlow:
+      'radial-gradient(ellipse 65% 55% at 50% 40%, rgba(60,170,115,0.09) 0%, transparent 70%)',
+    hasStudy: true,
   },
 ];
 
@@ -728,6 +750,8 @@ function ProjectRow({
               }}
             />
 
+            {project.video && <ProjectFilm src={project.video} active={isActive} reduced={reduced} />}
+
             {/* Soft project-tinted bloom */}
             <div
               aria-hidden
@@ -755,6 +779,47 @@ function ProjectRow({
         </motion.div>
       </motion.div>
     </motion.article>
+  );
+}
+
+/* ── PROJECT FILM ──────────────────────────────────────────────────────
+   Muted, looping thumbnail film laid over the still. It plays only
+   while its row is the active one, never under reduced motion, and
+   removes itself if the file can't be loaded so the still shows.
+   ─────────────────────────────────────────────────────────────────────── */
+
+function ProjectFilm({ src, active, reduced }: { src: string; active: boolean; reduced: boolean }) {
+  const ref = useRef<HTMLVideoElement | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    if (active && !reduced) void v.play().catch(() => {});
+    else v.pause();
+  }, [active, reduced]);
+
+  if (failed) return null;
+  return (
+    <video
+      ref={ref}
+      src={src}
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      aria-hidden
+      onError={() => setFailed(true)}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        filter: active ? 'none' : 'brightness(0.82)',
+        transition: 'filter 0.6s ease',
+      }}
+    />
   );
 }
 
