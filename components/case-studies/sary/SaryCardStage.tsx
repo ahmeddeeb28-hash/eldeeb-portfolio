@@ -1,14 +1,15 @@
 import { motion, useReducedMotion } from 'motion/react';
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Bell, Clock, Repeat } from 'lucide-react';
+import { SARY_LOGO_PATH } from './saryLogoPath';
 import { SaryAddAllLoop, S } from './SaryPhone';
 
 /* ── Sary card stage ─────────────────────────────────
    The Projects thumbnail for Sary, styled apart from the other
-   cards: the Sary yellow-to-teal gradient, real grocery
-   packshots floating around one tilted phone that plays the
-   "Add all" loop, and a few UI pieces from the screens pinned
-   on top. Laid out on a 1600×900 board and scaled to fit, so
+   cards: one deep Sary blue, real grocery packshots floating
+   around one tilted phone that plays the "Add all" loop, and
+   pieces that make it personal to one store (welcome back,
+   its reminder, its tap count) pinned on top. Laid out on a 1600×900 board and scaled to fit, so
    nothing crops. Motion runs only while the row is active. */
 
 const IMG = '/images/case-studies/sary';
@@ -17,9 +18,9 @@ const BH = 900;
 
 /* [image, x, y, size, rotation, on a white tile] */
 const PRODUCTS: [string, number, number, number, number, boolean?][] = [
-  ['coke', 120, 70, 230, -10],
-  ['tea', 330, 330, 250, 8],
-  ['milk', 90, 520, 190, -6, true],
+  ['coke', 110, 190, 200, -10],
+  ['tea', 330, 340, 240, 8],
+  ['milk', 80, 560, 170, -6, true],
   ['eggs', 300, 690, 250, 4],
   ['nes', 1250, 40, 230, 10],
   ['oil', 1400, 300, 240, -8],
@@ -53,7 +54,7 @@ export function SaryCardStage({ active }: { active: boolean }) {
         position: 'absolute',
         inset: 0,
         overflow: 'hidden',
-        background: 'linear-gradient(125deg, #FEDD02 0%, #B7E34A 38%, #4FDDA0 68%, #28D8B7 100%)',
+        background: 'radial-gradient(ellipse 70% 90% at 50% 40%, #2E50C8 0%, #1D368D 48%, #0D1A4D 100%)',
       }}
     >
       {w > 0 && (
@@ -78,7 +79,7 @@ export function SaryCardStage({ active }: { active: boolean }) {
               width: 700,
               height: 800,
               borderRadius: '50%',
-              background: 'radial-gradient(closest-side, rgba(255,255,255,.65), rgba(255,255,255,0))',
+              background: 'radial-gradient(closest-side, rgba(125,162,255,.45), rgba(125,162,255,0))',
             }}
           />
           {/* dotted texture */}
@@ -87,7 +88,7 @@ export function SaryCardStage({ active }: { active: boolean }) {
               position: 'absolute',
               inset: 0,
               opacity: 0.18,
-              backgroundImage: 'radial-gradient(rgba(16,33,46,.5) 1.5px, transparent 1.6px)',
+              backgroundImage: 'radial-gradient(rgba(255,255,255,.55) 1.5px, transparent 1.6px)',
               backgroundSize: '28px 28px',
             }}
           />
@@ -116,7 +117,7 @@ export function SaryCardStage({ active }: { active: boolean }) {
                     width: size,
                     height: size,
                     objectFit: 'contain',
-                    filter: 'drop-shadow(0 24px 22px rgba(16,33,46,.35))',
+                    filter: 'drop-shadow(0 24px 22px rgba(0,0,0,.45))',
                   }}
                 />
               )}
@@ -137,15 +138,28 @@ export function SaryCardStage({ active }: { active: boolean }) {
           </div>
 
           {/* pinned UI pieces */}
-          <Float moving={moving} delay={0.2} rot={-4} style={{ left: 420, top: 120 }}>
+          <Float moving={moving} delay={0.2} rot={-4} style={{ left: 380, top: 150 }}>
             <Card>
-              <span style={tileSm}>
-                <img src={`${IMG}/milk.webp`} alt="" style={{ width: 52, height: 52, objectFit: 'contain' }} />
+              <span
+                style={{
+                  ...tileSm,
+                  borderRadius: '50%',
+                  background: '#FEDD02',
+                  color: S.ink,
+                  font: `800 24px/1 ${ui}`,
+                }}
+              >
+                AA
               </span>
               <span>
-                <b style={{ display: 'block', font: `800 22px/1.2 ${ui}`, color: S.ink }}>Almarai Milk 2 L</b>
-                <Chip bg={S.redBg} fg="#E5341A">
-                  <Clock size={16} strokeWidth={2.2} /> Due today
+                <span style={{ display: 'block', font: `700 15px/1 ${ui}`, letterSpacing: '.1em', color: S.sub }}>
+                  WELCOME BACK
+                </span>
+                <b style={{ display: 'block', marginTop: 6, font: `800 23px/1.2 ${ui}`, color: S.ink }}>
+                  Al Amana Grocery
+                </b>
+                <Chip bg={S.okBg} fg={S.ok}>
+                  <Clock size={16} strokeWidth={2.2} /> Your usual is ready
                 </Chip>
               </span>
             </Card>
@@ -200,15 +214,11 @@ export function SaryCardStage({ active }: { active: boolean }) {
           display: 'inline-flex',
           alignItems: 'center',
           gap: 8,
-          padding: '6px 11px',
+          padding: w < 500 ? '4px 9px 4px 8px' : '6px 12px 6px 10px',
           borderRadius: 99,
-          background: 'rgba(16,33,46,0.82)',
-          color: '#fff',
-          fontSize: 10,
-          fontWeight: 700,
-          letterSpacing: '0.16em',
-          textTransform: 'uppercase',
-          fontFamily: 'Inter, system-ui, sans-serif',
+          background: 'rgba(255,255,255,0.12)',
+          border: '1px solid rgba(255,255,255,0.18)',
+          backdropFilter: 'blur(6px)',
         }}
       >
         <span
@@ -220,7 +230,9 @@ export function SaryCardStage({ active }: { active: boolean }) {
             boxShadow: active ? '0 0 8px #FEDD02' : 'none',
           }}
         />
-        Live
+        <svg viewBox="0 0 64 32" width={w < 500 ? 32 : 44} height={w < 500 ? 16 : 22} role="img" aria-label="Sary">
+          <path fillRule="evenodd" clipRule="evenodd" d={SARY_LOGO_PATH} fill="#fff" />
+        </svg>
       </span>
     </div>
   );
