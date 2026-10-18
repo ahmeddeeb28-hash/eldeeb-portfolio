@@ -696,8 +696,8 @@ export function LeadershipStrategy() {
           <button
             type="button"
             onClick={() => setOpenArea(current)}
-            className="mt-5 inline-flex h-11 items-center gap-2 rounded-full px-5 font-semibold transition-colors hover:bg-white hover:text-black"
-            style={{ fontSize: '14px', color: 'rgba(255,255,255,0.92)', border: '1px solid rgba(255,255,255,0.2)' }}
+            className="mt-5 inline-flex h-11 items-center gap-2 rounded-full border border-white/20 px-5 font-semibold text-white/90 transition-colors hover:border-white hover:bg-white hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4AF2E5]"
+            style={{ fontSize: '14px' }}
           >
             <Lock className="h-3.5 w-3.5" style={{ color: GOLD }} aria-hidden="true" />
             {links ? 'Open resources' : 'Request access'}
