@@ -968,8 +968,17 @@ export function useOrderPlacedLoop(enabled = true, only?: PhoneState) {
 }
 
 /* A phone that plays the sequence by itself. */
-export function LoopingPhone({ width = 300, only }: { width?: number; only?: PhoneState }) {
-  const { state, progress } = useOrderPlacedLoop(true, only);
+export function LoopingPhone({
+  width = 300,
+  only,
+  playing = true,
+}: {
+  width?: number;
+  only?: PhoneState;
+  /* false freezes the loop where it is */
+  playing?: boolean;
+}) {
+  const { state, progress } = useOrderPlacedLoop(playing, only);
   return (
     <AnimatePresence mode="wait" initial={false}>
       <motion.div

@@ -27,15 +27,15 @@ const CASE_STUDY_IMAGES = {
   freshOrderPlaced: '/images/case-studies/fresh/poster.webp',
 } as const;
 
-/* Thumbnail films. A row with `video` plays it muted on loop in place of
-   the still; if the file is missing the still shows instead. */
-const CASE_STUDY_VIDEOS = {
-  freshOrderPlaced: '/videos/fresh-order-placed.mp4',
-} as const;
 
 import { ArrowUpRight } from 'lucide-react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+
+/* Live animated thumbnails, fetched only when their row renders. */
+const FreshCardStage = lazy(() =>
+  import('./case-studies/fresh/FreshCardStage').then((m) => ({ default: m.FreshCardStage })),
+);
 
 interface ProjectsProps {
   onProjectClick?: (id: string) => void;
@@ -135,7 +135,7 @@ const projects = [
   {
     id: 'fresh-order-placed',
     image: CASE_STUDY_IMAGES.freshOrderPlaced,
-    video: CASE_STUDY_VIDEOS.freshOrderPlaced,
+    stage: 'fresh' as const,
     year: 'Now',
     category: 'Food Delivery · fresh',
     title: 'fresh — The Five Seconds After Pay',
@@ -750,7 +750,11 @@ function ProjectRow({
               }}
             />
 
-            {project.video && <ProjectFilm src={project.video} active={isActive} reduced={reduced} />}
+            {project.stage === 'fresh' && (
+              <Suspense fallback={null}>
+                <FreshCardStage active={isActive && !reduced} />
+              </Suspense>
+            )}
 
             {/* Soft project-tinted bloom */}
             <div
@@ -779,47 +783,6 @@ function ProjectRow({
         </motion.div>
       </motion.div>
     </motion.article>
-  );
-}
-
-/* ── PROJECT FILM ──────────────────────────────────────────────────────
-   Muted, looping thumbnail film laid over the still. It plays only
-   while its row is the active one, never under reduced motion, and
-   removes itself if the file can't be loaded so the still shows.
-   ─────────────────────────────────────────────────────────────────────── */
-
-function ProjectFilm({ src, active, reduced }: { src: string; active: boolean; reduced: boolean }) {
-  const ref = useRef<HTMLVideoElement | null>(null);
-  const [failed, setFailed] = useState(false);
-
-  useEffect(() => {
-    const v = ref.current;
-    if (!v) return;
-    if (active && !reduced) void v.play().catch(() => {});
-    else v.pause();
-  }, [active, reduced]);
-
-  if (failed) return null;
-  return (
-    <video
-      ref={ref}
-      src={src}
-      muted
-      loop
-      playsInline
-      preload="metadata"
-      aria-hidden
-      onError={() => setFailed(true)}
-      style={{
-        position: 'absolute',
-        inset: 0,
-        width: '100%',
-        height: '100%',
-        objectFit: 'cover',
-        filter: active ? 'none' : 'brightness(0.82)',
-        transition: 'filter 0.6s ease',
-      }}
-    />
   );
 }
 
