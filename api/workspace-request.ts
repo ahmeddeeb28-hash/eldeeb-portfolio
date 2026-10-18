@@ -80,3 +80,11 @@ export async function POST(request: Request) {
   if (!res.ok) return reply(502, { error: 'send_failed' });
   return reply(200, { ok: true });
 }
+
+/* Lets the pop-up decide, before showing a form, whether requests can be
+   sent automatically. When this returns false (or the API is unreachable)
+   visitors get direct contact options instead of a form that would fail. */
+export async function GET() {
+  const enabled = Boolean(process.env.RESEND_API_KEY && process.env.WORKSPACE_REQUEST_TO);
+  return reply(200, { enabled });
+}

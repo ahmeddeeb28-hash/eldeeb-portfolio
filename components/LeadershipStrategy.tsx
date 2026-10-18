@@ -1,6 +1,6 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { ArrowLeft, ArrowRight, ArrowUpRight, Compass, Users, Boxes, BarChart3, FlaskConical, BookOpen, Lock, X, Mail, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUpRight, Compass, Users, Boxes, BarChart3, FlaskConical, BookOpen, Lock, X, Mail, Check, Copy, Linkedin } from 'lucide-react';
 import { motion } from 'motion/react';
 import { SectionHeader } from './SectionHeader';
 
@@ -16,6 +16,7 @@ import { SectionHeader } from './SectionHeader';
  * api/workspace-unlock.ts, which explains the setup.
  * ──────────────────────────────────────────────────────────────────────── */
 const ACCESS_EMAIL = 'ahmeddeeb28@gmail.com';
+const LINKEDIN_URL = 'https://www.linkedin.com/in/el-deeb-39032b131/';
 
 type WorkspaceLink = { label: string; href: string };
 
@@ -114,18 +115,18 @@ type View = 'intro' | 'request' | 'password';
 
 type RequestFields = { name: string; email: string; organization: string };
 
-/* Used only when the request can't be sent automatically: the same
-   details, pre-filled, so the visitor still finishes in one step. */
+/* Pre-written access request. Whatever the visitor already typed is
+   filled in; anything missing is left blank for them to complete. */
 function requestEmail(area: Area, f: RequestFields) {
-  const subject = `Workspace access request: ${f.name || '[name]'}, ${f.organization || '[organization]'}`;
+  const subject = `Access request: ${area.title}`;
   const body = [
     'Hi Ahmad,',
     '',
     `I'd like access to your Leadership & Strategy workspace, starting with ${area.title}.`,
     '',
-    `Name: ${f.name || '[name]'}`,
-    `Work email: ${f.email || '[email]'}`,
-    `Organization: ${f.organization || '[organization]'}`,
+    `Name: ${f.name}`,
+    `Company: ${f.organization}`,
+    `Role: `,
     '',
     'Thanks!',
   ].join('\n');
@@ -164,6 +165,29 @@ function AccessDialog({
   const [honeypot, setHoneypot] = useState('');
   const [request, setRequest] = useState<RequestState>('idle');
   const [touched, setTouched] = useState(false);
+  const [copied, setCopied] = useState(false);
+  /* null = not known yet. Only a confirmed `true` shows the form; anything
+     else (not configured, preview hosting, network error) shows direct
+     contact options, so a visitor never fills in a form that can't send. */
+  const [autoRequest, setAutoRequest] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!area || autoRequest !== null) return;
+    fetch('/api/workspace-request')
+      .then((r) => (r.ok ? r.json() : { enabled: false }))
+      .then((d) => setAutoRequest(d?.enabled === true))
+      .catch(() => setAutoRequest(false));
+  }, [area, autoRequest]);
+
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(ACCESS_EMAIL);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* Clipboard refused: the address stays visible and selectable. */
+    }
+  };
 
   const fieldErrors = {
     name: !fields.name.trim() ? 'Add your name.' : '',
@@ -313,8 +337,62 @@ function AccessDialog({
                       Thanks, {fields.name.trim().split(' ')[0]}. Once approved, the password goes to {fields.email.trim()}.
                     </p>
                   </div>
+                ) : view === 'request' && (autoRequest !== true || request === 'fallback') ? (
+                  /* ── Direct contact: works with no setup at all ── */
+                  <div id="workspace-dialog-description">
+                    <p className="mt-2" style={{ fontSize: '14.5px', lineHeight: 1.55, color: 'rgba(255,255,255,0.78)' }}>
+                      Send me a short note and I'll reply personally with access to this area.
+                    </p>
+                    <a
+                      href={requestEmail(area, fields)}
+                      className="mt-5 flex items-center justify-center gap-2 rounded-full bg-white px-5 font-bold text-black transition-transform hover:-translate-y-0.5"
+                      style={{ height: '48px', fontSize: '15px' }}
+                    >
+                      <Mail className="h-4 w-4" />
+                      Email me for access
+                    </a>
+                    <a
+                      href={LINKEDIN_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2.5 flex items-center justify-center gap-2 rounded-full px-5 transition-colors hover:bg-white/[0.06]"
+                      style={{ height: '46px', fontSize: '14.5px', fontWeight: 600, color: 'rgba(255,255,255,0.9)', border: '1px solid rgba(255,255,255,0.18)' }}
+                    >
+                      <Linkedin className="h-4 w-4" />
+                      Message me on LinkedIn
+                    </a>
+                    <div
+                      className="mt-4 flex items-center justify-between gap-3 rounded-xl px-3.5 py-2.5"
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
+                    >
+                      <span className="min-w-0 truncate select-all" style={{ fontSize: '13.5px', color: 'rgba(255,255,255,0.8)' }}>
+                        {ACCESS_EMAIL}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={copyEmail}
+                        className="flex min-h-[36px] shrink-0 items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold transition-colors hover:bg-white/[0.06] hover:text-white"
+                        style={{ color: copied ? GOLD : 'rgba(255,255,255,0.75)' }}
+                        aria-label="Copy email address"
+                      >
+                        {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                        {copied ? 'Copied' : 'Copy'}
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRequest('idle');
+                        setView('intro');
+                      }}
+                      className="mt-2 flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-full transition-colors hover:text-white"
+                      style={{ fontSize: '13.5px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}
+                    >
+                      <ArrowLeft className="h-4 w-4" /> Back
+                    </button>
+                  </div>
                 ) : view === 'request' ? (
-                  /* ── Request form ── */
+                  /* ── Request form (only when automatic sending is confirmed) ── */
                   <form id="workspace-dialog-description" className="mt-4 space-y-3" onSubmit={sendRequest} noValidate>
                     {(['name', 'email', 'organization'] as const).map((key) => {
                       const label = key === 'name' ? 'Name' : key === 'email' ? 'Work email' : 'Organization';
@@ -356,20 +434,6 @@ function AccessDialog({
                       className="absolute -left-[9999px] h-0 w-0 opacity-0"
                     />
 
-                    {request === 'fallback' && (
-                      <div className="rounded-xl p-3" role="status" style={{ background: 'rgba(220,190,140,0.08)', border: '1px solid rgba(220,190,140,0.3)' }}>
-                        <p style={{ fontSize: '13.5px', lineHeight: 1.5, color: 'rgba(255,255,255,0.85)' }}>
-                          The request couldn't be sent automatically. Send it by email instead; your details are already filled in.
-                        </p>
-                        <a
-                          href={requestEmail(area, fields)}
-                          className="mt-2 inline-flex items-center gap-1.5 font-semibold underline underline-offset-4"
-                          style={{ fontSize: '13.5px', color: GOLD }}
-                        >
-                          <Mail className="h-4 w-4" /> Email the request to {ACCESS_EMAIL}
-                        </a>
-                      </div>
-                    )}
 
                     <button
                       type="submit"
