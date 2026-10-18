@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { ArrowLeft, ArrowRight, ArrowUpRight, Compass, Users, Boxes, BarChart3, FlaskConical, BookOpen, Lock, X, Mail, Check, Copy, Linkedin } from 'lucide-react';
-import { motion } from 'motion/react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { SectionHeader } from './SectionHeader';
 
 /* ────────────────────────────────────────────────────────────────────────
@@ -541,106 +541,189 @@ export function LeadershipStrategy() {
   const [openArea, setOpenArea] = useState<Area | null>(null);
   /* Links stay in memory for this visit only; a reload asks again. */
   const [links, setLinks] = useState<Record<string, WorkspaceLink[]> | null>(null);
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const count = AREAS.length;
+
+  const go = (step: number) => setActive((i) => (i + step + count) % count);
+
+  /* One cover after another. Pauses while hovered, focused or while the
+     pop-up is open, and stays still for visitors who prefer less motion. */
+  useEffect(() => {
+    if (paused || openArea || reduceMotion) return;
+    const t = setInterval(() => go(1), 4200);
+    return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paused, openArea, reduceMotion]);
+
+  /* Signed distance from the centre, wrapping so the row reads as a loop. */
+  const offsetOf = (i: number) => {
+    let d = i - active;
+    if (d > count / 2) d -= count;
+    if (d < -count / 2) d += count;
+    return d;
+  };
+
+  const current = AREAS[active];
+  const CARD_WIDTH = 'w-[min(78vw,680px)]';
 
   return (
-    <section className="relative px-4 sm:px-6 py-24" id="leadership-strategy">
-      <div className="relative mx-auto max-w-7xl">
-        {/* Featured panel: a soft pastel border drawn from the covers' own
-            palette (mint, lavender, peach) marks this as the spotlight. */}
-        <motion.div
-          initial={{ opacity: 0, y: 32 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="relative rounded-[36px] p-px"
+    <section className="relative overflow-hidden px-4 sm:px-6 py-24" id="leadership-strategy">
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-80px' }}
+        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+        className="relative mx-auto max-w-7xl"
+      >
+        <SectionHeader
+          eyebrow="Private Workspace"
+          title="Leadership &"
+          flourish="strategy."
+          subtitle="Beyond designing experiences, I focus on building the teams, strategies, and systems that make great products possible. Explore how I approach leadership, product decisions, operational excellence, and measurable business impact."
+        />
+
+        {/* ── Stage: covers in a row, the middle one in focus ── */}
+        <div
+          className="relative"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+          onFocusCapture={() => setPaused(true)}
+          onBlurCapture={() => setPaused(false)}
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="Leadership work areas"
           style={{
-            background:
-              'linear-gradient(135deg, rgba(166,232,212,0.55), rgba(186,170,255,0.45) 35%, rgba(255,196,170,0.40) 65%, rgba(220,190,140,0.55))',
-            boxShadow: '0 40px 120px -40px rgba(166,150,255,0.25), 0 30px 80px -40px rgba(120,220,200,0.20)',
+            /* Soft fade at both edges so side covers dissolve, not clip */
+            WebkitMaskImage: 'linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%)',
+            maskImage: 'linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%)',
           }}
         >
-          <div
-            className="relative overflow-hidden rounded-[35px] px-4 pb-8 pt-12 sm:px-8 sm:pb-10 lg:px-12 lg:pt-14"
-            style={{
-              background: `
-                radial-gradient(60% 50% at 0% 0%, rgba(140,220,200,0.10), transparent 70%),
-                radial-gradient(50% 50% at 100% 0%, rgba(170,150,255,0.12), transparent 70%),
-                radial-gradient(70% 60% at 50% 110%, rgba(255,180,150,0.08), transparent 70%),
-                #0D0D0F
-              `,
+          {/* Sizer: gives the stage the height of one centred cover */}
+          <div className={`mx-auto aspect-video ${CARD_WIDTH}`} aria-hidden="true" />
+
+          <motion.div
+            className="absolute inset-0"
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.12}
+            onDragEnd={(_, info) => {
+              if (info.offset.x < -50) go(1);
+              else if (info.offset.x > 50) go(-1);
             }}
           >
-            <div className="mb-2 flex justify-center">
-              <span
-                className="inline-flex items-center gap-2 rounded-full px-4 py-1.5"
-                style={{
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  letterSpacing: '0.16em',
-                  textTransform: 'uppercase',
-                  color: GOLD,
-                  background: 'rgba(220,190,140,0.08)',
-                  border: '1px solid rgba(220,190,140,0.35)',
-                }}
+            {AREAS.map((area, i) => {
+              const d = offsetOf(i);
+              const abs = Math.abs(d);
+              const isActive = d === 0;
+              const hidden = abs > 2;
+              return (
+                <motion.button
+                  key={area.id}
+                  type="button"
+                  onClick={() => (isActive ? setOpenArea(area) : setActive(i))}
+                  tabIndex={isActive ? 0 : -1}
+                  aria-hidden={!isActive}
+                  aria-haspopup={isActive ? 'dialog' : undefined}
+                  aria-label={`${String(i + 1).padStart(2, '0')} ${area.title}: ${area.keywords}. Request access.`}
+                  className={`group absolute left-1/2 top-0 aspect-video ${CARD_WIDTH} rounded-[20px] text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4AF2E5]`}
+                  initial={false}
+                  animate={{
+                    x: `${-50 + d * 62}%`,
+                    scale: isActive ? 1 : abs === 1 ? 0.72 : 0.56,
+                    opacity: hidden ? 0 : isActive ? 1 : abs === 1 ? 0.38 : 0.12,
+                    filter: isActive ? 'blur(0px) saturate(1)' : `blur(${abs === 1 ? 1 : 2}px) saturate(0.7)`,
+                  }}
+                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 170, damping: 26, mass: 0.9 }}
+                  style={{
+                    zIndex: 10 - abs,
+                    pointerEvents: hidden ? 'none' : 'auto',
+                    cursor: isActive ? 'pointer' : 'pointer',
+                    boxShadow: isActive
+                      ? '0 0 0 1px rgba(220,190,140,0.55), 0 30px 80px -30px rgba(0,0,0,0.95), 0 0 70px -20px rgba(186,170,255,0.35)'
+                      : '0 20px 50px -30px rgba(0,0,0,0.9)',
+                  }}
+                >
+                  <AreaImage area={area} />
+                </motion.button>
+              );
+            })}
+          </motion.div>
+
+          {/* Arrows sit just inside the fade */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 right-0 z-20 mx-auto hidden max-w-5xl items-center justify-between px-4 sm:flex">
+            {[
+              { step: -1, label: 'Previous area', Icon: ArrowLeft },
+              { step: 1, label: 'Next area', Icon: ArrowRight },
+            ].map(({ step, label, Icon }) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => go(step)}
+                aria-label={label}
+                className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full text-white/80 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4AF2E5]"
+                style={{ background: 'rgba(12,12,12,0.7)', border: '1px solid rgba(255,255,255,0.14)', backdropFilter: 'blur(8px)' }}
               >
-                <span aria-hidden="true">✦</span> Featured<span className="hidden sm:inline"> · Design Leadership Series</span>
-              </span>
-            </div>
-
-            <SectionHeader
-              eyebrow="Private Workspace"
-              title="Leadership &"
-              flourish="strategy."
-              subtitle="Beyond designing experiences, I focus on building the teams, strategies, and systems that make great products possible. Explore how I approach leadership, product decisions, operational excellence, and measurable business impact."
-            />
-
-            {/* Magazine layout: 01 leads as the large cover, the other five
-                fill around it. Each cover already carries its title,
-                number and keywords, so no caption repeats them. */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
-              {AREAS.map((area, index) => {
-                const featured = index === 0;
-                return (
-                  <motion.button
-                    key={area.id}
-                    type="button"
-                    onClick={() => setOpenArea(area)}
-                    initial={{ opacity: 0, y: 24 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: '-60px' }}
-                    transition={{ delay: index * 0.06, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                    whileHover={{ y: -6 }}
-                    className={`group relative rounded-[20px] text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#4AF2E5] ${
-                      featured ? 'sm:col-span-2 lg:row-span-2' : ''
-                    }`}
-                    style={{ boxShadow: '0 18px 40px -22px rgba(0,0,0,0.9)' }}
-                    aria-haspopup="dialog"
-                    aria-label={`${String(index + 1).padStart(2, '0')} ${area.title}: ${area.keywords}. Private, unlock or request access.`}
-                  >
-                    <div
-                      className="h-full rounded-[20px] p-px transition-[background] duration-500"
-                      style={{ background: 'rgba(255,255,255,0.10)' }}
-                    >
-                      <AreaImage area={area} featured={featured} />
-                    </div>
-                    {/* Soft glow that blooms on hover */}
-                    <span
-                      aria-hidden="true"
-                      className="pointer-events-none absolute -inset-px rounded-[20px] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                      style={{ boxShadow: '0 0 0 1px rgba(220,190,140,0.55), 0 24px 60px -18px rgba(186,170,255,0.45)' }}
-                    />
-                  </motion.button>
-                );
-              })}
-            </div>
-
-            <p className="mt-8 flex items-center justify-center gap-2 text-center" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>
-              <Lock className="h-3.5 w-3.5 shrink-0" style={{ color: GOLD }} aria-hidden="true" />
-              {links ? 'Workspace unlocked for this visit.' : 'Selected leadership work, shared on request. Choose an area to request access.'}
-            </p>
+                <Icon className="h-4 w-4" />
+              </button>
+            ))}
           </div>
-        </motion.div>
-      </div>
+        </div>
+
+        {/* ── Caption for the cover in focus, fading between areas ── */}
+        <div className="mx-auto mt-8 flex max-w-xl flex-col items-center text-center" aria-live="polite">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={current.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <p style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.16em', color: GOLD, fontVariantNumeric: 'tabular-nums' }}>
+                {String(active + 1).padStart(2, '0')} / {String(count).padStart(2, '0')}
+              </p>
+              <h3 className="mt-2 font-semibold" style={{ fontSize: '20px', color: 'rgba(255,255,255,0.95)' }}>
+                {current.title}
+              </h3>
+              <p className="mt-1" style={{ fontSize: '13.5px', color: 'rgba(255,255,255,0.55)' }}>
+                {current.keywords}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+
+          <button
+            type="button"
+            onClick={() => setOpenArea(current)}
+            className="mt-5 inline-flex h-11 items-center gap-2 rounded-full px-5 font-semibold transition-colors hover:bg-white hover:text-black"
+            style={{ fontSize: '14px', color: 'rgba(255,255,255,0.92)', border: '1px solid rgba(255,255,255,0.2)' }}
+          >
+            <Lock className="h-3.5 w-3.5" style={{ color: GOLD }} aria-hidden="true" />
+            {links ? 'Open resources' : 'Request access'}
+          </button>
+
+          {/* Progress dots */}
+          <div className="mt-6 flex items-center gap-2" role="tablist" aria-label="Choose an area">
+            {AREAS.map((area, i) => (
+              <button
+                key={area.id}
+                type="button"
+                role="tab"
+                aria-selected={i === active}
+                aria-label={area.title}
+                onClick={() => setActive(i)}
+                className="flex h-6 items-center justify-center"
+              >
+                <span
+                  className="block h-1.5 rounded-full transition-all duration-500"
+                  style={{ width: i === active ? 26 : 6, background: i === active ? GOLD : 'rgba(255,255,255,0.25)' }}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+      </motion.div>
 
       <AccessDialog area={openArea} links={links} onUnlocked={setLinks} onClose={() => setOpenArea(null)} />
     </section>
