@@ -588,30 +588,52 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
           </div>
 
           <Eyebrow>How we measure the lift</Eyebrow>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-10">
-            {KPIS.map((k, i) => {
-              const result = RESULTS.find((r) => r.k === k.k);
-              return (
-                <motion.div
-                  key={k.k}
-                  {...reveal}
-                  transition={{ ...reveal.transition, delay: i * 0.05 }}
-                  className="rounded-[24px] border border-white/5 bg-[#0D0D0D] p-6"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <p className="text-white font-bold">{k.k}</p>
-                    <span
-                      className="text-[10px] font-black uppercase tracking-[0.2em]"
-                      style={{ color: k.dir === 'up' ? ACCENT : '#FFB547' }}
-                    >
-                      {k.dir === 'up' ? '↑ aim up' : '↓ aim down'}
-                    </span>
-                  </div>
-                  {result && <p className="text-white text-3xl font-black tracking-tight mb-2">{result.v}</p>}
-                  <p className="text-white/50 text-sm leading-relaxed">{k.d}</p>
-                </motion.div>
-              );
-            })}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-10 items-start">
+            {(
+              [
+                { dir: 'down', label: 'Should go down', color: '#FFB547', arrow: '↓' },
+                { dir: 'up', label: 'Should go up', color: ACCENT, arrow: '↑' },
+              ] as const
+            ).map((g, gi) => (
+              <motion.div
+                key={g.dir}
+                {...reveal}
+                transition={{ ...reveal.transition, delay: gi * 0.08 }}
+                className="rounded-[24px] border border-white/5 bg-[#0D0D0D] p-6 md:p-7"
+              >
+                <div className="flex items-center gap-3 pb-5 border-b border-white/5">
+                  <span
+                    className="w-7 h-7 rounded-full grid place-items-center text-sm font-black"
+                    style={{ color: g.color, background: `${g.color}1A` }}
+                    aria-hidden
+                  >
+                    {g.arrow}
+                  </span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.25em]" style={{ color: g.color }}>
+                    {g.label}
+                  </span>
+                </div>
+                <ul>
+                  {KPIS.filter((k) => k.dir === g.dir).map((k) => {
+                    const result = RESULTS.find((r) => r.k === k.k);
+                    return (
+                      <li
+                        key={k.k}
+                        className="flex items-start justify-between gap-6 py-4 border-b border-white/5 last:border-0 last:pb-0"
+                      >
+                        <span>
+                          <span className="block text-white font-bold mb-1">{k.k}</span>
+                          <span className="block text-white/50 text-sm leading-relaxed">{k.d}</span>
+                        </span>
+                        {result && (
+                          <span className="text-white text-2xl font-black tracking-tight shrink-0">{result.v}</span>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </motion.div>
+            ))}
           </div>
 
           {RESULTS.length === 0 && (
