@@ -121,7 +121,7 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
         <div style={{ position: 'relative', width: '34px', height: '34px', flexShrink: 0 }}>
           <a
             href="/"
-            aria-label="Ahmad Eldeeb — back to top"
+            aria-label="Ahmad Eldeeb, back to top"
             onClick={(e) => { e.preventDefault(); scrollToTop(); }}
             style={{
               position: 'relative',
@@ -328,7 +328,7 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
         <div style={{ position: 'relative', width: '30px', height: '30px' }}>
           <a
             href="/"
-            aria-label="Ahmad Eldeeb — back to top"
+            aria-label="Ahmad Eldeeb, back to top"
             onClick={(e) => { e.preventDefault(); scrollToTop(); }}
             style={{
               position: 'relative',

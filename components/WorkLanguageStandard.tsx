@@ -51,7 +51,7 @@ export function WorkLanguageStandard() {
                   Strategy that ships
                 </h2>
                 <p className="text-white/60 text-lg leading-relaxed max-w-[420px]">
-                  I lead cross-functional teams across product, engineering, and business to turn complex systems into clear decisions, scalable frameworks, and measurable outcomes—across fintech, SaaS, and gaming.
+                  I lead cross-functional teams across product, engineering, and business to turn complex systems into clear decisions, scalable frameworks, and measurable outcomes across fintech, SaaS, and gaming.
                 </p>
               </div>
 

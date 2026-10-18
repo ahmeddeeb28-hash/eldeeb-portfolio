@@ -61,7 +61,7 @@ const projects = [
     category: 'SaaS · Zyda era',
     title: 'Vendor & Product SaaS Management Dashboard',
     summary:
-      'A single command surface for vendor operators — one dashboard to run catalogue, pricing, and fulfilment. Cut time-to-resolve by 43%.',
+      'A single command surface for vendor operators: one dashboard to run catalogue, pricing, and fulfilment. Cut time-to-resolve by 43%.',
     accentColor: 'rgba(160,125,195,0.9)',
     imageGlow:
       'radial-gradient(ellipse 60% 55% at 50% 40%, rgba(100,70,120,0.07) 0%, transparent 70%)',
@@ -87,7 +87,7 @@ const projects = [
     category: 'Product Story · Marketing',
     title: 'Landing Page & Use-Case System',
     summary:
-      'A modular landing framework — hero, use-case gallery, proof rails — engineered so the same product could speak to five buyer types without a rebuild.',
+      'A modular landing framework (hero, use-case gallery, proof rails) built so the same product could speak to five buyer types without a rebuild.',
     accentColor: 'rgba(120,205,195,0.9)',
     imageGlow:
       'radial-gradient(ellipse 65% 50% at 80% 70%, rgba(90,175,165,0.08) 0%, transparent 70%)',
@@ -100,7 +100,7 @@ const projects = [
     category: 'Fintech Growth · Hakbah era',
     title: 'Behavior-Driven Retention for Saudi Fintech',
     summary:
-      'A health-scoring framework that flagged at-risk savers 3 weeks earlier — cutting churn 22% through targeted intervention flows.',
+      'A health-scoring framework that flagged at-risk savers 3 weeks earlier and cut churn 22% through targeted intervention flows.',
     accentColor: 'rgba(200,150,80,0.9)',
     imageGlow:
       'radial-gradient(ellipse 70% 60% at 25% 75%, rgba(160,100,40,0.08) 0%, transparent 70%)',
@@ -113,7 +113,7 @@ const projects = [
     category: 'Enterprise AI · SAMPO',
     title: 'SAMPO AI Pricing & Insights Platform',
     summary:
-      'A pricing-intelligence surface for enterprise revenue teams — real-time model outputs translated into a decision UI operators can actually read.',
+      'A pricing-intelligence surface for enterprise revenue teams. Real-time model outputs translated into a decision UI operators can actually read.',
     accentColor: 'rgba(120,180,215,0.9)',
     imageGlow:
       'radial-gradient(ellipse 65% 55% at 30% 30%, rgba(80,145,190,0.09) 0%, transparent 70%)',
@@ -124,9 +124,9 @@ const projects = [
     image: CASE_STUDY_IMAGES.jackarooGaming,
     year: '2026',
     category: 'Gaming UI/UX · Lobah',
-    title: 'Jackaroo — Real-Time Multiplayer Game UI',
+    title: 'Jackaroo: Real-Time Multiplayer Game UI',
     summary:
-      'The classic board reimagined for touch — an interface that stays out of the game, with motion, feedback, and turn-state clarity tuned for competitive play.',
+      'The classic board reimagined for touch. An interface that stays out of the game, with motion, feedback, and turn-state clarity tuned for competitive play.',
     accentColor: 'rgba(215,110,90,0.9)',
     imageGlow:
       'radial-gradient(ellipse 70% 60% at 70% 40%, rgba(190,80,60,0.09) 0%, transparent 70%)',
@@ -138,9 +138,9 @@ const projects = [
     stage: 'fresh' as const,
     year: 'Now',
     category: 'Food Delivery · fresh',
-    title: 'fresh — The Five Seconds After Pay',
+    title: 'fresh: The Five Seconds After Pay',
     summary:
-      'The order-placed moment, redesigned: a spinner became an honest five second window to fix the address or items, then a hand-off to tracking with no dead end.',
+      'I replaced the spinner after Pay with a 5 second window to fix the address or items, then a direct handoff to tracking.',
     accentColor: 'rgba(95,224,162,0.9)',
     imageGlow:
       'radial-gradient(ellipse 65% 55% at 50% 40%, rgba(60,170,115,0.09) 0%, transparent 70%)',
@@ -359,7 +359,7 @@ export function Projects({ onProjectClick }: ProjectsProps) {
             zIndex: 1,
           }}
         >
-          Six eras, one methodology — Zyda SaaS operators, Sary grocery
+          Six eras, one methodology: Zyda SaaS operators, Sary grocery
           marketplaces, a modular landing framework, Hakbah's Saudi fintech
           rails, SAMPO's enterprise AI, and today's Jackaroo game UI at
           Lobah. Strategy that ships across every category.
@@ -822,7 +822,7 @@ function ProjectCTA({
         gap: 14,
         fontFamily: 'Inter, system-ui, sans-serif',
       }}
-      aria-label={`View case study — ${project.title}`}
+      aria-label={`View case study: ${project.title}`}
     >
       <span
         style={{

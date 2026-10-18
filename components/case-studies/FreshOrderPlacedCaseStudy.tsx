@@ -27,87 +27,86 @@ const FILM = '/videos/fresh-order-placed.mp4';
 const POSTER = '/images/case-studies/fresh/poster.webp';
 
 const CHAPTERS: Chapter[] = [
-  { id: 'overview', num: '01', roman: 'I', label: 'Overview', beat: 'Five seconds nobody designed.' },
-  { id: 'problem', num: '02', roman: 'II', label: 'Problem', beat: 'How we found it, and where.' },
-  { id: 'insight', num: '03', roman: 'III', label: 'Insights', beat: 'What the evidence was really saying.' },
-  { id: 'standards', num: '04', roman: 'IV', label: 'Standards', beat: 'The rules every screen had to keep.' },
-  { id: 'cases', num: '05', roman: 'V', label: 'Use Cases', beat: 'Each moment, and the design for it.' },
-  { id: 'impact', num: '06', roman: 'VI', label: 'Impact', beat: 'How we will know it lifted.' },
+  { id: 'overview', num: '01', roman: 'I', label: 'Overview', beat: 'The screen after Pay.' },
+  { id: 'problem', num: '02', roman: 'II', label: 'Problem', beat: 'Where we saw it.' },
+  { id: 'insight', num: '03', roman: 'III', label: 'Insights', beat: 'What we learned.' },
+  { id: 'standards', num: '04', roman: 'IV', label: 'Standards', beat: 'Rules for every screen.' },
+  { id: 'cases', num: '05', roman: 'V', label: 'Use Cases', beat: 'Each state and its design.' },
+  { id: 'impact', num: '06', roman: 'VI', label: 'Impact', beat: 'What we measure.' },
 ];
 
-/* Where the problem showed up. Kept as summaries of the signal,
-   not quotes: no review or ticket is reproduced here. */
+/* Where the problem showed up. Summaries, not quotes. */
 const SIGNALS = [
   {
     k: 'Reviews & feedback',
-    t: 'Noticed it, could not fix it',
-    d: 'Store reviews and in-app feedback kept describing the same beat: the mistake was spotted right after paying, and the only option on screen was a spinner.',
+    t: 'Saw the mistake, couldn’t fix it',
+    d: 'People noticed a wrong address or item right after paying. The screen only showed a spinner.',
   },
   {
-    k: 'Support contacts',
-    t: 'Mistakes and silence',
-    d: 'Wrong-address and wrong-item tickets, plus "where is my food?" contacts from people who were handed off with nothing to read.',
+    k: 'Support',
+    t: 'Wrong orders and “where’s my food?”',
+    d: 'Tickets about wrong addresses and items, and people asking for an update after placing.',
   },
   {
     k: 'Cancellations',
-    t: 'Cancel was the only exit',
-    d: 'Orders killed in the first moments after Pay, when a one-line fix would have saved them.',
+    t: 'Cancel was the only way out',
+    d: 'Orders cancelled right after Pay that a small edit could have saved.',
   },
   {
-    k: 'Target audience',
-    t: 'Every diner who pays',
-    d: 'Restaurant, grocery, pickup, scheduled and team orders where colleagues each pay their share. One moment, every flow.',
+    k: 'Audience',
+    t: 'Everyone who pays',
+    d: 'Delivery, grocery, pickup, scheduled orders and team orders where each person pays their share.',
   },
 ];
 
 const INSIGHTS = [
   {
     n: '01',
-    t: 'Attention peaks right after Pay.',
-    d: 'People are still looking at the screen, waiting to be told it worked. A spinner spends that attention on nothing.',
+    t: 'People watch the screen after Pay.',
+    d: 'They wait to see that it worked. A spinner gives them nothing to do with that attention.',
   },
   {
     n: '02',
-    t: 'Mistakes are spotted at the last second.',
-    d: 'An old address or a wrong quantity jumps out the moment an order feels final. That is exactly when the app gave no way to fix it.',
+    t: 'Mistakes show up at the last second.',
+    d: 'An old address or a wrong quantity is easy to spot once the order feels final. That was the moment we had no fix for.',
   },
   {
     n: '03',
-    t: 'Cancel is the wrong tool for a small fix.',
-    d: 'When killing the order is the only exit, a one-line correction becomes a lost order, a refund and often a ticket.',
+    t: 'Cancelling is too much for a small fix.',
+    d: 'If cancel is the only option, a quick correction turns into a lost order, a refund and often a ticket.',
   },
   {
     n: '04',
-    t: 'Silence turns into anxiety.',
-    d: 'A frozen wait followed by a dead end is what sends people to support asking where their food is.',
+    t: 'No update means more support contacts.',
+    d: 'A spinner followed by a screen with no next step is what makes people ask where their food is.',
   },
 ];
 
 const STANDARDS = [
-  { t: 'One honest clock', d: 'The ring and the cancel window share a single five second timer. What you see is the real window.' },
-  { t: 'Edit, never only cancel', d: 'Address and items are one tap away. Editing pauses the clock and the same order carries on.' },
-  { t: 'Free means free', d: 'Cancel inside the window and nothing is charged. The cart is saved exactly as it was.' },
-  { t: 'No dead ends', d: 'The success screen hands off to tracking in five seconds, and any touch pauses the hand-off.' },
-  { t: 'The brand carries success', d: 'Bag pop with overshoot and confetti in brand greens and gold. Joy is earned after the window, not before.' },
-  { t: 'Motion respects people', d: 'One real timeline instead of quick Smart Animate jumps, and a reduced-motion path that skips the show.' },
+  { t: 'One clock', d: 'The ring and the cancel window use the same 5 second timer.' },
+  { t: 'Edit before cancel', d: 'Address and items are one tap away. Editing pauses the clock and keeps the same order.' },
+  { t: 'Free to cancel', d: 'Cancel inside the window and nothing is charged. The cart stays as it was.' },
+  { t: 'Always a next step', d: 'Tracking opens after 5 seconds. Touching the screen pauses it.' },
+  { t: 'Celebrate after, not before', d: 'The bag and confetti come only once the order is sent.' },
+  { t: 'Reduced motion', d: 'One timeline for the whole sequence, and a simpler version for people who turn motion off.' },
 ];
 
-/* The M1 timeline, beat by beat. */
+/* The M1 timeline. */
 const TIMELINE = [
-  { at: '0.6s', t: 'Rest', d: 'The screen settles before anything moves.' },
-  { at: '5s', t: 'Ring + countdown', d: 'Progress and the free cancel window, one clock.' },
-  { at: 'tick', t: 'Sent to Vapiano', d: 'A beat of confirmation before the celebration.' },
-  { at: '650ms', t: 'Bag pop', d: 'Overshoot, confetti in brand colours.' },
-  { at: '90ms', t: 'Cards rise', d: 'Arrival, savings and receipt, staggered.' },
-  { at: '5s', t: 'Hand-off', d: 'Tracking opens unless you are still reading.' },
+  { at: '0.6s', t: 'Pause', d: 'The screen settles first.' },
+  { at: '5s', t: 'Ring and countdown', d: 'Progress and the cancel window together.' },
+  { at: 'Tick', t: 'Sent to Vapiano', d: 'Confirmation before the celebration.' },
+  { at: '650ms', t: 'Bag pop', d: 'With confetti in brand colours.' },
+  { at: '90ms', t: 'Cards slide up', d: 'Arrival time, savings, receipt.' },
+  { at: '5s', t: 'Tracking', d: 'Opens unless you’re still reading.' },
 ];
 
-/* The numbers the success screen features, and the question each answers. */
+/* The numbers on the success screen. */
 const FEATURED = [
-  { v: '19:45', k: 'When', d: 'An arrival time, not a vague "on its way".' },
-  { v: '$4.00', k: 'Value', d: 'What the order saved, with a scratch card waiting.' },
-  { v: '$24.19', k: 'Proof', d: 'Paid, by which method, with the receipt one tap away.' },
-  { v: '5s', k: 'Control', d: 'Exactly how long is left to change your mind.' },
+  { v: '19:45', k: 'When', d: 'An arrival time instead of “on its way”.' },
+  { v: '$4.00', k: 'Saved', d: 'What the order saved, plus a scratch card.' },
+  { v: '$24.19', k: 'Paid', d: 'Amount and payment method, receipt one tap away.' },
+  { v: '5s', k: 'Time left', d: 'How long you still have to change your mind.' },
 ];
 
 type UseCase = {
@@ -125,23 +124,23 @@ type UseCase = {
 const USE_CASES: UseCase[] = [
   {
     id: 'placing',
-    code: 'K1–K4',
-    title: 'Placing, five seconds',
+    code: 'K1 to K4',
+    title: 'Placing (5 seconds)',
     state: 'placing',
     live: true,
-    what: 'The ring starts at the top and fills around the destination while the pin breathes. Address and items each carry a one-tap Edit. Cancel is free and counts down honestly.',
-    why: 'Show progress the second Pay is tapped, and keep the wait alive instead of freezing on a spinner.',
-    shown: 'Every diner who pays',
-    measured: 'Wrong-address cancels · drop-offs while placing · cancels in window',
+    what: 'The ring fills around the delivery address. Address and items each have an Edit button. Cancel is free and shows the seconds left.',
+    why: 'Show progress as soon as Pay is tapped, instead of a spinner.',
+    shown: 'Everyone who pays',
+    measured: 'Wrong-address cancels, drop-offs while placing, cancels in the window',
   },
   {
     id: 'address',
     code: 'K1a',
     title: 'Edit address',
     state: 'edit-address',
-    what: 'One tap opens saved places. The clock pauses, the order is held, and picking a new place keeps the same order and payment.',
+    what: 'Opens saved places. The clock pauses and the order waits. Picking a new place keeps the same order and payment.',
     why: 'A wrong address is the most expensive mistake. This catches it before the kitchen starts.',
-    shown: 'Anyone who taps Edit on the destination',
+    shown: 'Anyone who taps Edit on the address',
     measured: 'Address edits vs wrong-address tickets',
   },
   {
@@ -149,7 +148,7 @@ const USE_CASES: UseCase[] = [
     code: 'K1b',
     title: 'Edit items',
     state: 'edit-items',
-    what: 'Quantities change in place, with the difference called out and the new total on the button. The clock waits while you fix it.',
+    what: 'Change quantities in place. Changed lines are marked, and the clock waits.',
     why: 'People spot a wrong quantity at the last second.',
     shown: 'Anyone who taps Edit on the order',
     measured: 'Item edits vs cancels',
@@ -159,28 +158,28 @@ const USE_CASES: UseCase[] = [
     code: 'Cancel',
     title: 'Cancel in time',
     state: 'cancelled',
-    what: 'Inside the window the ring rewinds, nothing is charged and the cart comes back exactly as it was.',
-    why: 'Clear, honest countdown before money moves. Changing your mind should never cost anything.',
-    shown: 'Diners who cancel inside five seconds',
+    what: 'The ring rewinds, nothing is charged and the cart comes back.',
+    why: 'A clear countdown before any money moves.',
+    shown: 'People who cancel within 5 seconds',
     measured: 'Support tickets about mistakes',
   },
   {
     id: 'sent',
     code: 'K5',
-    title: 'Sent to the kitchen',
+    title: 'Sent to the restaurant',
     state: 'sent',
-    what: 'The ring closes and a quiet tick confirms the restaurant has it.',
-    why: 'A beat of confirmation before the celebration.',
-    shown: 'Every diner, after the window',
+    what: 'The ring closes and a tick confirms the restaurant has the order.',
+    why: 'Confirmation before the celebration.',
+    shown: 'Everyone, after the window',
     measured: 'Time to confirmation',
   },
   {
     id: 'burst',
     code: 'K6',
-    title: 'The burst',
+    title: 'Success',
     state: 'burst',
-    what: 'The map shrinks away, the bag pops in with overshoot, confetti in brand greens and gold.',
-    why: 'The success moment carries the brand.',
+    what: 'The map shrinks, the bag pops in, confetti in brand greens and gold.',
+    why: 'The brand shows up at the success moment.',
     shown: 'Every confirmed order',
     measured: 'Time to next tap',
   },
@@ -189,49 +188,49 @@ const USE_CASES: UseCase[] = [
     code: 'K7',
     title: 'Order placed',
     state: 'placed',
-    what: 'Arrival time, savings and receipt slide up. Live tracking opens in five seconds, and any touch pauses it.',
-    why: 'Hands off to tracking without a dead end.',
+    what: 'Arrival time, savings and receipt slide up. Tracking opens in 5 seconds; touching the screen pauses it.',
+    why: 'Leads into tracking with no dead end.',
     shown: 'Every confirmed order',
-    measured: 'Scratch card reveals · tracking opens',
+    measured: 'Scratch card reveals, tracking opens',
   },
   {
     id: 'scheduled',
     code: 'Scheduled',
     title: 'Scheduled order',
     state: 'scheduled',
-    what: 'Same moment, honest copy: when it arrives, when the card is charged, and that tracking opens when the kitchen starts.',
-    why: 'Expectations change when the order is for later. The screen says so instead of pretending it is live.',
-    shown: 'Diners who schedule ahead',
-    measured: 'Tracking opens at cook start',
+    what: 'Shows when it arrives, when the card is charged, and that tracking starts when the kitchen does.',
+    why: 'An order for later needs different copy than a live one.',
+    shown: 'People who schedule ahead',
+    measured: 'Tracking opens when cooking starts',
   },
   {
     id: 'late',
     code: 'Late',
     title: 'Running late',
     state: 'late',
-    what: 'The app speaks first: how late, why, and a credit already added to the wallet.',
-    why: 'Managing expectations does not stop at "placed". Bad news told early keeps trust.',
-    shown: 'Orders running behind the promised time',
-    measured: '"Where is my food?" contacts',
+    what: 'We tell people first: how late, why, and a credit added to their wallet.',
+    why: 'Telling people early keeps their trust.',
+    shown: 'Orders behind the promised time',
+    measured: '“Where’s my food?” contacts',
   },
 ];
 
 const KPIS = [
-  { k: 'Wrong-address cancels', dir: 'down', d: 'Caught by Edit before a rider is assigned.' },
-  { k: 'Edits vs cancels', dir: 'up', d: 'Fixes that replace a killed order.' },
-  { k: 'Tickets about mistakes', dir: 'down', d: 'Fewer wrong-address and wrong-item contacts.' },
-  { k: '"Where is my food?"', dir: 'down', d: 'A clear hand-off and early late notices.' },
-  { k: 'Drop-offs while placing', dir: 'down', d: 'A live wait instead of a frozen one.' },
-  { k: 'Tracking opens', dir: 'up', d: 'The hand-off lands people where the next answer is.' },
+  { k: 'Wrong-address cancels', dir: 'down', d: 'Fixed with Edit before a rider is assigned.' },
+  { k: 'Edits vs cancels', dir: 'up', d: 'More edits, fewer cancelled orders.' },
+  { k: 'Tickets about mistakes', dir: 'down', d: 'Wrong address and wrong item contacts.' },
+  { k: '“Where’s my food?”', dir: 'down', d: 'Clear next step and early late notices.' },
+  { k: 'Drop-offs while placing', dir: 'down', d: 'People leaving during the wait.' },
+  { k: 'Tracking opens', dir: 'up', d: 'People landing on live tracking.' },
 ];
 
-/* Real pilot results go here, e.g. { k: 'Wrong-address cancels', v: '−18%' }.
-   Left empty until there are numbers to show. */
+/* Pilot results go here, e.g. { k: 'Wrong-address cancels', v: '−18%' }.
+   Empty until there are real numbers. */
 const RESULTS: { k: string; v: string }[] = [];
 
 const SHIPPED = [
   { v: '9', k: 'designed states' },
-  { v: '14.5s', k: 'one motion timeline' },
+  { v: '14.5s', k: 'motion timeline' },
   { v: '47s', k: 'launch film' },
   { v: '1', k: 'clock for ring and cancel' },
 ];
@@ -297,11 +296,9 @@ function Film() {
           </div>
           <div className="hidden md:block max-w-[260px]">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-3" style={{ color: ACCENT }}>
-              Live · the M1 sequence
-            </p>
+              Live preview</p>
             <p className="text-white/70 text-sm leading-relaxed">
-              Ring and countdown, the tick, the burst, then arrival, savings and receipt. Playing in code, frame for frame
-              with the prototype.
+              Ring and countdown, confirmation, success, then arrival time, savings and receipt.
             </p>
           </div>
         </div>
@@ -349,7 +346,7 @@ function UseCases() {
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
           >
             <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-3" style={{ color: ACCENT }}>
-              {c.code.startsWith('K') ? c.code : 'Edge case'} · {String(active + 1).padStart(2, '0')} / {String(USE_CASES.length).padStart(2, '0')}
+              {c.code.startsWith('K') ? c.code : 'Extra case'} · {String(active + 1).padStart(2, '0')} / {String(USE_CASES.length).padStart(2, '0')}
             </p>
             <h3 className="text-white text-3xl md:text-4xl font-black tracking-tight mb-4">{c.title}</h3>
             <p className="text-white/60 text-base md:text-lg leading-relaxed mb-8 max-w-xl">{c.what}</p>
@@ -432,9 +429,7 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
               The five seconds after Pay.
             </h1>
             <p className="text-white/50 text-lg md:text-xl leading-relaxed max-w-2xl mb-12">
-              Every delivery app shows a spinner after you pay. We turned that dead wait into the last chance to catch the
-              two mistakes that cost delivery the most, the wrong address and the wrong items, then handed people
-              straight to the answer they want next.
+              Most delivery apps show a spinner after you pay. I used those seconds to let people fix the two most costly mistakes, a wrong address and wrong items, then sent them straight to tracking.
             </p>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-6 py-6 border-y border-white/10 mb-12">
@@ -460,12 +455,10 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
               <span className="text-[#FF5F5F]/70 text-[9px] font-black uppercase tracking-[0.4em]">Problem statement</span>
             </div>
             <p className="text-white text-2xl md:text-4xl font-bold leading-[1.15] tracking-tight max-w-3xl mb-8">
-              Right after Pay, attention is at its peak and control is at zero.
+              Right after Pay, people are watching the screen but can’t change anything.
             </p>
             <p className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl">
-              The order screen froze on a spinner. If the address or an item was wrong, the only way out was to cancel the
-              whole order. A fixable slip became a lost order, a refund, a support ticket or a rider at the wrong door,
-              and the moment that should carry the brand carried nothing.
+              The screen showed a spinner. If the address or an item was wrong, the only option was to cancel the whole order. A small mistake became a lost order, a refund, a support ticket or a rider at the wrong door.
             </p>
           </motion.div>
 
@@ -506,8 +499,7 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
             className="mt-20 border-l-2 pl-6 md:pl-8 text-white text-2xl md:text-3xl font-bold leading-snug tracking-tight max-w-3xl"
             style={{ borderColor: ACCENT }}
           >
-            So the job of this screen is not to entertain the wait. It is to give control back, then set honest
-            expectations for what happens next.
+            The goal: give people control during the wait, then tell them clearly what happens next.
           </motion.blockquote>
         </section>
 
@@ -568,8 +560,7 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
             </div>
           </div>
           <p className="text-white/35 text-xs mt-6 max-w-xl">
-            Values are from the prototype order. Each one answers the next question a diner has, so nothing on the
-            success screen is decoration.
+            Values from the prototype order.
           </p>
         </section>
 
@@ -632,8 +623,7 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
                 Pilot in progress
               </span>
               <p className="text-white/60 text-sm leading-relaxed">
-                Every screen ships with the metric it answers to. Results will be published here once the pilot reads
-                out, and not before. No projected numbers.
+                Each screen has a metric. Results will go here when the pilot ends.
               </p>
             </motion.div>
           )}
@@ -641,8 +631,7 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
           <motion.div {...reveal} className="max-w-3xl">
             <Eyebrow>What I carry forward</Eyebrow>
             <p className="text-white text-2xl md:text-3xl font-bold leading-snug tracking-tight">
-              The smallest screens hold the biggest costs. Design the moment people are already looking at, give them
-              control while it is cheap, and tell the truth about time.
+              Small screens can carry big costs. Design for the moment people are already looking, and give them control while a fix is still cheap.
             </p>
           </motion.div>
         </section>

@@ -29,7 +29,7 @@ const ARTICLES = [
     meta: ['Medium', 'Part 1'],
     title: 'Design Critique Fundamentals',
     summary:
-      "A deep dive into the foundations of effective design critique — how to give, receive, and structure feedback that elevates the entire team's output.",
+      "A deep dive into the foundations of effective design critique: how to give, receive, and structure feedback that elevates the entire team's output.",
   },
   {
     href: 'https://medium.com/design-bootcamp/mastering-the-art-of-asking-targeted-questions-c6e5fd2f5b87',
@@ -47,7 +47,7 @@ const ARTICLES = [
     meta: ['Medium', 'Leadership'],
     title: 'Redefining Design Leadership: Navigating Uncharted Responsibilities',
     summary:
-      'Exploring the evolving role of design leaders — from craft to strategy, mentorship, and navigating responsibilities that no one prepared you for.',
+      'Exploring the evolving role of design leaders, from craft to strategy, mentorship, and navigating responsibilities that no one prepared you for.',
   },
 ] as const;
 

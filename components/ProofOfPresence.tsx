@@ -301,7 +301,7 @@ export function ProofOfPresence() {
           <div className="col-span-12 lg:col-span-5">
             <PhotoTile
               src={IMAGES.heroTalk}
-              alt="On-air — recording a podcast episode"
+              alt="Recording a podcast episode"
               caption="Podcast · On Air"
               aspect="9 / 16"
               maxWidth={340}
@@ -440,7 +440,7 @@ export function ProofOfPresence() {
               }}
             >
               Beyond client work, I speak at conferences, run design workshops,
-              and show up for the community — mentoring, panels, and rooms
+              and show up for the community: mentoring, panels, and rooms
               where product decisions actually get made.
             </motion.p>
           </div>
@@ -484,7 +484,7 @@ export function ProofOfPresence() {
           <div className="col-span-12 lg:col-span-6">
             <PhotoTile
               src={IMAGES.talk}
-              alt="On stage — welcoming attendees to the session"
+              alt="On stage, welcoming attendees to the session"
               caption="Speaking · Talk"
               aspect="4 / 3"
               index={1}
@@ -493,7 +493,7 @@ export function ProofOfPresence() {
           <div className="col-span-12 lg:col-span-3">
             <PhotoTile
               src={IMAGES.workshop}
-              alt="Workshop — hands-on collaboration"
+              alt="Hands-on workshop"
               caption="Workshop"
               aspect="3 / 4"
               index={2}
@@ -516,7 +516,7 @@ export function ProofOfPresence() {
           <div className="col-span-12 lg:col-span-3">
             <PhotoTile
               src={IMAGES.between}
-              alt="Malmö castle corridor — a quiet moment between talks"
+              alt="Malmö castle corridor between talks"
               caption="Between the Talks"
               aspect="3 / 4"
               index={3}
@@ -557,7 +557,7 @@ export function ProofOfPresence() {
           <div className="col-span-12 lg:col-span-3">
             <PhotoTile
               src={IMAGES.meetup}
-              alt="At a Salon community meetup — capturing the moment"
+              alt="At a Salon community meetup"
               caption="Community · Meetup"
               aspect="4 / 5"
               maxWidth={260}
@@ -569,7 +569,7 @@ export function ProofOfPresence() {
           <div className="col-span-12 lg:col-span-3">
             <PhotoTile
               src={IMAGES.gathering}
-              alt="Group gathering after a session — the room, together"
+              alt="Group gathering after a session"
               caption="Gathering"
               aspect="4 / 5"
               maxWidth={260}

@@ -52,7 +52,7 @@ export function Mentorship() {
           eyebrow="ADPList Mentorship"
           title="Designers I've"
           flourish="mentored."
-          subtitle="Hundreds of designers through ADPList — portfolio reviews, career guidance, and real-world product strategy insights."
+          subtitle="Hundreds of designers through ADPList: portfolio reviews, career guidance, and real-world product strategy insights."
         />
 
         {/* Two Column Layout */}

@@ -29,7 +29,7 @@ export function DesignServices() {
       kicker: 'Strategy',
       title: 'Product UX & Strategy',
       description:
-        'Clarifying problems, mapping journeys, and aligning teams on what we should build — and why.',
+        'Clarifying problems, mapping journeys, and aligning teams on what to build and why.',
       image: DESIGN_SERVICES_IMAGES.strategy,
     },
     {
@@ -38,7 +38,7 @@ export function DesignServices() {
       kicker: 'Craft',
       title: 'End-to-End Product Design',
       description:
-        'From wireframes to high-fidelity UI and prototypes — web and mobile products ready for development.',
+        'From wireframes to high-fidelity UI and prototypes for web and mobile, ready for development.',
       image: DESIGN_SERVICES_IMAGES.craft,
     },
     {

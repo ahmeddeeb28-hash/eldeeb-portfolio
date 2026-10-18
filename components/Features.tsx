@@ -36,7 +36,7 @@ export function Features() {
     {
       title: "High-Impact Outcomes",
       statement: "Design that delivers results",
-      description: "Link decisions to adoption, retention, and business impact—then iterate with purpose and measurable data.",
+      description: "Link decisions to adoption, retention, and business impact, then iterate with purpose and measurable data.",
       image: FEATURE_IMAGES.highImpactOutcomes,
       imgId: "image-high-impact-outcomes"
     }
@@ -49,7 +49,7 @@ export function Features() {
           eyebrow="Leadership Spectrum"
           title="A framework for"
           flourish="design leadership."
-          subtitle="Three disciplines that compound into product outcomes — execution speed, strategic precision, and measurable impact."
+          subtitle="Three disciplines that compound into product outcomes: execution speed, strategic precision, and measurable impact."
           marginBottom={96}
         />
 

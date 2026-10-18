@@ -625,7 +625,7 @@ const ITEMS = [
 
 function ItemsSheet() {
   return (
-    <Sheet title="Fix your items" sub="Spotted a wrong quantity? Change it here. The same order carries on.">
+    <Sheet title="Fix your items" sub="Spotted a wrong quantity? Change it here. Your order stays the same.">
       <div style={{ display: 'grid', gap: 12, marginBottom: 18 }}>
         {ITEMS.map((it) => (
           <div

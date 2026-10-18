@@ -56,21 +56,21 @@ export function orderedMockups(
   if (before) {
     seq.push({
       url: before.url,
-      note: before.note || 'The starting state — what users were stuck with.',
+      note: before.note || 'The starting state users were stuck with.',
       caption: 'Before',
     });
   }
   if (after) {
     seq.push({
       url: after.url,
-      note: after.note || 'The intervention — where the change earned its place.',
+      note: after.note || 'The change we made.',
       caption: 'After',
     });
   }
   if (ctx) {
     seq.push({
       url: ctx.url,
-      note: ctx.note || 'Full context — how it lives in the product.',
+      note: ctx.note || 'How it looks in the product.',
       caption: 'In context',
     });
   }
