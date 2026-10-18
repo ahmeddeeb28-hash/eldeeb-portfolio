@@ -57,9 +57,17 @@ export function CaseFilm({
   const [playing, setPlaying] = useState(false);
 
   // A missing file can fail before React attaches onError; catch that too.
+  // React doesn't set the `muted` attribute, which can block autoplay, so
+  // mute and start the silent loop by hand.
   useEffect(() => {
     const v = ref.current;
-    if (v && (v.error || v.networkState === HTMLMediaElement.NETWORK_NO_SOURCE)) setHasFilm(false);
+    if (!v) return;
+    if (v.error || v.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
+      setHasFilm(false);
+      return;
+    }
+    v.muted = true;
+    void v.play().catch(() => {});
   }, []);
 
   const play = () => {

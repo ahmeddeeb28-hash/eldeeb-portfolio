@@ -14,12 +14,13 @@ import { SaryAddAllLoop, SaryPhone, type SaryState } from './sary/SaryPhone';
    orders on the screens are sample data.
 
    The results block keeps the figures from the earlier Sary
-   case study. The film lives at
-   public/videos/sary-buy-again-film.mp4; until it is added the
-   hero plays the "Add all" sequence live. */
+   case study. The film is public/videos/sary-buy-again-film.mp4;
+   if it ever fails to load, the hero plays the "Add all"
+   sequence live instead. */
 
 const ACCENT = '#7DA2FF';
 const FILM = '/videos/sary-buy-again-film.mp4';
+const POSTER = '/images/case-studies/sary/film-poster.webp';
 
 const CHAPTERS: Chapter[] = [
   { id: 'overview', num: '01', roman: 'I', label: 'Overview', beat: 'A home for stores that come back.' },
@@ -249,6 +250,7 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
 
             <CaseFilm
               src={FILM}
+              poster={POSTER}
               length="1:00"
               accent={ACCENT}
               buttonTint="#1D368D"
