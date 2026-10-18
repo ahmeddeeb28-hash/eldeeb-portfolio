@@ -232,53 +232,22 @@ export function PremiumHero() {
     >
       {/* Living Background Atmosphere */}
       <motion.div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ y: bgY }}>
-        {/* Aurora glow field */}
+        {/* Aurora glow: one full-bleed layer of soft gradients, no shapes.
+            Each gradient fades to nothing well inside the hero, so no
+            edge can show, and the whole layer drifts slowly (a cheap
+            transform). Replaces blurred blobs, whose 100–140px filters
+            were heavy on phones and whose edges showed without them. */}
         <motion.div
-          animate={{
-            x: ['-5%', '5%', '-5%'],
-            y: ['-5%', '4%', '-5%'],
-          }}
-          transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
+          animate={{ x: ['-2%', '2%', '-2%'], y: ['-1.5%', '1.5%', '-1.5%'] }}
+          transition={{ duration: 24, repeat: Infinity, ease: 'easeInOut' }}
           style={{
             position: 'absolute',
-            top: '-10%',
-            left: '-8%',
-            width: '55%',
-            height: '65%',
-            borderRadius: '50%',
-            background: `radial-gradient(circle, ${currentView.accentDim} 0%, transparent 70%)`,
-            opacity: 0.5,
-            transition: 'background 1.2s ease',
-          }}
-        />
-        <motion.div
-          animate={{
-            x: ['4%', '-6%', '4%'],
-            y: ['3%', '-4%', '3%'],
-          }}
-          transition={{ duration: 26, repeat: Infinity, ease: 'easeInOut' }}
-          style={{
-            position: 'absolute',
-            bottom: '-15%',
-            right: '-10%',
-            width: '50%',
-            height: '60%',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(220,190,140,0.22) 0%, transparent 70%)',
-          }}
-        />
-        <motion.div
-          animate={{ opacity: [0.15, 0.3, 0.15] }}
-          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-          style={{
-            position: 'absolute',
-            top: '30%',
-            left: '38%',
-            width: '30%',
-            height: '40%',
-            borderRadius: '50%',
-            background: `radial-gradient(circle, ${currentView.accentDim} 0%, transparent 75%)`,
-            transition: 'background 1.2s ease',
+            inset: '-8%',
+            background: [
+              `radial-gradient(ellipse 55% 60% at 22% 28%, color-mix(in srgb, ${currentView.accentDim} 55%, transparent) 0%, color-mix(in srgb, ${currentView.accentDim} 22%, transparent) 40%, transparent 72%)`,
+              'radial-gradient(ellipse 50% 55% at 82% 80%, rgba(220,190,140,0.10) 0%, rgba(220,190,140,0.04) 42%, transparent 72%)',
+              `radial-gradient(ellipse 35% 40% at 52% 48%, color-mix(in srgb, ${currentView.accentDim} 25%, transparent) 0%, transparent 70%)`,
+            ].join(', '),
           }}
         />
 
@@ -291,8 +260,7 @@ export function PremiumHero() {
             top: mousePosition.y - 260,
             width: '520px',
             height: '520px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(220,190,140,0.08) 0%, transparent 70%)',
+            background: 'radial-gradient(closest-side, rgba(220,190,140,0.08) 0%, transparent 100%)',
             transition: 'left 0.4s ease-out, top 0.4s ease-out',
           }}
         />
@@ -317,6 +285,13 @@ export function PremiumHero() {
           }}
         />
       </motion.div>
+
+      {/* Fade the hero into the next section. Outside the parallax layer
+          above so it stays pinned to the hero's bottom edge. */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-[30%] pointer-events-none"
+        style={{ background: 'linear-gradient(180deg, rgba(10,10,10,0) 0%, rgba(10,10,10,0.85) 70%, #0A0A0A 100%)' }}
+      />
 
       {/* Content Grid */}
       <motion.div
@@ -541,7 +516,7 @@ export function PremiumHero() {
         >
           {/* Persona-tinted glow behind the frame */}
           <motion.div
-            animate={{ background: `radial-gradient(circle at 50% 40%, ${currentView.accentDim} 0%, transparent 70%)` }}
+            animate={{ background: `radial-gradient(closest-side at 50% 42%, ${currentView.accentDim} 0%, transparent 100%)` }}
             transition={{ duration: 1 }}
             className="absolute pointer-events-none"
             style={{ inset: '-12%', opacity: 0.55 }}
