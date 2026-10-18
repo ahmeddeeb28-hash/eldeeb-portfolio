@@ -56,13 +56,16 @@ export function CaseFilm({
   const [hasFilm, setHasFilm] = useState(true);
   const [playing, setPlaying] = useState(false);
 
-  // A missing file can fail before React attaches onError; catch that too.
+  // A missing file can fail before React attaches onError; `v.error` is
+  // already set then, so check it once on mount. Don't read networkState:
+  // it is NETWORK_NO_SOURCE for a moment while any video is still picking
+  // its source, which on iPhones hid films that were fine.
   // React doesn't set the `muted` attribute, which can block autoplay, so
   // mute and start the silent loop by hand.
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
-    if (v.error || v.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
+    if (v.error) {
       setHasFilm(false);
       return;
     }
