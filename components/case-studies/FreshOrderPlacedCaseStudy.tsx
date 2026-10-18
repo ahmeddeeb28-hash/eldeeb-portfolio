@@ -18,12 +18,12 @@ import { CaseFilm, Eyebrow as BaseEyebrow, UseCaseExplorer, reveal, type UseCase
    empty on purpose. Add real figures to RESULTS when they land;
    nothing renders a number that is not there.
 
-   The film lives at public/videos/fresh-order-placed.mp4. Until
-   that file is added the hero plays the sequence live in code. */
+   The film is public/videos/fresh-order-placed.mp4; if it ever
+   fails to load, the hero plays the sequence live in code. */
 
 const ACCENT = '#5FE0A2';
 const FILM = '/videos/fresh-order-placed.mp4';
-const POSTER = '/images/case-studies/fresh/poster.webp';
+const POSTER = '/images/case-studies/fresh/film-poster.webp';
 
 const CHAPTERS: Chapter[] = [
   { id: 'overview', num: '01', roman: 'I', label: 'Overview', beat: 'The screen after Pay.' },
