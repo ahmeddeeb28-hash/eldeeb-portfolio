@@ -213,3 +213,13 @@ html {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* Touch devices: decorative blend modes (film grain, soft-light tints)
+   make WebKit composite each one as its own group, which on iPhones
+   added up to stutter and tab reloads. At 3–9% strength they read the
+   same with normal blending. */
+@media (hover: none) and (pointer: coarse) {
+  * {
+    mix-blend-mode: normal !important;
+  }
+}

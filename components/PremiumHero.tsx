@@ -247,7 +247,6 @@ export function PremiumHero() {
             height: '65%',
             borderRadius: '50%',
             background: `radial-gradient(circle, ${currentView.accentDim} 0%, transparent 70%)`,
-            filter: 'blur(120px)',
             opacity: 0.5,
             transition: 'background 1.2s ease',
           }}
@@ -266,7 +265,6 @@ export function PremiumHero() {
             height: '60%',
             borderRadius: '50%',
             background: 'radial-gradient(circle, rgba(220,190,140,0.22) 0%, transparent 70%)',
-            filter: 'blur(140px)',
           }}
         />
         <motion.div
@@ -280,7 +278,6 @@ export function PremiumHero() {
             height: '40%',
             borderRadius: '50%',
             background: `radial-gradient(circle, ${currentView.accentDim} 0%, transparent 75%)`,
-            filter: 'blur(100px)',
             transition: 'background 1.2s ease',
           }}
         />
@@ -296,7 +293,6 @@ export function PremiumHero() {
             height: '520px',
             borderRadius: '50%',
             background: 'radial-gradient(circle, rgba(220,190,140,0.08) 0%, transparent 70%)',
-            filter: 'blur(20px)',
             transition: 'left 0.4s ease-out, top 0.4s ease-out',
           }}
         />
@@ -548,7 +544,7 @@ export function PremiumHero() {
             animate={{ background: `radial-gradient(circle at 50% 40%, ${currentView.accentDim} 0%, transparent 70%)` }}
             transition={{ duration: 1 }}
             className="absolute pointer-events-none"
-            style={{ inset: '-12%', opacity: 0.55, filter: 'blur(40px)' }}
+            style={{ inset: '-12%', opacity: 0.55 }}
           />
 
           <div

@@ -42,6 +42,9 @@ const SaryCardStage = lazy(() =>
 
 interface ProjectsProps {
   onProjectClick?: (id: string) => void;
+  /* true while a case study or the About page covers the homepage:
+     the live card animations stop until it closes */
+  paused?: boolean;
 }
 
 /*
@@ -154,7 +157,7 @@ const projects = [
 
 /* ─────────────────────────────────────────────────────────────────────── */
 
-export function Projects({ onProjectClick }: ProjectsProps) {
+export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
   const rowRefs = useRef<Array<HTMLElement | null>>([]);
   const stackRef = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -542,6 +545,7 @@ export function Projects({ onProjectClick }: ProjectsProps) {
                   index={i}
                   isActive={activeIndex === i}
                   reduced={!!reduced}
+                  paused={paused}
                   onClick={
                     onProjectClick && p.hasStudy
                       ? () => onProjectClick(p.id)
@@ -568,6 +572,7 @@ interface ProjectRowProps {
   index: number;
   isActive: boolean;
   reduced: boolean;
+  paused: boolean;
   onClick?: () => void;
   rowRef: (el: HTMLElement | null) => void;
 }
@@ -577,6 +582,7 @@ function ProjectRow({
   index,
   isActive,
   reduced,
+  paused,
   onClick,
   rowRef,
 }: ProjectRowProps) {
@@ -757,9 +763,9 @@ function ProjectRow({
             {project.stage && (
               <Suspense fallback={null}>
                 {project.stage === 'fresh' ? (
-                  <FreshCardStage active={isActive && !reduced} />
+                  <FreshCardStage active={isActive && !reduced && !paused} />
                 ) : (
-                  <SaryCardStage active={isActive && !reduced} />
+                  <SaryCardStage active={isActive && !reduced && !paused} />
                 )}
               </Suspense>
             )}

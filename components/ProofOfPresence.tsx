@@ -274,7 +274,6 @@ export function ProofOfPresence() {
           height: '55%',
           background:
             'radial-gradient(closest-side, rgba(220,190,140,0.06) 0%, transparent 70%)',
-          filter: 'blur(80px)',
           pointerEvents: 'none',
           zIndex: 0,
         }}

@@ -1,5 +1,5 @@
-import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import { motion, AnimatePresence, useInView, useReducedMotion } from 'motion/react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 
 /* ── fresh phone ─────────────────────────────────────
    The "Order placed" screens rebuilt in code from the
@@ -292,6 +292,7 @@ function Ring({ progress }: { progress: number }) {
         strokeLinecap="round"
         strokeDasharray={RING}
         strokeDashoffset={RING * (1 - Math.max(0.04, progress))}
+        style={{ transition: 'stroke-dashoffset 0.2s linear' }}
       />
     </svg>
   );
@@ -497,6 +498,7 @@ function Placing({
                 background: paused ? F.gold : F.green,
                 transformOrigin: '0 50%',
                 transform: `scaleX(${1 - progress})`,
+                transition: 'transform 0.2s linear',
               }}
             />
           </div>
@@ -946,17 +948,26 @@ export function useOrderPlacedLoop(enabled = true, only?: PhoneState) {
     let raf = 0;
     let t0 = performance.now();
     let i = 0;
+    let shown = 0;
     const steps = only ? SEQUENCE.filter((s) => s.state === only) : SEQUENCE;
     setStep(SEQUENCE.indexOf(steps[0]));
     const tick = (now: number) => {
       const cur = steps[i];
       const p = Math.min(1, (now - t0) / cur.ms);
-      if (cur.state === 'placing') setProgress(p);
+      // Re-render in 4% steps (about every 200 ms), not every frame; the
+      // ring and bar ease between steps with a CSS transition.
+      if (cur.state === 'placing' && (p - shown >= 0.04 || p === 1)) {
+        shown = p;
+        setProgress(p);
+      }
       if (p >= 1) {
         i = (i + 1) % steps.length;
         t0 = now;
         setStep(SEQUENCE.indexOf(steps[i]));
-        if (steps[i].state === 'placing') setProgress(0);
+        if (steps[i].state === 'placing') {
+          shown = 0;
+          setProgress(0);
+        }
       }
       raf = requestAnimationFrame(tick);
     };
@@ -978,8 +989,12 @@ export function LoopingPhone({
   /* false freezes the loop where it is */
   playing?: boolean;
 }) {
-  const { state, progress } = useOrderPlacedLoop(playing, only);
+  // Pause while scrolled off screen so hidden loops don't cost frames.
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { margin: '120px' });
+  const { state, progress } = useOrderPlacedLoop(playing && inView, only);
   return (
+    <div ref={ref}>
     <AnimatePresence mode="wait" initial={false}>
       <motion.div
         key={state === 'placing' || state === 'sent' ? 'placing' : state}
@@ -991,5 +1006,6 @@ export function LoopingPhone({
         <FreshPhone state={state} progress={progress} width={width} />
       </motion.div>
     </AnimatePresence>
+    </div>
   );
 }

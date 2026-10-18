@@ -1,19 +1,23 @@
 import { useEffect, useState, RefObject } from 'react';
+import { useScroll, type MotionValue } from 'motion/react';
 import type { Chapter } from './types';
 
 /* ── useChapterScrollSpy ─────────────────────────────────────────
    Wires up an IntersectionObserver against each chapter section
-   inside the scroll container, plus a passive scroll listener for
-   overall reading progress. Returns the active chapter id and a
-   0-100 scroll-progress value the StoryTabs hairline consumes. */
+   inside the scroll container. Returns the active chapter id and
+   the container's 0–1 scroll progress as a MotionValue, which the
+   StoryTabs hairline reads directly. Keeping progress out of React
+   state matters: re-rendering the header on every scroll event made
+   its layout-animated pill re-measure the page, which stuttered on
+   phones. */
 
 export function useChapterScrollSpy(
   containerRef: RefObject<HTMLElement>,
   chapters: Chapter[],
   resetKey?: string
-): { activeId: string; scrollProgress: number } {
+): { activeId: string; scrollProgress: MotionValue<number> } {
   const [activeId, setActiveId] = useState<string>(chapters[0]?.id ?? '');
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const { scrollYProgress: scrollProgress } = useScroll({ container: containerRef });
 
   useEffect(() => {
     const root = containerRef.current;
@@ -34,17 +38,8 @@ export function useChapterScrollSpy(
       if (el) observer.observe(el);
     });
 
-    const onScroll = () => {
-      const max = root.scrollHeight - root.clientHeight;
-      const p = max > 0 ? Math.min(100, Math.max(0, (root.scrollTop / max) * 100)) : 0;
-      setScrollProgress(p);
-    };
-    onScroll();
-    root.addEventListener('scroll', onScroll, { passive: true });
-
     return () => {
       observer.disconnect();
-      root.removeEventListener('scroll', onScroll);
     };
     // chapters is intentionally not a dep — same array identity per project.
     // resetKey lets a project component force a re-bind when its data swaps.

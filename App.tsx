@@ -13,7 +13,7 @@ import { ProofOfPresence } from './components/ProofOfPresence';
 import { Articles } from './components/Articles';
 import { Footer } from './components/Footer';
 import { CASE_STUDY_REGISTRY } from './components/case-studies/registry';
-import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
+import { AnimatePresence } from 'motion/react';
 import { useRef, useState, useEffect, lazy, Suspense } from 'react';
 
 /* The Director's Cut is the heaviest view on the site and only opens
@@ -64,16 +64,8 @@ export default function App() {
 
   const activeProjectId = route.view === 'case' ? route.id : null;
   const aboutPageOpen = route.view === 'about';
+  const overlayOpen = Boolean(activeProjectId) || aboutPageOpen;
 
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
-
-  // Parallax transforms for global background elements
-  const bgY1 = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
-  const bgY2 = useTransform(scrollYProgress, [0, 1], ["0%", "-15%"]);
-  const bgRotate = useTransform(scrollYProgress, [0, 1], [0, 15]);
 
   /* Normalise the address bar once on load, so a trailing slash or
      an unknown slug cannot leave the URL describing a page that is
@@ -148,22 +140,30 @@ export default function App() {
       </Suspense>
 
       {/* Dynamic Background Parallax Layers */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <motion.div
-          style={{ y: bgY1, rotate: bgRotate }}
-          className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-[#4AF2E5]/[0.02] rounded-full blur-[160px]"
-        />
-        <motion.div
-          style={{ y: bgY2 }}
-          className="absolute top-[40%] -right-[15%] w-[50%] h-[50%] bg-[#4AF2E5]/[0.01] rounded-full blur-[140px]"
-        />
-      </div>
+      {/* Two faint teal glows. Plain gradients, no blur filter and no
+          scroll-linked motion: a blurred full-screen fixed layer that
+          moves on scroll is repainted every frame, which made phones
+          stutter and iOS Safari reload the page. */}
+      <div
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          background:
+            'radial-gradient(ellipse 45% 40% at 20% 10%, rgba(74,242,229,0.035) 0%, transparent 70%), radial-gradient(ellipse 40% 35% at 90% 65%, rgba(74,242,229,0.02) 0%, transparent 70%)',
+        }}
+      />
 
-      <main className={`relative z-10 transition-opacity duration-500 ${activeProjectId || aboutPageOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+      {/* Under an open case study or the About page the homepage fades out
+          and then goes invisible, so the browser stops painting it, and
+          the Projects card animations pause. */}
+      <main
+        className={`relative z-10 transition-[opacity,visibility] duration-500 ${
+          overlayOpen ? 'opacity-0 invisible pointer-events-none' : 'opacity-100 visible'
+        }`}
+      >
         <Navigation onOpenAboutPage={openAboutPage} />
         <PremiumHero />
         <BrandsStats />
-        <Projects onProjectClick={openProject} />
+        <Projects onProjectClick={openProject} paused={overlayOpen} />
         {/* Hidden but preserved — restore by uncommenting the line below */}
         {false && <WorkLanguage />}
         <LeadershipStrategy />
