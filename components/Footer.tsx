@@ -133,7 +133,7 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
      Contact is the same mailto as the CTA above. */
   const navLinks: { label: string; href: string; onClick?: () => void }[] = [
     { label: 'Work', href: `#${SECTION_IDS.work}`, onClick: () => scrollToSection(SECTION_IDS.work) },
-    { label: 'About', href: '/about', onClick: onOpenAboutPage },
+    { label: 'My Story', href: '/about', onClick: onOpenAboutPage },
     // Hidden with the Mentorship section in App.tsx — restore together.
     // { label: 'Mentorship', href: `#${SECTION_IDS.mentorship}`, onClick: () => scrollToSection(SECTION_IDS.mentorship) },
     { label: 'Speaking', href: `#${SECTION_IDS.speaking}`, onClick: () => scrollToSection(SECTION_IDS.speaking) },

@@ -48,7 +48,7 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
 
   const navItems: { label: string; targetId?: string; onClick?: () => void }[] = [
     { label: 'Work', targetId: SECTION_IDS.work },
-    { label: 'About', onClick: onOpenAboutPage },
+    { label: 'My Story', onClick: onOpenAboutPage },
     // Hidden with the Mentorship section in App.tsx — restore together.
     // { label: 'Mentorship', targetId: SECTION_IDS.mentorship },
     { label: 'Speaking', targetId: SECTION_IDS.speaking },
