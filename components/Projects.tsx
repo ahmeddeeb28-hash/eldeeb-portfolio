@@ -36,6 +36,9 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 const FreshCardStage = lazy(() =>
   import('./case-studies/fresh/FreshCardStage').then((m) => ({ default: m.FreshCardStage })),
 );
+const SaryCardStage = lazy(() =>
+  import('./case-studies/sary/SaryCardStage').then((m) => ({ default: m.SaryCardStage })),
+);
 
 interface ProjectsProps {
   onProjectClick?: (id: string) => void;
@@ -72,12 +75,13 @@ const projects = [
     image: CASE_STUDY_IMAGES.saryGrocery,
     year: '2022',
     category: 'Grocery Marketplace · Sary era',
-    title: 'Sary Grocery Ordering App',
+    title: 'Sary: Buy Again Hub',
     summary:
-      'One use case, one obsession: turn first-time buyers into repeat customers. A behavioural loop that lifted repeat purchases 28% and doubled retention.',
-    accentColor: 'rgba(200,140,70,0.9)',
+      'A Buy Again hub for grocery stores: the weekly restock in one tap, alerts before items run out, and a reminder on restock day. Repeat purchases rose 28%.',
+    accentColor: 'rgba(125,162,255,0.9)',
     imageGlow:
       'radial-gradient(ellipse 70% 55% at 15% 20%, rgba(200,120,50,0.09) 0%, transparent 70%)',
+    stage: 'sary' as const,
     hasStudy: true,
   },
   {
@@ -750,9 +754,13 @@ function ProjectRow({
               }}
             />
 
-            {project.stage === 'fresh' && (
+            {project.stage && (
               <Suspense fallback={null}>
-                <FreshCardStage active={isActive && !reduced} />
+                {project.stage === 'fresh' ? (
+                  <FreshCardStage active={isActive && !reduced} />
+                ) : (
+                  <SaryCardStage active={isActive && !reduced} />
+                )}
               </Suspense>
             )}
 
