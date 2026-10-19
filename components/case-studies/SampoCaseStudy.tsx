@@ -251,7 +251,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
               An AI that changes store prices. I designed it so merchants can read it, test it and undo it.
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-6 py-6 border-y border-white/10 mb-12">
-              <Meta label="Role" value="Lead Product Designer" />
+              <Meta label="Role" value="Principal Product Designer" />
               <Meta label="Timeline" value="Nov 2024 – Dec 2025" />
               <Meta label="Platform" value="Merchant web dashboard" />
               <Meta label="Market" value="Saudi Arabia · SAR · EN/AR" />
