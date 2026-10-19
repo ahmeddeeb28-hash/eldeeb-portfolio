@@ -245,7 +245,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
               Sampo AI · Pricing strategies · Saudi e-commerce
             </p>
             <h1 className="text-white text-5xl md:text-7xl font-black mb-8 leading-[0.95] tracking-tight max-w-4xl">
-              Handing an AI the price tag.
+              AI pricing merchants can trust, test and undo.
             </h1>
             <p className="text-white/50 text-lg md:text-xl leading-relaxed max-w-2xl mb-12">
               An AI that changes store prices. I designed it so merchants can read it, test it and undo it.
