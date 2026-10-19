@@ -12,6 +12,7 @@ import {
   Sparkles,
   Tag,
   TriangleAlert,
+  Trophy,
   Undo2,
   Zap,
 } from 'lucide-react';
@@ -20,7 +21,8 @@ import {
    The merchant dashboard screens from the Sampo boards,
    rebuilt in code so visitors can use them: expand a
    strategy, pick a mode, confirm, watch the test, change
-   or disable it. Everything is laid out on a fixed desktop
+   or disable it. `data-f` marks the parts the case study's
+   focus films click and zoom to. Everything is laid out on a fixed desktop
    canvas and scaled to the width it is given, so it reads
    as a real 1440 dashboard on any screen. All figures are
    the boards' sample data. */
@@ -251,11 +253,13 @@ export function Btn({
   kind = 'primary',
   onClick,
   style,
+  f,
 }: {
   children: ReactNode;
   kind?: 'primary' | 'secondary' | 'link' | 'danger';
   onClick?: () => void;
   style?: CSSProperties;
+  f?: string;
 }) {
   const k: Record<string, CSSProperties> = {
     primary: { background: C.indigo, color: '#fff', boxShadow: '0 8px 18px -10px rgba(67,56,202,.8)' },
@@ -266,6 +270,7 @@ export function Btn({
   return (
     <button
       type="button"
+      data-f={f}
       onClick={onClick}
       style={{
         height: 38,
@@ -290,11 +295,13 @@ export function Btn({
 }
 
 const CHIP: Record<string, [string, string]> = {
-  Suggested: ['#F1F0F7', C.sub],
-  Pending: [C.balancedBg, '#9A6200'],
-  Testing: [C.indigoBg, C.indigo],
+  'Not active': ['#F1F0F7', C.sub],
+  'Pending activation': [C.balancedBg, '#9A6200'],
+  'A/B testing': [C.indigoBg, C.indigo],
   Active: [C.carefulBg, '#0E7A4E'],
-  Completed: ['#EEF0F4', '#4A5468'],
+  Completed: ['#E8F1FD', '#1F5FB8'],
+  Paused: ['#EEF0F4', '#4A5468'],
+  Archived: ['#EEF0F4', '#4A5468'],
   Disabled: [C.redBg, C.red],
 };
 export function StatusChip({ s }: { s: keyof typeof CHIP }) {
@@ -319,9 +326,11 @@ function PageHead({ kicker, title, right }: { kicker: string; title: string; rig
   );
 }
 
-function Panel({ children, style }: { children: ReactNode; style?: CSSProperties }) {
+function Panel({ children, style, f }: { children: ReactNode; style?: CSSProperties; f?: string }) {
   return (
-    <div style={{ background: '#fff', border: `1px solid ${C.line}`, borderRadius: 14, ...style }}>{children}</div>
+    <div data-f={f} style={{ background: '#fff', border: `1px solid ${C.line}`, borderRadius: 14, ...style }}>
+      {children}
+    </div>
   );
 }
 
@@ -363,8 +372,9 @@ export function UnderstandView() {
   const [open, setOpen] = useState('rvd');
   return (
     <div style={{ padding: 28 }}>
-      <PageHead kicker="Sampo AI · suggested for your store" title="Pricing strategies" right={<StatusChip s="Suggested" />} />
+      <PageHead kicker="Sampo AI · suggested for your store" title="Pricing strategies" right={<StatusChip s="Not active" />} />
       <div
+        data-f="banner"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -387,9 +397,10 @@ export function UnderstandView() {
         {STRATEGIES.map((st) => {
           const isOpen = open === st.id;
           return (
-            <Panel key={st.id} style={{ padding: 0, overflow: 'hidden' }}>
+            <Panel key={st.id} f={`card-${st.id}`} style={{ padding: 0, overflow: 'hidden' }}>
               <button
                 type="button"
+                data-f={`st-${st.id}`}
                 onClick={() => setOpen(isOpen ? '' : st.id)}
                 style={{ all: 'unset', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 14, padding: '16px 18px', width: '100%', boxSizing: 'border-box' }}
               >
@@ -418,7 +429,9 @@ export function UnderstandView() {
                           {i < 2 && <span style={{ color: C.faint }}>→</span>}
                         </div>
                       ))}
-                      <Btn style={{ alignSelf: 'center' }}>Review & activate</Btn>
+                      <Btn f={`review-${st.id}`} style={{ alignSelf: 'center' }}>
+                        Review & activate
+                      </Btn>
                     </div>
                   </motion.div>
                 )}
@@ -432,84 +445,177 @@ export function UnderstandView() {
 }
 
 /* ── Rung 02 · Preview ─────────────────────────────── */
-function Gauge({ pct, color }: { pct: number; color: string }) {
-  const r = 34;
-  const len = Math.PI * r;
+// Mode selector as on board 08 (node 6022:57): a segmented risk dial,
+// dots for the share of shoppers, eyes for the views that trigger it.
+const TINT: Record<ModeId, string> = { careful: '#E7F6EE', balanced: '#FDF4DF', high: '#ECEBFD' };
+
+function Dial({ id, on }: { id: ModeId; on: boolean }) {
+  const m = MODES[id];
+  const filled = (m.discount - 5) / 5; // 1, 2 or 3 of the three segments
+  const r = 64;
+  const seg = (k: number) => {
+    const a0 = Math.PI - (k * Math.PI) / 3 - 0.05 * (k ? 1 : 0);
+    const a1 = Math.PI - ((k + 1) * Math.PI) / 3 + 0.05 * (k < 2 ? 1 : 0);
+    const p = (a: number) => `${(80 + r * Math.cos(a)).toFixed(2)} ${(78 - r * Math.sin(a)).toFixed(2)}`;
+    return `M ${p(a0)} A ${r} ${r} 0 0 1 ${p(a1)}`;
+  };
   return (
-    <svg width={92} height={54} viewBox="0 0 92 54">
-      <path d={`M 12 48 A ${r} ${r} 0 0 1 80 48`} fill="none" stroke="#E8E6F2" strokeWidth={9} strokeLinecap="round" />
-      <path
-        d={`M 12 48 A ${r} ${r} 0 0 1 80 48`}
-        fill="none"
-        stroke={color}
-        strokeWidth={9}
-        strokeLinecap="round"
-        strokeDasharray={len}
-        strokeDashoffset={len * (1 - pct / 25)}
-        style={{ transition: 'stroke-dashoffset .6s ease' }}
-      />
+    <svg width={160} height={86} viewBox="0 0 160 86">
+      {[0, 1, 2].map((k) => (
+        <g key={k}>
+          <path d={seg(k)} fill="none" stroke="#ECEAF3" strokeWidth={14} />
+          {k < filled && (
+            <motion.path
+              d={seg(k)}
+              fill="none"
+              stroke={m.color}
+              strokeWidth={14}
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 0.35, delay: (on ? 0.1 : 0.2) + k * 0.28, ease: 'easeOut' }}
+            />
+          )}
+        </g>
+      ))}
     </svg>
   );
 }
 
 export function ModeCard({ id, selected, onSelect }: { id: ModeId; selected: boolean; onSelect?: () => void }) {
   const m = MODES[id];
+  const dots = Math.round(m.reach / 5);
+  const profitLow = m.est.profit[0] < 10;
   return (
     <button
       type="button"
+      data-f={`mode-${id}`}
       onClick={onSelect}
       style={{
         all: 'unset',
         cursor: onSelect ? 'pointer' : 'default',
         boxSizing: 'border-box',
-        padding: 16,
-        borderRadius: 14,
+        borderRadius: 16,
         background: '#fff',
-        border: `2px solid ${selected ? m.color : C.line}`,
-        boxShadow: selected ? `0 14px 30px -18px ${m.color}` : 'none',
+        overflow: 'hidden',
+        border: `2px solid ${selected ? C.indigo : C.line}`,
+        boxShadow: selected ? '0 18px 36px -20px rgba(67,56,202,.7)' : 'none',
         transition: 'border-color .25s, box-shadow .25s',
         display: 'flex',
         flexDirection: 'column',
-        gap: 10,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: m.color, background: m.bg, padding: '3px 9px', borderRadius: 999 }}>{m.risk}</span>
-        {m.tag && <span style={{ fontSize: 11, fontWeight: 800, color: C.indigo }}>{m.tag}</span>}
+      <div style={{ position: 'relative', background: TINT[id], padding: '14px 14px 10px', textAlign: 'center' }}>
+        <span
+          style={{
+            position: 'absolute',
+            left: 12,
+            top: 12,
+            width: 18,
+            height: 18,
+            borderRadius: '50%',
+            boxSizing: 'border-box',
+            border: selected ? `5px solid ${C.indigo}` : `1.5px solid ${C.faint}`,
+            background: '#fff',
+            transition: 'border .2s',
+          }}
+        />
+        {m.tag && (
+          <span style={{ position: 'absolute', right: 10, top: 10, fontSize: 11, fontWeight: 700, color: '#fff', background: C.indigo, padding: '3px 10px', borderRadius: 999 }}>
+            {m.tag}
+          </span>
+        )}
+        <div style={{ position: 'relative', width: 160, height: 86, margin: '6px auto 0' }}>
+          <Dial key={`${id}-${selected}`} id={id} on={selected} />
+          <span style={{ position: 'absolute', left: 0, right: 0, bottom: -4, fontSize: 38, fontWeight: 900, letterSpacing: '-0.03em' }}>{m.discount}%</span>
+        </div>
+        <div style={{ fontSize: 12.5, color: C.sub, marginTop: 4 }}>discount</div>
+        <div style={{ fontSize: 12.5, fontWeight: 700, color: id === 'balanced' ? '#9A6200' : m.color }}>{m.risk}</div>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <Gauge pct={m.discount} color={m.color} />
+      <div style={{ padding: '12px 16px 14px', display: 'flex', flexDirection: 'column', gap: 9 }}>
         <div>
-          <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em' }}>{m.discount}%</div>
-          <div style={{ fontSize: 11.5, color: C.faint }}>discount</div>
+          <b style={{ display: 'block', fontSize: 17 }}>{m.name}</b>
+          <span style={{ fontSize: 12.5, color: C.sub }}>{m.line}.</span>
         </div>
-      </div>
-      <div>
-        <b style={{ display: 'block', fontSize: 15 }}>{m.name}</b>
-        <span style={{ fontSize: 12.5, color: C.sub }}>{m.line}</span>
-      </div>
-      <div style={{ display: 'grid', gap: 6, fontSize: 12, color: C.sub }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span>Who sees it</span>
-          <b style={{ color: C.ink }}>{m.reach}% of shoppers</b>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span>Triggers after</span>
-          <b style={{ color: C.ink }}>{m.views} views</b>
-        </div>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        {[
-          ['Est. revenue', m.est.revenue[0]],
-          ['Est. profit', m.est.profit[0]],
-        ].map(([k, v]) => (
-          <div key={k} style={{ background: C.surf, borderRadius: 9, padding: '8px 10px' }}>
-            <div style={{ fontSize: 11, color: C.faint }}>{k}</div>
-            <b style={{ fontSize: 16, color: '#0E7A4E' }}>+{v}%</b>
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, color: C.sub, marginBottom: 5 }}>
+            <span>Who sees it</span>
+            <b style={{ color: C.ink }}>{m.reach}% of shoppers</b>
           </div>
-        ))}
+          <div style={{ display: 'flex', gap: 3 }}>
+            {Array.from({ length: 20 }, (_, i) => (
+              <motion.span
+                key={i}
+                initial={false}
+                animate={{ scale: i < dots ? 1 : 0.8, backgroundColor: i < dots ? m.color : '#E6E4EF' }}
+                transition={{ delay: i < dots ? i * 0.05 : 0 }}
+                style={{ width: 8, height: 8, borderRadius: '50%', display: 'block' }}
+              />
+            ))}
+          </div>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12.5, color: C.sub }}>
+          <span>Triggers after</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: C.ink, fontWeight: 700 }}>
+            {Array.from({ length: m.views }, (_, i) => (
+              <Eye key={i} size={14} color={m.color} />
+            ))}
+            &nbsp;{m.views} views
+          </span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          {[
+            ['Est. revenue', m.est.revenue[0], false],
+            ['Est. profit', m.est.profit[0], profitLow],
+          ].map(([k, v, low]) => (
+            <div key={String(k)} style={{ background: C.surf, borderRadius: 10, padding: '8px 10px' }}>
+              <div style={{ fontSize: 11, color: C.sub }}>{k}</div>
+              <b style={{ fontSize: 18, color: low ? '#9A6200' : '#0E7A4E' }}>+{v}%</b>
+            </div>
+          ))}
+        </div>
       </div>
     </button>
+  );
+}
+
+function BoldRail({ selected }: { selected: ModeId }) {
+  const at: Record<ModeId, number> = { careful: 16.7, balanced: 50, high: 83.3 };
+  return (
+    <div data-f="slider" style={{ marginBottom: 14 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, fontWeight: 800, letterSpacing: '0.14em', color: C.faint, marginBottom: 8 }}>
+        <span>SAFER</span>
+        <span>BOLDER</span>
+      </div>
+      <div style={{ position: 'relative', height: 16 }}>
+        <div style={{ position: 'absolute', left: 0, right: 0, top: 6, height: 4, borderRadius: 2, background: `linear-gradient(90deg, ${C.careful}, ${C.balanced} 50%, ${C.high})` }} />
+        {MODE_IDS.map((id) => {
+          const on = id === selected;
+          return (
+            <motion.span
+              key={id}
+              initial={false}
+              animate={{ width: on ? 16 : 10, height: on ? 16 : 10, top: on ? 0 : 3 }}
+              style={{
+                position: 'absolute',
+                left: `${at[id]}%`,
+                x: '-50%',
+                borderRadius: '50%',
+                background: '#fff',
+                border: `${on ? 4 : 2.5}px solid ${MODES[id].color}`,
+                boxSizing: 'border-box',
+                boxShadow: on ? `0 0 0 4px ${MODES[id].color}33` : 'none',
+              }}
+            />
+          );
+        })}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 8 }}>
+        <span style={{ fontSize: 12, fontWeight: 600, padding: '4px 12px', borderRadius: 999, background: '#fff', border: `1px solid ${C.line}` }}>
+          <Sparkles size={12} color={C.indigo} style={{ verticalAlign: '-1px', marginRight: 6 }} />
+          Recommended from your last 30 days
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -520,7 +626,7 @@ function LiftBars({ selected }: { selected: ModeId }) {
     ['profit', 'Profit'],
   ];
   return (
-    <Panel style={{ padding: '14px 18px' }}>
+    <Panel f="lift" style={{ padding: '14px 18px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
         <b style={{ fontSize: 14 }}>Estimated lift vs. your normal prices</b>
         <span style={{ fontSize: 12, color: C.faint }}>Next 30 days · based on your last 30 days</span>
@@ -551,7 +657,7 @@ function LiftBars({ selected }: { selected: ModeId }) {
   );
 }
 
-type Stage = 'preview' | 'confirm' | 'live';
+type Stage = 'preview' | 'confirm' | 'leave' | 'live';
 
 export function PreviewView({
   selected: selectedProp,
@@ -580,11 +686,7 @@ export function PreviewView({
           </div>
         }
       />
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, fontSize: 11, fontWeight: 800, letterSpacing: '0.12em', color: C.faint }}>
-        SAFER
-        <div style={{ flex: 1, height: 3, borderRadius: 2, background: `linear-gradient(90deg, ${C.careful}, ${C.balanced}, ${C.high})` }} />
-        BOLDER
-      </div>
+      <BoldRail selected={selected} />
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 14 }}>
         {MODE_IDS.map((id) => (
           <ModeCard key={id} id={id} selected={id === selected} onSelect={interactive ? () => setSel(id) : undefined} />
@@ -592,6 +694,7 @@ export function PreviewView({
       </div>
       <LiftBars selected={selected} />
       <div
+        data-f="bar"
         style={{
           position: 'absolute',
           left: 0,
@@ -610,13 +713,17 @@ export function PreviewView({
           Recommended: <b style={{ color: C.ink }}>Balanced</b>, best profit (+25%) for moderate risk.
         </span>
         <Btn kind="secondary">View affected products</Btn>
-        <Btn onClick={go ? () => go('confirm') : undefined}>Confirm & activate</Btn>
+        <Btn f="confirm" onClick={go ? () => go('confirm') : undefined}>
+          Confirm & activate
+        </Btn>
       </div>
       <AnimatePresence>
         {stage !== 'preview' && (
           <Modal key={stage} onClose={go ? () => go('preview') : undefined}>
             {stage === 'confirm' ? (
-              <ConfirmBody selected={selected} onBack={go ? () => go('preview') : undefined} onConfirm={go ? () => go('live') : undefined} />
+              <ConfirmBody selected={selected} onBack={go ? () => go('leave') : undefined} onConfirm={go ? () => go('live') : undefined} />
+            ) : stage === 'leave' ? (
+              <LeaveBody onLeave={go ? () => go('preview') : undefined} onStay={go ? () => go('confirm') : undefined} />
             ) : (
               <LiveBody onDone={go ? () => go('preview') : undefined} />
             )}
@@ -643,6 +750,7 @@ function Modal({ children, onClose }: { children: ReactNode; onClose?: () => voi
         exit={{ y: 8, scale: 0.98 }}
         transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
         onClick={(e) => e.stopPropagation()}
+        data-f="modal"
         style={{ width: 420, background: '#fff', borderRadius: 16, boxShadow: '0 30px 60px -20px rgba(20,18,43,.5)', overflow: 'hidden' }}
       >
         {children}
@@ -683,10 +791,34 @@ function ConfirmBody({ selected, onBack, onConfirm }: { selected: ModeId; onBack
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 22px', borderTop: `1px solid ${C.line}` }}>
         <Btn kind="link">Edit modes</Btn>
         <span style={{ flex: 1 }} />
-        <Btn kind="secondary" onClick={onBack}>
+        <Btn kind="secondary" f="m-back" onClick={onBack}>
           Back
         </Btn>
-        <Btn onClick={onConfirm}>Confirm & activate</Btn>
+        <Btn f="m-confirm" onClick={onConfirm}>
+          Confirm & activate
+        </Btn>
+      </div>
+    </>
+  );
+}
+
+function LeaveBody({ onLeave, onStay }: { onLeave?: () => void; onStay?: () => void }) {
+  return (
+    <>
+      <div style={{ padding: 22 }}>
+        <ModalIcon bg={C.balancedBg} fg={C.balanced}>
+          <TriangleAlert size={20} />
+        </ModalIcon>
+        <div style={{ fontSize: 18, fontWeight: 800, margin: '14px 0 8px' }}>Leave without activating?</div>
+        <div style={{ fontSize: 13.5, color: C.sub, lineHeight: 1.55 }}>Your mode choice won’t be saved. Nothing changes on your store.</div>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '14px 22px', borderTop: `1px solid ${C.line}` }}>
+        <Btn kind="secondary" f="m-leave" onClick={onLeave}>
+          Leave
+        </Btn>
+        <Btn f="m-keep" onClick={onStay}>
+          Keep reviewing
+        </Btn>
       </div>
     </>
   );
@@ -700,7 +832,7 @@ function LiveBody({ onDone }: { onDone?: () => void }) {
           <ModalIcon bg={C.carefulBg} fg={C.careful}>
             <Check size={20} />
           </ModalIcon>
-          <StatusChip s="Testing" />
+          <StatusChip s="A/B testing" />
         </div>
         <div style={{ fontSize: 18, fontWeight: 800, margin: '14px 0 12px' }}>Your test is live</div>
         {[
@@ -737,8 +869,78 @@ export const AB: Record<ModeId, number[]> = {
   high: curve(12, (t) => (t < 0.35 ? (t / 0.35) * 0.95 : 0.95 + (t - 0.35) * 0.08)),
 };
 
+// Per-product results from the board, sorted by revenue lift.
+const PRODUCTS: [string, string, ModeId, string, string, number, boolean][] = [
+  ['Leather Backpack', 'LB-2207', 'balanced', '2.2%', '2.8%', 24, true],
+  ['Watch Series 7', 'OG-01500ML-006', 'balanced', '2.9%', '3.6%', 21, true],
+  ['Running Shoes X', 'RS-1180', 'balanced', '3.4%', '4.0%', 17, true],
+  ['Wireless Earbuds', 'WE-0931', 'careful', '4.1%', '4.4%', 8, true],
+  ['Smart Kettle', 'SK-0412', 'high', '3.0%', '3.1%', 2, false],
+];
+
+function Spark({ lift, color }: { lift: number; color: string }) {
+  const pts = Array.from({ length: 12 }, (_, i) => {
+    const t = i / 11;
+    const v = lift * Math.pow(t, 0.7) + Math.sin(i * 1.7) * 1.2;
+    return `${i ? 'L' : 'M'}${(i * 9).toFixed(1)},${(22 - (v / 26) * 18).toFixed(1)}`;
+  }).join(' ');
+  return (
+    <svg width={100} height={26} viewBox="0 0 100 26">
+      <path d={pts} fill="none" stroke={color} strokeWidth={2} strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function WinnerBody({ onClose }: { onClose?: () => void }) {
+  return (
+    <>
+      <div style={{ padding: 22 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <ModalIcon bg={C.balancedBg} fg={C.balanced}>
+            <Trophy size={20} />
+          </ModalIcon>
+          <StatusChip s="Completed" />
+        </div>
+        <div style={{ fontSize: 18, fontWeight: 800, margin: '14px 0 12px' }}>Balanced mode won</div>
+        <div style={{ background: C.balancedBg, borderRadius: 12, padding: '12px 14px', marginBottom: 12 }}>
+          <span style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.02em' }}>+17%</span>
+          <span style={{ fontSize: 14, marginLeft: 8 }}>revenue</span>
+          <div style={{ fontSize: 12, color: C.sub }}>vs. your normal prices over 21 days</div>
+        </div>
+        <div style={{ background: C.surf, borderRadius: 12, padding: '10px 14px' }}>
+          <div style={{ fontSize: 12, color: C.sub, marginBottom: 6 }}>Revenue lift by mode</div>
+          {MODE_IDS.map((id) => (
+            <div key={id} style={{ display: 'grid', gridTemplateColumns: '90px 1fr 40px', alignItems: 'center', gap: 8, fontSize: 12.5, marginBottom: 4 }}>
+              <span style={{ fontWeight: id === 'balanced' ? 700 : 500 }}>{MODES[id].name}</span>
+              <span style={{ height: 6, borderRadius: 3, background: '#E8E6F2' }}>
+                <motion.span
+                  initial={{ width: 0 }}
+                  animate={{ width: `${(AB[id][21] / 17) * 100}%` }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  style={{ display: 'block', height: '100%', borderRadius: 3, background: MODES[id].color }}
+                />
+              </span>
+              <b style={{ textAlign: 'right' }}>+{AB[id][21]}%</b>
+            </div>
+          ))}
+        </div>
+        <div style={{ fontSize: 12.5, color: C.sub, marginTop: 10 }}>Applied automatically to 30 products.</div>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 22px', borderTop: `1px solid ${C.line}` }}>
+        <Btn kind="link">Choose another mode</Btn>
+        <span style={{ flex: 1 }} />
+        <Btn kind="secondary" f="m-later" onClick={onClose}>
+          Later
+        </Btn>
+        <Btn onClick={onClose}>See results</Btn>
+      </div>
+    </>
+  );
+}
+
 export function MonitorView() {
   const [day, setDay] = useState(21);
+  const [winner, setWinner] = useState(false);
   const W = 860;
   const H = 230;
   const x = (d: number) => 40 + (d / 21) * (W - 70);
@@ -746,9 +948,20 @@ export function MonitorView() {
   const path = (arr: number[]) => arr.map((v, d) => `${d ? 'L' : 'M'}${x(d).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
   const leader = MODE_IDS.reduce((a, b) => (AB[a][day] >= AB[b][day] ? a : b));
   return (
-    <div style={{ padding: 28 }}>
-      <PageHead kicker="Returning Visitor Discount · A/B test" title="Is it working?" right={<StatusChip s="Testing" />} />
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 14 }}>
+    <div style={{ padding: 28, position: 'relative', height: '100%', boxSizing: 'border-box' }}>
+      <PageHead
+        kicker="Returning Visitor Discount · A/B test"
+        title="Is it working?"
+        right={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <StatusChip s="A/B testing" />
+            <Btn kind="secondary" f="winner-btn" onClick={() => setWinner(true)}>
+              <Trophy size={15} /> Test ended
+            </Btn>
+          </div>
+        }
+      />
+      <div data-f="kpis" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 14 }}>
         {[
           ['Revenue lift · leader', `+${AB[leader][day]}%`, `${MODES[leader].name} vs. normal prices`],
           ['Conversion rate', '3.2% → 3.8%', 'Balanced, last 7 days'],
@@ -768,12 +981,13 @@ export function MonitorView() {
           </Panel>
         ))}
       </div>
-      <Panel style={{ padding: '14px 18px' }}>
+      <Panel f="chart-panel" style={{ padding: '14px 18px', marginBottom: 14 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
           <b style={{ fontSize: 14 }}>Revenue lift vs. normal prices</b>
           <span style={{ fontSize: 12, color: C.faint }}>Day {day} of 21 · move across the chart</span>
         </div>
         <svg
+          data-f="chart"
           width={W}
           height={H}
           viewBox={`0 0 ${W} ${H}`}
@@ -822,6 +1036,51 @@ export function MonitorView() {
         </svg>
         <div style={{ fontSize: 12, color: C.sub }}>High Impact rises fastest, then flattens as deeper discounts eat into revenue per order. Balanced takes the lead on day 9.</div>
       </Panel>
+      <Panel f="products" style={{ padding: '14px 18px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
+          <b style={{ fontSize: 14 }}>Products in this test</b>
+          <span style={{ fontSize: 12, color: C.faint }}>30 products · sorted by revenue lift</span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr 1fr 0.7fr 1.1fr 0.9fr', fontSize: 11.5, color: C.faint, padding: '6px 0', borderBottom: `1px solid ${C.line}` }}>
+          <span>Product</span>
+          <span>Mode</span>
+          <span>Conversion</span>
+          <span>Revenue lift</span>
+          <span>21-day trend</span>
+          <span>Status</span>
+        </div>
+        {PRODUCTS.map(([name, sku, mode, from, to, lift, win]) => (
+          <div key={sku} style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr 1fr 0.7fr 1.1fr 0.9fr', alignItems: 'center', fontSize: 12.5, padding: '7px 0', borderBottom: `1px solid ${C.line}` }}>
+            <span>
+              <b style={{ display: 'block' }}>{name}</b>
+              <span style={{ fontSize: 11, color: C.faint }}>SKU {sku}</span>
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: MODES[mode].color }} />
+              {MODES[mode].name}
+            </span>
+            <span>
+              {from} → <b>{to}</b>
+            </span>
+            <span>
+              <span style={{ fontWeight: 700, color: win ? '#0E7A4E' : C.sub, background: win ? C.carefulBg : C.surf, padding: '2px 7px', borderRadius: 6 }}>+{lift}%</span>
+            </span>
+            <Spark lift={lift} color={MODES[mode].color} />
+            <span>
+              <span style={{ fontSize: 11.5, fontWeight: 700, padding: '3px 9px', borderRadius: 999, color: win ? '#0E7A4E' : C.sub, background: win ? C.carefulBg : C.surf }}>
+                ● {win ? 'Winning' : 'Low impact'}
+              </span>
+            </span>
+          </div>
+        ))}
+      </Panel>
+      <AnimatePresence>
+        {winner && (
+          <Modal onClose={() => setWinner(false)}>
+            <WinnerBody onClose={() => setWinner(false)} />
+          </Modal>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -842,13 +1101,14 @@ export function ReverseView() {
   return (
     <div style={{ padding: 28, position: 'relative', height: '100%', boxSizing: 'border-box' }}>
       <PageHead kicker="Your strategies" title="Returning Visitor Discount" right={<StatusChip s={disabled ? 'Disabled' : 'Active'} />} />
-      <Panel style={{ padding: 18, marginBottom: 14, opacity: disabled ? 0.55 : 1, transition: 'opacity .3s' }}>
+      <Panel f="mode-panel" style={{ padding: 18, marginBottom: 14, opacity: disabled ? 0.55 : 1, transition: 'opacity .3s' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 12, color: C.faint, marginBottom: 6 }}>Current mode</div>
             <div style={{ position: 'relative', display: 'inline-block' }}>
               <button
                 type="button"
+                data-f="mode-dd"
                 disabled={disabled}
                 onClick={() => setMenu((v) => !v)}
                 style={{
@@ -877,12 +1137,14 @@ export function ReverseView() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.18 }}
+                    data-f="menu"
                     style={{ position: 'absolute', top: 46, left: 0, width: 330, background: '#fff', borderRadius: 12, boxShadow: '0 20px 40px -16px rgba(20,18,43,.35)', border: `1px solid ${C.line}`, padding: 6, zIndex: 5 }}
                   >
                     {MODE_IDS.map((id) => (
                       <button
                         key={id}
                         type="button"
+                        data-f={`opt-${id}`}
                         onClick={() => {
                           if (id !== mode) {
                             setPrev(mode);
@@ -917,14 +1179,16 @@ export function ReverseView() {
           ))}
         </div>
       </Panel>
-      <Panel style={{ padding: 18, display: 'flex', alignItems: 'center', gap: 14 }}>
+      <Panel f="notice" style={{ padding: 18, display: 'flex', alignItems: 'center', gap: 14 }}>
         <span style={{ flex: 1, fontSize: 13.5, color: C.sub }}>
           {disabled ? 'Strategy disabled. Prices on 30 products are back to normal and results are kept in your archive.' : 'A new mode applies as soon as it is saved, with a few seconds to undo.'}
         </span>
         {disabled ? (
-          <Btn onClick={() => setDisabled(false)}>Re-activate</Btn>
+          <Btn f="reactivate" onClick={() => setDisabled(false)}>
+            Re-activate
+          </Btn>
         ) : (
-          <Btn kind="secondary" onClick={() => setDialog(true)} style={{ color: C.red }}>
+          <Btn kind="secondary" f="disable" onClick={() => setDialog(true)} style={{ color: C.red }}>
             Disable strategy
           </Btn>
         )}
@@ -935,11 +1199,13 @@ export function ReverseView() {
             initial={{ opacity: 0, y: 12, x: '-50%' }}
             animate={{ opacity: 1, y: 0, x: '-50%' }}
             exit={{ opacity: 0, y: 12, x: '-50%' }}
+            data-f="toast"
             style={{ position: 'absolute', left: '50%', bottom: 24, background: C.ink, color: '#fff', borderRadius: 12, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 14, fontSize: 13.5, whiteSpace: 'nowrap' }}
           >
             Mode changed to {m.name}. Changes apply right away.
             <button
               type="button"
+              data-f="undo"
               onClick={() => {
                 setMode(prev);
                 setPrev(null);
@@ -966,11 +1232,12 @@ export function ReverseView() {
               </ul>
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '14px 22px', borderTop: `1px solid ${C.line}` }}>
-              <Btn kind="secondary" onClick={() => setDialog(false)}>
+              <Btn kind="secondary" f="m-keep" onClick={() => setDialog(false)}>
                 Keep strategy
               </Btn>
               <Btn
                 kind="danger"
+                f="m-disable"
                 onClick={() => {
                   setDialog(false);
                   setDisabled(true);
@@ -987,13 +1254,164 @@ export function ReverseView() {
   );
 }
 
+/* ── Your strategies · live card and archive ──────── */
+type Row = [string, ModeId | null, number, string, keyof typeof CHIP];
+const ACTIVE_ROWS: Row[] = [
+  ['Returning Visitor Discount', 'balanced', 30, '2 May', 'A/B testing'],
+  ['Low-Stock Urgency', 'careful', 12, '14 Apr', 'Active'],
+  ['Out-of-Season Markdown', 'careful', 18, '28 Apr', 'Pending activation'],
+  ['Abandoned Cart Recovery', null, 0, '—', 'Not active'],
+];
+const ARCHIVE_ROWS: Row[] = [
+  ['Weekend Flash Sale', 'high', 40, '12 Jan', 'Completed'],
+  ['Ramadan Bundle Pricing', 'balanced', 25, '1 Mar', 'Completed'],
+  ['Traffic Surge Pricing', 'careful', 8, '9 Feb', 'Disabled'],
+  ['Weekly Discount Test', 'balanced', 14, '20 Dec', 'Archived'],
+];
+
+function LiveCard() {
+  const W = 300;
+  const H = 54;
+  const pts = AB.balanced.map((v, d) => `${d ? 'L' : 'M'}${((d / 21) * W).toFixed(1)},${(H - 4 - (v / 18) * (H - 8)).toFixed(1)}`).join(' ');
+  return (
+    <Panel f="live-card" style={{ padding: 18, marginBottom: 14, boxShadow: '0 20px 40px -28px rgba(67,56,202,.45)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+        <span style={{ width: 38, height: 38, borderRadius: 10, background: C.indigoBg, color: C.indigo, display: 'grid', placeItems: 'center' }}>
+          <Eye size={18} />
+        </span>
+        <span style={{ flex: 1 }}>
+          <b style={{ display: 'block', fontSize: 15 }}>Returning Visitor Discount</b>
+          <span style={{ fontSize: 12, color: C.faint }}>Running on 30 products · since 2 May</span>
+        </span>
+        <StatusChip s="A/B testing" />
+      </div>
+      <div style={{ fontSize: 13.5, color: C.sub, marginBottom: 12 }}>
+        Shoppers who view a product <b style={{ color: C.ink }}>twice</b> without buying get <b style={{ color: C.careful }}>15% off</b> on their next visit.
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1.25fr', gap: 10, alignItems: 'stretch' }}>
+        {[
+          ['Trigger', '2 product views, no purchase', C.indigoBg, C.indigo],
+          ['Action', '15% off, for that shopper only', C.carefulBg, '#0E7A4E'],
+          ['Outcome', 'Purchase on the 3rd visit', '#F3EEFF', '#7A3FD1'],
+        ].map(([k, v, bg, fg]) => (
+          <div key={k} style={{ padding: '10px 12px', borderRadius: 10, background: bg }}>
+            <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.08em', color: fg, textTransform: 'uppercase', marginBottom: 4 }}>{k}</div>
+            <div style={{ fontSize: 12.5, fontWeight: 600 }}>{v}</div>
+          </div>
+        ))}
+        <div data-f="live" style={{ borderRadius: 10, background: C.ink, color: '#fff', padding: '10px 12px', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.1em', color: '#7EE2B0' }}>● LIVE · DAY 21 OF 21</div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, margin: '2px 0' }}>
+            <b style={{ fontSize: 22 }}>+17%</b>
+            <span style={{ fontSize: 11, opacity: 0.7 }}>revenue</span>
+            <span style={{ flex: 1 }} />
+            <span style={{ fontSize: 10.5, opacity: 0.7 }}>
+              Leading <b style={{ color: C.balanced }}>● Balanced</b>
+            </span>
+          </div>
+          <svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ display: 'block' }}>
+            <motion.path
+              d={pts}
+              fill="none"
+              stroke={C.balanced}
+              strokeWidth={2.5}
+              initial={{ pathLength: 0 }}
+              whileInView={{ pathLength: 1 }}
+              viewport={{ once: false }}
+              transition={{ duration: 1.4, ease: 'easeOut' }}
+            />
+          </svg>
+        </div>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12 }}>
+        {['Low risk', 'Per shopper'].map((t) => (
+          <span key={t} style={{ fontSize: 11.5, fontWeight: 600, color: C.sub, background: C.surf, padding: '3px 9px', borderRadius: 999 }}>
+            {t}
+          </span>
+        ))}
+        <span style={{ flex: 1 }} />
+        <Btn kind="secondary">Change mode</Btn>
+        <Btn>View results</Btn>
+      </div>
+    </Panel>
+  );
+}
+
+export function StrategiesView() {
+  const [tab, setTab] = useState<'active' | 'archive'>('active');
+  const rows = tab === 'active' ? ACTIVE_ROWS : ARCHIVE_ROWS;
+  return (
+    <div style={{ padding: 28 }}>
+      <PageHead
+        kicker="Pricing strategies · 3 running"
+        title="Your strategies"
+        right={
+          <div data-f="tabs" style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 10, background: '#fff', border: `1px solid ${C.line}` }}>
+            {(
+              [
+                ['active', 'Active', ACTIVE_ROWS.length],
+                ['archive', 'Archive', ARCHIVE_ROWS.length],
+              ] as const
+            ).map(([id, label, n]) => (
+              <button
+                key={id}
+                type="button"
+                data-f={`tab-${id}`}
+                onClick={() => setTab(id)}
+                style={{ all: 'unset', cursor: 'pointer', padding: '6px 14px', borderRadius: 7, fontSize: 12.5, fontWeight: 700, background: tab === id ? C.indigo : 'transparent', color: tab === id ? '#fff' : C.sub }}
+              >
+                {label} <span style={{ opacity: 0.6 }}>{n}</span>
+              </button>
+            ))}
+          </div>
+        }
+      />
+      <LiveCard />
+      <Panel f="table" style={{ padding: '6px 18px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 0.8fr 0.8fr 1.2fr', fontSize: 11.5, color: C.faint, padding: '8px 0', borderBottom: `1px solid ${C.line}` }}>
+          <span>Strategy</span>
+          <span>Mode</span>
+          <span>Products</span>
+          <span>Started</span>
+          <span>Status</span>
+        </div>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.2 }}>
+            {rows.map(([name, mode, n, start, st]) => (
+              <div key={name} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 0.8fr 0.8fr 1.2fr', alignItems: 'center', fontSize: 13, padding: '10px 0', borderBottom: `1px solid ${C.line}` }}>
+                <b>{name}</b>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: mode ? C.ink : C.faint }}>
+                  {mode && <span style={{ width: 7, height: 7, borderRadius: '50%', background: MODES[mode].color }} />}
+                  {mode ? MODES[mode].name : 'Not set'}
+                </span>
+                <span>{n || '—'}</span>
+                <span style={{ color: C.sub }}>{start}</span>
+                <span>
+                  <StatusChip s={st} />
+                </span>
+              </div>
+            ))}
+          </motion.div>
+        </AnimatePresence>
+      </Panel>
+    </div>
+  );
+}
+
 /* ── Store dashboard ───────────────────────────────── */
 const THIS_YEAR = [44, 47, 52, 49, 55, 58, 54, 61, 58.8, 63, 60, 66, 68.5];
 const LAST_YEAR = [42, 43, 46, 45, 48, 50, 49, 53, 52.1, 55, 54, 57, 59];
+// Watch Series 7 by month: sales in SAR and gross margin. October matches
+// the board's tooltip (SAR 12,900 sales, SAR 5,900 profit).
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const SALES = [9300, 11800, 7400, 10600, 7800, 9600, 8200, 5600, 11400, 12900, 10400, 8700];
+const PROFIT = [3813, 4484, 3182, 4664, 3120, 4032, 3198, 2072, 5130, 5900, 4472, 3567];
+const RANGES: Record<string, string> = { '7D': 'Last 7 days', '30D': 'Last 30 days', '90D': 'Last 90 days', '12M': 'Last 12 months' };
 
 export function DashboardView() {
   const [wk, setWk] = useState(8);
   const [range, setRange] = useState('90D');
+  const [mo, setMo] = useState(9);
   const W = 560;
   const H = 210;
   const x = (i: number) => 44 + (i / 12) * (W - 64);
@@ -1009,14 +1427,15 @@ export function DashboardView() {
   return (
     <div style={{ padding: 28 }}>
       <PageHead
-        kicker="Last 90 days · compared with the same period last year"
+        kicker={`${RANGES[range]} · compared with the same period last year`}
         title="Welcome back, Khalifah"
         right={
-          <div style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 10, background: '#fff', border: `1px solid ${C.line}` }}>
-            {['7D', '30D', '90D', '12M'].map((r) => (
+          <div data-f="range" style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 10, background: '#fff', border: `1px solid ${C.line}` }}>
+            {Object.keys(RANGES).map((r) => (
               <button
                 key={r}
                 type="button"
+                data-f={`range-${r}`}
                 onClick={() => setRange(r)}
                 style={{ all: 'unset', cursor: 'pointer', padding: '6px 12px', borderRadius: 7, fontSize: 12.5, fontWeight: 700, background: r === range ? C.indigo : 'transparent', color: r === range ? '#fff' : C.sub }}
               >
@@ -1026,7 +1445,7 @@ export function DashboardView() {
           </div>
         }
       />
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 14 }}>
+      <div data-f="kpis" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 14 }}>
         {[
           ['Revenue', 'SAR 750k', '↑ 11.4%', '+SAR 76,750 vs last year'],
           ['Items sold', '18,000', '↑ 8%', '+1,333 vs last year'],
@@ -1043,8 +1462,8 @@ export function DashboardView() {
           </Panel>
         ))}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1.55fr 1fr', gap: 12 }}>
-        <Panel style={{ padding: '14px 16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1.55fr 1fr', gap: 12, marginBottom: 14 }}>
+        <Panel f="chart-panel" style={{ padding: '14px 16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
             <b style={{ fontSize: 14 }}>Revenue by week</b>
             <span style={{ fontSize: 11.5, color: C.faint }}>
@@ -1052,6 +1471,7 @@ export function DashboardView() {
             </span>
           </div>
           <svg
+            data-f="chart"
             width={W}
             height={H}
             viewBox={`0 0 ${W} ${H}`}
@@ -1101,7 +1521,7 @@ export function DashboardView() {
             ))}
           </svg>
         </Panel>
-        <Panel style={{ padding: '16px 18px' }}>
+        <Panel f="impact" style={{ padding: '16px 18px' }}>
           <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', color: C.faint, marginBottom: 12 }}>SAMPO IMPACT · LAST 90 DAYS</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 14 }}>
             <svg width={84} height={84} viewBox="0 0 84 84">
@@ -1132,7 +1552,76 @@ export function DashboardView() {
           </div>
         </Panel>
       </div>
+      <Profitability mo={mo} onMonth={setMo} />
     </div>
+  );
+}
+
+function Profitability({ mo, onMonth }: { mo: number; onMonth: (i: number) => void }) {
+  const W = 876;
+  const H = 190;
+  const sales = SALES.reduce((a, b) => a + b, 0);
+  const profit = PROFIT.reduce((a, b) => a + b, 0);
+  const bw = 40;
+  const x = (i: number) => 64 + i * ((W - 84) / 12) + 12;
+  const y = (v: number) => H - 26 - (v / 15000) * (H - 40);
+  const sar = (v: number) => `SAR ${v.toLocaleString('en-US')}`;
+  const tipX = Math.min(Math.max(x(mo) + bw / 2 - 90, 60), W - 190);
+  return (
+    <Panel f="profit" style={{ padding: '14px 18px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+        <span>
+          <b style={{ fontSize: 14 }}>Product profitability · Watch Series 7</b>
+          <span style={{ display: 'block', fontSize: 12, color: C.faint }}>
+            {sar(profit)} gross profit on {sar(sales)} sales · {((profit / sales) * 100).toFixed(1)}% margin
+          </span>
+        </span>
+        <span style={{ fontSize: 11.5, color: C.faint }}>
+          <span style={{ color: C.indigo }}>■</span> Gross profit <span style={{ marginLeft: 8, color: '#C9C5F5' }}>■</span> Costs
+        </span>
+      </div>
+      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
+        {[0, 5000, 10000, 15000].map((v) => (
+          <g key={v}>
+            <line x1={56} x2={W - 20} y1={y(v)} y2={y(v)} stroke="#EEEDF5" />
+            <text x={48} y={y(v) + 4} fontSize={10.5} fill={C.faint} textAnchor="end">
+              {v ? `${v / 1000}k` : '0'}
+            </text>
+          </g>
+        ))}
+        {MONTHS.map((m, i) => {
+          const on = i === mo;
+          return (
+            <g key={m} data-f={`month-${i}`} onPointerEnter={() => onMonth(i)} onClick={() => onMonth(i)} style={{ cursor: 'pointer' }}>
+              <rect x={x(i) - 8} y={8} width={bw + 16} height={H - 14} rx={8} fill={on ? C.indigoBg : 'transparent'} />
+              <rect x={x(i)} y={y(SALES[i])} width={bw} height={y(PROFIT[i]) - y(SALES[i])} rx={3} fill={on ? '#B9B4F4' : '#DCD9FA'} />
+              <rect x={x(i)} y={y(PROFIT[i])} width={bw} height={y(0) - y(PROFIT[i])} fill={on ? C.indigo : C.indigo2} opacity={on ? 1 : 0.8} />
+              <text x={x(i) + bw / 2} y={H - 8} fontSize={11} fill={on ? C.indigo : C.sub} fontWeight={on ? 800 : 500} textAnchor="middle">
+                {m} · {Math.round((PROFIT[i] / SALES[i]) * 100)}%
+              </text>
+            </g>
+          );
+        })}
+        <g transform={`translate(${tipX}, ${Math.max(y(SALES[mo]) - 86, 0)})`} style={{ pointerEvents: 'none' }}>
+          <rect width={180} height={76} rx={8} fill={C.ink} />
+          <text x={12} y={18} fontSize={11.5} fill="#fff" fontWeight={700}>
+            {MONTHS[mo]}
+          </text>
+          {[
+            ['Sales', sar(SALES[mo])],
+            ['Gross profit', sar(PROFIT[mo])],
+            ['Margin', `${((PROFIT[mo] / SALES[mo]) * 100).toFixed(1)}%`],
+          ].map(([k, v], i) => (
+            <text key={k} x={12} y={36 + i * 15} fontSize={11.5} fill="rgba(255,255,255,.75)">
+              {k}
+              <tspan x={168} textAnchor="end" fill="#fff" fontWeight={700}>
+                {v}
+              </tspan>
+            </text>
+          ))}
+        </g>
+      </svg>
+    </Panel>
   );
 }
 

@@ -5,15 +5,15 @@ import { ChapterTitle } from './_shared/ChapterTitle';
 import { Meta } from './_shared/Meta';
 import { CaseFilm, Eyebrow as BaseEyebrow, reveal } from './_shared/CaseBits';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
-import { CameraReel, SHOTS, ScreenReel, type Shot } from './sampo/SampoReel';
+import { FocusFilm, type FocusScene, type FocusStep } from './sampo/FocusFilm';
 import {
   DashboardView,
-  DesktopFrame,
   MonitorView,
   PreviewView,
   ReverseView,
   SampoLoop,
   StatusChip,
+  StrategiesView,
   UnderstandView,
 } from './sampo/SampoUI';
 
@@ -22,9 +22,10 @@ import {
    e-commerce stores. Sources: the 12 case study boards in
    Figma (cover, Trust Ladder, five flows, components,
    pop-ups, results, dashboard, audit and principles) and the
-   72s film. Each flow plays as a reel of the real screens,
-   and is also rebuilt in code to try; all figures are the
-   boards' sample data. No pilot results are claimed. */
+   72s film. Every screen is the new design rebuilt in code;
+   each flow plays as a focus film over it and can be taken
+   over and used. All figures are the boards' sample data.
+   No pilot results are claimed. */
 
 const ACCENT = '#8B85FF';
 const FILM = '/videos/sampo-pricing-film.mp4';
@@ -50,14 +51,10 @@ type Rung = {
   t: string;
   q: string;
   head: string;
-  shots: Shot[];
-  ratio: number;
-  view: ReactNode;
   h: number;
+  scenes: FocusScene[];
+  steps: FocusStep[];
 };
-
-const WIDE = 820 / 587;
-const NARROW = 534 / 392;
 
 const RUNGS: Rung[] = [
   {
@@ -65,85 +62,96 @@ const RUNGS: Rung[] = [
     t: 'Understand',
     q: 'What does Sampo do?',
     head: 'Explain the engine before asking for the keys.',
-    shots: [
-      ['understand-1', 'First-time guidance', 50, 62, 1.35],
-      ['understand-2', 'How it works, inline', 62, 50, 1.3],
-      ['understand-3', 'Walkthrough, step 1', 72, 48, 1.45],
-      ['understand-4', 'Walkthrough, step 2', 38, 42, 1.45],
-    ],
-    ratio: WIDE,
-    view: <UnderstandView />,
     h: 560,
+    scenes: [{ node: <UnderstandView /> }],
+    steps: [
+      { cap: 'Strategies, explained first', ms: 1600 },
+      { cap: 'How Sampo decides, up front', look: 'banner', z: 2, ms: 2200 },
+      { cap: 'Every card reads trigger, action, outcome', look: 'card-rvd', z: 1.7, ms: 2400 },
+      { cap: 'Open another, same three beats', act: 'st-lsu', look: 'card-lsu', z: 1.7, ms: 2600 },
+      { cap: 'One next step on every card', act: 'st-osm', look: 'review-osm', z: 2.2, ms: 2400 },
+      { cap: 'Back to the whole list', ms: 1400 },
+    ],
   },
   {
     n: '02',
     t: 'Preview',
     q: 'What will it do to my store?',
     head: 'Turn a risky decision into a choice of temperament.',
-    shots: [
-      ['preview-1', 'Three modes, side by side', 58, 45, 1.3],
-      ['preview-2', 'Guided preview', 60, 70, 1.45],
-      ['preview-3', 'Mode charts', 62, 55, 1.3],
-      ['preview-4', 'Affected products', 58, 50, 1.35],
+    h: 830,
+    scenes: [{ node: <PreviewView /> }],
+    steps: [
+      { cap: 'Three modes, one page', ms: 1600 },
+      { cap: 'Safer to bolder, recommended from your last 30 days', look: 'slider', ms: 2200 },
+      { cap: 'Careful: small, safe nudges', act: 'mode-careful', ms: 2600 },
+      { cap: 'High Impact: more reach, less profit', act: 'mode-high', ms: 2600 },
+      { cap: 'Balanced: best profit for moderate risk', act: 'mode-balanced', ms: 2600 },
+      { cap: 'Estimates against your normal prices', look: 'lift', ms: 2400 },
+      { cap: 'One clear recommendation', look: 'bar', ms: 1800 },
     ],
-    ratio: WIDE,
-    view: <PreviewView />,
-    h: 700,
   },
   {
     n: '03',
     t: 'Commit',
     q: 'Can I still back out?',
     head: 'A confirmation that lowers the stakes.',
-    shots: [
-      ['commit-1', 'Review and confirm', 45, 55, 1.55],
-      ['commit-2', 'Activation in progress', 50, 45, 1.7],
-      ['commit-3', 'Safe exit', 50, 45, 1.7],
+    h: 830,
+    scenes: [{ node: <PreviewView /> }],
+    steps: [
+      { cap: 'Ready to activate', look: 'bar', ms: 1600 },
+      { cap: 'The deal, in plain words', act: 'confirm', look: 'modal', ms: 2800 },
+      { cap: 'Leaving is always safe', act: 'm-back', look: 'modal', ms: 2400 },
+      { cap: 'Back to the review', act: 'm-keep', look: 'modal', ms: 1800 },
+      { cap: 'Your test is live', act: 'm-confirm', look: 'modal', ms: 2800 },
     ],
-    ratio: NARROW,
-    view: <PreviewView initialStage="confirm" />,
-    h: 700,
   },
   {
     n: '04',
     t: 'Monitor',
     q: 'Is it working?',
     head: 'After launch, the black box gets a label.',
-    shots: [
-      ['monitor-1', 'A/B test finished', 50, 52, 1.35],
-      ['monitor-2', 'Activation alert bar', 60, 20, 1.45],
-      ['monitor-3', 'Status on the product', 55, 45, 1.3],
-      ['monitor-4', 'Strategy statuses', 80, 30, 1.5],
+    h: 900,
+    scenes: [{ node: <StrategiesView />, active: 'yours', url: 'app.sampo.ai/your-strategies' }, { node: <MonitorView />, active: 'yours', url: 'app.sampo.ai/strategies/returning-visitor/results' }],
+    steps: [
+      { cap: 'Your strategies', ms: 1500 },
+      { cap: 'The strategy card shows its live result', look: 'live-card', ms: 2600 },
+      { cap: 'One status chip, one lifecycle', look: 'table', z: 1.6, ms: 2200 },
+      { cap: 'The archive keeps every result', act: 'tab-archive', look: 'table', z: 1.6, ms: 2400 },
+      { cap: 'Four numbers first', scene: 1, look: 'kpis', ms: 2200 },
+      { cap: 'High Impact starts fastest', scene: 1, scrub: ['chart', 0.2], look: 'chart-panel', z: 1.5, ms: 2000 },
+      { cap: 'Balanced takes the lead on day 9', scene: 1, scrub: ['chart', 0.44], look: 'chart-panel', z: 1.5, ms: 2000 },
+      { cap: 'Day 21: Balanced +17%', scene: 1, scrub: ['chart', 0.97], look: 'chart-panel', z: 1.5, ms: 1800 },
+      { cap: 'A winner, with the numbers', scene: 1, act: 'winner-btn', look: 'modal', ms: 2800 },
+      { cap: 'Results per product', scene: 1, act: 'm-later', look: 'products', z: 1.5, ms: 2600 },
     ],
-    ratio: WIDE,
-    view: <MonitorView />,
-    h: 560,
   },
   {
     n: '05',
     t: 'Reverse',
     q: 'Can I take it back?',
     head: 'Every door opens both ways.',
-    shots: [
-      ['reverse-1', 'Strategies archive', 75, 50, 1.4],
-      ['reverse-2', 'Strategy overview', 55, 45, 1.25],
-      ['reverse-3', 'Change mode', 60, 68, 1.5],
-      ['reverse-4', 'Mode updated', 22, 92, 1.7],
-      ['reverse-5', 'Undo', 22, 92, 1.7],
-      ['reverse-6', 'Confirm and save', 85, 94, 1.6],
-    ],
-    ratio: NARROW,
-    view: <ReverseView />,
     h: 460,
+    scenes: [{ node: <ReverseView />, active: 'yours', url: 'app.sampo.ai/strategies/returning-visitor' }],
+    steps: [
+      { cap: 'A running strategy', ms: 1400 },
+      { cap: 'Every mode, one trade-off each', act: 'mode-dd', look: 'menu', ms: 2400 },
+      { cap: 'Changed, with a way back', act: 'opt-careful', look: 'toast', ms: 2400 },
+      { cap: 'Undone in one click', act: 'undo', look: 'mode-panel', ms: 2000 },
+      { cap: 'Consequences before the button', act: 'disable', look: 'modal', ms: 2600 },
+      { cap: 'Disabled, results kept', act: 'm-disable', look: 'notice', ms: 2200 },
+      { cap: 'Back on whenever you want', act: 'reactivate', ms: 1600 },
+    ],
   },
 ];
 
-const DASH_STOPS: [string, number, number, number][] = [
-  ['The whole store at a glance', 50, 50, 1],
-  ['Four numbers first', 50, 12, 1.7],
-  ['Revenue against last year', 36, 36, 1.9],
-  ['Sampo’s share, in SAR', 83, 36, 2],
-  ['Profit that adds up', 72, 78, 1.8],
+const DASH_STEPS: FocusStep[] = [
+  { cap: 'The store at a glance', ms: 1600 },
+  { cap: 'Switch the period', act: 'range-30D', look: 'range', ms: 1800 },
+  { cap: 'Four numbers first', act: 'range-90D', look: 'kpis', ms: 2200 },
+  { cap: 'Revenue against last year', scrub: ['chart', 0.67], look: 'chart-panel', ms: 2400 },
+  { cap: 'Sampo’s share, in SAR', look: 'impact', ms: 2400 },
+  { cap: 'Profit that adds up', act: 'month-9', look: 'profit', ms: 2600 },
+  { cap: 'All on one screen', ms: 1400 },
 ];
 
 const RULES = [
@@ -194,50 +202,22 @@ function Ladder({ onPick, active }: { onPick: (i: number) => void; active: numbe
   );
 }
 
-/* Watch the real screens, or try the rebuilt one */
-function WatchOrTry({ mode, onMode }: { mode: 'watch' | 'try'; onMode: (m: 'watch' | 'try') => void }) {
-  return (
-    <div className="inline-flex self-start md:self-auto rounded-full border border-white/10 p-1 text-xs font-bold">
-      {(['watch', 'try'] as const).map((m) => (
-        <button
-          key={m}
-          type="button"
-          onClick={() => onMode(m)}
-          className={`rounded-full px-4 py-1.5 transition-colors ${mode === m ? 'bg-white text-black' : 'text-white/55 hover:text-white'}`}
-        >
-          {m === 'watch' ? 'Watch the flow' : 'Try it live'}
-        </button>
-      ))}
-    </div>
-  );
-}
-
 function Flows() {
   const [i, setI] = useState(1);
-  const [mode, setMode] = useState<'watch' | 'try'>('watch');
   const r = RUNGS[i];
   return (
     <>
       <Ladder active={i} onPick={setI} />
       <AnimatePresence mode="wait">
         <motion.div
-          key={r.n + mode}
+          key={r.n}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
-            <h3 className="text-white text-2xl md:text-4xl font-black tracking-tight max-w-2xl">{r.head}</h3>
-            <WatchOrTry mode={mode} onMode={setMode} />
-          </div>
-          {mode === 'watch' ? (
-            <ScreenReel shots={r.shots} ratio={r.ratio} accent={ACCENT} />
-          ) : (
-            <DesktopFrame canvasH={r.h} active={i >= 3 ? 'yours' : 'strategies'}>
-              {r.view}
-            </DesktopFrame>
-          )}
+          <h3 className="text-white text-2xl md:text-4xl font-black tracking-tight max-w-2xl mb-6">{r.head}</h3>
+          <FocusFilm scenes={r.scenes} steps={r.steps} h={r.h} accent={ACCENT} />
         </motion.div>
       </AnimatePresence>
     </>
@@ -245,20 +225,10 @@ function Flows() {
 }
 
 function Dashboard() {
-  const [mode, setMode] = useState<'watch' | 'try'>('watch');
   return (
     <>
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
-        <h2 className="text-white text-2xl md:text-4xl font-black tracking-tight max-w-2xl">A dashboard that answers before it decorates.</h2>
-        <WatchOrTry mode={mode} onMode={setMode} />
-      </div>
-      {mode === 'watch' ? (
-        <CameraReel src={`${SHOTS}/dashboard.webp`} ratio={1680 / 1334} stops={DASH_STOPS} accent={ACCENT} />
-      ) : (
-        <DesktopFrame canvasH={560} active="dashboard" url="app.sampo.ai/dashboard">
-          <DashboardView />
-        </DesktopFrame>
-      )}
+      <h2 className="text-white text-2xl md:text-4xl font-black tracking-tight max-w-2xl mb-6">A dashboard that answers before it decorates.</h2>
+      <FocusFilm scenes={[{ node: <DashboardView />, active: 'dashboard', url: 'app.sampo.ai/dashboard' }]} steps={DASH_STEPS} h={780} accent={ACCENT} />
     </>
   );
 }
@@ -394,7 +364,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
 
           <Eyebrow>One status, everywhere</Eyebrow>
           <div className="flex flex-wrap items-center gap-3 mb-16 rounded-[24px] bg-[#F6F5FB] p-5">
-            {(['Suggested', 'Pending', 'Testing', 'Active', 'Completed'] as const).map((st, i, a) => (
+            {(['Not active', 'Pending activation', 'A/B testing', 'Active', 'Completed'] as const).map((st, i, a) => (
               <motion.span
                 key={st}
                 className="flex items-center gap-3"
