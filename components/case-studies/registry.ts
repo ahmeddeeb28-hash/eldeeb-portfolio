@@ -27,3 +27,12 @@ export const CASE_STUDY_REGISTRY: Record<
 };
 
 export type CaseStudyId = keyof typeof CASE_STUDY_REGISTRY;
+
+/* Projects kept off the homepage for now. Their rows are hidden and
+   "Next" skips them; remove an id here to bring it back. */
+export const HIDDEN_PROJECTS = new Set([
+  'shorefield-holidays',
+  'health-ladder',
+  'global-payments',
+  'jackaroo-game-ui',
+]);

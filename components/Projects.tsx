@@ -31,6 +31,7 @@ const CASE_STUDY_IMAGES = {
 import { ArrowUpRight } from 'lucide-react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { HIDDEN_PROJECTS } from './case-studies/registry';
 
 /* Live animated thumbnails, fetched only when their row renders. */
 const FreshCardStage = lazy(() =>
@@ -62,7 +63,7 @@ interface ProjectsProps {
    set `hasStudy: false` so they read as inline chapters rather than
    opening a blank overlay.
 */
-const projects = [
+const allProjects = [
   {
     id: 'shorefield-holidays',
     image: CASE_STUDY_IMAGES.saasDashboard,
@@ -158,6 +159,8 @@ const projects = [
     hasStudy: true,
   },
 ];
+
+const projects = allProjects.filter((p) => !HIDDEN_PROJECTS.has(p.id));
 
 /* ─────────────────────────────────────────────────────────────────────── */
 
@@ -370,10 +373,9 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
             zIndex: 1,
           }}
         >
-          Six eras, one methodology: Zyda SaaS operators, Sary grocery
-          marketplaces, a modular landing framework, Hakbah's Saudi fintech
-          rails, SAMPO's enterprise AI, and today's Jackaroo game UI at
-          Lobah. Strategy that ships across every category.
+          Three products, one methodology: Sary's grocery marketplace,
+          SAMPO's AI pricing, and fresh's checkout moment. Strategy that
+          ships across every category.
         </motion.p>
       </div>
 
