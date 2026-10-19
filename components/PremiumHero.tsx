@@ -126,7 +126,7 @@ export function PremiumHero() {
       label: 'The Strategist',
       index: '01',
       headline: 'Strategy that ships.',
-      description: '10+ years building scalable product systems across gaming, AI, fintech, and SaaS platforms. Translating complex requirements into clarity, execution, and measurable business impact.',
+      description: 'Over ten years leading product design across gaming, AI, fintech and SaaS. I turn complex requirements into clear decisions, structured execution and measurable business results.',
       accent: 'rgba(255, 140, 100, 1)',
       accentDim: 'rgba(255, 140, 100, 0.5)',
       gradient: 'linear-gradient(135deg, #FFE9C7 0%, #F5C78A 50%, #E7A868 100%)',
@@ -136,7 +136,7 @@ export function PremiumHero() {
       label: 'The Builder',
       index: '02',
       headline: 'Building at scale.',
-      description: 'From concept to launch, I build design systems and product experiences that teams can rally behind. Proven track record of delivering complex platforms on time and on spec.',
+      description: 'From concept to launch, I build design systems and product experiences that teams can adopt and scale, delivering complex platforms on time and to specification.',
       accent: 'rgba(74, 242, 229, 1)',
       accentDim: 'rgba(74, 242, 229, 0.5)',
       gradient: 'linear-gradient(135deg, #B8FFF5 0%, #7EF0DF 50%, #4AF2E5 100%)',
@@ -146,7 +146,7 @@ export function PremiumHero() {
       label: 'The Innovator',
       index: '03',
       headline: 'Innovating with AI.',
-      description: 'Leading research-driven innovation in emerging technologies. Pushing boundaries at the intersection of design, artificial intelligence, and human-centered product thinking.',
+      description: 'I lead research-driven work in emerging technology, where product design, artificial intelligence and human-centred thinking meet.',
       accent: 'rgba(180, 100, 255, 1)',
       accentDim: 'rgba(180, 100, 255, 0.5)',
       gradient: 'linear-gradient(135deg, #E4D8FF 0%, #BFA8F5 50%, #9A86E8 100%)',
@@ -316,7 +316,7 @@ export function PremiumHero() {
               initial={{ opacity: 0, y: 44 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-              style={{ display: 'block', overflow: 'hidden' }}
+              style={{ display: 'block' }}
             >
               Lead Product Designer with a Data Science background.
             </motion.span>
@@ -324,68 +324,21 @@ export function PremiumHero() {
               initial={{ opacity: 0, y: 44 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.22 }}
-              style={{ display: 'block', fontStyle: 'italic', color: 'rgba(255,255,255,0.4)' }}
+              style={{ display: 'block', fontStyle: 'italic', color: 'rgba(255,255,255,0.45)', paddingRight: '0.08em' }}
             >
               Driving growth and AI.
             </motion.span>
           </h1>
-
-          {/* Rotating persona headline */}
-          <div style={{ minHeight: '3.2em', marginBottom: '1.75rem' }}>
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={activeView}
-                initial={{ opacity: 0, y: 16, filter: 'blur(6px)' }}
-                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, y: -16, filter: 'blur(6px)' }}
-                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                style={{
-                  fontFamily: "'Fraunces', 'Times New Roman', serif",
-                  fontSize: 'clamp(1.5rem, 2.6vw, 2.1rem)',
-                  fontWeight: 500,
-                  fontStyle: 'italic',
-                  letterSpacing: '-0.01em',
-                  background: currentView.gradient,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                {currentView.headline}
-              </motion.p>
-            </AnimatePresence>
-          </div>
-
-          {/* Description */}
-          <div style={{ minHeight: '5.6em', marginBottom: '2.25rem' }}>
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={activeView}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
-                className="max-w-xl"
-                style={{
-                  fontSize: '15px',
-                  color: 'rgba(255,255,255,0.65)',
-                  fontWeight: 400,
-                  lineHeight: 1.7,
-                  letterSpacing: '0.005em',
-                }}
-              >
-                {currentView.description}
-              </motion.p>
-            </AnimatePresence>
-          </div>
 
           {/* Persona tab switcher */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="flex items-center gap-1 mb-10"
+            className="flex flex-wrap items-center gap-x-1 gap-y-2 mb-7"
             style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}
+            role="tablist"
+            aria-label="Focus"
           >
             {heroViews.map((view, i) => {
               const isActive = activeView === i;
@@ -393,15 +346,16 @@ export function PremiumHero() {
                 <button
                   key={view.label}
                   onClick={() => setActiveView(i)}
-                  className="relative"
+                  className="relative pr-3 mr-1 sm:pr-[18px] sm:mr-2"
                   style={{
                     background: 'none',
                     border: 'none',
                     cursor: 'pointer',
-                    padding: '0 18px 14px 0',
-                    marginRight: '8px',
+                    paddingBottom: '14px',
                   }}
                   aria-label={view.label}
+                  role="tab"
+                  aria-selected={isActive}
                 >
                   <span
                     style={{
@@ -425,16 +379,18 @@ export function PremiumHero() {
                         transition: 'background 0.3s ease',
                       }}
                     />
-                    {view.label}
+                    <span className="hidden sm:inline" style={{ opacity: 0.55, fontVariantNumeric: 'tabular-nums' }}>{view.index}</span>
+                    <span className="sm:hidden">{view.label.replace(/^The /, '')}</span>
+                    <span className="hidden sm:inline">{view.label}</span>
                   </span>
                   {isActive && (
                     <motion.div
                       layoutId="heroTabUnderline"
                       transition={{ type: 'spring', stiffness: 420, damping: 38 }}
+                      className="right-3 sm:right-[18px]"
                       style={{
                         position: 'absolute',
                         left: 0,
-                        right: '18px',
                         bottom: '-1px',
                         height: '2px',
                         background: currentView.accent,
@@ -446,6 +402,62 @@ export function PremiumHero() {
               );
             })}
           </motion.div>
+
+          {/* Persona panel: the active tab's headline and description,
+              grouped behind one accent rule. The gradient headline gets
+              padding so italic overhangs and descenders aren't clipped by
+              background-clip: text. */}
+          <div
+            role="tabpanel"
+            className="mb-10 min-h-[12.5rem] sm:min-h-[9rem] lg:min-h-[7.5rem]"
+            style={{
+              borderLeft: `2px solid ${currentView.accent}`,
+              paddingLeft: '20px',
+              transition: 'border-color 0.4s ease',
+            }}
+          >
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeView}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <p
+                  style={{
+                    display: 'inline-block',
+                    margin: '0 0 0.6rem',
+                    padding: '0 0.15em 0.12em 0',
+                    fontFamily: "'Fraunces', 'Times New Roman', serif",
+                    fontSize: 'clamp(1.4rem, 2.3vw, 1.85rem)',
+                    fontWeight: 500,
+                    fontStyle: 'italic',
+                    lineHeight: 1.25,
+                    letterSpacing: '-0.01em',
+                    background: currentView.gradient,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  }}
+                >
+                  {currentView.headline}
+                </p>
+                <p
+                  className="max-w-xl"
+                  style={{
+                    margin: 0,
+                    fontSize: '15px',
+                    color: 'rgba(255,255,255,0.68)',
+                    fontWeight: 400,
+                    lineHeight: 1.7,
+                  }}
+                >
+                  {currentView.description}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
           {/* CTA row */}
           <motion.div

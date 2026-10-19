@@ -12,7 +12,7 @@ import { Testimonials } from './components/Testimonials';
 import { ProofOfPresence } from './components/ProofOfPresence';
 import { Articles } from './components/Articles';
 import { Footer } from './components/Footer';
-import { CASE_STUDY_REGISTRY } from './components/case-studies/registry';
+import { CASE_STUDY_REGISTRY, HIDDEN_PROJECTS } from './components/case-studies/registry';
 import { AnimatePresence } from 'motion/react';
 import { useRef, useState, useEffect, lazy, Suspense } from 'react';
 
@@ -112,7 +112,7 @@ export default function App() {
   const ActiveCase = activeProjectId ? CASE_STUDY_REGISTRY[activeProjectId] : null;
   const goToNextCase = () => {
     if (!activeProjectId) return;
-    const keys = Object.keys(CASE_STUDY_REGISTRY);
+    const keys = Object.keys(CASE_STUDY_REGISTRY).filter((k) => !HIDDEN_PROJECTS.has(k));
     const nextKey = keys[(keys.indexOf(activeProjectId) + 1) % keys.length];
     navigate({ view: 'case', id: nextKey });
   };

@@ -23,6 +23,16 @@ export const CASE_STUDY_REGISTRY: Record<
   'shorefield-holidays': load(() => import('./ShorefieldHolidaysCaseStudy'), 'ShorefieldHolidaysCaseStudy'),
   'global-payments': load(() => import('./GlobalPaymentsCaseStudy'), 'GlobalPaymentsCaseStudy'),
   'fresh-order-placed': load(() => import('./FreshOrderPlacedCaseStudy'), 'FreshOrderPlacedCaseStudy'),
+  'sampo-ai-pricing': load(() => import('./SampoCaseStudy'), 'SampoCaseStudy'),
 };
 
 export type CaseStudyId = keyof typeof CASE_STUDY_REGISTRY;
+
+/* Projects kept off the homepage for now. Their rows are hidden and
+   "Next" skips them; remove an id here to bring it back. */
+export const HIDDEN_PROJECTS = new Set([
+  'shorefield-holidays',
+  'health-ladder',
+  'global-payments',
+  'jackaroo-game-ui',
+]);

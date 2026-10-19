@@ -116,7 +116,7 @@ export function ChapterTitle({
         <h2
           className="font-black tracking-tight leading-[0.9] flex flex-wrap justify-center"
           style={{
-            fontSize: 'clamp(56px, 9vw, 120px)',
+            fontSize: 'clamp(40px, 11vw, 120px)',
             color: '#ffffff',
             letterSpacing: '0.02em',
           }}

@@ -31,6 +31,7 @@ const CASE_STUDY_IMAGES = {
 import { ArrowUpRight } from 'lucide-react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { HIDDEN_PROJECTS } from './case-studies/registry';
 
 /* Live animated thumbnails, fetched only when their row renders. */
 const FreshCardStage = lazy(() =>
@@ -38,6 +39,9 @@ const FreshCardStage = lazy(() =>
 );
 const SaryCardStage = lazy(() =>
   import('./case-studies/sary/SaryCardStage').then((m) => ({ default: m.SaryCardStage })),
+);
+const SampoCardStage = lazy(() =>
+  import('./case-studies/sampo/SampoCardStage').then((m) => ({ default: m.SampoCardStage })),
 );
 
 interface ProjectsProps {
@@ -59,7 +63,7 @@ interface ProjectsProps {
    set `hasStudy: false` so they read as inline chapters rather than
    opening a blank overlay.
 */
-const projects = [
+const allProjects = [
   {
     id: 'shorefield-holidays',
     image: CASE_STUDY_IMAGES.saasDashboard,
@@ -117,14 +121,15 @@ const projects = [
     id: 'sampo-ai-pricing',
     image: CASE_STUDY_IMAGES.sampoAi,
     year: '2025',
-    category: 'Enterprise AI · SAMPO',
-    title: 'SAMPO AI Pricing & Insights Platform',
+    category: 'AI Pricing · Sampo',
+    title: 'Sampo AI: Pricing That Thinks',
     summary:
-      'A pricing-intelligence surface for enterprise revenue teams. Real-time model outputs translated into a decision UI operators can actually read.',
-    accentColor: 'rgba(120,180,215,0.9)',
+      'An AI that changes store prices, designed so merchants can trust it: every strategy explained, previewed in three modes, tested, and reversible in one click.',
+    accentColor: 'rgba(139,133,255,0.95)',
     imageGlow:
-      'radial-gradient(ellipse 65% 55% at 30% 30%, rgba(80,145,190,0.09) 0%, transparent 70%)',
-    hasStudy: false,
+      'radial-gradient(ellipse 65% 55% at 30% 30%, rgba(90,80,220,0.10) 0%, transparent 70%)',
+    stage: 'sampo' as const,
+    hasStudy: true,
   },
   {
     id: 'jackaroo-game-ui',
@@ -154,6 +159,8 @@ const projects = [
     hasStudy: true,
   },
 ];
+
+const projects = allProjects.filter((p) => !HIDDEN_PROJECTS.has(p.id));
 
 /* ─────────────────────────────────────────────────────────────────────── */
 
@@ -366,10 +373,9 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
             zIndex: 1,
           }}
         >
-          Six eras, one methodology: Zyda SaaS operators, Sary grocery
-          marketplaces, a modular landing framework, Hakbah's Saudi fintech
-          rails, SAMPO's enterprise AI, and today's Jackaroo game UI at
-          Lobah. Strategy that ships across every category.
+          Three products, one methodology: Sary's grocery marketplace,
+          SAMPO's AI pricing, and fresh's checkout moment. Strategy that
+          ships across every category.
         </motion.p>
       </div>
 
@@ -764,8 +770,10 @@ function ProjectRow({
               <Suspense fallback={null}>
                 {project.stage === 'fresh' ? (
                   <FreshCardStage active={isActive && !reduced && !paused} />
-                ) : (
+                ) : project.stage === 'sary' ? (
                   <SaryCardStage active={isActive && !reduced && !paused} />
+                ) : (
+                  <SampoCardStage active={isActive && !reduced && !paused} />
                 )}
               </Suspense>
             )}
