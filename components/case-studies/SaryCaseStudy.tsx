@@ -233,7 +233,7 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
               Sary · B2B grocery · Repeat customers
             </p>
             <h1 className="text-white text-5xl md:text-7xl font-black mb-8 leading-[0.95] tracking-tight max-w-4xl">
-              Buy Again Hub
+              Restock in 3 taps, not 39.
             </h1>
             <p className="text-white/50 text-lg md:text-xl leading-relaxed max-w-2xl mb-12">
               Grocery owners reorder the same few dozen products every week. I designed a page that turns that routine

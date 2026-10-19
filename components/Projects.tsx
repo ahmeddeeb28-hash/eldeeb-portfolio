@@ -82,10 +82,10 @@ const allProjects = [
     image: CASE_STUDY_IMAGES.saryGrocery,
     year: '2022',
     category: 'Grocery Marketplace · Sary era',
-    title: 'Sary: Buy Again Hub',
+    title: 'Sary: Restock in 3 Taps, Not 39',
     summary:
-      'A Buy Again hub for grocery stores: the weekly restock in one tap, alerts before items run out, and a reminder on restock day. Repeat purchases rose 28%.',
-    accentColor: 'rgba(125,162,255,0.9)',
+      'Restocking 18 usual items went from 39 taps to 3. A Buy Again hub for grocery stores lifted repeat purchases 28% and order value 27%.',
+    accentColor: 'rgba(255,160,90,0.95)',
     imageGlow:
       'radial-gradient(ellipse 70% 55% at 15% 20%, rgba(200,120,50,0.09) 0%, transparent 70%)',
     stage: 'sary' as const,
@@ -122,9 +122,9 @@ const allProjects = [
     image: CASE_STUDY_IMAGES.sampoAi,
     year: '2025',
     category: 'AI Pricing · Sampo',
-    title: 'Sampo AI: Pricing That Thinks',
+    title: 'Sampo AI: Pricing Merchants Can Trust',
     summary:
-      'An AI that changes store prices, designed so merchants can trust it: every strategy explained, previewed in three modes, tested, and reversible in one click.',
+      'An AI that sets store prices, made trustworthy: every strategy explained, A/B tested in three modes before anything goes live, and undone in one click.',
     accentColor: 'rgba(139,133,255,0.95)',
     imageGlow:
       'radial-gradient(ellipse 65% 55% at 30% 30%, rgba(90,80,220,0.10) 0%, transparent 70%)',
