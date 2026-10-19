@@ -919,7 +919,7 @@ export function ReverseView() {
       </Panel>
       <Panel style={{ padding: 18, display: 'flex', alignItems: 'center', gap: 14 }}>
         <span style={{ flex: 1, fontSize: 13.5, color: C.sub }}>
-          {disabled ? 'Strategy disabled. Prices on 30 products are back to normal and results are kept in your archive.' : 'A mode change applies right away and can be undone for 5 seconds.'}
+          {disabled ? 'Strategy disabled. Prices on 30 products are back to normal and results are kept in your archive.' : 'A new mode applies as soon as it is saved, with a few seconds to undo.'}
         </span>
         {disabled ? (
           <Btn onClick={() => setDisabled(false)}>Re-activate</Btn>
@@ -937,7 +937,7 @@ export function ReverseView() {
             exit={{ opacity: 0, y: 12, x: '-50%' }}
             style={{ position: 'absolute', left: '50%', bottom: 24, background: C.ink, color: '#fff', borderRadius: 12, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 14, fontSize: 13.5, whiteSpace: 'nowrap' }}
           >
-            Mode changed to {m.name}. New prices apply from now on.
+            Mode changed to {m.name}. Changes apply right away.
             <button
               type="button"
               onClick={() => {
