@@ -23,6 +23,7 @@ export const CASE_STUDY_REGISTRY: Record<
   'shorefield-holidays': load(() => import('./ShorefieldHolidaysCaseStudy'), 'ShorefieldHolidaysCaseStudy'),
   'global-payments': load(() => import('./GlobalPaymentsCaseStudy'), 'GlobalPaymentsCaseStudy'),
   'fresh-order-placed': load(() => import('./FreshOrderPlacedCaseStudy'), 'FreshOrderPlacedCaseStudy'),
+  'sampo-ai-pricing': load(() => import('./SampoCaseStudy'), 'SampoCaseStudy'),
 };
 
 export type CaseStudyId = keyof typeof CASE_STUDY_REGISTRY;
