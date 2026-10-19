@@ -1521,19 +1521,32 @@ export function DashboardView() {
             ))}
           </svg>
         </Panel>
-        <Panel f="impact" style={{ padding: '16px 18px' }}>
-          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', color: C.faint, marginBottom: 12 }}>SAMPO IMPACT · LAST 90 DAYS</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 14 }}>
-            <svg width={84} height={84} viewBox="0 0 84 84">
-              <circle cx={42} cy={42} r={34} fill="none" stroke="#EEEDF5" strokeWidth={10} />
-              <circle cx={42} cy={42} r={34} fill="none" stroke={C.indigo} strokeWidth={10} strokeDasharray={`${2 * Math.PI * 34 * 0.15} 999`} transform="rotate(-90 42 42)" strokeLinecap="round" />
-              <text x={42} y={46} fontSize={16} fontWeight={800} textAnchor="middle" fill={C.ink}>
+        <div
+          data-f="impact"
+          style={{
+            borderRadius: 14,
+            padding: '16px 18px',
+            color: '#fff',
+            background: 'linear-gradient(150deg, #3A2FD6 0%, #2A1FA8 45%, #1A1470 100%)',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.75)', marginBottom: 12 }}>SAMPO IMPACT · LAST 90 DAYS</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, paddingBottom: 14, borderBottom: '1px solid rgba(255,255,255,0.14)', marginBottom: 12 }}>
+            <svg width={92} height={92} viewBox="0 0 92 92" style={{ flex: 'none' }}>
+              <circle cx={46} cy={46} r={38} fill="none" stroke="rgba(255,255,255,0.16)" strokeWidth={9} />
+              <circle cx={46} cy={46} r={38} fill="none" stroke="#FFD25C" strokeWidth={9} strokeDasharray={`${2 * Math.PI * 38 * 0.15} 999`} transform="rotate(-90 46 46)" />
+              <text x={46} y={47} fontSize={18} fontWeight={800} textAnchor="middle" fill="#fff">
                 15%
+              </text>
+              <text x={46} y={62} fontSize={9.5} textAnchor="middle" fill="rgba(255,255,255,0.75)">
+                of revenue
               </text>
             </svg>
             <div>
-              <div style={{ fontSize: 24, fontWeight: 800 }}>SAR 112,500</div>
-              <div style={{ fontSize: 12.5, color: C.sub }}>of revenue came from Sampo prices</div>
+              <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.01em' }}>SAR 112,500</div>
+              <div style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.8)' }}>came from Sampo prices</div>
             </div>
           </div>
           {impact.map(([k, v]) => (
@@ -1542,15 +1555,19 @@ export function DashboardView() {
                 <span>{k}</span>
                 <b>SAR {v.toLocaleString('en-US')}</b>
               </div>
-              <div style={{ height: 6, borderRadius: 3, background: '#EEEDF5', marginTop: 5 }}>
-                <div style={{ width: `${(v / 112500) * 100}%`, height: '100%', borderRadius: 3, background: C.indigo2 }} />
+              <div style={{ height: 5, borderRadius: 3, background: 'rgba(255,255,255,0.14)', marginTop: 6 }}>
+                <div style={{ width: `${(v / 112500) * 100}%`, height: '100%', borderRadius: 3, background: '#FFD25C' }} />
               </div>
             </div>
           ))}
-          <div style={{ textAlign: 'center', marginTop: 8 }}>
-            <Btn kind="link">View strategies →</Btn>
-          </div>
-        </Panel>
+          <span style={{ flex: 1 }} />
+          <button
+            type="button"
+            style={{ all: 'unset', cursor: 'pointer', marginTop: 8, height: 36, borderRadius: 9, background: '#fff', color: C.indigo, fontSize: 13, fontWeight: 700, display: 'grid', placeItems: 'center' }}
+          >
+            View strategies →
+          </button>
+        </div>
       </div>
       <Profitability mo={mo} onMonth={setMo} />
     </div>
