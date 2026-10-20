@@ -149,7 +149,7 @@ export function BeforeAfter({
           const pct = Math.max(0, Math.min(100, (x / rect.width) * 100));
           rawX.set(pct);
         }}
-        className="relative w-full overflow-hidden rounded-[24px] border border-white/5 bg-[#0D0D0D] select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4AF2E5]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+        className="relative w-full overflow-hidden rounded-[24px] border border-white/5 bg-[#0D0D0D] select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E8E4DC]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
         style={{ aspectRatio: aspect, cursor: isDragging ? 'grabbing' : 'ew-resize' }}
       >
         {/* AFTER — sits behind at full width. */}
@@ -181,7 +181,7 @@ export function BeforeAfter({
           style={{ opacity: seamPct < 8 ? 0 : 1 }}
         >
           <span className="w-1.5 h-1.5 rounded-full bg-[rgba(228,184,120,0.95)]" />
-          <span className="text-white/85 text-[10px] font-black uppercase tracking-[0.3em]">
+          <span className="text-white/85 text-xs font-semibold">
             {beforeLabel}
           </span>
         </div>
@@ -189,8 +189,8 @@ export function BeforeAfter({
           className="absolute top-4 right-4 md:top-6 md:right-6 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/55 backdrop-blur-md border border-white/10 transition-opacity duration-300"
           style={{ opacity: seamPct > 92 ? 0 : 1 }}
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-[#4AF2E5]" />
-          <span className="text-white/85 text-[10px] font-black uppercase tracking-[0.3em]">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#E8E4DC]" />
+          <span className="text-white/85 text-xs font-semibold">
             {afterLabel}
           </span>
         </div>
@@ -203,8 +203,8 @@ export function BeforeAfter({
             width: '2px',
             transform: 'translateX(-1px)',
             background:
-              'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.85) 20%, rgba(74,242,229,0.85) 50%, rgba(255,255,255,0.85) 80%, rgba(255,255,255,0.15) 100%)',
-            boxShadow: '0 0 20px rgba(74,242,229,0.35)',
+              'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.85) 20%, rgba(232,228,220,0.85) 50%, rgba(255,255,255,0.85) 80%, rgba(255,255,255,0.15) 100%)',
+            boxShadow: '0 0 20px rgba(232,228,220,0.35)',
           }}
         >
           {/* Circular grab handle */}
@@ -225,7 +225,7 @@ export function BeforeAfter({
       </div>
 
       {caption && (
-        <figcaption className="mt-4 text-white/40 text-[11px] font-black uppercase tracking-[0.28em] text-center">
+        <figcaption className="mt-4 text-white/40 text-[13px] font-semibold text-center">
           {caption}
         </figcaption>
       )}

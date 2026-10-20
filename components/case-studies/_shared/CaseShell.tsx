@@ -60,22 +60,22 @@ export function CaseShell({
         <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-white/60 hover:text-[#4AF2E5] transition-colors group"
+            className="flex items-center gap-2 text-white/60 hover:text-white transition-colors group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-xs font-bold uppercase tracking-widest">Back</span>
+            <span className="text-sm font-medium">Back</span>
           </button>
 
-          <div className="text-white/30 text-[10px] font-bold uppercase tracking-[0.25em]">
+          <div className="text-white/40 text-sm">
             {metaLine}
           </div>
 
           {onNext ? (
             <button
               onClick={onNext}
-              className="flex items-center gap-2 text-white/60 hover:text-[#4AF2E5] transition-colors group"
+              className="flex items-center gap-2 text-white/60 hover:text-white transition-colors group"
             >
-              <span className="text-xs font-bold uppercase tracking-widest">Next</span>
+              <span className="text-sm font-medium">Next</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           ) : (

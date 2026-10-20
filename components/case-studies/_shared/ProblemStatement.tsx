@@ -21,7 +21,7 @@ export function ProblemStatement({
       {/* Corner mark */}
       <div className="absolute top-8 right-8 flex items-center gap-2">
         <div className="w-1.5 h-1.5 rounded-full bg-[#FF5F5F] animate-pulse" />
-        <span className="text-[#FF5F5F]/70 text-[9px] font-black uppercase tracking-[0.4em]">
+        <span className="text-[#FF5F5F]/70 text-xs font-semibold">
           Problem Statement
         </span>
       </div>
@@ -29,7 +29,6 @@ export function ProblemStatement({
       {/* Quote glyph */}
       <span
         className="absolute top-6 left-8 text-[120px] leading-none text-[#FF5F5F]/15 select-none pointer-events-none"
-        style={{ fontFamily: 'Fraunces, Georgia, serif' }}
         aria-hidden
       >
         “
@@ -52,7 +51,7 @@ export function ProblemStatement({
           {/* Stakes line */}
           {stakes && (
             <div className="mt-10 flex items-start gap-4 pt-8 border-t border-white/5">
-              <span className="shrink-0 inline-block px-2.5 py-1 rounded-md bg-[#FF5F5F]/10 border border-[#FF5F5F]/20 text-[#FF5F5F] text-[9px] font-black uppercase tracking-[0.3em]">
+              <span className="shrink-0 inline-block px-2.5 py-1 rounded-md bg-[#FF5F5F]/10 border border-[#FF5F5F]/20 text-[#FF5F5F] text-xs font-semibold">
                 Stakes
               </span>
               <p className="text-white/60 text-sm leading-relaxed">{stakes}.</p>
@@ -63,20 +62,20 @@ export function ProblemStatement({
         {/* Affected baselines */}
         {baselines && baselines.length > 0 && (
           <div className="md:col-span-4 md:border-l md:border-white/5 md:pl-10 flex flex-col gap-5">
-            <span className="text-white/30 text-[9px] font-black uppercase tracking-[0.3em]">
+            <span className="text-white/30 text-xs font-semibold">
               Affected metrics (baseline)
             </span>
             <div className="flex flex-col gap-4">
               {baselines.map((b, i) => (
                 <div key={i} className="flex flex-col gap-1">
-                  <span className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em]">
+                  <span className="text-white/40 text-xs font-semibold">
                     {b.label}
                   </span>
                   <div className="flex items-baseline gap-2">
                     <span className="text-white text-2xl font-black tracking-tight">
                       {b.before}
                     </span>
-                    <span className="text-[#FF5F5F]/70 text-[9px] font-black uppercase tracking-widest">
+                    <span className="text-[#FF5F5F]/70 text-xs font-semibold">
                       Below target
                     </span>
                   </div>

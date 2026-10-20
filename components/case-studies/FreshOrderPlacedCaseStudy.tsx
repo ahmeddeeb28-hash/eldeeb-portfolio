@@ -244,10 +244,10 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="text-[10px] font-black uppercase tracking-[0.32em] mb-6" style={{ color: ACCENT }}>
+            <p className="text-xs font-semibold mb-6" style={{ color: ACCENT }}>
               fresh · food & grocery delivery
             </p>
-            <h1 className="text-white text-5xl md:text-7xl font-black mb-8 leading-[0.95] tracking-tight max-w-4xl">
+            <h1 className="text-white text-5xl md:text-7xl font-semibold mb-8 leading-[0.95] tracking-tight max-w-4xl">
               The five seconds after Pay.
             </h1>
             <p className="text-white/50 text-lg md:text-xl leading-relaxed max-w-2xl mb-12">
@@ -284,7 +284,7 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
           >
             <div className="flex items-center gap-2 mb-8">
               <div className="w-1.5 h-1.5 rounded-full bg-[#FF5F5F] animate-pulse" />
-              <span className="text-[#FF5F5F]/70 text-[9px] font-black uppercase tracking-[0.4em]">Problem statement</span>
+              <span className="text-[#FF5F5F]/70 text-xs font-semibold">Problem statement</span>
             </div>
             <p className="text-white text-2xl md:text-4xl font-bold leading-[1.15] tracking-tight max-w-3xl mb-8">
               Right after Pay, people are watching the screen but can’t change anything.
@@ -303,7 +303,7 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
                 transition={{ ...reveal.transition, delay: i * 0.06 }}
                 className="rounded-[24px] border border-white/5 bg-[#0D0D0D] p-7"
               >
-                <p className="text-white/35 text-[10px] font-black uppercase tracking-[0.25em] mb-4">{s.k}</p>
+                <p className="text-white/35 text-xs font-semibold mb-4">{s.k}</p>
                 <p className="text-white text-xl font-bold tracking-tight mb-2">{s.t}</p>
                 <p className="text-white/50 text-sm leading-relaxed">{s.d}</p>
               </motion.div>
@@ -317,7 +317,7 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
             {INSIGHTS.map((it, i) => (
               <motion.div key={it.n} {...reveal} transition={{ ...reveal.transition, delay: i * 0.06 }}>
-                <span className="block text-5xl font-black tracking-tight mb-4" style={{ color: ACCENT, opacity: 0.35 }}>
+                <span className="block text-5xl font-semibold tracking-[-0.03em] mb-4" style={{ color: ACCENT, opacity: 0.35 }}>
                   {it.n}
                 </span>
                 <p className="text-white text-2xl font-bold tracking-tight mb-3">{it.t}</p>
@@ -381,8 +381,8 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
                   transition={{ ...reveal.transition, delay: i * 0.06 }}
                   className="rounded-[24px] border border-white/5 bg-[#0D0D0D] p-6"
                 >
-                  <p className="text-white/35 text-[10px] font-black uppercase tracking-[0.25em] mb-3">{f.k}</p>
-                  <p className="text-white text-4xl font-black tracking-[-0.04em] mb-3">{f.v}</p>
+                  <p className="text-white/35 text-xs font-semibold mb-3">{f.k}</p>
+                  <p className="text-white text-4xl font-semibold tracking-[-0.04em] mb-3">{f.v}</p>
                   <p className="text-white/50 text-sm leading-relaxed">{f.d}</p>
                 </motion.div>
               ))}
@@ -419,7 +419,7 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
                 transition={{ ...reveal.transition, delay: i * 0.06 }}
                 className="rounded-[24px] border border-white/5 bg-[#0D0D0D] p-6"
               >
-                <p className="text-white text-4xl md:text-5xl font-black tracking-[-0.04em] mb-2">{s.v}</p>
+                <p className="text-white text-4xl md:text-5xl font-semibold tracking-[-0.04em] mb-2">{s.v}</p>
                 <p className="text-white/45 text-sm">{s.k}</p>
               </motion.div>
             ))}
@@ -441,13 +441,13 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
               >
                 <div className="flex items-center gap-3 pb-5 border-b border-white/5">
                   <span
-                    className="w-7 h-7 rounded-full grid place-items-center text-sm font-black"
+                    className="w-7 h-7 rounded-full grid place-items-center text-sm font-semibold"
                     style={{ color: g.color, background: `${g.color}1A` }}
                     aria-hidden
                   >
                     {g.arrow}
                   </span>
-                  <span className="text-[10px] font-black uppercase tracking-[0.25em]" style={{ color: g.color }}>
+                  <span className="text-xs font-semibold" style={{ color: g.color }}>
                     {g.label}
                   </span>
                 </div>
@@ -464,7 +464,7 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
                           <span className="block text-white/50 text-sm leading-relaxed">{k.d}</span>
                         </span>
                         {result && (
-                          <span className="text-white text-2xl font-black tracking-tight shrink-0">{result.v}</span>
+                          <span className="text-white text-2xl font-semibold tracking-[-0.03em] shrink-0">{result.v}</span>
                         )}
                       </li>
                     );
@@ -479,7 +479,7 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
               {...reveal}
               className="rounded-[24px] border border-dashed border-white/15 p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-4 mb-20"
             >
-              <span className="text-[10px] font-black uppercase tracking-[0.3em]" style={{ color: ACCENT }}>
+              <span className="text-xs font-semibold" style={{ color: ACCENT }}>
                 Pilot in progress
               </span>
               <p className="text-white/60 text-sm leading-relaxed">

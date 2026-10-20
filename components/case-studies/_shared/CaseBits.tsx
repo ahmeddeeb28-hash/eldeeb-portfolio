@@ -15,13 +15,9 @@ export const reveal = {
 
 export function Eyebrow({ children, tone }: { children: ReactNode; tone: string }) {
   return (
-    <div className="flex items-center gap-3 mb-6">
-      <span className="w-1.5 h-1.5 rounded-full" style={{ background: tone }} />
-      <span className="text-[10px] font-black uppercase tracking-[0.32em]" style={{ color: tone, opacity: 0.8 }}>
-        {children}
-      </span>
-      <span className="flex-1 h-px bg-gradient-to-r from-white/10 to-transparent" />
-    </div>
+    <p className="text-sm font-semibold text-white/85 mb-5 pb-3 border-b border-white/10" data-tone={tone}>
+      {children}
+    </p>
   );
 }
 
@@ -143,7 +139,7 @@ function CinemaStage({
   const tickerRow = (dir: 1 | -1, top: string) => (
     <div className="absolute left-0 right-0 overflow-hidden whitespace-nowrap pointer-events-none" style={{ top }} aria-hidden>
       <motion.div
-        className="inline-block text-[10px] md:text-[11px] font-black uppercase tracking-[0.4em] text-white/25"
+        className="inline-block text-xs md:text-[13px] font-semibold text-white/25"
         animate={reduced ? undefined : { x: dir === 1 ? ['0%', '-50%'] : ['-50%', '0%'] }}
         transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
       >
@@ -164,7 +160,7 @@ function CinemaStage({
       {/* decorative lettering behind the phone */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden>
         <span
-          className="font-black uppercase leading-none whitespace-nowrap select-none"
+          className="font-semibold leading-none whitespace-nowrap select-none"
           style={{
             fontSize: 'clamp(56px, 13vw, 168px)',
             letterSpacing: '-0.04em',
@@ -263,7 +259,7 @@ export function UseCaseExplorer<T extends UseCase>({
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-3" style={{ color: accent }}>
+            <p className="text-xs font-semibold mb-3" style={{ color: accent }}>
               {c.code ?? 'Extra case'} · {String(active + 1).padStart(2, '0')} / {String(cases.length).padStart(2, '0')}
             </p>
             <h3 className="text-white text-3xl md:text-4xl font-black tracking-tight mb-4">{c.title}</h3>
@@ -276,7 +272,7 @@ export function UseCaseExplorer<T extends UseCase>({
                 ['Measured by', c.measured],
               ].map(([k, v]) => (
                 <div key={k} className="bg-[#0D0D0D] px-5 py-4 grid grid-cols-[110px_1fr] gap-4">
-                  <dt className="text-white/35 text-[10px] font-black uppercase tracking-[0.2em] pt-0.5">{k}</dt>
+                  <dt className="text-white/35 text-xs font-semibold pt-0.5">{k}</dt>
                   <dd className="text-white/85 text-sm leading-relaxed">{v}</dd>
                 </div>
               ))}

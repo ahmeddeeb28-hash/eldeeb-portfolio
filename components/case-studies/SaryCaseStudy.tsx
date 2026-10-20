@@ -193,10 +193,10 @@ function TapCount() {
         { label: 'After', n: 3, steps: 'Open app · Add all · checkout', tone: ACCENT },
       ].map((b) => (
         <motion.div key={b.label} {...reveal} className="rounded-[24px] border border-white/5 bg-[#0D0D0D] p-6 md:p-7">
-          <p className="text-[10px] font-black uppercase tracking-[0.25em] mb-4" style={{ color: b.tone }}>
+          <p className="text-xs font-semibold mb-4" style={{ color: b.tone }}>
             {b.label}
           </p>
-          <p className="text-white text-5xl font-black tracking-[-0.04em] mb-1">≈ {b.n}</p>
+          <p className="text-white text-5xl font-semibold tracking-[-0.04em] mb-1">≈ {b.n}</p>
           <p className="text-white/45 text-sm mb-5">taps to restock 18 usual items</p>
           <div className="flex flex-wrap gap-1.5 mb-5" aria-hidden>
             {Array.from({ length: b.n }, (_, i) => (
@@ -229,10 +229,10 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="text-[10px] font-black uppercase tracking-[0.32em] mb-6" style={{ color: ACCENT }}>
+            <p className="text-xs font-semibold mb-6" style={{ color: ACCENT }}>
               Sary · B2B grocery · Repeat customers
             </p>
-            <h1 className="text-white text-5xl md:text-7xl font-black mb-8 leading-[0.95] tracking-tight max-w-4xl">
+            <h1 className="text-white text-5xl md:text-7xl font-semibold mb-8 leading-[0.95] tracking-tight max-w-4xl">
               Restock in 3 taps, not 39.
             </h1>
             <p className="text-white/50 text-lg md:text-xl leading-relaxed max-w-2xl mb-12">
@@ -271,7 +271,7 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           >
             <div className="flex items-center gap-2 mb-8">
               <div className="w-1.5 h-1.5 rounded-full bg-[#FF5F5F] animate-pulse" />
-              <span className="text-[#FF5F5F]/70 text-[9px] font-black uppercase tracking-[0.4em]">Problem statement</span>
+              <span className="text-[#FF5F5F]/70 text-xs font-semibold">Problem statement</span>
             </div>
             <p className="text-white text-2xl md:text-4xl font-bold leading-[1.15] tracking-tight max-w-3xl mb-8">
               Stores that order the same basket every week had to build it from scratch every time.
@@ -292,7 +292,7 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
                 transition={{ ...reveal.transition, delay: i * 0.06 }}
                 className="rounded-[24px] border border-white/5 bg-[#0D0D0D] p-7"
               >
-                <p className="text-white/35 text-[10px] font-black uppercase tracking-[0.25em] mb-4">{s.k}</p>
+                <p className="text-white/35 text-xs font-semibold mb-4">{s.k}</p>
                 <p className="text-white text-xl font-bold tracking-tight mb-2">{s.t}</p>
                 <p className="text-white/50 text-sm leading-relaxed">{s.d}</p>
               </motion.div>
@@ -314,11 +314,11 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.25em] mb-2 text-[#FF5F5F]">Before</p>
+                    <p className="text-xs font-semibold mb-2 text-[#FF5F5F]">Before</p>
                     <p className="text-white/55 text-sm leading-relaxed">{b.before}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.25em] mb-2" style={{ color: ACCENT }}>
+                    <p className="text-xs font-semibold mb-2" style={{ color: ACCENT }}>
                       After
                     </p>
                     <p className="text-white/85 text-sm leading-relaxed">{b.after}</p>
@@ -339,7 +339,7 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
             {INSIGHTS.map((it, i) => (
               <motion.div key={it.n} {...reveal} transition={{ ...reveal.transition, delay: i * 0.06 }}>
-                <span className="block text-5xl font-black tracking-tight mb-4" style={{ color: ACCENT, opacity: 0.4 }}>
+                <span className="block text-5xl font-semibold tracking-[-0.03em] mb-4" style={{ color: ACCENT, opacity: 0.4 }}>
                   {it.n}
                 </span>
                 <p className="text-white text-2xl font-bold tracking-tight mb-3">{it.t}</p>
@@ -417,7 +417,7 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
                 transition={{ ...reveal.transition, delay: i * 0.06 }}
                 className="rounded-[24px] border border-white/5 bg-[#0D0D0D] p-6"
               >
-                <p className="text-white text-4xl md:text-5xl font-black tracking-[-0.04em] mb-2">{r.v}</p>
+                <p className="text-white text-4xl md:text-5xl font-semibold tracking-[-0.04em] mb-2">{r.v}</p>
                 <p className="text-white/45 text-sm">{r.k}</p>
               </motion.div>
             ))}

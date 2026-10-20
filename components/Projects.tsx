@@ -40,6 +40,9 @@ const FreshCardStage = lazy(() =>
 const SaryCardStage = lazy(() =>
   import('./case-studies/sary/SaryCardStage').then((m) => ({ default: m.SaryCardStage })),
 );
+const ReportCardStage = lazy(() =>
+  import('./case-studies/report/ReportCardStage').then((m) => ({ default: m.ReportCardStage })),
+);
 const SampoCardStage = lazy(() =>
   import('./case-studies/sampo/SampoCardStage').then((m) => ({ default: m.SampoCardStage })),
 );
@@ -89,6 +92,20 @@ const allProjects = [
     imageGlow:
       'radial-gradient(ellipse 70% 55% at 15% 20%, rgba(200,120,50,0.09) 0%, transparent 70%)',
     stage: 'sary' as const,
+    hasStudy: true,
+  },
+  {
+    id: 'sary-usability-report',
+    image: CASE_STUDY_IMAGES.saryGrocery,
+    year: "Q4 '22",
+    category: 'Usability & Conversion · Sary',
+    title: 'Sary: Usability Performance Report',
+    summary:
+      'Only 9.63% of shoppers reached Discover. My quarterly report on funnels, conversion and heatmaps, rebuilt with AI as a live page.',
+    accentColor: 'rgba(150,190,235,0.9)',
+    imageGlow:
+      'radial-gradient(ellipse 65% 55% at 70% 30%, rgba(150,190,235,0.08) 0%, transparent 70%)',
+    stage: 'report' as const,
     hasStudy: true,
   },
   {
@@ -202,7 +219,7 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
 
   /*
     Whole-stack scroll progress (0 → 1 across the entire projects
-    stack). Drives the sticky rail's progressive teal fill line —
+    stack). Drives the sticky rail's progressive fill line —
     smooth, continuous, no scroll-hijacking.
   */
   const { scrollYProgress: stackProgress } = useScroll({
@@ -251,7 +268,7 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
             inset: '-60px -40px',
             pointerEvents: 'none',
             background:
-              'radial-gradient(ellipse 42% 70% at 28% 55%, rgba(200,140,70,0.09) 0%, transparent 65%), radial-gradient(ellipse 42% 70% at 72% 55%, rgba(74,242,229,0.08) 0%, transparent 65%)',
+              'radial-gradient(ellipse 42% 70% at 28% 55%, rgba(200,140,70,0.09) 0%, transparent 65%)',
             filter: 'blur(4px)',
             zIndex: 0,
           }}
@@ -270,7 +287,7 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
             borderRadius: '100px',
             border: '1px solid rgba(200,140,70,0.22)',
             background:
-              'linear-gradient(90deg, rgba(200,140,70,0.05) 0%, rgba(74,242,229,0.04) 100%)',
+              'rgba(255,255,255,0.03)',
             backdropFilter: 'blur(10px)',
             marginBottom: '32px',
             position: 'relative',
@@ -341,15 +358,7 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
           </span>{' '}
           <span
             style={{
-              fontFamily: "'Fraunces', 'Times New Roman', serif",
-              fontStyle: 'italic',
-              fontWeight: 400,
-              backgroundImage:
-                'linear-gradient(120deg, #E4B878 0%, #C88A3C 35%, #8E6CB4 65%, #4AF2E5 100%)',
-              WebkitBackgroundClip: 'text',
-              backgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              paddingRight: '0.05em',
+              color: 'rgba(255,255,255,0.45)',
             }}
           >
             studies.
@@ -373,15 +382,15 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
             zIndex: 1,
           }}
         >
-          Three products, one methodology: Sary's grocery marketplace,
-          SAMPO's AI pricing, and fresh's checkout moment. Strategy that
-          ships across every category.
+          One methodology across products: Sary's grocery marketplace and
+          how we measured it, SAMPO's AI pricing, and fresh's checkout
+          moment. Strategy that ships, and numbers that show it.
         </motion.p>
       </div>
 
       {/* ── PROJECTS STACK ──────────────────────────────────────────────
          Sticky timeline rail (left) sits beside the content column of
-         project rows (right). The rail's teal fill line progresses as
+         project rows (right). The rail's fill line progresses as
          the whole section scrolls; year+node markers highlight when
          their project enters the central active band. Each row still
          has its own big inline year + hairline rule + category label
@@ -427,10 +436,9 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
             bottom: 124,
             width: 1,
             background:
-              'linear-gradient(180deg, rgba(74,242,229,0.85) 0%, rgba(74,242,229,0.55) 45%, rgba(200,140,70,0.35) 100%)',
+              'linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.35) 100%)',
             transformOrigin: 'top',
             scaleY: reduced ? 1 : railFillScaleY,
-            boxShadow: '0 0 12px rgba(74,242,229,0.35)',
             pointerEvents: 'none',
           }}
         />
@@ -490,14 +498,14 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
                   initial={false}
                   animate={{
                     backgroundColor: isRailActive
-                      ? '#4AF2E5'
+                      ? '#FFFFFF'
                       : '#0A0A0A', // sit on top of the line
                     borderColor: isRailActive
-                      ? '#4AF2E5'
+                      ? '#FFFFFF'
                       : 'rgba(255,255,255,0.55)',
                     boxShadow: isRailActive
-                      ? '0 0 0 4px rgba(74,242,229,0.16), 0 0 18px rgba(74,242,229,0.55)'
-                      : '0 0 0 0 rgba(74,242,229,0)',
+                      ? '0 0 0 4px rgba(255,255,255,0.12)'
+                      : '0 0 0 0 rgba(255,255,255,0)',
                   }}
                   transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                   style={{
@@ -511,10 +519,7 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
                     flexShrink: 0,
                   }}
                 />
-                {/* Year label — Fraunces display cut at weight 900 with
-                   'opsz' 60 optical sizing for editorial dateline gravitas
-                   that matches the site's serif wordmark on the dark
-                   canvas. Tabular numerics keep the column of digits
+                {/* Year label. Tabular numerics keep the column of digits
                    aligned down the rail. */}
                 <motion.span
                   initial={false}
@@ -522,21 +527,19 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
                     color: isRailActive
                       ? 'rgba(255,255,255,0.98)'
                       : 'rgba(255,255,255,0.42)',
-                    fontSize: isRailActive ? 34 : 30,
+                    fontSize: isRailActive ? 28 : 24,
                   }}
                   transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                   style={{
-                    fontFamily:
-                      "'Fraunces', 'Times New Roman', Georgia, serif",
-                    fontFeatureSettings: '"tnum" 1, "lnum" 1',
-                    fontVariationSettings: "'opsz' 60, 'SOFT' 0",
-                    fontStyle: 'normal',
-                    fontWeight: 900,
-                    fontSize: 30,
-                    letterSpacing: '-0.035em',
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    fontFeatureSettings: '"tnum" 1',
+                    fontWeight: 700,
+                    fontSize: 24,
+                    letterSpacing: '-0.02em',
                     lineHeight: 1,
                     color: 'rgba(255,255,255,0.42)',
                     display: 'inline-block',
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   {p.year}
@@ -667,12 +670,10 @@ function ProjectRow({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 12,
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: '0.32em',
-                textTransform: 'uppercase',
+                fontSize: 13,
+                fontWeight: 500,
                 fontFamily: 'Inter, system-ui, sans-serif',
-                margin: '0 0 22px 0',
+                margin: '0 0 18px 0',
               }}
             >
               <motion.span
@@ -772,6 +773,8 @@ function ProjectRow({
                   <FreshCardStage active={isActive && !reduced && !paused} />
                 ) : project.stage === 'sary' ? (
                   <SaryCardStage active={isActive && !reduced && !paused} />
+                ) : project.stage === 'report' ? (
+                  <ReportCardStage active={isActive && !reduced && !paused} />
                 ) : (
                   <SampoCardStage active={isActive && !reduced && !paused} />
                 )}
@@ -849,10 +852,8 @@ function ProjectCTA({
       <span
         style={{
           position: 'relative',
-          fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: '0.22em',
-          textTransform: 'uppercase',
+          fontSize: 14,
+          fontWeight: 600,
           color:
             hover || isActive ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.55)',
           transition: 'color 0.35s ease',

@@ -34,14 +34,14 @@ export function ProofRow({
       {/* Caption column */}
       <div className="md:col-span-4 md:[direction:ltr]">
         <div className="flex items-baseline gap-3 mb-4">
-          <span className="text-[#4AF2E5] text-xs font-black tracking-[0.3em]">
+          <span className="text-[#E8E4DC] text-xs font-semibold tracking-[0.3em]">
             0{index + 1}
           </span>
-          <span className="text-white/20 text-[10px] font-black tracking-[0.3em]">
+          <span className="text-white/20 text-[10px] font-semibold tracking-[0.3em]">
             / {String(total).padStart(2, '0')}
           </span>
         </div>
-        <h3 className="text-white text-2xl md:text-3xl font-black leading-tight tracking-tight mb-3">
+        <h3 className="text-white text-2xl md:text-3xl font-semibold leading-tight tracking-tight mb-3">
           {caption}
         </h3>
         <p className="text-white/45 text-sm leading-relaxed">{note}</p>
