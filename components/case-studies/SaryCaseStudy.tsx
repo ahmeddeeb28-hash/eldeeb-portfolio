@@ -194,8 +194,8 @@ function ScreenCompare() {
   const clip = useTransform(smooth, (v) => `inset(0 ${100 - v}% 0 0)`);
   const left = useTransform(smooth, (v) => `${v}%`);
   const pill = useTransform(smooth, (v) => `clamp(76px, ${v}%, calc(100% - 76px))`);
-  const beforeOp = useTransform(smooth, [0, 50, 100], [0.35, 0.7, 1]);
-  const afterOp = useTransform(smooth, [0, 50, 100], [1, 0.7, 0.35]);
+  const beforeOp = useTransform(smooth, [0, 50, 100], [0.45, 1, 1]);
+  const afterOp = useTransform(smooth, [0, 50, 100], [1, 1, 0.45]);
   const inView = useInView(box, { once: true, margin: '-20% 0px' });
   const reduced = useReducedMotion();
 
@@ -239,7 +239,10 @@ function ScreenCompare() {
             className="absolute inset-0 w-full h-full"
             style={{ clipPath: clip }}
           />
-          <motion.div className="absolute inset-y-0 w-0.5 -ml-px bg-white shadow-[0_0_12px_rgba(0,0,0,0.35)] pointer-events-none" style={{ left }} />
+          <motion.div
+            className="absolute inset-y-0 w-px pointer-events-none"
+            style={{ left, background: 'linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.95) 18%, rgba(255,255,255,0.95) 82%, transparent 100%)', boxShadow: '0 0 14px rgba(0,0,0,0.35)' }}
+          />
           {/* the handle: one pill naming both sides, kept inside the phone at the edges */}
           <motion.span
             data-handle
@@ -253,15 +256,21 @@ function ScreenCompare() {
               if (e.key === 'ArrowLeft') seam.set(Math.max(0, seam.get() - 5));
               if (e.key === 'ArrowRight') seam.set(Math.min(100, seam.get() + 5));
             }}
-            className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center rounded-full bg-white shadow-[0_8px_24px_-6px_rgba(0,0,0,0.45)] text-[13px] font-semibold cursor-grab active:cursor-grabbing focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7DA2FF]"
-            style={{ left: pill }}
+            className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center rounded-full text-[13px] font-semibold text-white cursor-grab active:cursor-grabbing backdrop-blur-xl backdrop-saturate-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7DA2FF]"
+            style={{
+              left: pill,
+              background: 'linear-gradient(180deg, rgba(40,44,58,0.62) 0%, rgba(14,16,24,0.72) 100%)',
+              border: '1px solid rgba(255,255,255,0.22)',
+              boxShadow:
+                'inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(255,255,255,0.06), 0 10px 30px -8px rgba(0,0,0,0.55), -10px 0 24px -12px rgba(255,138,138,0.55), 10px 0 24px -12px rgba(125,162,255,0.65)',
+            }}
           >
-            <motion.span className="flex items-center gap-1 pl-2.5 pr-3 py-2 text-[#D9363E]" style={{ opacity: beforeOp }}>
+            <motion.span className="flex items-center gap-1 pl-2.5 pr-3 py-2 text-[#FFB3B3]" style={{ opacity: beforeOp }}>
               <ChevronLeft className="w-4 h-4" />
               Before
             </motion.span>
-            <span className="w-px self-stretch my-2 bg-black/10" />
-            <motion.span className="flex items-center gap-1 pl-3 pr-2.5 py-2 text-[#1D368D]" style={{ opacity: afterOp }}>
+            <span className="w-px self-stretch my-2 bg-white/20" />
+            <motion.span className="flex items-center gap-1 pl-3 pr-2.5 py-2 text-[#B9CCFF]" style={{ opacity: afterOp }}>
               After
               <ChevronRight className="w-4 h-4" />
             </motion.span>
