@@ -1,5 +1,5 @@
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'motion/react';
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react';
 import {
   ArrowDown,
   ArrowLeft,
@@ -466,6 +466,7 @@ function RunningLow() {
 function UsualCta({ label, pressed, added }: { label: string; pressed?: boolean; added?: boolean }) {
   return (
     <motion.span
+      data-act={added ? undefined : 'add'}
       animate={{ scale: pressed ? 0.97 : 1 }}
       transition={{ duration: 0.12, ease: 'easeOut' }}
       style={{ flex: 1, display: 'flex' }}
@@ -1051,7 +1052,8 @@ function AddedSheet({ show, routineOn }: { show: boolean; routineOn: boolean }) 
         initial={false}
         animate={{ opacity: show ? 1 : 0 }}
         transition={{ duration: 0.34 }}
-        style={{ position: 'absolute', inset: 0, background: 'rgba(6,6,15,.45)', zIndex: 90, pointerEvents: 'none' }}
+        data-act="close"
+        style={{ position: 'absolute', inset: 0, background: 'rgba(6,6,15,.45)', zIndex: 90, pointerEvents: show ? 'auto' : 'none' }}
       />
       <motion.div
         initial={false}
@@ -1111,6 +1113,7 @@ function AddedSheet({ show, routineOn }: { show: boolean; routineOn: boolean }) 
           </div>
         </div>
         <motion.div
+          data-act="routine"
           initial={false}
           animate={{ background: routineOn ? S.info : '#F8F8F9' }}
           style={{
@@ -1159,7 +1162,9 @@ function AddedSheet({ show, routineOn }: { show: boolean; routineOn: boolean }) 
             />
           </span>
         </motion.div>
-        <Btn full>View cart</Btn>
+        <div data-act="close" style={{ width: '100%', display: 'flex' }}>
+          <Btn full>View cart</Btn>
+        </div>
       </motion.div>
     </>
   );
@@ -1245,6 +1250,123 @@ export function SaryAddAllLoop({ width = 300, playing = true }: { width?: number
       toast={false}
       {...beat.s}
     />
+    </div>
+  );
+}
+
+/* ── "Add all", played by hand ───────────────────────
+   The same hub screen, driven by taps instead of a timer: Add all
+   runs the press, fly, land and sheet beats; the reminder row
+   toggles the weekly routine (with its toast); View cart or the
+   dimmed backdrop closes the sheet. Taps are read from the data-act
+   attributes on the screen's own buttons.
+
+   Whatever can be tapped next pulses with a soft ring, so you can
+   tell what's interactive before trying it: Add all first, then the
+   reminder and View cart (only View cart once the reminder is on).
+   Tappable parts also react on hover. With reduced motion the ring
+   holds still. */
+const PLAY_CSS = `
+@keyframes sary-next { 0% { outline-color: rgba(125,162,255,.95); outline-offset: 2px } 100% { outline-color: rgba(125,162,255,0); outline-offset: 16px } }
+.sary-play[data-stage=idle] [data-act=add] > span,
+.sary-play[data-stage=sheet][data-routine=off] [data-act=routine],
+.sary-play[data-stage=sheet] div[data-act=close] > span {
+  outline: 4px solid rgba(125,162,255,.95); animation: sary-next 1.4s ease-out infinite;
+}
+.sary-play[data-stage=sheet][data-routine=off] div[data-act=close] > span { animation-delay: .7s }
+.sary-play [data-act=add] > span:hover, .sary-play div[data-act=close] > span:hover { filter: brightness(1.18) }
+.sary-play [data-act=routine]:hover { filter: brightness(.97) }
+@media (prefers-reduced-motion: reduce) {
+  .sary-play [data-act] > span, .sary-play [data-act=routine] { animation: none !important; outline-offset: 5px }
+}
+`;
+
+type Knobs = Beat['s'];
+
+const HINTS = {
+  idle: 'Tap Add all to cart',
+  playing: '',
+  sheet: 'Turn on the Sunday reminder, then View cart',
+  done: 'Added. Start over to try it again',
+};
+
+export function SaryAddAllPlay({ width = 300 }: { width?: number }) {
+  const [k, setK] = useState<Knobs>({});
+  const [stage, setStage] = useState<keyof typeof HINTS>('idle');
+  const timers = useRef<number[]>([]);
+  const later = (ms: number, fn: () => void) => timers.current.push(window.setTimeout(fn, ms));
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
+
+  const reset = () => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    setK({});
+    setStage('idle');
+  };
+
+  const onClick = (e: ReactMouseEvent) => {
+    const act = (e.target as HTMLElement).closest<HTMLElement>('[data-act]')?.dataset.act;
+    if (act === 'add' && stage === 'idle') {
+      setStage('playing');
+      setK({ pressed: true });
+      later(220, () => setK({ flying: true }));
+      later(1040, () => setK({ added: true, badge: 21, cartBar: true }));
+      later(1740, () => {
+        setK({ added: true, badge: 21, cartBar: true, sheet: true });
+        setStage('sheet');
+      });
+    } else if (act === 'routine' && stage === 'sheet') {
+      setK((p) => {
+        const on = !p.routineOn;
+        if (on) later(1800, () => setK((q) => ({ ...q, toast: false })));
+        return { ...p, routineOn: on, toast: on };
+      });
+    } else if (act === 'close' && stage === 'sheet') {
+      setK((p) => ({ ...p, sheet: false, toast: false }));
+      setStage('done');
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-5">
+      <style>{PLAY_CSS}</style>
+      <div
+        onClick={onClick}
+        data-stage={stage}
+        data-routine={k.routineOn ? 'on' : 'off'}
+        className="sary-play [&_[data-act]]:cursor-pointer select-none"
+      >
+        <SaryPhone
+          state="hub"
+          width={width}
+          pressed={false}
+          added={false}
+          badge={3}
+          cartBar={false}
+          sheet={false}
+          routineOn={false}
+          toast={false}
+          {...k}
+        />
+      </div>
+      <div className="h-9 flex items-center gap-4 text-sm">
+        {HINTS[stage] && (
+          <span className="flex items-center gap-2.5 text-white/70">
+            {stage !== 'done' && (
+              <span className="relative flex w-2 h-2">
+                <span className="absolute inset-0 rounded-full bg-[#7DA2FF] opacity-60 motion-safe:animate-ping" />
+                <span className="relative w-2 h-2 rounded-full bg-[#7DA2FF]" />
+              </span>
+            )}
+            {HINTS[stage]}
+          </span>
+        )}
+        {stage !== 'idle' && (
+          <button type="button" onClick={reset} className="rounded-full border border-white/20 px-4 py-1.5 text-white/80 hover:text-white hover:border-white/50 transition-colors">
+            Start over
+          </button>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,10 +1,13 @@
-import { motion } from 'motion/react';
+import { motion, useInView, useMotionValue, useReducedMotion, useSpring, useTransform } from 'motion/react';
+import { useEffect, useRef, useState } from 'react';
+import { CaseIntro, LeadStats, Takeaway } from './_shared/CaseLayout';
+import { ChevronsLeftRight, MousePointerClick } from 'lucide-react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
-import { Meta } from './_shared/Meta';
 import { CaseFilm, Eyebrow as BaseEyebrow, UseCaseExplorer, reveal, type UseCase as BaseUseCase } from './_shared/CaseBits';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
-import { SaryAddAllLoop, SaryPhone, type SaryState } from './sary/SaryPhone';
+import { MarqueeGallery, type Screen } from './_shared/MarqueeGallery';
+import { SaryAddAllLoop, SaryAddAllPlay, SaryPhone, type SaryState } from './sary/SaryPhone';
 
 /* ── Sary · Buy Again Hub ────────────────────────────
    Repeat customers on Sary, the B2B grocery app. Sources: the
@@ -26,9 +29,10 @@ const CHAPTERS: Chapter[] = [
   { id: 'overview', num: '01', roman: 'I', label: 'Overview', beat: 'A home for stores that come back.' },
   { id: 'problem', num: '02', roman: 'II', label: 'Problem', beat: 'Where we saw it.' },
   { id: 'insight', num: '03', roman: 'III', label: 'Insights', beat: 'What we learned.' },
-  { id: 'cases', num: '04', roman: 'IV', label: 'Use Cases', beat: 'Each case and its design.' },
-  { id: 'motion', num: '05', roman: 'V', label: 'Motion', beat: 'Add all, frame by frame.' },
-  { id: 'impact', num: '06', roman: 'VI', label: 'Impact', beat: 'What changed.' },
+  { id: 'screens', num: '04', roman: 'IV', label: 'Screens', beat: 'Every screen, side by side.' },
+  { id: 'cases', num: '05', roman: 'V', label: 'Use Cases', beat: 'Each case and its design.' },
+  { id: 'motion', num: '06', roman: 'VI', label: 'Motion', beat: 'Try Add all yourself.' },
+  { id: 'impact', num: '07', roman: 'VII', label: 'Impact', beat: 'What changed.' },
 ];
 
 const SIGNALS = [
@@ -158,15 +162,6 @@ const USE_CASES: UseCase[] = [
   },
 ];
 
-const MOTION = [
-  { k: 'K1', t: 'Tap', at: '0–120 ms', what: 'The button presses in and darkens. Light haptic.', why: 'Instant feedback. Nothing moves yet, so a mis-tap can still be cancelled.' },
-  { k: 'K2', t: 'Lift', at: '120–520 ms', what: 'The six preview items lift off the card and arc into the cart, 40 ms apart.', why: 'Owners trust Add all when they see their own products go in.' },
-  { k: 'K3', t: 'Land', at: '520–760 ms', what: 'The cart badge bumps and rolls from 3 to 21. The button turns green: Added.', why: 'Confirms the count without a toast and stops double adds.' },
-  { k: 'K4', t: 'Cart bar', at: '760–1060 ms', what: 'The cart bar slides up with the new total and Free delivery unlocked.', why: 'Money is the first thing an owner checks.' },
-  { k: 'K5', t: 'Sheet', at: '1060–1400 ms', what: 'A sheet rises with a tick, the summary and SAR saved.', why: 'Closes the loop with the value and the next step.' },
-  { k: 'K6', t: 'Routine', at: 'On tap', what: 'Remind me every Sunday: the switch slides and a toast confirms.', why: 'Turns a one-off reorder into a weekly habit.' },
-];
-
 const RESULTS = [
   { v: '+28%', k: 'Repeat purchases' },
   { v: '+27%', k: 'Average order value' },
@@ -174,15 +169,144 @@ const RESULTS = [
   { v: '+20%', k: 'Auto-reorder habit' },
 ];
 
-const SIGNALS_TRACKED = [
-  { k: 'Repeat-order rate', d: 'Stores that order again within their cycle.' },
-  { k: 'Time to checkout', d: 'From opening the app to paying, for returning stores.' },
-  { k: 'Orders from Buy Again', d: 'Share of orders that start on the hub or the Welcome back card.' },
-];
-
 const Eyebrow = ({ children, tone = ACCENT }: { children: React.ReactNode; tone?: string }) => (
   <BaseEyebrow tone={tone}>{children}</BaseEyebrow>
 );
+
+/* Before and after, as the real screens from the Figma board
+   ("4 · Before → After"): the current Arabic home and catalogue
+   against the new home and Buy Again hub. The before screen sits
+   on top and is clipped at a seam you can drag (pointer, touch or
+   arrow keys); it wipes in once on arrival. Pick the case with the
+   tabs. */
+const CMP = '/images/case-studies/sary/compare';
+const PAIRS = [
+  ['before-home', 'after-home'],
+  ['before-catalogue', 'after-hub'],
+];
+
+function ScreenCompare() {
+  const [i, setI] = useState(0);
+  const box = useRef<HTMLDivElement>(null);
+  const drag = useRef(false);
+  const seam = useMotionValue(50);
+  const smooth = useSpring(seam, { stiffness: 320, damping: 34 });
+  const clip = useTransform(smooth, (v) => `inset(0 ${100 - v}% 0 0)`);
+  const left = useTransform(smooth, (v) => `${v}%`);
+  const beforeTag = useTransform(smooth, [16, 26], [0, 1]);
+  const afterTag = useTransform(smooth, [74, 84], [1, 0]);
+  const beforeOp = useTransform(smooth, [0, 50, 100], [0.45, 1, 1]);
+  const afterOp = useTransform(smooth, [0, 50, 100], [1, 1, 0.45]);
+  const inView = useInView(box, { once: true, margin: '-20% 0px' });
+  const reduced = useReducedMotion();
+
+  useEffect(() => {
+    if (!inView || reduced) return;
+    seam.jump(100);
+    const t = setTimeout(() => seam.set(50), 350);
+    return () => clearTimeout(t);
+  }, [inView, reduced, seam]);
+
+  const moveTo = (x: number) => {
+    const r = box.current!.getBoundingClientRect();
+    seam.set(Math.max(0, Math.min(100, ((x - r.left) / r.width) * 100)));
+  };
+  const b = BEFORE_AFTER[i];
+
+  return (
+    <div className="grid md:grid-cols-[300px_minmax(0,1fr)] gap-10 md:gap-16 items-center">
+      <div className="mx-auto w-[260px] md:w-[300px]">
+        <div
+          ref={box}
+          className="relative select-none cursor-ew-resize rounded-[38px] overflow-hidden bg-white"
+          style={{ aspectRatio: '414 / 924', touchAction: 'pan-y', boxShadow: '0 0 0 10px #0B0F14, 0 0 0 11px #2a3038, 0 40px 80px -30px rgba(0,0,0,.6)' }}
+          onPointerDown={(e) => {
+            drag.current = true;
+            e.currentTarget.setPointerCapture(e.pointerId);
+            // grabbing the handle keeps the seam where it is; anywhere else jumps to the finger
+            if (!(e.target as HTMLElement).closest('[data-handle]')) moveTo(e.clientX);
+          }}
+          onPointerMove={(e) => drag.current && moveTo(e.clientX)}
+          onPointerUp={() => (drag.current = false)}
+          onPointerCancel={() => (drag.current = false)}
+        >
+          <img src={`${CMP}/${PAIRS[i][1]}.webp`} alt={`After: ${b.after}`} width={414} height={924} draggable={false} className="absolute inset-0 w-full h-full" />
+          <motion.img
+            src={`${CMP}/${PAIRS[i][0]}.webp`}
+            alt={`Before: ${b.before}`}
+            width={414}
+            height={924}
+            draggable={false}
+            className="absolute inset-0 w-full h-full"
+            style={{ clipPath: clip }}
+          />
+          {/* the seam: a line with a round knob, and a tag on each side that rides along it */}
+          <motion.div data-handle className="absolute inset-y-0 w-10 -ml-5 cursor-ew-resize" style={{ left }}>
+            <span className="absolute inset-y-0 left-1/2 w-[2px] -ml-px bg-white shadow-[0_0_10px_rgba(0,0,0,0.25)]" />
+            <motion.span
+              className="absolute top-[54px] right-[calc(50%+8px)] rounded-full bg-[#0F1117] text-white text-[11px] font-semibold px-2.5 py-1 whitespace-nowrap shadow-[0_4px_12px_-4px_rgba(0,0,0,0.5)]"
+              style={{ opacity: beforeTag }}
+            >
+              Before
+            </motion.span>
+            <motion.span
+              className="absolute top-[54px] left-[calc(50%+8px)] rounded-full bg-[#1D368D] text-white text-[11px] font-semibold px-2.5 py-1 whitespace-nowrap shadow-[0_4px_12px_-4px_rgba(0,0,0,0.5)]"
+              style={{ opacity: afterTag }}
+            >
+              After
+            </motion.span>
+            <span
+              role="slider"
+              tabIndex={0}
+              aria-label="Drag to compare before and after"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuetext="Before on the left, after on the right"
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowLeft') seam.set(Math.max(0, seam.get() - 5));
+                if (e.key === 'ArrowRight') seam.set(Math.min(100, seam.get() + 5));
+              }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white text-[#1D368D] grid place-items-center shadow-[0_6px_20px_-4px_rgba(0,0,0,0.45),0_0_0_4px_rgba(255,255,255,0.35)] transition-transform hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7DA2FF]"
+            >
+              <ChevronsLeftRight className="w-5 h-5" strokeWidth={2.25} />
+            </span>
+          </motion.div>
+        </div>
+      </div>
+
+      <div>
+        <div className="flex flex-wrap gap-2 mb-8" role="tablist" aria-label="Before and after cases">
+          {BEFORE_AFTER.map((x, k) => (
+            <button
+              key={x.n}
+              type="button"
+              role="tab"
+              aria-selected={k === i}
+              onClick={() => {
+                setI(k);
+                seam.set(50);
+              }}
+              className={`rounded-full px-4 py-2 text-sm transition-colors ${k === i ? 'bg-white text-black' : 'border border-white/15 text-white/60 hover:text-white'}`}
+            >
+              {x.n} · {x.t}
+            </button>
+          ))}
+        </div>
+        <motion.div style={{ opacity: beforeOp }} className="mb-6">
+          <p className="text-xs font-semibold mb-1.5 text-[#FF8A8A]">Before</p>
+          <p className="text-white/80 text-base md:text-lg leading-relaxed">{b.before}</p>
+        </motion.div>
+        <motion.div style={{ opacity: afterOp }}>
+          <p className="text-xs font-semibold mb-1.5" style={{ color: ACCENT }}>
+            After
+          </p>
+          <p className="text-white text-base md:text-lg leading-relaxed">{b.after}</p>
+        </motion.div>
+        <p className="text-white/35 text-sm mt-8">Drag the handle on the phone to compare. Screens from the design board.</p>
+      </div>
+    </div>
+  );
+}
 
 /* 39 taps vs 3, drawn as dots. */
 function TapCount() {
@@ -210,6 +334,19 @@ function TapCount() {
   );
 }
 
+/* All the Buy Again screens for the marquee gallery. Neighbouring
+   columns start on different screens; "Add all" plays live in two. */
+const ph = (state: SaryState): Screen => (w) => <SaryPhone state={state} width={w} />;
+const live: Screen = (w, on) => <SaryAddAllLoop width={w} playing={on} />;
+const SCREENS: Screen[][] = [
+  [ph('home'), ph('review'), ph('routine')],
+  [ph('hub'), ph('order'), live],
+  [ph('added'), ph('home'), ph('review')],
+  [live, ph('routine'), ph('hub')],
+  [ph('order'), ph('added'), ph('home')],
+  [ph('review'), ph('hub'), ph('added')],
+];
+
 export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
   return (
     <CaseShell
@@ -220,7 +357,7 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
       resetKey="sary-repeat-customers"
       pillId="sary-tab-pill"
     >
-      <div className="max-w-5xl mx-auto px-6 pt-16 pb-24">
+      <div className="max-w-5xl mx-auto px-6 pt-16">
         {/* ── 01 OVERVIEW ── */}
         <ChapterTitle chapter={CHAPTERS[0]} />
         <section id="overview" className="mb-32 scroll-mt-24">
@@ -229,24 +366,26 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="text-xs font-semibold mb-6" style={{ color: ACCENT }}>
-              Sary · B2B grocery · Repeat customers
-            </p>
-            <h1 className="text-white text-5xl md:text-7xl font-semibold mb-8 leading-[0.95] tracking-tight max-w-4xl">
-              Restock in 3 taps, not 39.
-            </h1>
-            <p className="text-white/50 text-lg md:text-xl leading-relaxed max-w-2xl mb-12">
-              Grocery owners reorder the same few dozen products every week. I designed a page that turns that routine
-              into one tap, flags what’s running low before the shelf is empty, and suggests the next order on the
-              store’s own restock day.
-            </p>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-6 py-6 border-y border-white/10 mb-12">
-              <Meta label="Role" value="Lead Product Designer" />
-              <Meta label="User" value="Grocery owner, Riyadh" />
-              <Meta label="Surface" value="Home · Orders tab" />
-              <Meta label="Deliverables" value="5 screens · motion · film" />
-            </div>
+            <CaseIntro
+              meta={[
+                ['Role', 'Lead Product Designer'],
+                ['Platform', 'Mobile app'],
+                ['Market', 'Saudi Arabia · B2B grocery'],
+                ['User', 'Grocery store owners'],
+                ['Year', '2022'],
+                ['Deliverables', '5 screens · motion · film'],
+              ]}
+              title="Restock in 3 taps, not 39."
+            >
+              <p>
+                Sary is a B2B grocery marketplace in Saudi Arabia. Store owners use it to restock their shelves, and most of
+                them buy the same few dozen products every week.
+              </p>
+              <p>
+                I designed a Buy Again hub that turns that routine into one tap, flags what’s running low before the shelf is
+                empty, and suggests the next order on the store’s own restock day.
+              </p>
+            </CaseIntro>
 
             <CaseFilm
               src={FILM}
@@ -300,32 +439,8 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           </div>
 
           <Eyebrow tone="#FF5F5F">Before and after</Eyebrow>
-          <div className="grid gap-3 mb-3">
-            {BEFORE_AFTER.map((b, i) => (
-              <motion.div
-                key={b.n}
-                {...reveal}
-                transition={{ ...reveal.transition, delay: i * 0.06 }}
-                className="rounded-[24px] border border-white/5 bg-[#0D0D0D] p-6 md:p-7"
-              >
-                <p className="text-white font-bold text-lg mb-5">
-                  <span className="text-white/30 mr-3">{b.n}</span>
-                  {b.t}
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <p className="text-xs font-semibold mb-2 text-[#FF5F5F]">Before</p>
-                    <p className="text-white/55 text-sm leading-relaxed">{b.before}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold mb-2" style={{ color: ACCENT }}>
-                      After
-                    </p>
-                    <p className="text-white/85 text-sm leading-relaxed">{b.after}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+          <div className="mb-10">
+            <ScreenCompare />
           </div>
           <TapCount />
           <p className="text-white/35 text-xs mt-4 max-w-xl">
@@ -357,8 +472,15 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           </motion.blockquote>
         </section>
 
-        {/* ── 04 USE CASES ── */}
-        <ChapterTitle chapter={CHAPTERS[3]} tone="teal" />
+        {/* ── 04 SCREENS ── */}
+        <ChapterTitle chapter={CHAPTERS[3]} />
+      </div>
+      <section id="screens" className="mb-32 scroll-mt-24">
+        <MarqueeGallery columns={SCREENS} aspect={390 / 844} label="All the Buy Again screens, scrolling in columns" />
+      </section>
+      <div className="max-w-5xl mx-auto px-6 pb-24">
+        {/* ── 05 USE CASES ── */}
+        <ChapterTitle chapter={CHAPTERS[4]} />
         <section id="cases" className="mb-32 scroll-mt-24">
           <UseCaseExplorer
             cases={USE_CASES}
@@ -367,82 +489,46 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           />
         </section>
 
-        {/* ── 05 MOTION ── */}
-        <ChapterTitle chapter={CHAPTERS[4]} />
+        {/* ── 06 MOTION ── */}
+        <ChapterTitle chapter={CHAPTERS[5]} />
         <section id="motion" className="mb-32 scroll-mt-24">
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-10 items-start">
-            <div>
-              <p className="text-white/60 text-base md:text-lg leading-relaxed mb-8 max-w-xl">
-                One tap restocks the usual basket. The items fly into the cart so the owner sees exactly what was added,
-                then the app offers to make it a weekly routine. About 1.4 seconds, and every step can be interrupted.
-              </p>
-              <ol className="grid gap-px rounded-2xl overflow-hidden border border-white/10 bg-white/10">
-                {MOTION.map((m, i) => (
-                  <motion.li
-                    key={m.k}
-                    {...reveal}
-                    transition={{ ...reveal.transition, delay: i * 0.04 }}
-                    className="bg-[#0D0D0D] p-5 grid grid-cols-[52px_1fr] gap-4"
-                  >
-                    <span className="font-mono text-xs pt-1" style={{ color: ACCENT }}>
-                      {m.k}
-                    </span>
-                    <span>
-                      <span className="flex flex-wrap items-baseline gap-x-3 mb-1">
-                        <span className="text-white font-bold">{m.t}</span>
-                        <span className="text-white/35 text-xs font-mono">{m.at}</span>
-                      </span>
-                      <span className="block text-white/70 text-sm leading-relaxed">{m.what}</span>
-                      <span className="block text-white/40 text-sm leading-relaxed mt-1">{m.why}</span>
-                    </span>
-                  </motion.li>
-                ))}
-              </ol>
+          {/* framed as a playground, so it reads as something to try before anyone taps */}
+          <motion.div
+            {...reveal}
+            className="rounded-[28px] border border-white/10 bg-[#111214] overflow-hidden"
+          >
+            <div className="flex items-center justify-between gap-4 px-5 md:px-7 py-4 border-b border-white/[0.06] bg-[#111214]/80">
+              <span className="flex items-center gap-2.5 text-sm font-medium text-white whitespace-nowrap">
+                <MousePointerClick className="w-4 h-4" style={{ color: ACCENT }} />
+                Interactive prototype
+              </span>
+              <span className="flex items-center gap-2 rounded-full border border-white/10 px-3 py-1 text-xs text-white/60 whitespace-nowrap">
+                <span className="relative flex w-1.5 h-1.5">
+                  <span className="absolute inset-0 rounded-full opacity-60 motion-safe:animate-ping" style={{ background: ACCENT }} />
+                  <span className="relative w-1.5 h-1.5 rounded-full" style={{ background: ACCENT }} />
+                </span>
+                Live<span className="hidden sm:inline"> · tap to try</span>
+              </span>
             </div>
-            <div className="flex justify-center lg:sticky lg:top-40">
-              <SaryAddAllLoop width={280} />
+            <div className="flex justify-center px-4 py-10 md:py-16">
+              <SaryAddAllPlay width={300} />
             </div>
-          </div>
+          </motion.div>
         </section>
 
-        {/* ── 06 IMPACT ── */}
-        <ChapterTitle chapter={CHAPTERS[5]} />
+        {/* ── 07 IMPACT ── */}
+        <ChapterTitle chapter={CHAPTERS[6]} />
         <section id="impact" className="mb-16 scroll-mt-24">
-          <Eyebrow>Results</Eyebrow>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-16">
-            {RESULTS.map((r, i) => (
-              <motion.div
-                key={r.k}
-                {...reveal}
-                transition={{ ...reveal.transition, delay: i * 0.06 }}
-                className="rounded-[24px] border border-white/5 bg-[#0D0D0D] p-6"
-              >
-                <p className="text-white text-4xl md:text-5xl font-semibold tracking-[-0.04em] mb-2">{r.v}</p>
-                <p className="text-white/45 text-sm">{r.k}</p>
-              </motion.div>
-            ))}
-          </div>
-
-          <Eyebrow>Signals we keep watching</Eyebrow>
-          <motion.ul
-            {...reveal}
-            className="rounded-[24px] border border-white/5 bg-[#0D0D0D] px-6 md:px-7 mb-20"
+          <LeadStats lead={RESULTS[0]} note="The number this project was built to move." rest={RESULTS.slice(1)} accent={ACCENT} />
+          <Takeaway
+            accent={ACCENT}
+            deep="#1D368D"
+            note="Next on Sary, we keep watching the repeat-order rate, time to checkout, and the share of orders that start from Buy Again."
           >
-            {SIGNALS_TRACKED.map((s) => (
-              <li key={s.k} className="py-5 border-b border-white/5 last:border-0 md:grid md:grid-cols-[240px_1fr] md:gap-6">
-                <span className="block text-white font-bold mb-1 md:mb-0">{s.k}</span>
-                <span className="block text-white/50 text-sm leading-relaxed">{s.d}</span>
-              </li>
-            ))}
-          </motion.ul>
-
-          <motion.div {...reveal} className="max-w-3xl">
-            <Eyebrow>What I carry forward</Eyebrow>
-            <p className="text-white text-2xl md:text-3xl font-bold leading-snug tracking-tight">
-              The biggest wins don’t always need a big redesign. Look past the surface numbers, learn what people
-              already do, and make that the easiest thing in the app.
-            </p>
-          </motion.div>
+            Store owners were already reordering the same basket every week. The{' '}
+            <span style={{ color: ACCENT }}>biggest win</span> wasn’t a bigger redesign: it was putting that basket first, one
+            tap away.
+          </Takeaway>
         </section>
       </div>
     </CaseShell>
