@@ -1,7 +1,7 @@
 import { motion, useInView, useMotionValue, useReducedMotion, useSpring, useTransform } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { CaseIntro, LeadStats, Takeaway } from './_shared/CaseLayout';
-import { ChevronLeft, ChevronRight, MousePointerClick } from 'lucide-react';
+import { ChevronsLeftRight, MousePointerClick } from 'lucide-react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
 import { CaseFilm, Eyebrow as BaseEyebrow, UseCaseExplorer, reveal, type UseCase as BaseUseCase } from './_shared/CaseBits';
@@ -193,7 +193,8 @@ function ScreenCompare() {
   const smooth = useSpring(seam, { stiffness: 320, damping: 34 });
   const clip = useTransform(smooth, (v) => `inset(0 ${100 - v}% 0 0)`);
   const left = useTransform(smooth, (v) => `${v}%`);
-  const pill = useTransform(smooth, (v) => `clamp(76px, ${v}%, calc(100% - 76px))`);
+  const beforeTag = useTransform(smooth, [16, 26], [0, 1]);
+  const afterTag = useTransform(smooth, [74, 84], [1, 0]);
   const beforeOp = useTransform(smooth, [0, 50, 100], [0.45, 1, 1]);
   const afterOp = useTransform(smooth, [0, 50, 100], [1, 1, 0.45]);
   const inView = useInView(box, { once: true, margin: '-20% 0px' });
@@ -239,42 +240,37 @@ function ScreenCompare() {
             className="absolute inset-0 w-full h-full"
             style={{ clipPath: clip }}
           />
-          <motion.div
-            className="absolute inset-y-0 w-px pointer-events-none"
-            style={{ left, background: 'linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.95) 18%, rgba(255,255,255,0.95) 82%, transparent 100%)', boxShadow: '0 0 14px rgba(0,0,0,0.35)' }}
-          />
-          {/* the handle: one pill naming both sides, kept inside the phone at the edges */}
-          <motion.span
-            data-handle
-            role="slider"
-            tabIndex={0}
-            aria-label="Drag to compare before and after"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuetext="Before on the left, after on the right"
-            onKeyDown={(e) => {
-              if (e.key === 'ArrowLeft') seam.set(Math.max(0, seam.get() - 5));
-              if (e.key === 'ArrowRight') seam.set(Math.min(100, seam.get() + 5));
-            }}
-            className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center rounded-full text-[13px] font-semibold text-white cursor-grab active:cursor-grabbing backdrop-blur-xl backdrop-saturate-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7DA2FF]"
-            style={{
-              left: pill,
-              background: 'linear-gradient(180deg, rgba(40,44,58,0.62) 0%, rgba(14,16,24,0.72) 100%)',
-              border: '1px solid rgba(255,255,255,0.22)',
-              boxShadow:
-                'inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(255,255,255,0.06), 0 10px 30px -8px rgba(0,0,0,0.55), -10px 0 24px -12px rgba(255,138,138,0.55), 10px 0 24px -12px rgba(125,162,255,0.65)',
-            }}
-          >
-            <motion.span className="flex items-center gap-1 pl-2.5 pr-3 py-2 text-[#FFB3B3]" style={{ opacity: beforeOp }}>
-              <ChevronLeft className="w-4 h-4" />
+          {/* the seam: a line with a round knob, and a tag on each side that rides along it */}
+          <motion.div data-handle className="absolute inset-y-0 w-10 -ml-5 cursor-ew-resize" style={{ left }}>
+            <span className="absolute inset-y-0 left-1/2 w-[2px] -ml-px bg-white shadow-[0_0_10px_rgba(0,0,0,0.25)]" />
+            <motion.span
+              className="absolute top-[54px] right-[calc(50%+8px)] rounded-full bg-[#0F1117] text-white text-[11px] font-semibold px-2.5 py-1 whitespace-nowrap shadow-[0_4px_12px_-4px_rgba(0,0,0,0.5)]"
+              style={{ opacity: beforeTag }}
+            >
               Before
             </motion.span>
-            <span className="w-px self-stretch my-2 bg-white/20" />
-            <motion.span className="flex items-center gap-1 pl-3 pr-2.5 py-2 text-[#B9CCFF]" style={{ opacity: afterOp }}>
+            <motion.span
+              className="absolute top-[54px] left-[calc(50%+8px)] rounded-full bg-[#1D368D] text-white text-[11px] font-semibold px-2.5 py-1 whitespace-nowrap shadow-[0_4px_12px_-4px_rgba(0,0,0,0.5)]"
+              style={{ opacity: afterTag }}
+            >
               After
-              <ChevronRight className="w-4 h-4" />
             </motion.span>
-          </motion.span>
+            <span
+              role="slider"
+              tabIndex={0}
+              aria-label="Drag to compare before and after"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuetext="Before on the left, after on the right"
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowLeft') seam.set(Math.max(0, seam.get() - 5));
+                if (e.key === 'ArrowRight') seam.set(Math.min(100, seam.get() + 5));
+              }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white text-[#1D368D] grid place-items-center shadow-[0_6px_20px_-4px_rgba(0,0,0,0.45),0_0_0_4px_rgba(255,255,255,0.35)] transition-transform hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7DA2FF]"
+            >
+              <ChevronsLeftRight className="w-5 h-5" strokeWidth={2.25} />
+            </span>
+          </motion.div>
         </div>
       </div>
 
