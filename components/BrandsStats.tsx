@@ -160,7 +160,7 @@ export function BrandsStats() {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '88px',
+                gap: '96px',
                 width: 'max-content',
               }}
               className="group-hover/strip:[animation-play-state:paused]"
@@ -169,7 +169,7 @@ export function BrandsStats() {
                 <div
                   key={`${brand.name}-${i}`}
                   className="group/logo flex-shrink-0 flex items-center justify-center"
-                  style={{ height: '52px', width: '128px' }}
+                  style={{ height: '72px', width: '176px' }}
                   aria-hidden={i >= brandLogos.length ? true : undefined}
                 >
                   <img
@@ -178,8 +178,8 @@ export function BrandsStats() {
                     loading="lazy"
                     draggable={false}
                     style={{
-                      maxHeight: '32px',
-                      maxWidth: '108px',
+                      maxHeight: '46px',
+                      maxWidth: '152px',
                       width: 'auto',
                       height: 'auto',
                       objectFit: 'contain',
