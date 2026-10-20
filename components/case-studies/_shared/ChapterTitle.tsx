@@ -4,7 +4,8 @@ import type { Chapter } from './types';
 /* ── Chapter opener ───────────────────────────────────
    A quiet start to each chapter: a thin rule, then the chapter
    number, name and one line in small type. Sentence case and no
-   colour, so the work itself carries the page. `tone` and `total` are kept so callers don't change. */
+   colour, so the work itself carries the page. `tone` and `total`
+   are kept so callers don't change. */
 export function ChapterTitle({
   chapter,
 }: {
