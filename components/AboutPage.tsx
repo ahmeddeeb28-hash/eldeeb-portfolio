@@ -1,19 +1,19 @@
 import { motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
-import { Mail, Linkedin, Download, ArrowRight } from 'lucide-react';
+import { Mail, Linkedin, Download, ArrowRight, Check } from 'lucide-react';
 import { CaseShell } from './case-studies/_shared/CaseShell';
 import { Meta } from './case-studies/_shared/Meta';
 import type { Chapter } from './case-studies/_shared/types';
 import { ds } from '../styles/designSystem';
 
 const LINKEDIN_URL = 'https://www.linkedin.com/in/el-deeb-39032b131/';
-const RESUME_URL = 'https://drive.google.com/file/d/1W0NqqKXwbhjts_xdbsSxtfon3wnGSee1/view?usp=drive_link';
+const RESUME_URL = '/cv/Ahmad_Eldeeb_Lead_Product_Designer_CV.pdf';
 
 /* ── Chapter spine — mirrors the case-study cinematic language but with
    a warmer, more personal set of beats. ────────────────────────────── */
 const CHAPTERS: Chapter[] = [
-  { id: 'intro', num: '01', roman: 'I', label: 'Intro', beat: 'Where the story actually starts.' },
-  { id: 'story', num: '02', roman: 'II', label: 'Story', beat: 'What the résumé leaves out.' },
+  { id: 'intro', num: '01', roman: 'I', label: 'Intro', beat: 'Who I am.' },
+  { id: 'what', num: '02', roman: 'II', label: 'What I Do', beat: 'Where I help teams most.' },
   { id: 'experience', num: '03', roman: 'III', label: 'Experience', beat: 'Where I\u2019ve done the work.' },
   { id: 'timeline', num: '04', roman: 'IV', label: 'Timeline', beat: 'The milestones behind the titles.' },
   { id: 'beyond', num: '05', roman: 'V', label: 'Beyond Work', beat: 'Who I am off the clock.' },
@@ -59,125 +59,131 @@ function SectionHeader({
   );
 }
 
-/* ── Gallery-print photo treatment ───────────────────────────────────
-   Distinct from the Hero's soft asymmetric-radius portrait: sharp
-   rectangle, an offset gold hairline frame sitting behind/right of the
-   print (matted-print look), fine grain, and a photographer-style
-   caption tag in the corner. */
-function GalleryPhoto() {
-  const [photoFailed, setPhotoFailed] = useState(false);
+/* ── 01 · Intro ───────────────────────────────────────────────────── */
+/* ── 01 · Intro ─────────────────────────────────────────────────────
+   Who I am in two sentences, under a round portrait, with one way to
+   start working together. The résumé sits beside it for recruiters. */
+const ACCENT = 'rgba(220,190,140,1)';
 
+function IntroSection() {
   return (
-    <div className="relative w-full" style={{ maxWidth: '380px' }}>
-      {/* Offset frame — sits behind and to the lower-right of the print */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: '14px',
-          left: '14px',
-          right: '-14px',
-          bottom: '-14px',
-          border: '1px solid rgba(220,190,140,0.35)',
-        }}
-        aria-hidden="true"
-      />
-
-      <div
-        className="relative w-full overflow-hidden"
-        style={{ aspectRatio: '4 / 5', border: '1px solid rgba(220,190,140,0.45)', background: '#111' }}
-      >
-        {photoFailed ? (
-          <div
-            className="absolute inset-0 flex items-center justify-center"
-            style={{ background: 'linear-gradient(160deg, #18150F 0%, #0A0A0A 75%)' }}
-          >
-            <span style={{ fontFamily: ds.font.serif, fontStyle: 'italic', color: 'rgba(220,190,140,0.5)', fontSize: '14px' }}>
-              Ahmad Eldeeb
-            </span>
-          </div>
-        ) : (
-          <img
-            src="/images/profile.jpg"
-            alt="Ahmad Eldeeb"
-            onError={() => setPhotoFailed(true)}
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ filter: 'grayscale(0.15) contrast(1.05)' }}
-          />
-        )}
-
-        {/* Fine grain for a gallery-print texture */}
-        <div
-          className="absolute inset-0 opacity-[0.06] pointer-events-none"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")",
-            mixBlendMode: 'overlay',
-          }}
-        />
-
-        {/* Caption tag */}
-        <div
-          className="absolute bottom-3 right-3 px-2.5 py-1"
-          style={{ background: 'rgba(10,10,10,0.6)', backdropFilter: 'blur(6px)' }}
+    <section id="intro" className="relative px-6 pt-20 md:pt-28 pb-24 md:pb-32">
+      <div className="mx-auto max-w-4xl text-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="mx-auto mb-12 w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden"
+          style={{ boxShadow: '0 0 0 1px rgba(255,255,255,0.12), 0 30px 60px -20px rgba(0,0,0,0.8)' }}
         >
-          <span style={{ fontFamily: ds.font.serif, fontStyle: 'italic', fontSize: '11px', color: 'rgba(220,190,140,0.85)' }}>
-            A.E., 2026
-          </span>
-        </div>
+          <img src="/images/profile.jpg" alt="Ahmad Eldeeb" className="w-full h-full object-cover" />
+        </motion.div>
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          className="text-white leading-[1.25] tracking-[-0.01em] mb-6"
+          style={{ fontSize: 'clamp(1.5rem, 3.4vw, 2.6rem)' }}
+        >
+          <span style={{ color: ACCENT }}>I’m Ahmad.</span> I lead product design teams and design digital products, design
+          systems and AI tools for companies from early-stage startups to established platforms.
+        </motion.p>
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          className="text-white leading-[1.25] tracking-[-0.01em]"
+          style={{ fontSize: 'clamp(1.5rem, 3.4vw, 2.6rem)' }}
+        >
+          My work spans e-commerce, SaaS, fintech, AI and gaming, with teams across Europe and the Gulf.
+        </motion.p>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="flex flex-wrap items-center justify-center gap-6 mt-12"
+        >
+          <a
+            href="mailto:ahmeddeeb28@gmail.com"
+            className="inline-flex items-center px-8 py-3.5 rounded-2xl text-white text-sm font-semibold uppercase tracking-[0.06em] hover:bg-white hover:text-black transition-colors"
+            style={{ border: '1.5px solid rgba(255,255,255,0.85)', textDecoration: 'none' }}
+          >
+            Work with me
+          </a>
+          <a
+            href={RESUME_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-white/60 hover:text-white text-sm font-semibold transition-colors"
+            style={{ textDecoration: 'none' }}
+          >
+            <Download size={15} strokeWidth={2.5} /> Download resume
+          </a>
+        </motion.div>
       </div>
-    </div>
+    </section>
   );
 }
 
-/* ── 01 · Intro ───────────────────────────────────────────────────── */
-function IntroSection() {
+/* ── 02 · What I do ─────────────────────────────────────────────────
+   One statement of the job, then the work in three columns. */
+const WHAT: [string, string[]][] = [
+  ['Leadership & Strategy', ['Design Team Leadership', 'Design Reviews & Mentoring', 'Product & Design Strategy']],
+  ['Product Design', ['App & Web Design', 'Design Systems', 'Data-Heavy Dashboards']],
+  ['AI & Growth', ['AI-Built Prototypes', 'AI Design Workflows', 'Experiments & Metrics']],
+];
+
+function WhatIDoSection() {
   return (
-    <section id="intro" className="relative px-6 pt-16 md:pt-24 pb-28 md:pb-36">
-      <div
-        className="mx-auto grid md:grid-cols-2 gap-14 md:gap-20 items-center"
-        style={{ maxWidth: ds.layout.contentMaxWidth }}
-      >
-        <div>
-          <span className="text-[#4AF2E5] font-mono text-[11px] tracking-[0.4em] uppercase block mb-6">
-            The Director's Cut
-          </span>
-          <h1
-            className="text-white font-black tracking-tighter leading-[0.98] mb-8"
-            style={{ fontSize: 'clamp(2.3rem, 6vw, 4.1rem)' }}
-          >
-            Beyond the case studies:{' '}
-            <span style={{ fontFamily: ds.font.serif, fontStyle: 'italic', color: 'rgba(220,190,140,0.9)', fontWeight: 500 }}>
-              this is the story
-            </span>{' '}
-            I don't put in the deck.
-          </h1>
-          <p className="text-white/50 text-base md:text-lg leading-relaxed max-w-md">
-            The work speaks for itself elsewhere on this site. This page is everything around
-            it: how I got here, what I believe, and who I am when I'm not shipping.
-          </p>
-          <div className="flex flex-wrap items-center gap-4 mt-10">
-            <a
-              href={RESUME_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full"
-              style={{ background: '#fff', border: '1px solid rgba(220,190,140,0.6)', color: '#0A0A0A', fontSize: '13px', fontWeight: 600, letterSpacing: '0.01em', textDecoration: 'none' }}
+    <section id="what" className="relative px-6 py-24 md:py-32 border-t border-white/5">
+      <div className="mx-auto" style={{ maxWidth: ds.layout.contentMaxWidth }}>
+        <p className="flex items-center justify-center gap-3 text-white/85 text-base md:text-lg mb-14 md:mb-20">
+          <span className="w-3 h-3 rounded-full border-[1.5px] border-white/80" aria-hidden /> What I do
+        </p>
+        <motion.h2
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px 0px' }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          className="text-white text-center uppercase font-semibold leading-[1.02] tracking-[-0.02em] mb-10"
+          style={{ fontSize: 'clamp(2.1rem, 6.2vw, 5.4rem)' }}
+        >
+          I lead teams that turn complex problems into <span style={{ color: ACCENT }}>products people use.</span>
+        </motion.h2>
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: '-80px 0px' }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-white/80 text-center text-lg md:text-2xl leading-snug max-w-3xl mx-auto mb-20 md:mb-28"
+        >
+          Whether a team is finding its first version, scaling a platform or bringing AI into how it works, I set the
+          direction, design the hard parts and help designers grow.
+        </motion.p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
+          {WHAT.map(([group, items], gi) => (
+            <motion.div
+              key={group}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px 0px' }}
+              transition={{ duration: 0.6, delay: gi * 0.1, ease: [0.22, 1, 0.36, 1] }}
             >
-              <Download size={15} strokeWidth={2.5} /> Download Resume
-            </a>
-            <a
-              href={LINKEDIN_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(74,242,229,0.4)', color: 'rgba(255,255,255,0.85)', fontSize: '13px', fontWeight: 600, letterSpacing: '0.01em', textDecoration: 'none' }}
-            >
-              <Linkedin size={15} strokeWidth={2.5} fill="currentColor" style={{ color: '#4AF2E5' }} /> LinkedIn
-            </a>
-          </div>
-        </div>
-        <div className="flex md:justify-end justify-center">
-          <GalleryPhoto />
+              <p className="text-sm font-semibold mb-6" style={{ color: ACCENT }}>
+                {group}
+              </p>
+              <ul className="grid gap-5">
+                {items.map((it) => (
+                  <li key={it} className="flex items-center gap-4 text-white text-lg md:text-xl">
+                    <span className="w-8 h-8 rounded-full bg-white text-black grid place-items-center flex-none">
+                      <Check size={16} strokeWidth={3} />
+                    </span>
+                    {it}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
@@ -307,7 +313,7 @@ function StorySection() {
   return (
     <section id="story" className="relative px-6 py-24 md:py-32 border-t border-white/5">
       <div className="mx-auto" style={{ maxWidth: ds.layout.contentMaxWidth }}>
-        <SectionHeader num="02" roman="II" label="Story" beat="What the résumé leaves out." />
+        <SectionHeader num="05" roman="V" label="Story" beat="What the résumé leaves out." />
         <div className="grid md:grid-cols-[1fr_auto] gap-14 md:gap-24 items-start">
           <div className="space-y-6 max-w-2xl">
             <p className="text-white/70 text-base md:text-lg leading-[1.7]">
@@ -2330,9 +2336,11 @@ export function AboutPage({ onBack }: { onBack: () => void }) {
   return (
     <CaseShell chapters={CHAPTERS} metaLine="The Director's Cut" onBack={onBack} pillId="about-tab-pill">
       <IntroSection />
-      <StorySection />
+      <WhatIDoSection />
       <ExperienceSection />
       <TimelineSection />
+      {/* Story is hidden for now; restore by rendering it again and adding its chapter back. */}
+      {false && <StorySection />}
       <BeyondWorkSection />
       <ConnectSection />
     </CaseShell>

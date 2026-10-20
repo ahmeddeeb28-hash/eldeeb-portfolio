@@ -35,9 +35,10 @@ const CHAPTERS: Chapter[] = [
   { id: 'overview', num: '01', roman: 'I', label: 'Overview', beat: 'Handing an AI the price tag.' },
   { id: 'problem', num: '02', roman: 'II', label: 'Problem', beat: 'Trust, not capability.' },
   { id: 'concept', num: '03', roman: 'III', label: 'Concept', beat: 'A ladder of trust.' },
-  { id: 'flows', num: '04', roman: 'IV', label: 'The Flows', beat: 'Five rungs, five screens.' },
-  { id: 'dashboard', num: '05', roman: 'V', label: 'Dashboard', beat: 'Answers before decoration.' },
-  { id: 'craft', num: '06', roman: 'VI', label: 'Craft', beat: 'The details that hold it.' },
+  { id: 'process', num: '04', roman: 'IV', label: 'Process', beat: 'Agreed, prototyped, tested.' },
+  { id: 'flows', num: '05', roman: 'V', label: 'The Flows', beat: 'Five rungs, five screens.' },
+  { id: 'dashboard', num: '06', roman: 'VI', label: 'Dashboard', beat: 'Answers before decoration.' },
+  { id: 'craft', num: '07', roman: 'VII', label: 'Craft', beat: 'The details that hold it.' },
 ];
 
 const PROBLEMS = [
@@ -154,6 +155,40 @@ const DASH_STEPS: FocusStep[] = [
   { cap: 'All on one screen', ms: 1400 },
 ];
 
+const PROCESS: { t: string; d: string; out: string[] }[] = [
+  {
+    t: 'Shared the diagnosis with the other teams',
+    d: 'I walked product, data and engineering through the problem as one story: merchants did not distrust the math, they could not see it.',
+    out: ['Problem board', 'Trust ladder'],
+  },
+  {
+    t: 'Agreed the feature, its use and its impact',
+    d: 'Before any screen was final we agreed what the feature does, how a merchant uses it day to day, and how we would know it worked.',
+    out: ['Feature scope', 'Utilization', 'Impact metrics'],
+  },
+  {
+    t: 'Built the prototype with AI',
+    d: 'I built the clickable prototype with Claude: every flow, the mode selector and the dashboard as working screens, not static frames. It is the prototype you can use on this page.',
+    out: ['Claude', 'Working prototype', 'All five flows'],
+  },
+  {
+    t: 'Tested it and fed back',
+    d: 'We tested the prototype flow by flow with the team. Every round of feedback became a named fix, so the design changed for a reason we could point to.',
+    out: ['Team feedback', 'Fix list'],
+  },
+  {
+    t: 'Handed over rules, not just screens',
+    d: 'The team kept building with four components, one status chip and four placement rules for every pop-up.',
+    out: ['4 components', '4 rules', '1 status system'],
+  },
+];
+
+const AGREED: [string, string][] = [
+  ['Feature', 'Pricing strategies a merchant can read, preview in three modes, test, and undo.'],
+  ['Utilization', 'Activation rate and time to first strategy: do merchants start, and how fast.'],
+  ['Impact', 'Revenue and profit lift against normal prices, and the 7-day disable rate as the trust signal.'],
+];
+
 const RULES = [
   { k: 'R1', t: 'Primary on the right' },
   { k: 'R2', t: 'One primary per view' },
@@ -238,7 +273,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
     <CaseShell chapters={CHAPTERS} metaLine="Sampo AI · Pricing" onBack={onBack} onNext={onNext} resetKey="sampo-ai-pricing" pillId="sampo-tab-pill">
       <div className="max-w-6xl mx-auto px-6 pt-16 pb-24">
         {/* ── 01 OVERVIEW ── */}
-        <ChapterTitle chapter={CHAPTERS[0]} />
+        <ChapterTitle total="VII" chapter={CHAPTERS[0]} />
         <section id="overview" className="mb-32 scroll-mt-24">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
             <p className="text-[10px] font-black uppercase tracking-[0.32em] mb-6" style={{ color: ACCENT }}>
@@ -248,7 +283,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
               AI pricing merchants can trust, test and undo.
             </h1>
             <p className="text-white/50 text-lg md:text-xl leading-relaxed max-w-2xl mb-12">
-              An AI that changes store prices. I designed it so merchants can read it, test it and undo it.
+              An AI that changes store prices. As consultant and design team lead, I got the teams to agree on the feature and its impact, built the prototype with AI, and tested it before handoff.
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-6 py-6 border-y border-white/10 mb-12">
               <Meta label="Role" value="Consultation &amp; Design team management" />
@@ -271,7 +306,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         </section>
 
         {/* ── 02 PROBLEM ── */}
-        <ChapterTitle chapter={CHAPTERS[1]} tone="red" />
+        <ChapterTitle total="VII" chapter={CHAPTERS[1]} tone="red" />
         <section id="problem" className="mb-32 scroll-mt-24">
           <motion.p {...reveal} className="text-white text-3xl md:text-5xl font-black leading-[1.1] tracking-tight max-w-4xl mb-12">
             Merchants were asked to trust a black box with their margin.
@@ -291,7 +326,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         </section>
 
         {/* ── 03 CONCEPT ── */}
-        <ChapterTitle chapter={CHAPTERS[2]} tone="teal" />
+        <ChapterTitle total="VII" chapter={CHAPTERS[2]} tone="teal" />
         <section id="concept" className="mb-32 scroll-mt-24">
           <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-black tracking-tight mb-10 max-w-3xl">
             Control is handed over one rung at a time.
@@ -317,20 +352,81 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           </div>
         </section>
 
-        {/* ── 04 FLOWS ── */}
-        <ChapterTitle chapter={CHAPTERS[3]} tone="teal" />
+        {/* ── 04 PROCESS ── */}
+        <ChapterTitle total="VII" chapter={CHAPTERS[3]} tone="teal" />
+        <section id="process" className="mb-32 scroll-mt-24">
+          <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-black tracking-tight mb-4 max-w-3xl">
+            I ran it as a consultant: agree first, then prototype, then test.
+          </motion.h2>
+          <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-12">
+            My job was to get product, data and engineering to one plan, and to prove it with something people could click.
+          </motion.p>
+          <ol className="relative grid gap-4">
+            <span className="absolute left-[23px] top-6 bottom-6 w-px bg-gradient-to-b from-[#8B85FF]/60 via-[#8B85FF]/20 to-transparent hidden sm:block" aria-hidden />
+            {PROCESS.map((p, i) => (
+              <motion.li
+                key={p.t}
+                initial={{ opacity: 0, x: -16 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: '-10% 0px' }}
+                transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                className="relative grid grid-cols-[48px_minmax(0,1fr)] gap-4 sm:gap-6"
+              >
+                <span
+                  className="w-12 h-12 rounded-full grid place-items-center text-sm font-black border"
+                  style={{ borderColor: `${ACCENT}66`, background: '#0D0B1F', color: ACCENT }}
+                >
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <div className="rounded-[20px] border border-white/8 bg-[#0D0D0D] p-5 md:p-6 grid md:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] gap-4 md:gap-8 items-start">
+                  <div>
+                    <p className="text-white text-lg md:text-xl font-bold tracking-tight mb-1.5">{p.t}</p>
+                    <p className="text-white/55 text-sm md:text-base leading-relaxed">{p.d}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2 md:justify-end">
+                    {p.out.map((o) => (
+                      <span key={o} className="text-xs font-semibold rounded-full px-3 py-1.5 border" style={{ borderColor: `${ACCENT}44`, color: '#CFCBFF', background: `${ACCENT}12` }}>
+                        {o}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </motion.li>
+            ))}
+          </ol>
+          <motion.div
+            {...reveal}
+            className="mt-10 rounded-[24px] p-6 md:p-8 border grid md:grid-cols-3 gap-6"
+            style={{ borderColor: `${ACCENT}44`, background: `${ACCENT}0D` }}
+          >
+            {AGREED.map(([k, v]) => (
+              <div key={k}>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-2" style={{ color: ACCENT }}>
+                  {k}
+                </p>
+                <p className="text-white/85 text-sm md:text-base leading-relaxed">{v}</p>
+              </div>
+            ))}
+          </motion.div>
+        </section>
+
+        {/* ── 05 FLOWS ── */}
+        <ChapterTitle total="VII" chapter={CHAPTERS[4]} tone="teal" />
         <section id="flows" className="mb-32 scroll-mt-24">
+          <p className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-10">
+            Every screen here is the prototype I built with Claude and tested with the team. Watch each flow, or click the screen and use it.
+          </p>
           <Flows />
         </section>
 
-        {/* ── 05 DASHBOARD ── */}
-        <ChapterTitle chapter={CHAPTERS[4]} />
+        {/* ── 06 DASHBOARD ── */}
+        <ChapterTitle total="VII" chapter={CHAPTERS[5]} />
         <section id="dashboard" className="mb-32 scroll-mt-24">
           <Dashboard />
         </section>
 
-        {/* ── 06 CRAFT ── */}
-        <ChapterTitle chapter={CHAPTERS[5]} />
+        {/* ── 07 CRAFT ── */}
+        <ChapterTitle total="VII" chapter={CHAPTERS[6]} />
         <section id="craft" className="mb-16 scroll-mt-24">
           <Eyebrow>Four rules for every pop-up</Eyebrow>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-16">
