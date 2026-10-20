@@ -7,6 +7,7 @@ import { Projects } from './components/Projects';
 import { Mentorship } from './components/Mentorship';
 import { LeadershipStrategy } from './components/LeadershipStrategy';
 import { BrandsStats } from './components/BrandsStats';
+import { HowILead } from './components/HowILead';
 import { Results } from './components/Results';
 import { Testimonials } from './components/Testimonials';
 import { ProofOfPresence } from './components/ProofOfPresence';
@@ -163,6 +164,7 @@ export default function App() {
         <Navigation onOpenAboutPage={openAboutPage} />
         <PremiumHero />
         <BrandsStats />
+        <HowILead />
         <Projects onProjectClick={openProject} paused={overlayOpen} />
         {/* Hidden but preserved — restore by uncommenting the line below */}
         {false && <WorkLanguage />}

@@ -123,30 +123,30 @@ export function PremiumHero() {
 
   const heroViews = [
     {
-      label: 'The Strategist',
+      label: 'The Leader',
       index: '01',
-      headline: 'Strategy that ships.',
-      description: 'Over ten years leading product design across gaming, AI, fintech and SaaS. I turn complex requirements into clear decisions, structured execution and measurable business results.',
+      headline: 'Teams that grow.',
+      description: 'Four years leading multinational design teams across e-commerce, SaaS and fintech, with teams in Europe and the Gulf. At Sary I managed 8 designers across 3 squads. I run design reviews, keep the bar high and help senior designers grow.',
       accent: 'rgba(255, 140, 100, 1)',
       accentDim: 'rgba(255, 140, 100, 0.5)',
       gradient: 'linear-gradient(135deg, #FFE9C7 0%, #F5C78A 50%, #E7A868 100%)',
-      words: ['strategy', 'systems', 'frameworks', 'clarity', 'structure', 'focus'],
+      words: ['leadership', 'mentoring', 'design reviews', 'quality', 'alignment', 'growth'],
     },
     {
-      label: 'The Builder',
+      label: 'The Maker',
       index: '02',
-      headline: 'Building at scale.',
-      description: 'From concept to launch, I build design systems and product experiences that teams can adopt and scale, delivering complex platforms on time and to specification.',
+      headline: 'Hands on the hard problems.',
+      description: 'I still do the design work myself: complex flows, design systems and data-heavy dashboards, from early exploration to shipped features, tracked after launch.',
       accent: 'rgba(74, 242, 229, 1)',
       accentDim: 'rgba(74, 242, 229, 0.5)',
       gradient: 'linear-gradient(135deg, #B8FFF5 0%, #7EF0DF 50%, #4AF2E5 100%)',
       words: ['execution', 'delivery', 'scalability', 'velocity', 'precision', 'craft'],
     },
     {
-      label: 'The Innovator',
+      label: 'The AI Builder',
       index: '03',
-      headline: 'Innovating with AI.',
-      description: 'I lead research-driven work in emerging technology, where product design, artificial intelligence and human-centred thinking meet.',
+      headline: 'AI in the workflow.',
+      description: 'I find practical places for AI in the design process and build new workflows around it with the team. On Sampo I built the working prototype with Claude and tested it before handoff.',
       accent: 'rgba(180, 100, 255, 1)',
       accentDim: 'rgba(180, 100, 255, 0.5)',
       gradient: 'linear-gradient(135deg, #E4D8FF 0%, #BFA8F5 50%, #9A86E8 100%)',
@@ -171,8 +171,8 @@ export function PremiumHero() {
     },
     {
       id: 'launches',
-      value: '30+ Launches',
-      label: 'Shipped to millions',
+      value: '4 Years',
+      label: 'Leading design teams',
       rotate: 6,
       style: { bottom: '32%', right: '-14%' },
       floatDuration: 6.2,
@@ -182,8 +182,8 @@ export function PremiumHero() {
     },
     {
       id: 'industries',
-      value: '4 Industries',
-      label: 'Gaming to fintech',
+      value: 'EU · Gulf',
+      label: 'Multinational teams',
       rotate: -5,
       style: { bottom: '2%', left: '-10%' },
       floatDuration: 5.8,
@@ -318,7 +318,7 @@ export function PremiumHero() {
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
               style={{ display: 'block' }}
             >
-              Lead Product Designer with a Data Science background.
+              Product Design Lead who still designs.
             </motion.span>
             <motion.span
               initial={{ opacity: 0, y: 44 }}
@@ -326,7 +326,7 @@ export function PremiumHero() {
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.22 }}
               style={{ display: 'block', fontStyle: 'italic', color: 'rgba(255,255,255,0.45)', paddingRight: '0.08em' }}
             >
-              Driving growth and AI.
+              Leading teams, building with AI.
             </motion.span>
           </h1>
 
