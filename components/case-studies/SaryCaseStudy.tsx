@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { MousePointerClick } from 'lucide-react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
 import { Meta } from './_shared/Meta';
@@ -387,8 +388,30 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
 
         {/* ── 06 MOTION ── */}
         <ChapterTitle chapter={CHAPTERS[5]} />
-        <section id="motion" className="mb-32 scroll-mt-24 flex justify-center">
-          <SaryAddAllPlay width={320} />
+        <section id="motion" className="mb-32 scroll-mt-24">
+          {/* framed as a playground, so it reads as something to try before anyone taps */}
+          <motion.div
+            {...reveal}
+            className="rounded-[28px] border border-white/10 bg-[#111214] overflow-hidden"
+            style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px)', backgroundSize: '22px 22px' }}
+          >
+            <div className="flex items-center justify-between gap-4 px-5 md:px-7 py-4 border-b border-white/[0.06] bg-[#111214]/80">
+              <span className="flex items-center gap-2.5 text-sm font-medium text-white whitespace-nowrap">
+                <MousePointerClick className="w-4 h-4" style={{ color: ACCENT }} />
+                Interactive prototype
+              </span>
+              <span className="flex items-center gap-2 rounded-full border border-white/10 px-3 py-1 text-xs text-white/60 whitespace-nowrap">
+                <span className="relative flex w-1.5 h-1.5">
+                  <span className="absolute inset-0 rounded-full opacity-60 motion-safe:animate-ping" style={{ background: ACCENT }} />
+                  <span className="relative w-1.5 h-1.5 rounded-full" style={{ background: ACCENT }} />
+                </span>
+                Live<span className="hidden sm:inline"> · tap to try</span>
+              </span>
+            </div>
+            <div className="flex justify-center px-4 py-10 md:py-16">
+              <SaryAddAllPlay width={300} />
+            </div>
+          </motion.div>
         </section>
 
         {/* ── 07 IMPACT ── */}
