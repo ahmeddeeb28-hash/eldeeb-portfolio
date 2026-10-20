@@ -213,40 +213,30 @@ const SCREENS: Screen[][] = [
   [ph('review'), ph('hub'), ph('added')],
 ];
 
-/* Impact: one lead number, three supporting ones, a line on what we
-   keep watching and the takeaway. No cards or rules; the numbers
+/* Impact: four results in one even row, the takeaway and a line on
+   what we keep watching. No cards or rules; the numbers
    count up once when the section comes into view. */
 function Impact() {
   const ref = useRef<HTMLDivElement>(null);
   const seen = useInView(ref, { once: true, margin: '-15% 0px' });
-  const [lead, ...rest] = RESULTS;
   const n = (v: string) => parseInt(v.replace(/[^0-9]/g, ''), 10);
   return (
     <div ref={ref}>
-      <div className="grid md:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] gap-12 md:gap-20 md:items-end mb-20">
-        <motion.div {...reveal}>
-          <p className="text-white font-semibold tracking-[-0.06em] leading-[0.85] tabular-nums" style={{ fontSize: 'clamp(104px, 15vw, 180px)' }}>
-            <span style={{ color: ACCENT }}>+</span>
-            <CountUp from={0} to={n(lead.v)} run={seen} ms={1400} />
-            <span style={{ color: ACCENT }}>%</span>
-          </p>
-          <p className="text-white/65 text-lg md:text-xl mt-5">{lead.k}</p>
-        </motion.div>
-        <motion.ul {...reveal} transition={{ ...reveal.transition, delay: 0.1 }} className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-6 gap-y-7 items-baseline">
-          {rest.map((x, i) => (
-            <li key={x.k} className="contents">
-              <span className="text-white text-5xl font-semibold tracking-[-0.04em] tabular-nums">
-                +<CountUp from={0} to={n(x.v)} run={seen} ms={1200} delay={150 + i * 120} />%
-              </span>
-              <span className="text-white/55 text-base">{x.k}</span>
-            </li>
-          ))}
-        </motion.ul>
-      </div>
+      <motion.ul {...reveal} className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-10 mb-20">
+        {RESULTS.map((x, i) => (
+          <li key={x.k}>
+            <p className="text-white text-4xl md:text-5xl font-semibold tracking-[-0.03em] tabular-nums">
+              <span style={{ color: ACCENT }}>+</span>
+              <CountUp from={0} to={n(x.v)} run={seen} ms={1200} delay={i * 120} />%
+            </p>
+            <p className="text-white/55 text-sm md:text-base mt-2">{x.k}</p>
+          </li>
+        ))}
+      </motion.ul>
 
       <motion.div {...reveal} className="max-w-3xl">
         <p className="text-white/40 text-sm mb-4">What I carry forward</p>
-        <p className="text-white text-2xl md:text-4xl font-semibold leading-snug tracking-[-0.02em]">
+        <p className="text-white text-2xl md:text-3xl font-semibold leading-snug tracking-[-0.02em]">
           The biggest wins don’t always need a big redesign. Learn what people already do, and make that the easiest thing
           in the app.
         </p>
