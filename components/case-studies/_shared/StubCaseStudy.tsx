@@ -41,10 +41,10 @@ export function StubCaseStudy({
             style={{ ['--accent' as any]: accent }}
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-xs font-bold uppercase tracking-widest">Back</span>
+            <span className="text-xs font-bold">Back</span>
           </button>
 
-          <div className="text-white/30 text-[10px] font-bold uppercase tracking-[0.25em]">
+          <div className="text-white/30 text-xs font-bold">
             {company} · {year}
           </div>
 
@@ -53,7 +53,7 @@ export function StubCaseStudy({
               onClick={onNext}
               className="flex items-center gap-2 text-white/60 hover:text-white transition-colors group"
             >
-              <span className="text-xs font-bold uppercase tracking-widest">Next</span>
+              <span className="text-xs font-bold">Next</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           ) : (
@@ -79,7 +79,7 @@ export function StubCaseStudy({
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            className="inline-block text-[10px] font-black uppercase tracking-[0.5em] mb-8"
+            className="inline-block text-xs font-semibold mb-8"
             style={{ color: accent }}
           >
             {category}
@@ -120,19 +120,19 @@ export function StubCaseStudy({
             className="mt-16 inline-flex flex-wrap items-center justify-center gap-x-10 gap-y-4 py-6 px-8 border-y border-white/10"
           >
             <div className="flex flex-col gap-1.5">
-              <span className="text-white/30 text-[9px] font-black uppercase tracking-[0.25em]">
+              <span className="text-white/30 text-xs font-semibold">
                 Company
               </span>
               <span className="text-white font-bold text-sm tracking-tight">{company}</span>
             </div>
             <div className="flex flex-col gap-1.5">
-              <span className="text-white/30 text-[9px] font-black uppercase tracking-[0.25em]">
+              <span className="text-white/30 text-xs font-semibold">
                 Year
               </span>
               <span className="text-white font-bold text-sm tracking-tight">{year}</span>
             </div>
             <div className="flex flex-col gap-1.5">
-              <span className="text-white/30 text-[9px] font-black uppercase tracking-[0.25em]">
+              <span className="text-white/30 text-xs font-semibold">
                 Category
               </span>
               <span className="text-white font-bold text-sm tracking-tight">{category}</span>

@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import type { Chapter } from './types';
 
 /* ── Sticky Story Tabs — fascinating chapter navigation ──
-   Sliding teal pill highlight · scroll-progress hairline
-   below · mobile chip showing current chapter · horizontal scroll-snap
+   Sliding pill highlight · scroll-progress hairline
+   below · horizontal scroll-snap
    on narrow viewports with edge fade-mask hinting more tabs.
 
    Accepts `chapters` so each project can pass its own chapter array
@@ -29,7 +29,6 @@ export function StoryTabs({
 }) {
   const tabsRef = useRef<HTMLOListElement>(null);
   const active = chapters.find((c) => c.id === activeId) || chapters[0];
-  const activeIndex = chapters.findIndex((c) => c.id === active.id);
 
   const [pill, setPill] = useState<{ left: number; width: number } | null>(null);
 
@@ -55,24 +54,6 @@ export function StoryTabs({
   return (
     <div className="border-t border-white/5">
       <div className="max-w-6xl mx-auto">
-        {/* Mobile-only "you are here" chip */}
-        <div className="md:hidden px-5 pt-3 pb-1 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#4AF2E5]/10 border border-[#4AF2E5]/40 text-[#4AF2E5] text-[9px] font-black tracking-[0.1em]">
-              {active.num}
-            </span>
-            <span className="text-white text-[12px] font-black uppercase tracking-[0.2em]">
-              {active.label}
-            </span>
-            <span className="text-white/30 text-[10px] font-black tracking-[0.15em]">
-              · {active.beat}
-            </span>
-          </div>
-          <span className="text-white/35 text-[9px] font-black tracking-[0.2em]">
-            {activeIndex + 1} / {chapters.length}
-          </span>
-        </div>
-
         {/* Tab strip */}
         <div className="relative">
           <ol
@@ -82,7 +63,7 @@ export function StoryTabs({
             {pill && (
               <motion.span
                 aria-hidden
-                className="absolute top-2 bottom-2 left-0 rounded-full bg-[#4AF2E5]/[0.07] border border-[#4AF2E5]/40 shadow-[0_0_28px_rgba(74,242,229,0.18),inset_0_0_0_1px_rgba(74,242,229,0.05)] pointer-events-none"
+                className="absolute top-2 bottom-2 left-0 rounded-full bg-white/[0.08] pointer-events-none"
                 initial={false}
                 animate={{ x: pill.left, width: pill.width }}
                 transition={{ type: 'spring', stiffness: 420, damping: 32, mass: 0.8 }}
@@ -104,14 +85,14 @@ export function StoryTabs({
                     )}
 
                     <span
-                      className={`relative text-[9px] font-black tracking-[0.2em] transition-colors duration-300 ${
-                        isActive ? 'text-[#4AF2E5]' : 'text-white/30 group-hover/tab:text-white/55'
+                      className={`relative text-xs tabular-nums transition-colors duration-300 ${
+                        isActive ? 'text-white/55' : 'text-white/25 group-hover/tab:text-white/45'
                       }`}
                     >
                       {c.num}
                     </span>
                     <span
-                      className={`relative text-[11px] font-black uppercase tracking-[0.22em] whitespace-nowrap transition-colors duration-300 ${
+                      className={`relative text-[13px] font-medium whitespace-nowrap transition-colors duration-300 ${
                         isActive ? 'text-white' : 'text-white/45 group-hover/tab:text-white/85'
                       }`}
                     >
@@ -131,7 +112,7 @@ export function StoryTabs({
         {/* Scroll-progress hairline — fills as you read the case study */}
         <div className="relative h-px bg-white/[0.04]">
           <motion.div
-            className="absolute inset-x-0 top-0 h-px origin-left bg-gradient-to-r from-[#4AF2E5] via-[#4AF2E5]/70 to-[#4AF2E5]/30 shadow-[0_0_8px_rgba(74,242,229,0.5)]"
+            className="absolute inset-x-0 top-0 h-px origin-left bg-white/50"
             style={{ scaleX: progress }}
           />
         </div>

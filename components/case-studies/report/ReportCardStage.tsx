@@ -1,20 +1,21 @@
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
-import { Sparkles } from 'lucide-react';
+import { FUNNEL, NAVY, SKY, TEAL } from './ReportData';
+import { Rate } from './ReportUI';
 
-/* ── AI analyst card stage ───────────────────────────
-   The Projects thumbnail: a five second conversation. A question
-   goes in, the analyst types, and the answer lands as a number and
-   a decision. Two questions alternate between loops. Laid out on a
-   1600×900 board and scaled to fit; still cards rest on an answer. */
+/* ── Report card stage ───────────────────────────────
+   The Projects thumbnail for the usability report: the cover's
+   light mint, the funnel pouring from 34,860 shoppers down to
+   Discover, then three conversion tiles counting up. A five second
+   loop on a 1600×900 board, scaled to fit. Still cards rest on
+   the finished report. */
 
 const BW = 1600;
 const BH = 900;
-const TEAL = '#00C9B7';
-
-const QA: { q: string; n: string; k: string; d: string }[] = [
-  { q: 'Where are shoppers dropping off?', n: '9.63%', k: 'reach Discover from the catalogue', d: 'Rebuild Discover around search and ad interest' },
-  { q: 'Did campaigns convert better?', n: '13.8%', k: 'banner conversion, below Q2’s 16.7%', d: 'Target banners by segment, like the pop-up' },
+const TILES: [string, number][] = [
+  ['Discover', 9.63],
+  ['Banners', 13.8],
+  ['Pop-up', 39.2],
 ];
 
 export function ReportCardStage({ active }: { active: boolean }) {
@@ -22,8 +23,7 @@ export function ReportCardStage({ active }: { active: boolean }) {
   const [w, setW] = useState(0);
   const reduced = useReducedMotion();
   const run = active && !reduced;
-  const [i, setI] = useState(0);
-  const [beat, setBeat] = useState(3); // 0 question, 1 typing, 2 number, 3 decision
+  const [take, setTake] = useState(0);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -32,26 +32,17 @@ export function ReportCardStage({ active }: { active: boolean }) {
     return () => ro.disconnect();
   }, []);
   useEffect(() => {
-    if (!run) {
-      setBeat(3);
-      return;
-    }
-    const ms = [700, 1000, 1300, 2000][beat];
-    const t = setTimeout(() => {
-      if (beat === 3) {
-        setI((n) => (n + 1) % QA.length);
-        setBeat(0);
-      } else setBeat(beat + 1);
-    }, ms);
-    return () => clearTimeout(t);
-  }, [beat, run]);
+    if (!run) return;
+    const t = setInterval(() => setTake((n) => n + 1), 5000);
+    return () => clearInterval(t);
+  }, [run]);
   const scale = w / BW;
-  const a = QA[i];
 
   return (
-    <div ref={ref} style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: 'radial-gradient(ellipse 70% 80% at 70% 20%, #0F4A47 0%, #082826 45%, #040F0E 100%)' }}>
+    <div ref={ref} style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: 'linear-gradient(135deg, #F7FBFF 0%, #DDF5F1 100%)' }}>
       {w > 0 && (
         <div
+          key={run ? take : 'still'}
           style={{
             position: 'absolute',
             left: 0,
@@ -62,65 +53,48 @@ export function ReportCardStage({ active }: { active: boolean }) {
             transform: `scale(${scale})`,
             transformOrigin: '0 0',
             fontFamily: 'Inter, system-ui, sans-serif',
-            color: '#fff',
+            color: NAVY,
           }}
         >
-          <div style={{ position: 'absolute', left: 120, top: 110, display: 'flex', alignItems: 'center', gap: 18 }}>
-            <span style={{ width: 64, height: 64, borderRadius: 18, background: `${TEAL}22`, color: TEAL, display: 'grid', placeItems: 'center' }}>
-              <Sparkles size={32} />
-            </span>
-            <span style={{ font: '700 30px/1.2 Inter, sans-serif', opacity: 0.85 }}>Usability analyst</span>
+          <div style={{ position: 'absolute', left: 110, top: 120, font: '700 30px/1 Inter, sans-serif', opacity: 0.8 }}>Q4 Performance · Flagship</div>
+          <div style={{ position: 'absolute', left: 110, top: 170, font: '900 92px/0.95 Inter, sans-serif', letterSpacing: '-0.03em', width: 760 }}>
+            Usability Performance Report
           </div>
-          <AnimatePresence mode="wait">
-            <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-              {/* question */}
-              <motion.div
-                initial={run ? { opacity: 0, y: 30 } : false}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-                style={{ position: 'absolute', right: 120, top: 230, background: '#fff', color: '#0A0A0A', borderRadius: '36px 36px 10px 36px', padding: '26px 38px', font: '600 38px/1.2 Inter, sans-serif' }}
-              >
-                {a.q}
-              </motion.div>
-              {/* typing */}
-              {beat === 1 && (
-                <div style={{ position: 'absolute', left: 120, top: 380, display: 'flex', gap: 12, padding: '30px 36px', borderRadius: '36px 36px 36px 10px', background: 'rgba(255,255,255,0.08)' }}>
-                  {[0, 1, 2].map((k) => (
-                    <motion.span
-                      key={k}
-                      animate={{ opacity: [0.3, 1, 0.3], y: [0, -6, 0] }}
-                      transition={{ duration: 0.8, repeat: Infinity, delay: k * 0.15 }}
-                      style={{ width: 16, height: 16, borderRadius: '50%', background: '#fff' }}
-                    />
-                  ))}
+          {/* funnel */}
+          <div style={{ position: 'absolute', left: 110, top: 470, width: 760, display: 'grid', gap: 18 }}>
+            {FUNNEL.map((f, i) => (
+              <div key={f.k} style={{ display: 'grid', gridTemplateColumns: '1fr 120px', alignItems: 'center', gap: 20 }}>
+                <div style={{ height: 52, borderRadius: 14, background: 'rgba(30,58,138,0.08)', overflow: 'hidden' }}>
+                  <motion.div
+                    initial={run ? { width: 0 } : false}
+                    animate={{ width: `${Math.max(f.pct, 7)}%` }}
+                    transition={{ duration: 0.8, delay: 0.2 + i * 0.3, ease: [0.22, 1, 0.36, 1] }}
+                    style={{ height: '100%', borderRadius: 14, background: `linear-gradient(90deg, ${TEAL}, ${SKY})` }}
+                  />
                 </div>
-              )}
-              {/* answer: number */}
-              {beat >= 2 && (
-                <motion.div
-                  initial={run ? { opacity: 0, y: 24 } : false}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                  style={{ position: 'absolute', left: 120, top: 370, width: 900, borderRadius: '36px 36px 36px 10px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', padding: '30px 40px' }}
-                >
-                  <div style={{ font: '900 120px/1 Inter, sans-serif', letterSpacing: '-0.04em', color: TEAL }}>{a.n}</div>
-                  <div style={{ font: '500 32px/1.3 Inter, sans-serif', opacity: 0.8, marginTop: 10 }}>{a.k}</div>
-                </motion.div>
-              )}
-              {/* answer: decision */}
-              {beat >= 3 && (
-                <motion.div
-                  initial={run ? { opacity: 0, y: 24 } : false}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                  style={{ position: 'absolute', left: 120, top: 680, width: 1360, borderRadius: 28, background: `${TEAL}1F`, border: `2px solid ${TEAL}88`, padding: '24px 36px', display: 'flex', alignItems: 'center', gap: 22 }}
-                >
-                  <span style={{ font: '800 22px/1 Inter, sans-serif', letterSpacing: '0.18em', color: TEAL }}>DECISION</span>
-                  <span style={{ font: '700 36px/1.2 Inter, sans-serif' }}>{a.d}</span>
-                </motion.div>
-              )}
-            </motion.div>
-          </AnimatePresence>
+                <b style={{ font: '800 30px/1 Inter, sans-serif', textAlign: 'right' }}>
+                  <Rate v={f.pct} run={run} delay={200 + i * 300} />
+                </b>
+              </div>
+            ))}
+          </div>
+          {/* conversion tiles */}
+          <div style={{ position: 'absolute', left: 960, top: 150, width: 520, display: 'grid', gap: 26 }}>
+            {TILES.map(([k, v], i) => (
+              <motion.div
+                key={k}
+                initial={run ? { opacity: 0, x: 60 } : false}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 1.6 + i * 0.25, ease: [0.22, 1, 0.36, 1] }}
+                style={{ background: '#fff', borderRadius: 30, padding: '28px 36px', boxShadow: '0 30px 50px -28px rgba(30,58,138,.45)' }}
+              >
+                <div style={{ font: '700 22px/1 Inter, sans-serif', letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.7 }}>{k} CR</div>
+                <div style={{ font: '900 84px/1.05 Inter, sans-serif', letterSpacing: '-0.03em', marginTop: 8 }}>
+                  <Rate v={v} run={run} delay={1700 + i * 250} />
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       )}
     </div>

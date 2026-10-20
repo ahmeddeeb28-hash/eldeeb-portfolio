@@ -90,7 +90,7 @@ export function ConversionTiles() {
           const delta = cur && other ? cur[0] - other[0] : null;
           return (
             <div key={t.k} className="rounded-[22px] bg-white p-6 text-[#0F1B3D] relative overflow-hidden">
-              <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: NAVY }}>
+              <p className="text-xs font-bold" style={{ color: NAVY }}>
                 {t.k}
               </p>
               <p className="text-[13px] text-[#5B6478] mt-1 mb-5">{t.line}</p>
@@ -99,7 +99,7 @@ export function ConversionTiles() {
                   {cur ? (
                     <>
                       <div className="flex items-baseline gap-3">
-                        <b className="text-5xl font-black tracking-tight tabular-nums">
+                        <b className="text-5xl font-semibold tracking-[-0.03em] tabular-nums">
                           <Rate v={cur[0]} run={seen} delay={i * 150} />
                         </b>
                         {delta !== null && q === 'Q4' && (
@@ -127,7 +127,7 @@ export function ConversionTiles() {
               </AnimatePresence>
               {t.best && (
                 <div className="mt-5 pt-4 border-t border-[#EEF2F7] flex items-center justify-between text-[13px]">
-                  <span className="font-bold text-[#D92D3A] text-[10px] uppercase tracking-[0.14em]">{t.best[0]}</span>
+                  <span className="font-bold text-[#D92D3A] text-xs">{t.best[0]}</span>
                   <span>
                     <b>{t.best[1]}%</b> <span className="text-[#5B6478]">{t.best[2]}</span>
                   </span>

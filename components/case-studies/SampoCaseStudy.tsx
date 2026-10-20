@@ -225,7 +225,7 @@ function Ladder({ onPick, active }: { onPick: (i: number) => void; active: numbe
               on ? 'border-[#8B85FF] bg-[#8B85FF]/10' : 'border-white/10 bg-white/[0.02] hover:border-white/25'
             } ${i === 4 ? 'col-span-2 sm:col-span-1' : ''}`}
           >
-            <span className="block italic text-2xl mb-1" style={{ color: on ? ACCENT : 'rgba(255,255,255,0.35)', fontFamily: 'Fraunces, serif' }}>
+            <span className="block font-semibold tabular-nums text-2xl mb-1" style={{ color: on ? ACCENT : 'rgba(255,255,255,0.35)' }}>
               {r.n}
             </span>
             <span className="block text-white font-bold">{r.t}</span>
@@ -251,7 +251,7 @@ function Flows() {
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
         >
-          <h3 className="text-white text-2xl md:text-4xl font-black tracking-tight max-w-2xl mb-6">{r.head}</h3>
+          <h3 className="text-white text-2xl md:text-4xl font-semibold tracking-[-0.03em] max-w-2xl mb-6">{r.head}</h3>
           <FocusFilm scenes={r.scenes} steps={r.steps} h={r.h} accent={ACCENT} />
         </motion.div>
       </AnimatePresence>
@@ -262,7 +262,7 @@ function Flows() {
 function Dashboard() {
   return (
     <>
-      <h2 className="text-white text-2xl md:text-4xl font-black tracking-tight max-w-2xl mb-6">A dashboard that answers before it decorates.</h2>
+      <h2 className="text-white text-2xl md:text-4xl font-semibold tracking-[-0.03em] max-w-2xl mb-6">A dashboard that answers before it decorates.</h2>
       <FocusFilm scenes={[{ node: <DashboardView />, active: 'dashboard', url: 'app.sampo.ai/dashboard' }]} steps={DASH_STEPS} h={780} accent={ACCENT} />
     </>
   );
@@ -276,10 +276,10 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         <ChapterTitle total="VII" chapter={CHAPTERS[0]} />
         <section id="overview" className="mb-32 scroll-mt-24">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
-            <p className="text-[10px] font-black uppercase tracking-[0.32em] mb-6" style={{ color: ACCENT }}>
+            <p className="text-xs font-semibold mb-6" style={{ color: ACCENT }}>
               Sampo AI · Pricing strategies · Saudi e-commerce
             </p>
-            <h1 className="text-white text-5xl md:text-7xl font-black mb-8 leading-[0.95] tracking-tight max-w-4xl">
+            <h1 className="text-white text-5xl md:text-7xl font-semibold mb-8 leading-[0.95] tracking-tight max-w-4xl">
               AI pricing merchants can trust, test and undo.
             </h1>
             <p className="text-white/50 text-lg md:text-xl leading-relaxed max-w-2xl mb-12">
@@ -308,7 +308,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         {/* ── 02 PROBLEM ── */}
         <ChapterTitle total="VII" chapter={CHAPTERS[1]} tone="red" />
         <section id="problem" className="mb-32 scroll-mt-24">
-          <motion.p {...reveal} className="text-white text-3xl md:text-5xl font-black leading-[1.1] tracking-tight max-w-4xl mb-12">
+          <motion.p {...reveal} className="text-white text-3xl md:text-5xl font-semibold leading-[1.1] tracking-tight max-w-4xl mb-12">
             Merchants were asked to trust a black box with their margin.
           </motion.p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-12">
@@ -328,7 +328,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         {/* ── 03 CONCEPT ── */}
         <ChapterTitle total="VII" chapter={CHAPTERS[2]} tone="teal" />
         <section id="concept" className="mb-32 scroll-mt-24">
-          <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-black tracking-tight mb-10 max-w-3xl">
+          <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] mb-10 max-w-3xl">
             Control is handed over one rung at a time.
           </motion.h2>
           <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 items-end">
@@ -342,7 +342,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
                 className="rounded-2xl border border-white/10 bg-[#0D0D0D] p-5"
                 style={{ minHeight: 120 + i * 18 }}
               >
-                <span className="block italic text-3xl mb-2" style={{ color: ACCENT, fontFamily: 'Fraunces, serif', opacity: 0.4 + i * 0.15 }}>
+                <span className="block font-semibold tabular-nums text-3xl mb-2" style={{ color: ACCENT, opacity: 0.4 + i * 0.15 }}>
                   {r.n}
                 </span>
                 <span className="block text-white font-bold mb-1">{r.t}</span>
@@ -355,7 +355,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         {/* ── 04 PROCESS ── */}
         <ChapterTitle total="VII" chapter={CHAPTERS[3]} tone="teal" />
         <section id="process" className="mb-32 scroll-mt-24">
-          <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-black tracking-tight mb-4 max-w-3xl">
+          <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] mb-4 max-w-3xl">
             I ran it as a consultant: agree first, then prototype, then test.
           </motion.h2>
           <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-12">
@@ -373,7 +373,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
                 className="relative grid grid-cols-[48px_minmax(0,1fr)] gap-4 sm:gap-6"
               >
                 <span
-                  className="w-12 h-12 rounded-full grid place-items-center text-sm font-black border"
+                  className="w-12 h-12 rounded-full grid place-items-center text-sm font-semibold border"
                   style={{ borderColor: `${ACCENT}66`, background: '#0D0B1F', color: ACCENT }}
                 >
                   {String(i + 1).padStart(2, '0')}
@@ -401,7 +401,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           >
             {AGREED.map(([k, v]) => (
               <div key={k}>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-2" style={{ color: ACCENT }}>
+                <p className="text-xs font-semibold mb-2" style={{ color: ACCENT }}>
                   {k}
                 </p>
                 <p className="text-white/85 text-sm md:text-base leading-relaxed">{v}</p>
@@ -479,7 +479,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
             {PRINCIPLES.map((p, i) => (
               <motion.div key={p} {...reveal} transition={{ ...reveal.transition, delay: i * 0.05 }} className="rounded-[20px] border border-white/5 bg-[#0D0D0D] p-5">
-                <span className="block italic text-3xl mb-2" style={{ color: ACCENT, fontFamily: 'Fraunces, serif' }}>
+                <span className="block font-semibold tabular-nums text-3xl mb-2" style={{ color: ACCENT }}>
                   {String(i + 1).padStart(2, '0')}
                 </span>
                 <p className="text-white font-bold">{p}</p>
