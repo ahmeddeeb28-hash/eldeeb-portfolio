@@ -4,7 +4,7 @@ import { ChapterTitle } from './_shared/ChapterTitle';
 import { Meta } from './_shared/Meta';
 import { CaseFilm, Eyebrow as BaseEyebrow, UseCaseExplorer, reveal, type UseCase as BaseUseCase } from './_shared/CaseBits';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
-import { ScreenCanvas, type ScreenColumn } from './_shared/ScreenCanvas';
+import { MarqueeGallery, type Screen } from './_shared/MarqueeGallery';
 import { SaryAddAllLoop, SaryPhone, type SaryState } from './sary/SaryPhone';
 
 /* ── Sary · Buy Again Hub ────────────────────────────
@@ -27,7 +27,7 @@ const CHAPTERS: Chapter[] = [
   { id: 'overview', num: '01', roman: 'I', label: 'Overview', beat: 'A home for stores that come back.' },
   { id: 'problem', num: '02', roman: 'II', label: 'Problem', beat: 'Where we saw it.' },
   { id: 'insight', num: '03', roman: 'III', label: 'Insights', beat: 'What we learned.' },
-  { id: 'screens', num: '04', roman: 'IV', label: 'Screens', beat: 'Every screen on one board.' },
+  { id: 'screens', num: '04', roman: 'IV', label: 'Screens', beat: 'Every screen, side by side.' },
   { id: 'cases', num: '05', roman: 'V', label: 'Use Cases', beat: 'Each case and its design.' },
   { id: 'motion', num: '06', roman: 'VI', label: 'Motion', beat: 'Add all, frame by frame.' },
   { id: 'impact', num: '07', roman: 'VII', label: 'Impact', beat: 'What changed.' },
@@ -212,15 +212,17 @@ function TapCount() {
   );
 }
 
-/* All the Buy Again screens for the screen canvas, in staggered
-   columns. The "Add all" sequence plays live in two of them. */
-const SCREENS: ScreenColumn[] = [
-  { top: 0, screens: [<SaryPhone state="home" width={300} />, <SaryPhone state="review" width={300} />] },
-  { top: 280, screens: [<SaryAddAllLoop width={300} />, <SaryPhone state="order" width={300} />] },
-  { top: 90, screens: [<SaryPhone state="hub" width={300} />, <SaryPhone state="routine" width={300} />] },
-  { top: 360, screens: [<SaryPhone state="added" width={300} />, <SaryPhone state="home" width={300} />] },
-  { top: 150, screens: [<SaryPhone state="review" width={300} />, <SaryAddAllLoop width={300} />] },
-  { top: 20, screens: [<SaryPhone state="order" width={300} />, <SaryPhone state="hub" width={300} />] },
+/* All the Buy Again screens for the marquee gallery. Neighbouring
+   columns start on different screens; "Add all" plays live in two. */
+const ph = (state: SaryState): Screen => (w) => <SaryPhone state={state} width={w} />;
+const live: Screen = (w, on) => <SaryAddAllLoop width={w} playing={on} />;
+const SCREENS: Screen[][] = [
+  [ph('home'), ph('review'), ph('routine')],
+  [ph('hub'), ph('order'), live],
+  [ph('added'), ph('home'), ph('review')],
+  [live, ph('routine'), ph('hub')],
+  [ph('order'), ph('added'), ph('home')],
+  [ph('review'), ph('hub'), ph('added')],
 ];
 
 export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
@@ -379,7 +381,7 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         <ChapterTitle chapter={CHAPTERS[3]} />
       </div>
       <section id="screens" className="mb-32 scroll-mt-24">
-        <ScreenCanvas columns={SCREENS} label="All Buy Again screens" />
+        <MarqueeGallery columns={SCREENS} aspect={390 / 844} label="All the Buy Again screens, scrolling in columns" />
       </section>
       <div className="max-w-5xl mx-auto px-6 pb-24">
         {/* ── 05 USE CASES ── */}

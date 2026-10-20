@@ -4,6 +4,7 @@ import { ChapterTitle } from './_shared/ChapterTitle';
 import { Meta } from './_shared/Meta';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 import { FreshPhone, LoopingPhone, type PhoneState } from './fresh/FreshPhone';
+import { MarqueeGallery, type Screen } from './_shared/MarqueeGallery';
 import { CaseFilm, Eyebrow as BaseEyebrow, UseCaseExplorer, reveal, type UseCase as BaseUseCase } from './_shared/CaseBits';
 
 /* ── fresh · Order placed ────────────────────────────
@@ -30,8 +31,9 @@ const CHAPTERS: Chapter[] = [
   { id: 'problem', num: '02', roman: 'II', label: 'Problem', beat: 'Where we saw it.' },
   { id: 'insight', num: '03', roman: 'III', label: 'Insights', beat: 'What we learned.' },
   { id: 'standards', num: '04', roman: 'IV', label: 'Standards', beat: 'Rules for every screen.' },
-  { id: 'cases', num: '05', roman: 'V', label: 'Use Cases', beat: 'Each state and its design.' },
-  { id: 'impact', num: '06', roman: 'VI', label: 'Impact', beat: 'What we measure.' },
+  { id: 'screens', num: '05', roman: 'V', label: 'Screens', beat: 'Every state, side by side.' },
+  { id: 'cases', num: '06', roman: 'VI', label: 'Use Cases', beat: 'Each state and its design.' },
+  { id: 'impact', num: '07', roman: 'VII', label: 'Impact', beat: 'What we measure.' },
 ];
 
 /* Where the problem showed up. Summaries, not quotes. */
@@ -225,6 +227,19 @@ const SHIPPED = [
   { v: '1', k: 'clock for ring and cancel' },
 ];
 
+/* Every Order placed state for the marquee gallery. The placing
+   countdown plays live in two columns. */
+const ph = (state: PhoneState): Screen => (w) => <FreshPhone state={state} width={w} progress={0.45} />;
+const live: Screen = (w, on) => <LoopingPhone width={w} only="placing" playing={on} />;
+const SCREENS: Screen[][] = [
+  [ph('placed'), ph('edit-address'), ph('sent')],
+  [live, ph('late'), ph('edit-items')],
+  [ph('scheduled'), ph('burst'), ph('cancelled')],
+  [ph('edit-items'), live, ph('placed')],
+  [ph('sent'), ph('scheduled'), ph('late')],
+  [ph('cancelled'), ph('placing'), ph('burst')],
+];
+
 export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
   return (
     <CaseShell
@@ -235,7 +250,7 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
       resetKey="fresh-order-placed"
       pillId="fresh-tab-pill"
     >
-      <div className="max-w-5xl mx-auto px-6 pt-16 pb-24">
+      <div className="max-w-5xl mx-auto px-6 pt-16">
         {/* ── 01 OVERVIEW ── */}
         <ChapterTitle chapter={CHAPTERS[0]} />
         <section id="overview" className="mb-32 scroll-mt-24">
@@ -396,8 +411,15 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
           </p>
         </section>
 
-        {/* ── 05 USE CASES ── */}
-        <ChapterTitle chapter={CHAPTERS[4]} tone="teal" />
+        {/* ── 05 SCREENS ── */}
+        <ChapterTitle chapter={CHAPTERS[4]} />
+      </div>
+      <section id="screens" className="mb-32 scroll-mt-24">
+        <MarqueeGallery columns={SCREENS} aspect={440 / 956} label="Every Order placed state, scrolling in columns" />
+      </section>
+      <div className="max-w-5xl mx-auto px-6 pb-24">
+        {/* ── 06 USE CASES ── */}
+        <ChapterTitle chapter={CHAPTERS[5]} />
         <section id="cases" className="mb-32 scroll-mt-24">
           <UseCaseExplorer
             cases={USE_CASES}
@@ -408,8 +430,8 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
           />
         </section>
 
-        {/* ── 06 IMPACT ── */}
-        <ChapterTitle chapter={CHAPTERS[5]} />
+        {/* ── 07 IMPACT ── */}
+        <ChapterTitle chapter={CHAPTERS[6]} />
         <section id="impact" className="mb-16 scroll-mt-24">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-16">
             {SHIPPED.map((s, i) => (
