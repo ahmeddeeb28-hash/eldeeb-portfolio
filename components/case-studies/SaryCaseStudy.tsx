@@ -1,6 +1,7 @@
-import { motion } from 'motion/react';
+import { motion, useInView, useMotionValue, useReducedMotion, useSpring, useTransform } from 'motion/react';
+import { useEffect, useRef, useState } from 'react';
 import { CaseIntro, LeadStats, Takeaway } from './_shared/CaseLayout';
-import { MousePointerClick } from 'lucide-react';
+import { ArrowLeftRight, MousePointerClick } from 'lucide-react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
 import { CaseFilm, Eyebrow as BaseEyebrow, UseCaseExplorer, reveal, type UseCase as BaseUseCase } from './_shared/CaseBits';
@@ -172,6 +173,132 @@ const Eyebrow = ({ children, tone = ACCENT }: { children: React.ReactNode; tone?
   <BaseEyebrow tone={tone}>{children}</BaseEyebrow>
 );
 
+/* Before and after, as the real screens from the Figma board
+   ("4 · Before → After"): the current Arabic home and catalogue
+   against the new home and Buy Again hub. The before screen sits
+   on top and is clipped at a seam you can drag (pointer, touch or
+   arrow keys); it wipes in once on arrival. Pick the case with the
+   tabs. */
+const CMP = '/images/case-studies/sary/compare';
+const PAIRS = [
+  ['before-home', 'after-home'],
+  ['before-catalogue', 'after-hub'],
+];
+
+function ScreenCompare() {
+  const [i, setI] = useState(0);
+  const box = useRef<HTMLDivElement>(null);
+  const drag = useRef(false);
+  const seam = useMotionValue(50);
+  const smooth = useSpring(seam, { stiffness: 320, damping: 34 });
+  const clip = useTransform(smooth, (v) => `inset(0 ${100 - v}% 0 0)`);
+  const left = useTransform(smooth, (v) => `${v}%`);
+  const beforeOp = useTransform(smooth, [0, 50, 100], [0.35, 0.7, 1]);
+  const afterOp = useTransform(smooth, [0, 50, 100], [1, 0.7, 0.35]);
+  const inView = useInView(box, { once: true, margin: '-20% 0px' });
+  const reduced = useReducedMotion();
+
+  useEffect(() => {
+    if (!inView || reduced) return;
+    seam.jump(100);
+    const t = setTimeout(() => seam.set(50), 350);
+    return () => clearTimeout(t);
+  }, [inView, reduced, seam]);
+
+  const moveTo = (x: number) => {
+    const r = box.current!.getBoundingClientRect();
+    seam.set(Math.max(0, Math.min(100, ((x - r.left) / r.width) * 100)));
+  };
+  const b = BEFORE_AFTER[i];
+
+  return (
+    <div className="grid md:grid-cols-[300px_minmax(0,1fr)] gap-10 md:gap-16 items-center">
+      <div className="mx-auto w-[260px] md:w-[300px]">
+        <div className="flex justify-between text-xs mb-4 px-1">
+          <button type="button" onClick={() => seam.set(100)} style={{ color: '#FF8A8A' }}>
+            Before
+          </button>
+          <button type="button" onClick={() => seam.set(0)} style={{ color: ACCENT }}>
+            After
+          </button>
+        </div>
+        <div
+          ref={box}
+          className="relative select-none cursor-ew-resize rounded-[38px] overflow-hidden bg-white"
+          style={{ aspectRatio: '414 / 924', touchAction: 'pan-y', boxShadow: '0 0 0 10px #0B0F14, 0 0 0 11px #2a3038, 0 40px 80px -30px rgba(0,0,0,.6)' }}
+          onPointerDown={(e) => {
+            drag.current = true;
+            e.currentTarget.setPointerCapture(e.pointerId);
+            moveTo(e.clientX);
+          }}
+          onPointerMove={(e) => drag.current && moveTo(e.clientX)}
+          onPointerUp={() => (drag.current = false)}
+          onPointerCancel={() => (drag.current = false)}
+        >
+          <img src={`${CMP}/${PAIRS[i][1]}.webp`} alt={`After: ${b.after}`} width={414} height={924} draggable={false} className="absolute inset-0 w-full h-full" />
+          <motion.img
+            src={`${CMP}/${PAIRS[i][0]}.webp`}
+            alt={`Before: ${b.before}`}
+            width={414}
+            height={924}
+            draggable={false}
+            className="absolute inset-0 w-full h-full"
+            style={{ clipPath: clip }}
+          />
+          <motion.div className="absolute inset-y-0 w-0.5 -ml-px bg-white shadow-[0_0_12px_rgba(0,0,0,0.35)]" style={{ left }}>
+            <span
+              role="slider"
+              tabIndex={0}
+              aria-label="Compare before and after"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(seam.get())}
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowLeft') seam.set(Math.max(0, seam.get() - 5));
+                if (e.key === 'ArrowRight') seam.set(Math.min(100, seam.get() + 5));
+              }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-[#1D368D] grid place-items-center shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7DA2FF]"
+            >
+              <ArrowLeftRight className="w-4 h-4" />
+            </span>
+          </motion.div>
+        </div>
+      </div>
+
+      <div>
+        <div className="flex flex-wrap gap-2 mb-8" role="tablist" aria-label="Before and after cases">
+          {BEFORE_AFTER.map((x, k) => (
+            <button
+              key={x.n}
+              type="button"
+              role="tab"
+              aria-selected={k === i}
+              onClick={() => {
+                setI(k);
+                seam.set(50);
+              }}
+              className={`rounded-full px-4 py-2 text-sm transition-colors ${k === i ? 'bg-white text-black' : 'border border-white/15 text-white/60 hover:text-white'}`}
+            >
+              {x.n} · {x.t}
+            </button>
+          ))}
+        </div>
+        <motion.div style={{ opacity: beforeOp }} className="mb-6">
+          <p className="text-xs font-semibold mb-1.5 text-[#FF8A8A]">Before</p>
+          <p className="text-white/80 text-base md:text-lg leading-relaxed">{b.before}</p>
+        </motion.div>
+        <motion.div style={{ opacity: afterOp }}>
+          <p className="text-xs font-semibold mb-1.5" style={{ color: ACCENT }}>
+            After
+          </p>
+          <p className="text-white text-base md:text-lg leading-relaxed">{b.after}</p>
+        </motion.div>
+        <p className="text-white/35 text-sm mt-8">Drag the line on the phone to compare. Screens from the design board.</p>
+      </div>
+    </div>
+  );
+}
+
 /* 39 taps vs 3, drawn as dots. */
 function TapCount() {
   return (
@@ -303,32 +430,8 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           </div>
 
           <Eyebrow tone="#FF5F5F">Before and after</Eyebrow>
-          <div className="grid gap-3 mb-3">
-            {BEFORE_AFTER.map((b, i) => (
-              <motion.div
-                key={b.n}
-                {...reveal}
-                transition={{ ...reveal.transition, delay: i * 0.06 }}
-                className="rounded-[24px] border border-white/5 bg-[#0D0D0D] p-6 md:p-7"
-              >
-                <p className="text-white font-bold text-lg mb-5">
-                  <span className="text-white/30 mr-3">{b.n}</span>
-                  {b.t}
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <p className="text-xs font-semibold mb-2 text-[#FF5F5F]">Before</p>
-                    <p className="text-white/55 text-sm leading-relaxed">{b.before}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold mb-2" style={{ color: ACCENT }}>
-                      After
-                    </p>
-                    <p className="text-white/85 text-sm leading-relaxed">{b.after}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+          <div className="mb-10">
+            <ScreenCompare />
           </div>
           <TapCount />
           <p className="text-white/35 text-xs mt-4 max-w-xl">
