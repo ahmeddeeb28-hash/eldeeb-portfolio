@@ -1,4 +1,6 @@
-import { motion } from 'motion/react';
+import { motion, useInView } from 'motion/react';
+import { useRef } from 'react';
+import { CountUp } from './_shared/CountUp';
 import { MousePointerClick } from 'lucide-react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
@@ -168,12 +170,6 @@ const RESULTS = [
   { v: '+20%', k: 'Auto-reorder habit' },
 ];
 
-const SIGNALS_TRACKED = [
-  { k: 'Repeat-order rate', d: 'Stores that order again within their cycle.' },
-  { k: 'Time to checkout', d: 'From opening the app to paying, for returning stores.' },
-  { k: 'Orders from Buy Again', d: 'Share of orders that start on the hub or the Welcome back card.' },
-];
-
 const Eyebrow = ({ children, tone = ACCENT }: { children: React.ReactNode; tone?: string }) => (
   <BaseEyebrow tone={tone}>{children}</BaseEyebrow>
 );
@@ -216,6 +212,51 @@ const SCREENS: Screen[][] = [
   [ph('order'), ph('added'), ph('home')],
   [ph('review'), ph('hub'), ph('added')],
 ];
+
+/* Impact: one lead number, three supporting ones, a line on what we
+   keep watching and the takeaway. No cards or rules; the numbers
+   count up once when the section comes into view. */
+function Impact() {
+  const ref = useRef<HTMLDivElement>(null);
+  const seen = useInView(ref, { once: true, margin: '-15% 0px' });
+  const [lead, ...rest] = RESULTS;
+  const n = (v: string) => parseInt(v.replace(/[^0-9]/g, ''), 10);
+  return (
+    <div ref={ref}>
+      <div className="grid md:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] gap-12 md:gap-20 md:items-end mb-20">
+        <motion.div {...reveal}>
+          <p className="text-white font-semibold tracking-[-0.06em] leading-[0.85] tabular-nums" style={{ fontSize: 'clamp(104px, 15vw, 180px)' }}>
+            <span style={{ color: ACCENT }}>+</span>
+            <CountUp from={0} to={n(lead.v)} run={seen} ms={1400} />
+            <span style={{ color: ACCENT }}>%</span>
+          </p>
+          <p className="text-white/65 text-lg md:text-xl mt-5">{lead.k}</p>
+        </motion.div>
+        <motion.ul {...reveal} transition={{ ...reveal.transition, delay: 0.1 }} className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-6 gap-y-7 items-baseline">
+          {rest.map((x, i) => (
+            <li key={x.k} className="contents">
+              <span className="text-white text-5xl font-semibold tracking-[-0.04em] tabular-nums">
+                +<CountUp from={0} to={n(x.v)} run={seen} ms={1200} delay={150 + i * 120} />%
+              </span>
+              <span className="text-white/55 text-base">{x.k}</span>
+            </li>
+          ))}
+        </motion.ul>
+      </div>
+
+      <motion.div {...reveal} className="max-w-3xl">
+        <p className="text-white/40 text-sm mb-4">What I carry forward</p>
+        <p className="text-white text-2xl md:text-4xl font-semibold leading-snug tracking-[-0.02em]">
+          The biggest wins don’t always need a big redesign. Learn what people already do, and make that the easiest thing
+          in the app.
+        </p>
+        <p className="text-white/40 text-[15px] leading-relaxed mt-8">
+          We keep watching the repeat-order rate, time to checkout, and the share of orders that start from Buy Again.
+        </p>
+      </motion.div>
+    </div>
+  );
+}
 
 export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
   return (
@@ -417,41 +458,7 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         {/* ── 07 IMPACT ── */}
         <ChapterTitle chapter={CHAPTERS[6]} />
         <section id="impact" className="mb-16 scroll-mt-24">
-          <Eyebrow>Results</Eyebrow>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-16">
-            {RESULTS.map((r, i) => (
-              <motion.div
-                key={r.k}
-                {...reveal}
-                transition={{ ...reveal.transition, delay: i * 0.06 }}
-                className="rounded-[24px] border border-white/5 bg-[#0D0D0D] p-6"
-              >
-                <p className="text-white text-4xl md:text-5xl font-semibold tracking-[-0.04em] mb-2">{r.v}</p>
-                <p className="text-white/45 text-sm">{r.k}</p>
-              </motion.div>
-            ))}
-          </div>
-
-          <Eyebrow>Signals we keep watching</Eyebrow>
-          <motion.ul
-            {...reveal}
-            className="rounded-[24px] border border-white/5 bg-[#0D0D0D] px-6 md:px-7 mb-20"
-          >
-            {SIGNALS_TRACKED.map((s) => (
-              <li key={s.k} className="py-5 border-b border-white/5 last:border-0 md:grid md:grid-cols-[240px_1fr] md:gap-6">
-                <span className="block text-white font-bold mb-1 md:mb-0">{s.k}</span>
-                <span className="block text-white/50 text-sm leading-relaxed">{s.d}</span>
-              </li>
-            ))}
-          </motion.ul>
-
-          <motion.div {...reveal} className="max-w-3xl">
-            <Eyebrow>What I carry forward</Eyebrow>
-            <p className="text-white text-2xl md:text-3xl font-bold leading-snug tracking-tight">
-              The biggest wins don’t always need a big redesign. Look past the surface numbers, learn what people
-              already do, and make that the easiest thing in the app.
-            </p>
-          </motion.div>
+          <Impact />
         </section>
       </div>
     </CaseShell>
