@@ -262,7 +262,7 @@ export function UseCaseExplorer<T extends UseCase>({
             <p className="text-xs font-semibold mb-3" style={{ color: accent }}>
               {c.code ?? 'Extra case'} · {String(active + 1).padStart(2, '0')} / {String(cases.length).padStart(2, '0')}
             </p>
-            <h3 className="text-white text-3xl md:text-4xl font-black tracking-tight mb-4">{c.title}</h3>
+            <h3 className="text-white text-3xl md:text-4xl font-semibold tracking-[-0.03em] mb-4">{c.title}</h3>
             <p className="text-white/60 text-base md:text-lg leading-relaxed mb-8 max-w-xl">{c.what}</p>
 
             <dl className="grid gap-px rounded-2xl overflow-hidden border border-white/10 bg-white/10 max-w-xl">
