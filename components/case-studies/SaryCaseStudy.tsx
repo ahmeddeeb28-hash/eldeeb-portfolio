@@ -523,10 +523,11 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           <Takeaway
             accent={ACCENT}
             deep="#1D368D"
-            note="We keep watching the repeat-order rate, time to checkout, and the share of orders that start from Buy Again."
+            note="Next on Sary, we keep watching the repeat-order rate, time to checkout, and the share of orders that start from Buy Again."
           >
-            The <span style={{ color: ACCENT }}>biggest wins</span> don’t always need a big redesign. Learn what people already
-            do, and make that the easiest thing in the app.
+            Store owners were already reordering the same basket every week. The{' '}
+            <span style={{ color: ACCENT }}>biggest win</span> wasn’t a bigger redesign: it was putting that basket first, one
+            tap away.
           </Takeaway>
         </section>
       </div>
