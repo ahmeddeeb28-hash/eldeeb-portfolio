@@ -4,7 +4,7 @@ import { ChapterTitle } from './_shared/ChapterTitle';
 import { Meta } from './_shared/Meta';
 import { CaseFilm, Eyebrow as BaseEyebrow, UseCaseExplorer, reveal, type UseCase as BaseUseCase } from './_shared/CaseBits';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
-import { CanvasCard, WorkCanvas, type CanvasColumn } from './_shared/WorkCanvas';
+import { ScreenCanvas, type ScreenColumn } from './_shared/ScreenCanvas';
 import { SaryAddAllLoop, SaryPhone, type SaryState } from './sary/SaryPhone';
 
 /* ── Sary · Buy Again Hub ────────────────────────────
@@ -25,10 +25,12 @@ const POSTER = '/images/case-studies/sary/film-poster.webp';
 
 const CHAPTERS: Chapter[] = [
   { id: 'overview', num: '01', roman: 'I', label: 'Overview', beat: 'A home for stores that come back.' },
-  { id: 'problem', num: '02', roman: 'II', label: 'Problem & process', beat: 'The whole board, from problem to goal.' },
-  { id: 'cases', num: '03', roman: 'III', label: 'Use Cases', beat: 'Each case and its design.' },
-  { id: 'motion', num: '04', roman: 'IV', label: 'Motion', beat: 'Add all, frame by frame.' },
-  { id: 'impact', num: '05', roman: 'V', label: 'Impact', beat: 'What changed.' },
+  { id: 'problem', num: '02', roman: 'II', label: 'Problem', beat: 'Where we saw it.' },
+  { id: 'insight', num: '03', roman: 'III', label: 'Insights', beat: 'What we learned.' },
+  { id: 'screens', num: '04', roman: 'IV', label: 'Screens', beat: 'Every screen on one board.' },
+  { id: 'cases', num: '05', roman: 'V', label: 'Use Cases', beat: 'Each case and its design.' },
+  { id: 'motion', num: '06', roman: 'VI', label: 'Motion', beat: 'Add all, frame by frame.' },
+  { id: 'impact', num: '07', roman: 'VII', label: 'Impact', beat: 'What changed.' },
 ];
 
 const SIGNALS = [
@@ -184,106 +186,41 @@ const Eyebrow = ({ children, tone = ACCENT }: { children: React.ReactNode; tone?
   <BaseEyebrow tone={tone}>{children}</BaseEyebrow>
 );
 
-const RED = '#F08A7E';
-
 /* 39 taps vs 3, drawn as dots. */
-function TapCard({ before }: { before: boolean }) {
-  const b = before
-    ? { label: 'Before', n: 39, steps: 'Open app · search · add · × 18 items · cart · checkout', tone: RED }
-    : { label: 'After', n: 3, steps: 'Open app · Add all · checkout', tone: ACCENT };
+function TapCount() {
   return (
-    <CanvasCard tag={`${b.label}: taps to restock 18 usual items`} tone={b.tone}>
-      <p className="text-white text-5xl font-semibold tracking-[-0.04em] mb-4">≈ {b.n}</p>
-      <div className="flex flex-wrap gap-1.5 mb-4" aria-hidden>
-        {Array.from({ length: b.n }, (_, i) => (
-          <span key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: b.tone, opacity: 0.85 }} />
-        ))}
-      </div>
-      <p className="text-white/50 text-xs leading-relaxed">{b.steps}</p>
-      {!before && <p className="text-white/35 text-xs mt-3">Estimated from the two flows, not measured.</p>}
-    </CanvasCard>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      {[
+        { label: 'Before', n: 39, steps: 'Open app · search · add · × 18 items · cart · checkout', tone: '#FF5F5F' },
+        { label: 'After', n: 3, steps: 'Open app · Add all · checkout', tone: ACCENT },
+      ].map((b) => (
+        <motion.div key={b.label} {...reveal} className="rounded-[24px] border border-white/5 bg-[#0D0D0D] p-6 md:p-7">
+          <p className="text-xs font-semibold mb-4" style={{ color: b.tone }}>
+            {b.label}
+          </p>
+          <p className="text-white text-5xl font-semibold tracking-[-0.04em] mb-1">≈ {b.n}</p>
+          <p className="text-white/45 text-sm mb-5">taps to restock 18 usual items</p>
+          <div className="flex flex-wrap gap-1.5 mb-5" aria-hidden>
+            {Array.from({ length: b.n }, (_, i) => (
+              <span key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: b.tone, opacity: 0.85 }} />
+            ))}
+          </div>
+          <p className="text-white/50 text-xs leading-relaxed">{b.steps}</p>
+        </motion.div>
+      ))}
+    </div>
   );
 }
 
-function Screen({ state, live, caption }: { state?: SaryState; live?: boolean; caption: string }) {
-  return (
-    <figure className="pt-3">
-      <div className="flex justify-center">{live ? <SaryAddAllLoop width={258} /> : <SaryPhone state={state!} width={258} />}</div>
-      <figcaption className="text-white/50 text-[13px] mt-6 text-center">{caption}</figcaption>
-    </figure>
-  );
-}
-
-const Signal = ({ i }: { i: number }) => (
-  <CanvasCard tag={`How we found it · ${SIGNALS[i].k}`} tone={RED}>
-    <p className="text-white text-xl font-semibold tracking-tight mb-2">{SIGNALS[i].t}</p>
-    <p className="text-white/55 text-sm leading-relaxed">{SIGNALS[i].d}</p>
-  </CanvasCard>
-);
-
-const Insight = ({ i }: { i: number }) => (
-  <CanvasCard tag={`What we learned · ${INSIGHTS[i].n}`} tone={ACCENT}>
-    <p className="text-white text-xl font-semibold tracking-tight mb-2">{INSIGHTS[i].t}</p>
-    <p className="text-white/55 text-sm leading-relaxed">{INSIGHTS[i].d}</p>
-  </CanvasCard>
-);
-
-const Change = ({ i }: { i: number }) => (
-  <CanvasCard tag={`Before and after · ${BEFORE_AFTER[i].n}`}>
-    <p className="text-white text-lg font-semibold mb-5">{BEFORE_AFTER[i].t}</p>
-    <p className="text-xs font-semibold mb-1.5" style={{ color: RED }}>
-      Before
-    </p>
-    <p className="text-white/55 text-sm leading-relaxed mb-4">{BEFORE_AFTER[i].before}</p>
-    <p className="text-xs font-semibold mb-1.5" style={{ color: ACCENT }}>
-      After
-    </p>
-    <p className="text-white/85 text-sm leading-relaxed">{BEFORE_AFTER[i].after}</p>
-  </CanvasCard>
-);
-
-/* The problem and the process, laid out left to right as one board:
-   the problem, how we found it, what it cost in taps, what we
-   learned, the goal and the before and after, with the screens in
-   between. */
-const BOARD: CanvasColumn[] = [
-  {
-    w: 520,
-    tiles: [
-      <CanvasCard tag="The problem" tone={RED}>
-        <p className="text-white text-3xl font-semibold leading-[1.15] tracking-[-0.02em] mb-5">
-          Stores that order the same basket every week had to build it from scratch every time.
-        </p>
-        <p className="text-white/55 text-[15px] leading-relaxed">
-          The app was built for discovery: banners, categories and search. A returning store saw the same discount banner
-          as everyone else, and last Sunday’s 18 item order wasn’t visible anywhere on the first screen. Most buyers
-          ordered once and didn’t come back.
-        </p>
-      </CanvasCard>,
-      <Signal i={0} />,
-    ],
-  },
-  { w: 270, top: 90, tiles: [<Screen state="home" caption="The new home: Welcome back" />] },
-  { w: 340, top: 20, tiles: [<Signal i={1} />, <Signal i={2} />, <Signal i={3} />] },
-  { w: 340, top: 150, tiles: [<TapCard before />, <TapCard before={false} />] },
-  { w: 270, top: 40, tiles: [<Screen live caption="Add all, playing live" />] },
-  { w: 400, tiles: [<Insight i={0} />, <Insight i={1} />, <Insight i={2} />] },
-  {
-    w: 400,
-    top: 130,
-    tiles: [
-      <Insight i={3} />,
-      <CanvasCard tag="The goal" tone={ACCENT}>
-        <p className="text-white text-2xl font-semibold leading-snug tracking-tight">
-          Make the repeat order the starting point, not something owners rebuild by hand.
-        </p>
-      </CanvasCard>,
-    ],
-  },
-  { w: 270, top: 60, tiles: [<Screen state="hub" caption="The Buy Again hub" />] },
-  { w: 460, top: 10, tiles: [<Change i={0} />, <Change i={1} />] },
-  { w: 270, top: 120, tiles: [<Screen state="review" caption="Review and swap" />] },
-  { w: 270, top: 30, tiles: [<Screen state="routine" caption="Make it a routine" />] },
+/* All the Buy Again screens for the screen canvas, in staggered
+   columns. The "Add all" sequence plays live in two of them. */
+const SCREENS: ScreenColumn[] = [
+  { top: 0, screens: [<SaryPhone state="home" width={300} />, <SaryPhone state="review" width={300} />] },
+  { top: 280, screens: [<SaryAddAllLoop width={300} />, <SaryPhone state="order" width={300} />] },
+  { top: 90, screens: [<SaryPhone state="hub" width={300} />, <SaryPhone state="routine" width={300} />] },
+  { top: 360, screens: [<SaryPhone state="added" width={300} />, <SaryPhone state="home" width={300} />] },
+  { top: 150, screens: [<SaryPhone state="review" width={300} />, <SaryAddAllLoop width={300} />] },
+  { top: 20, screens: [<SaryPhone state="order" width={300} />, <SaryPhone state="hub" width={300} />] },
 ];
 
 export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
@@ -343,15 +280,110 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           </motion.div>
         </section>
 
-        {/* ── 02 PROBLEM & PROCESS ── */}
-        <ChapterTitle chapter={CHAPTERS[1]} />
+        {/* ── 02 PROBLEM ── */}
+        <ChapterTitle chapter={CHAPTERS[1]} tone="red" />
+        <section id="problem" className="mb-32 scroll-mt-24">
+          <motion.div
+            {...reveal}
+            className="relative rounded-[36px] border border-[#FF5F5F]/15 bg-gradient-to-b from-[#FF5F5F]/[0.04] to-transparent p-8 md:p-14 mb-16"
+          >
+            <div className="flex items-center gap-2 mb-8">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#FF5F5F] animate-pulse" />
+              <span className="text-[#FF5F5F]/70 text-xs font-semibold">Problem statement</span>
+            </div>
+            <p className="text-white text-2xl md:text-4xl font-bold leading-[1.15] tracking-tight max-w-3xl mb-8">
+              Stores that order the same basket every week had to build it from scratch every time.
+            </p>
+            <p className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl">
+              The app was built for discovery: banners, categories and search. A returning store saw the same discount
+              banner as everyone else, and last Sunday’s 18 item order wasn’t visible anywhere on the first screen. Most
+              buyers ordered once and didn’t come back.
+            </p>
+          </motion.div>
+
+          <Eyebrow tone="#FF5F5F">How we found it</Eyebrow>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-20">
+            {SIGNALS.map((s, i) => (
+              <motion.div
+                key={s.k}
+                {...reveal}
+                transition={{ ...reveal.transition, delay: i * 0.06 }}
+                className="rounded-[24px] border border-white/5 bg-[#0D0D0D] p-7"
+              >
+                <p className="text-white/35 text-xs font-semibold mb-4">{s.k}</p>
+                <p className="text-white text-xl font-bold tracking-tight mb-2">{s.t}</p>
+                <p className="text-white/50 text-sm leading-relaxed">{s.d}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <Eyebrow tone="#FF5F5F">Before and after</Eyebrow>
+          <div className="grid gap-3 mb-3">
+            {BEFORE_AFTER.map((b, i) => (
+              <motion.div
+                key={b.n}
+                {...reveal}
+                transition={{ ...reveal.transition, delay: i * 0.06 }}
+                className="rounded-[24px] border border-white/5 bg-[#0D0D0D] p-6 md:p-7"
+              >
+                <p className="text-white font-bold text-lg mb-5">
+                  <span className="text-white/30 mr-3">{b.n}</span>
+                  {b.t}
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <p className="text-xs font-semibold mb-2 text-[#FF5F5F]">Before</p>
+                    <p className="text-white/55 text-sm leading-relaxed">{b.before}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold mb-2" style={{ color: ACCENT }}>
+                      After
+                    </p>
+                    <p className="text-white/85 text-sm leading-relaxed">{b.after}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+          <TapCount />
+          <p className="text-white/35 text-xs mt-4 max-w-xl">
+            Estimated from the two flows, not measured. Reviewing the basket adds 1 to 3 taps.
+          </p>
+        </section>
+
+        {/* ── 03 INSIGHTS ── */}
+        <ChapterTitle chapter={CHAPTERS[2]} tone="teal" />
+        <section id="insight" className="mb-32 scroll-mt-24">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
+            {INSIGHTS.map((it, i) => (
+              <motion.div key={it.n} {...reveal} transition={{ ...reveal.transition, delay: i * 0.06 }}>
+                <span className="block text-5xl font-semibold tracking-[-0.03em] mb-4" style={{ color: ACCENT, opacity: 0.4 }}>
+                  {it.n}
+                </span>
+                <p className="text-white text-2xl font-bold tracking-tight mb-3">{it.t}</p>
+                <p className="text-white/50 leading-relaxed">{it.d}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.blockquote
+            {...reveal}
+            className="mt-20 border-l-2 pl-6 md:pl-8 text-white text-2xl md:text-3xl font-bold leading-snug tracking-tight max-w-3xl"
+            style={{ borderColor: ACCENT }}
+          >
+            The goal: make the repeat order the starting point, not something owners rebuild by hand.
+          </motion.blockquote>
+        </section>
+
+        {/* ── 04 SCREENS ── */}
+        <ChapterTitle chapter={CHAPTERS[3]} />
       </div>
-      <section id="problem" className="mb-32 scroll-mt-24 px-4 md:px-8 max-w-[1600px] mx-auto">
-        <WorkCanvas columns={BOARD} label="Problem and process board" />
+      <section id="screens" className="mb-32 scroll-mt-24">
+        <ScreenCanvas columns={SCREENS} label="All Buy Again screens" />
       </section>
       <div className="max-w-5xl mx-auto px-6 pb-24">
-        {/* ── 03 USE CASES ── */}
-        <ChapterTitle chapter={CHAPTERS[2]} />
+        {/* ── 05 USE CASES ── */}
+        <ChapterTitle chapter={CHAPTERS[4]} />
         <section id="cases" className="mb-32 scroll-mt-24">
           <UseCaseExplorer
             cases={USE_CASES}
@@ -360,8 +392,8 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           />
         </section>
 
-        {/* ── 04 MOTION ── */}
-        <ChapterTitle chapter={CHAPTERS[3]} />
+        {/* ── 06 MOTION ── */}
+        <ChapterTitle chapter={CHAPTERS[5]} />
         <section id="motion" className="mb-32 scroll-mt-24">
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-10 items-start">
             <div>
@@ -398,8 +430,8 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           </div>
         </section>
 
-        {/* ── 05 IMPACT ── */}
-        <ChapterTitle chapter={CHAPTERS[4]} />
+        {/* ── 07 IMPACT ── */}
+        <ChapterTitle chapter={CHAPTERS[6]} />
         <section id="impact" className="mb-16 scroll-mt-24">
           <Eyebrow>Results</Eyebrow>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-16">
