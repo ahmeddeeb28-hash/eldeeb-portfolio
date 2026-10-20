@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Mail, Linkedin } from 'lucide-react';
+import { Download, Linkedin } from 'lucide-react';
+
+const CV_URL = '/cv/Ahmad_Eldeeb_Lead_Product_Designer_CV.pdf';
 import { motion } from 'motion/react';
 import { SECTION_IDS, scrollToSection, scrollToTop } from '../lib/scrollToSection';
 
@@ -273,7 +275,8 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <motion.a
-            href="mailto:ahmeddeeb28@gmail.com"
+            href={CV_URL}
+            download
             animate={{
               boxShadow: [
                 '0 2px 14px rgba(220,190,140,0.22)',
@@ -287,8 +290,8 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
             whileTap={{ scale: 0.97 }}
             style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 20px', borderRadius: '9999px', background: '#fff', border: '1px solid rgba(220,190,140,0.6)', color: '#0A0A0A', fontSize: '13px', fontWeight: '600', textDecoration: 'none', letterSpacing: '0.01em' }}
           >
-            <Mail size={13} strokeWidth={2.5} />
-            Say Hello
+            <Download size={13} strokeWidth={2.5} />
+            Download CV
           </motion.a>
           <motion.a
             href={LINKEDIN_URL}
@@ -420,10 +423,11 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
           )}
           <div style={{ marginTop: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <a
-              href="mailto:ahmeddeeb28@gmail.com"
+              href={CV_URL}
+              download
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '11px 20px', borderRadius: '9999px', background: '#fff', color: '#0A0A0A', fontSize: '14px', fontWeight: '600', textDecoration: 'none' }}
             >
-              <Mail size={14} /> Say Hello
+              <Download size={14} /> Download CV
             </a>
             <a
               href={LINKEDIN_URL}

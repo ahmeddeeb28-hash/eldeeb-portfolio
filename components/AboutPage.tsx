@@ -7,7 +7,7 @@ import type { Chapter } from './case-studies/_shared/types';
 import { ds } from '../styles/designSystem';
 
 const LINKEDIN_URL = 'https://www.linkedin.com/in/el-deeb-39032b131/';
-const RESUME_URL = 'https://drive.google.com/file/d/1W0NqqKXwbhjts_xdbsSxtfon3wnGSee1/view?usp=drive_link';
+const RESUME_URL = '/cv/Ahmad_Eldeeb_Lead_Product_Designer_CV.pdf';
 
 /* ── Chapter spine — mirrors the case-study cinematic language but with
    a warmer, more personal set of beats. ────────────────────────────── */
