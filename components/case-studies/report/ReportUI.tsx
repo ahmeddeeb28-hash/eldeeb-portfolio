@@ -18,8 +18,8 @@ export function Funnel({ dark = false }: { dark?: boolean }) {
   return (
     <div ref={ref} className="grid gap-3">
       {FUNNEL.map((f, i) => (
-        <div key={f.k} className="grid grid-cols-[minmax(0,1fr)_96px] sm:grid-cols-[150px_minmax(0,1fr)_120px] items-center gap-3 sm:gap-5">
-          <span className="hidden sm:block text-sm font-semibold" style={{ color: dark ? 'rgba(255,255,255,0.75)' : NAVY }}>
+        <div key={f.k} className="grid grid-cols-[minmax(0,1fr)_72px] sm:grid-cols-[150px_minmax(0,1fr)_120px] items-center gap-x-3 gap-y-1.5 sm:gap-5">
+          <span className="col-span-2 sm:col-span-1 text-xs sm:text-sm font-semibold" style={{ color: dark ? 'rgba(255,255,255,0.75)' : NAVY }}>
             {f.k}
           </span>
           <div className="relative h-12 rounded-xl overflow-hidden" style={{ background: dark ? 'rgba(255,255,255,0.06)' : '#EEF6FB' }}>
@@ -32,9 +32,6 @@ export function Funnel({ dark = false }: { dark?: boolean }) {
             >
               <span className="text-xs font-bold text-white whitespace-nowrap">{fmt(f.n)}</span>
             </motion.div>
-            <span className="sm:hidden absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-semibold" style={{ color: dark ? 'rgba(255,255,255,0.6)' : NAVY }}>
-              {f.k}
-            </span>
           </div>
           <span className="text-right">
             <b className="block text-lg tabular-nums" style={{ color: ink }}>

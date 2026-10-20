@@ -1,6 +1,6 @@
-/* ── Sary usability performance report · data ────────
-   Figures from the Q4 '22 Flagship report in Figma (Discover tab,
-   campaigns and promotions). The board lists funnel counts as users
+/* ── AI usability analyst · data ─────────────────────
+   Figures from a real Q4 2022 usability report for a B2B grocery
+   app (Discover tab, campaigns and promotions). The board lists funnel counts as users
    who dropped; here they are turned into users who reached each
    step, so every rate reads "reached of 34,860". */
 
@@ -47,23 +47,4 @@ export const HEAT: { img: string; t: string; d: string; fx: number; fy: number }
   { img: 'heat-2', t: 'Discover', d: 'Few clicks beyond the categories: the page offered nothing the catalogue did not.', fx: 70, fy: 22 },
   { img: 'heat-3', t: 'Catalogue', d: 'A dense scroll path through the new sections, plus some random taps.', fx: 60, fy: 55 },
   { img: 'heat-4', t: 'Product list', d: 'A good average of clicks on the carousel, and touches that show it is used.', fx: 55, fy: 20 },
-];
-
-export const FLOW = ['Cashback pop-up', 'Home banner', 'Discover categories', 'Favourites'];
-
-export const INSIGHTS = [
-  'Discover is new and already used to browse categories. More sections and a walkthrough should lift it.',
-  'Banner conversion fell below Q2. Ramadan and Eid campaigns lifted the other quarters; Q4 had none.',
-  'The pop-up hit its highest interaction yet, after campaigns were targeted by segment.',
-];
-
-export const ISSUES = [
-  'Banners and ads looked alike, so the same shopper opened the same banner more than once.',
-  'Copying a code from a banner gave no success message, and nothing changed in the basket.',
-];
-
-export const FIXES = [
-  'Apply the banner code to the basket automatically, with a clear, festive success message.',
-  'Hide brands with no products or offers, or move them to the end of the brand filter.',
-  'Make Discover worth visiting: sections built from what shoppers search for and the ads they open.',
 ];

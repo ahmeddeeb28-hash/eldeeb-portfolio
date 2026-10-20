@@ -95,20 +95,6 @@ const allProjects = [
     hasStudy: true,
   },
   {
-    id: 'sary-usability-report',
-    image: CASE_STUDY_IMAGES.saryGrocery,
-    year: "Q4'22",
-    category: 'Usability & Conversion · Sary',
-    title: 'Sary: Usability Performance Report',
-    summary:
-      'Only 9.63% of shoppers reached Discover. My quarterly report on funnels, conversion and heatmaps, rebuilt with AI as a live page.',
-    accentColor: 'rgba(0,201,183,0.95)',
-    imageGlow:
-      'radial-gradient(ellipse 65% 55% at 70% 30%, rgba(0,201,183,0.10) 0%, transparent 70%)',
-    stage: 'report' as const,
-    hasStudy: true,
-  },
-  {
     id: 'health-ladder',
     image: CASE_STUDY_IMAGES.landingPage,
     year: '2023',
@@ -146,6 +132,20 @@ const allProjects = [
     imageGlow:
       'radial-gradient(ellipse 65% 55% at 30% 30%, rgba(90,80,220,0.10) 0%, transparent 70%)',
     stage: 'sampo' as const,
+    hasStudy: true,
+  },
+  {
+    id: 'ai-usability-analyst',
+    image: CASE_STUDY_IMAGES.saryGrocery,
+    year: '2026',
+    category: 'AI Concept · Usability & Conversion',
+    title: 'AI Usability Analyst: From Numbers to Decisions',
+    summary:
+      'Ask the report a question and get the number, the reason and the decision. A quarterly usability report rebuilt with Claude as an AI conversation.',
+    accentColor: 'rgba(0,201,183,0.95)',
+    imageGlow:
+      'radial-gradient(ellipse 65% 55% at 70% 30%, rgba(0,201,183,0.10) 0%, transparent 70%)',
+    stage: 'report' as const,
     hasStudy: true,
   },
   {
@@ -390,9 +390,9 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
             zIndex: 1,
           }}
         >
-          One methodology across products: Sary's grocery marketplace and
-          how we measured it, SAMPO's AI pricing, and fresh's checkout
-          moment. Strategy that ships, and numbers that show it.
+          One methodology across products: Sary's grocery marketplace,
+          SAMPO's AI pricing, an AI analyst that turns usability numbers
+          into decisions, and fresh's checkout moment.
         </motion.p>
       </div>
 
