@@ -40,6 +40,9 @@ const FreshCardStage = lazy(() =>
 const SaryCardStage = lazy(() =>
   import('./case-studies/sary/SaryCardStage').then((m) => ({ default: m.SaryCardStage })),
 );
+const ReportCardStage = lazy(() =>
+  import('./case-studies/report/ReportCardStage').then((m) => ({ default: m.ReportCardStage })),
+);
 const SampoCardStage = lazy(() =>
   import('./case-studies/sampo/SampoCardStage').then((m) => ({ default: m.SampoCardStage })),
 );
@@ -89,6 +92,20 @@ const allProjects = [
     imageGlow:
       'radial-gradient(ellipse 70% 55% at 15% 20%, rgba(200,120,50,0.09) 0%, transparent 70%)',
     stage: 'sary' as const,
+    hasStudy: true,
+  },
+  {
+    id: 'sary-usability-report',
+    image: CASE_STUDY_IMAGES.saryGrocery,
+    year: "Q4'22",
+    category: 'Usability & Conversion · Sary',
+    title: 'Sary: Usability Performance Report',
+    summary:
+      'Only 9.63% of shoppers reached Discover. My quarterly report on funnels, conversion and heatmaps, rebuilt with AI as a live page.',
+    accentColor: 'rgba(0,201,183,0.95)',
+    imageGlow:
+      'radial-gradient(ellipse 65% 55% at 70% 30%, rgba(0,201,183,0.10) 0%, transparent 70%)',
+    stage: 'report' as const,
     hasStudy: true,
   },
   {
@@ -373,9 +390,9 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
             zIndex: 1,
           }}
         >
-          Three products, one methodology: Sary's grocery marketplace,
-          SAMPO's AI pricing, and fresh's checkout moment. Strategy that
-          ships across every category.
+          One methodology across products: Sary's grocery marketplace and
+          how we measured it, SAMPO's AI pricing, and fresh's checkout
+          moment. Strategy that ships, and numbers that show it.
         </motion.p>
       </div>
 
@@ -537,6 +554,7 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
                     lineHeight: 1,
                     color: 'rgba(255,255,255,0.42)',
                     display: 'inline-block',
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   {p.year}
@@ -772,6 +790,8 @@ function ProjectRow({
                   <FreshCardStage active={isActive && !reduced && !paused} />
                 ) : project.stage === 'sary' ? (
                   <SaryCardStage active={isActive && !reduced && !paused} />
+                ) : project.stage === 'report' ? (
+                  <ReportCardStage active={isActive && !reduced && !paused} />
                 ) : (
                   <SampoCardStage active={isActive && !reduced && !paused} />
                 )}
