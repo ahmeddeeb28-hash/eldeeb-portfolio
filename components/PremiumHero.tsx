@@ -1,6 +1,6 @@
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useRef, useEffect, useState } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
+import { motion, useScroll, useTransform } from 'motion/react';
 import { SECTION_IDS, scrollToSection } from '../lib/scrollToSection';
 
 interface StickyNoteData {
@@ -116,7 +116,7 @@ function StickyNote({
 export function PremiumHero() {
   const heroRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [activeView, setActiveView] = useState(0); // 0: Strategist, 1: Builder, 2: Innovator
+  const activeView = 0; // one warm accent now that the persona tabs are gone
   const [ctaOffset, setCtaOffset] = useState({ x: 0, y: 0 });
   const [photoFailed, setPhotoFailed] = useState(false);
   const [hoveredNote, setHoveredNote] = useState<string | null>(null);
@@ -210,12 +210,6 @@ export function PremiumHero() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveView((prev) => (prev + 1) % heroViews.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
 
   const handleCtaMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -300,164 +294,32 @@ export function PremiumHero() {
       >
         {/* Left — kinetic typography column */}
         <div>
-          {/* Massive headline with staggered line reveal */}
-          <h1
+          {/* Who I am, in a formal sans: the greeting carries the accent */}
+          <motion.h1
+            initial={{ opacity: 0, y: 32 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
             style={{
-              fontFamily: "'Fraunces', 'Times New Roman', serif",
-              fontSize: 'clamp(2rem, 4.4vw, 3.6rem)',
+              fontFamily: 'Inter, system-ui, sans-serif',
+              fontSize: 'clamp(2.4rem, 5vw, 4.4rem)',
               fontWeight: 600,
-              lineHeight: 1.1,
-              letterSpacing: '-0.02em',
+              lineHeight: 1.06,
+              letterSpacing: '-0.035em',
               color: '#FFFFFF',
-              marginBottom: '2rem',
+              marginBottom: '1.6rem',
             }}
           >
-            <motion.span
-              initial={{ opacity: 0, y: 44 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-              style={{ display: 'block' }}
-            >
-              Product Design Lead who still designs.
-            </motion.span>
-            <motion.span
-              initial={{ opacity: 0, y: 44 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.22 }}
-              style={{ display: 'block', fontStyle: 'italic', color: 'rgba(255,255,255,0.45)', paddingRight: '0.08em' }}
-            >
-              Leading teams, building with AI.
-            </motion.span>
-          </h1>
-
-          {/* Persona tab switcher */}
-          <motion.div
+            <span style={{ color: currentView.accent }}>Hello, I’m Ahmad.</span> Product Design Lead.
+          </motion.h1>
+          <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-wrap items-center gap-x-1 gap-y-2 mb-7"
-            style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}
-            role="tablist"
-            aria-label="Focus"
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.25 }}
+            className="text-white/70 text-lg md:text-xl leading-relaxed max-w-xl mb-10"
           >
-            {heroViews.map((view, i) => {
-              const isActive = activeView === i;
-              return (
-                <button
-                  key={view.label}
-                  onClick={() => setActiveView(i)}
-                  className="relative pr-3 mr-1 sm:pr-[18px] sm:mr-2"
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    paddingBottom: '14px',
-                  }}
-                  aria-label={view.label}
-                  role="tab"
-                  aria-selected={isActive}
-                >
-                  <span
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '7px',
-                      fontSize: '0.72rem',
-                      fontWeight: 700,
-                      letterSpacing: '0.1em',
-                      textTransform: 'uppercase',
-                      color: isActive ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.35)',
-                      transition: 'color 0.3s ease',
-                    }}
-                  >
-                    <span
-                      style={{
-                        width: '5px',
-                        height: '5px',
-                        borderRadius: '50%',
-                        background: isActive ? currentView.accent : 'rgba(255,255,255,0.25)',
-                        transition: 'background 0.3s ease',
-                      }}
-                    />
-                    <span className="hidden sm:inline" style={{ opacity: 0.55, fontVariantNumeric: 'tabular-nums' }}>{view.index}</span>
-                    <span className="sm:hidden">{view.label.replace(/^The /, '')}</span>
-                    <span className="hidden sm:inline">{view.label}</span>
-                  </span>
-                  {isActive && (
-                    <motion.div
-                      layoutId="heroTabUnderline"
-                      transition={{ type: 'spring', stiffness: 420, damping: 38 }}
-                      className="right-3 sm:right-[18px]"
-                      style={{
-                        position: 'absolute',
-                        left: 0,
-                        bottom: '-1px',
-                        height: '2px',
-                        background: currentView.accent,
-                        borderRadius: '2px',
-                      }}
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </motion.div>
-
-          {/* Persona panel: the active tab's headline and description,
-              grouped behind one accent rule. The gradient headline gets
-              padding so italic overhangs and descenders aren't clipped by
-              background-clip: text. */}
-          <div
-            role="tabpanel"
-            className="mb-10 min-h-[12.5rem] sm:min-h-[9rem] lg:min-h-[7.5rem]"
-            style={{
-              borderLeft: `2px solid ${currentView.accent}`,
-              paddingLeft: '20px',
-              transition: 'border-color 0.4s ease',
-            }}
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeView}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <p
-                  style={{
-                    display: 'inline-block',
-                    margin: '0 0 0.6rem',
-                    padding: '0 0.15em 0.12em 0',
-                    fontFamily: "'Fraunces', 'Times New Roman', serif",
-                    fontSize: 'clamp(1.4rem, 2.3vw, 1.85rem)',
-                    fontWeight: 500,
-                    fontStyle: 'italic',
-                    lineHeight: 1.25,
-                    letterSpacing: '-0.01em',
-                    background: currentView.gradient,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                  }}
-                >
-                  {currentView.headline}
-                </p>
-                <p
-                  className="max-w-xl"
-                  style={{
-                    margin: 0,
-                    fontSize: '15px',
-                    color: 'rgba(255,255,255,0.68)',
-                    fontWeight: 400,
-                    lineHeight: 1.7,
-                  }}
-                >
-                  {currentView.description}
-                </p>
-              </motion.div>
-            </AnimatePresence>
-          </div>
+            I lead product design teams and still design the hard parts myself. Ten years across e-commerce, SaaS, fintech,
+            AI and gaming, with teams in Europe and the Gulf.
+          </motion.p>
 
           {/* CTA row */}
           <motion.div

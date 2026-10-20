@@ -76,7 +76,7 @@ function IntroSection() {
           className="mx-auto mb-12 w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden"
           style={{ boxShadow: '0 0 0 1px rgba(255,255,255,0.12), 0 30px 60px -20px rgba(0,0,0,0.8)' }}
         >
-          <img src="/images/profile.jpg" alt="Ahmed Eldeeb" className="w-full h-full object-cover" />
+          <img src="/images/profile.jpg" alt="Ahmad Eldeeb" className="w-full h-full object-cover" />
         </motion.div>
         <motion.p
           initial={{ opacity: 0, y: 16 }}
@@ -85,7 +85,7 @@ function IntroSection() {
           className="text-white leading-[1.25] tracking-[-0.01em] mb-6"
           style={{ fontSize: 'clamp(1.5rem, 3.4vw, 2.6rem)' }}
         >
-          <span style={{ color: ACCENT }}>I’m Ahmed.</span> I lead product design teams and design digital products, design
+          <span style={{ color: ACCENT }}>I’m Ahmad.</span> I lead product design teams and design digital products, design
           systems and AI tools for companies from early-stage startups to established platforms.
         </motion.p>
         <motion.p
