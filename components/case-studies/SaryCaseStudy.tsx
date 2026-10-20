@@ -1,7 +1,7 @@
 import { motion, useInView, useMotionValue, useReducedMotion, useSpring, useTransform } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { CaseIntro, LeadStats, Takeaway } from './_shared/CaseLayout';
-import { ArrowLeftRight, MousePointerClick } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MousePointerClick } from 'lucide-react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
 import { CaseFilm, Eyebrow as BaseEyebrow, UseCaseExplorer, reveal, type UseCase as BaseUseCase } from './_shared/CaseBits';
@@ -193,6 +193,7 @@ function ScreenCompare() {
   const smooth = useSpring(seam, { stiffness: 320, damping: 34 });
   const clip = useTransform(smooth, (v) => `inset(0 ${100 - v}% 0 0)`);
   const left = useTransform(smooth, (v) => `${v}%`);
+  const pill = useTransform(smooth, (v) => `clamp(76px, ${v}%, calc(100% - 76px))`);
   const beforeOp = useTransform(smooth, [0, 50, 100], [0.35, 0.7, 1]);
   const afterOp = useTransform(smooth, [0, 50, 100], [1, 0.7, 0.35]);
   const inView = useInView(box, { once: true, margin: '-20% 0px' });
@@ -214,14 +215,6 @@ function ScreenCompare() {
   return (
     <div className="grid md:grid-cols-[300px_minmax(0,1fr)] gap-10 md:gap-16 items-center">
       <div className="mx-auto w-[260px] md:w-[300px]">
-        <div className="flex justify-between text-xs mb-4 px-1">
-          <button type="button" onClick={() => seam.set(100)} style={{ color: '#FF8A8A' }}>
-            Before
-          </button>
-          <button type="button" onClick={() => seam.set(0)} style={{ color: ACCENT }}>
-            After
-          </button>
-        </div>
         <div
           ref={box}
           className="relative select-none cursor-ew-resize rounded-[38px] overflow-hidden bg-white"
@@ -229,7 +222,8 @@ function ScreenCompare() {
           onPointerDown={(e) => {
             drag.current = true;
             e.currentTarget.setPointerCapture(e.pointerId);
-            moveTo(e.clientX);
+            // grabbing the handle keeps the seam where it is; anywhere else jumps to the finger
+            if (!(e.target as HTMLElement).closest('[data-handle]')) moveTo(e.clientX);
           }}
           onPointerMove={(e) => drag.current && moveTo(e.clientX)}
           onPointerUp={() => (drag.current = false)}
@@ -245,23 +239,33 @@ function ScreenCompare() {
             className="absolute inset-0 w-full h-full"
             style={{ clipPath: clip }}
           />
-          <motion.div className="absolute inset-y-0 w-0.5 -ml-px bg-white shadow-[0_0_12px_rgba(0,0,0,0.35)]" style={{ left }}>
-            <span
-              role="slider"
-              tabIndex={0}
-              aria-label="Compare before and after"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={Math.round(seam.get())}
-              onKeyDown={(e) => {
-                if (e.key === 'ArrowLeft') seam.set(Math.max(0, seam.get() - 5));
-                if (e.key === 'ArrowRight') seam.set(Math.min(100, seam.get() + 5));
-              }}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-[#1D368D] grid place-items-center shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7DA2FF]"
-            >
-              <ArrowLeftRight className="w-4 h-4" />
-            </span>
-          </motion.div>
+          <motion.div className="absolute inset-y-0 w-0.5 -ml-px bg-white shadow-[0_0_12px_rgba(0,0,0,0.35)] pointer-events-none" style={{ left }} />
+          {/* the handle: one pill naming both sides, kept inside the phone at the edges */}
+          <motion.span
+            data-handle
+            role="slider"
+            tabIndex={0}
+            aria-label="Drag to compare before and after"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuetext="Before on the left, after on the right"
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowLeft') seam.set(Math.max(0, seam.get() - 5));
+              if (e.key === 'ArrowRight') seam.set(Math.min(100, seam.get() + 5));
+            }}
+            className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center rounded-full bg-white shadow-[0_8px_24px_-6px_rgba(0,0,0,0.45)] text-[13px] font-semibold cursor-grab active:cursor-grabbing focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7DA2FF]"
+            style={{ left: pill }}
+          >
+            <motion.span className="flex items-center gap-1 pl-2.5 pr-3 py-2 text-[#D9363E]" style={{ opacity: beforeOp }}>
+              <ChevronLeft className="w-4 h-4" />
+              Before
+            </motion.span>
+            <span className="w-px self-stretch my-2 bg-black/10" />
+            <motion.span className="flex items-center gap-1 pl-3 pr-2.5 py-2 text-[#1D368D]" style={{ opacity: afterOp }}>
+              After
+              <ChevronRight className="w-4 h-4" />
+            </motion.span>
+          </motion.span>
         </div>
       </div>
 
@@ -293,7 +297,7 @@ function ScreenCompare() {
           </p>
           <p className="text-white text-base md:text-lg leading-relaxed">{b.after}</p>
         </motion.div>
-        <p className="text-white/35 text-sm mt-8">Drag the line on the phone to compare. Screens from the design board.</p>
+        <p className="text-white/35 text-sm mt-8">Drag the handle on the phone to compare. Screens from the design board.</p>
       </div>
     </div>
   );
