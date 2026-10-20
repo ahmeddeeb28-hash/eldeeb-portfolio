@@ -252,17 +252,6 @@ function Impact() {
           background: `radial-gradient(ellipse 60% 90% at 88% 10%, ${ACCENT}2E 0%, transparent 60%), radial-gradient(ellipse 50% 70% at 0% 100%, #1D368D55 0%, transparent 65%), #0F1117`,
         }}
       >
-        {/* soft dot pattern, fading out toward the text */}
-        <div
-          aria-hidden
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundImage: 'radial-gradient(rgba(255,255,255,0.09) 1px, transparent 1px)',
-            backgroundSize: '20px 20px',
-            maskImage: 'linear-gradient(110deg, transparent 35%, #000 100%)',
-            WebkitMaskImage: 'linear-gradient(110deg, transparent 35%, #000 100%)',
-          }}
-        />
         <span aria-hidden className="absolute right-6 md:right-12 -top-6 md:-top-10 text-[160px] md:text-[240px] leading-none font-semibold select-none" style={{ color: `${ACCENT}26` }}>
           “
         </span>
@@ -457,7 +446,6 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           <motion.div
             {...reveal}
             className="rounded-[28px] border border-white/10 bg-[#111214] overflow-hidden"
-            style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px)', backgroundSize: '22px 22px' }}
           >
             <div className="flex items-center justify-between gap-4 px-5 md:px-7 py-4 border-b border-white/[0.06] bg-[#111214]/80">
               <span className="flex items-center gap-2.5 text-sm font-medium text-white whitespace-nowrap">
