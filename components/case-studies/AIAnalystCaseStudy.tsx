@@ -5,6 +5,7 @@ import { Meta } from './_shared/Meta';
 import { reveal } from './_shared/CaseBits';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 import { AIChat, TURNS } from './report/AIChat';
+import { BuildStory } from './report/BuildStory';
 import { TEAL } from './report/ReportData';
 
 /* ── AI usability analyst ────────────────────────────
@@ -19,15 +20,9 @@ const CHAPTERS: Chapter[] = [
   { id: 'overview', num: '01', roman: 'I', label: 'Overview', beat: 'Reports get read once.' },
   { id: 'ask', num: '02', roman: 'II', label: 'Ask It', beat: 'Numbers in, decisions out.' },
   { id: 'decisions', num: '03', roman: 'III', label: 'Decisions', beat: 'Every signal gets a next step.' },
-  { id: 'built', num: '04', roman: 'IV', label: 'The Build', beat: 'How I made it with Claude.' },
+  { id: 'built', num: '04', roman: 'IV', label: 'Process', beat: 'I directed, Claude built.' },
 ];
 
-const STEPS: [string, string][] = [
-  ['Started from a real report', 'A quarterly usability report I led: funnel, campaign conversion, heatmaps and the team’s findings.'],
-  ['Structured the numbers', 'I turned every figure into data the page reads: who reached each step, quarter against quarter, where taps landed.'],
-  ['Built it with Claude', 'I built the conversation, the charts and the decision cards with Claude, and checked every number against the source.'],
-  ['Fixed what the report hid', 'Rebuilding it caught a mismatch: the original listed drop-offs as “of 34,860”. Every rate now reads as shoppers who reached the step.'],
-];
 
 export function AIAnalystCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
   return (
@@ -99,23 +94,8 @@ export function AIAnalystCaseStudy({ onBack, onNext }: CaseStudyComponentProps) 
         {/* ── 04 HOW I BUILT IT ── */}
         <ChapterTitle total="IV" chapter={CHAPTERS[3]} tone="teal" />
         <section id="built" className="mb-16 scroll-mt-24">
-          <ol className="grid md:grid-cols-2 gap-3">
-            {STEPS.map(([k, v], i) => (
-              <motion.li
-                key={k}
-                {...reveal}
-                transition={{ ...reveal.transition, delay: i * 0.06 }}
-                className="rounded-[22px] border border-white/10 bg-[#0D0D0D] p-6"
-              >
-                <span className="font-mono text-xs" style={{ color: ACCENT }}>
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <p className="text-white text-lg font-bold mt-2 mb-1.5">{k}</p>
-                <p className="text-white/55 text-sm leading-relaxed">{v}</p>
-              </motion.li>
-            ))}
-          </ol>
-          <p className="text-white/35 text-xs mt-6">
+          <BuildStory />
+          <p className="text-white/35 text-xs mt-16">
             Figures come from a Q4 2022 usability report for a B2B grocery app. Target metrics are proposals, not results.
           </p>
         </section>
