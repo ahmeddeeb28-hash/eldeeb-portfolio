@@ -213,36 +213,69 @@ const SCREENS: Screen[][] = [
   [ph('review'), ph('hub'), ph('added')],
 ];
 
-/* Impact: four results in one even row, the takeaway and a line on
-   what we keep watching. No cards or rules; the numbers
+/* Impact: the lead result (repeat purchases, what the project set
+   out to move) large and bold, the other three listed beside it,
+   then the takeaway and a line on what we keep watching. No cards or rules; the numbers
    count up once when the section comes into view. */
 function Impact() {
   const ref = useRef<HTMLDivElement>(null);
   const seen = useInView(ref, { once: true, margin: '-15% 0px' });
+  const [lead, ...rest] = RESULTS;
   const n = (v: string) => parseInt(v.replace(/[^0-9]/g, ''), 10);
   return (
     <div ref={ref}>
-      <motion.ul {...reveal} className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-10 mb-20">
-        {RESULTS.map((x, i) => (
-          <li key={x.k}>
-            <p className="text-white text-4xl md:text-5xl font-semibold tracking-[-0.03em] tabular-nums">
-              <span style={{ color: ACCENT }}>+</span>
-              <CountUp from={0} to={n(x.v)} run={seen} ms={1200} delay={i * 120} />%
-            </p>
-            <p className="text-white/55 text-sm md:text-base mt-2">{x.k}</p>
-          </li>
-        ))}
-      </motion.ul>
+      <motion.div {...reveal} className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-10 md:gap-16 items-center mb-20">
+        <div>
+          <p className="text-white font-bold tracking-[-0.05em] leading-none tabular-nums" style={{ fontSize: 'clamp(72px, 9vw, 112px)' }}>
+            <span style={{ color: ACCENT }}>+</span>
+            <CountUp from={0} to={n(lead.v)} run={seen} ms={1300} />%
+          </p>
+          <p className="text-white text-lg md:text-xl font-medium mt-4">{lead.k}</p>
+          <p className="text-white/50 text-sm md:text-base mt-1">The number this project was built to move.</p>
+        </div>
+        <ul className="grid gap-5 md:border-l md:border-white/10 md:pl-12">
+          {rest.map((x, i) => (
+            <li key={x.k} className="flex items-baseline gap-4">
+              <span className="text-white text-3xl font-semibold tracking-[-0.03em] tabular-nums w-[4.5ch] flex-none">
+                +<CountUp from={0} to={n(x.v)} run={seen} ms={1200} delay={150 + i * 120} />%
+              </span>
+              <span className="text-white/55 text-base">{x.k}</span>
+            </li>
+          ))}
+        </ul>
+      </motion.div>
 
-      <motion.div {...reveal} className="max-w-3xl">
-        <p className="text-white/40 text-sm mb-4">What I carry forward</p>
-        <p className="text-white text-2xl md:text-3xl font-semibold leading-snug tracking-[-0.02em]">
-          The biggest wins don’t always need a big redesign. Learn what people already do, and make that the easiest thing
-          in the app.
-        </p>
-        <p className="text-white/40 text-[15px] leading-relaxed mt-8">
-          We keep watching the repeat-order rate, time to checkout, and the share of orders that start from Buy Again.
-        </p>
+      <motion.div
+        {...reveal}
+        className="relative overflow-hidden rounded-[28px] border border-white/[0.07] px-7 py-10 md:px-14 md:py-16"
+        style={{
+          background: `radial-gradient(ellipse 60% 90% at 88% 10%, ${ACCENT}2E 0%, transparent 60%), radial-gradient(ellipse 50% 70% at 0% 100%, #1D368D55 0%, transparent 65%), #0F1117`,
+        }}
+      >
+        {/* soft dot pattern, fading out toward the text */}
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: 'radial-gradient(rgba(255,255,255,0.09) 1px, transparent 1px)',
+            backgroundSize: '20px 20px',
+            maskImage: 'linear-gradient(110deg, transparent 35%, #000 100%)',
+            WebkitMaskImage: 'linear-gradient(110deg, transparent 35%, #000 100%)',
+          }}
+        />
+        <span aria-hidden className="absolute right-6 md:right-12 -top-6 md:-top-10 text-[160px] md:text-[240px] leading-none font-semibold select-none" style={{ color: `${ACCENT}26` }}>
+          “
+        </span>
+        <div className="relative max-w-3xl">
+          <p className="text-white/45 text-sm mb-4">What I carry forward</p>
+          <p className="text-white text-2xl md:text-4xl font-semibold leading-snug tracking-[-0.02em]">
+            The <span style={{ color: ACCENT }}>biggest wins</span> don’t always need a big redesign. Learn what people
+            already do, and make that the easiest thing in the app.
+          </p>
+          <p className="text-white/45 text-[15px] leading-relaxed mt-8">
+            We keep watching the repeat-order rate, time to checkout, and the share of orders that start from Buy Again.
+          </p>
+        </div>
       </motion.div>
     </div>
   );
