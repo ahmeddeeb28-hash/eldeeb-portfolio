@@ -1,5 +1,5 @@
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'motion/react';
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react';
 import {
   ArrowDown,
   ArrowLeft,
@@ -466,6 +466,7 @@ function RunningLow() {
 function UsualCta({ label, pressed, added }: { label: string; pressed?: boolean; added?: boolean }) {
   return (
     <motion.span
+      data-act={added ? undefined : 'add'}
       animate={{ scale: pressed ? 0.97 : 1 }}
       transition={{ duration: 0.12, ease: 'easeOut' }}
       style={{ flex: 1, display: 'flex' }}
@@ -1051,7 +1052,8 @@ function AddedSheet({ show, routineOn }: { show: boolean; routineOn: boolean }) 
         initial={false}
         animate={{ opacity: show ? 1 : 0 }}
         transition={{ duration: 0.34 }}
-        style={{ position: 'absolute', inset: 0, background: 'rgba(6,6,15,.45)', zIndex: 90, pointerEvents: 'none' }}
+        data-act="close"
+        style={{ position: 'absolute', inset: 0, background: 'rgba(6,6,15,.45)', zIndex: 90, pointerEvents: show ? 'auto' : 'none' }}
       />
       <motion.div
         initial={false}
@@ -1111,6 +1113,7 @@ function AddedSheet({ show, routineOn }: { show: boolean; routineOn: boolean }) 
           </div>
         </div>
         <motion.div
+          data-act="routine"
           initial={false}
           animate={{ background: routineOn ? S.info : '#F8F8F9' }}
           style={{
@@ -1159,7 +1162,9 @@ function AddedSheet({ show, routineOn }: { show: boolean; routineOn: boolean }) 
             />
           </span>
         </motion.div>
-        <Btn full>View cart</Btn>
+        <div data-act="close" style={{ width: '100%', display: 'flex' }}>
+          <Btn full>View cart</Btn>
+        </div>
       </motion.div>
     </>
   );
@@ -1245,6 +1250,86 @@ export function SaryAddAllLoop({ width = 300, playing = true }: { width?: number
       toast={false}
       {...beat.s}
     />
+    </div>
+  );
+}
+
+/* ── "Add all", played by hand ───────────────────────
+   The same hub screen, driven by taps instead of a timer: Add all
+   runs the press, fly, land and sheet beats; the reminder row
+   toggles the weekly routine (with its toast); View cart or the
+   dimmed backdrop closes the sheet. Taps are read from the data-act
+   attributes on the screen's own buttons. */
+type Knobs = Beat['s'];
+
+const HINTS = {
+  idle: 'Tap Add all to cart',
+  playing: '',
+  sheet: 'Turn on the Sunday reminder, or tap View cart',
+  done: 'Added. Start over to try it again',
+};
+
+export function SaryAddAllPlay({ width = 300 }: { width?: number }) {
+  const [k, setK] = useState<Knobs>({});
+  const [stage, setStage] = useState<keyof typeof HINTS>('idle');
+  const timers = useRef<number[]>([]);
+  const later = (ms: number, fn: () => void) => timers.current.push(window.setTimeout(fn, ms));
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
+
+  const reset = () => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    setK({});
+    setStage('idle');
+  };
+
+  const onClick = (e: ReactMouseEvent) => {
+    const act = (e.target as HTMLElement).closest<HTMLElement>('[data-act]')?.dataset.act;
+    if (act === 'add' && stage === 'idle') {
+      setStage('playing');
+      setK({ pressed: true });
+      later(220, () => setK({ flying: true }));
+      later(1040, () => setK({ added: true, badge: 21, cartBar: true }));
+      later(1740, () => {
+        setK({ added: true, badge: 21, cartBar: true, sheet: true });
+        setStage('sheet');
+      });
+    } else if (act === 'routine' && stage === 'sheet') {
+      setK((p) => {
+        const on = !p.routineOn;
+        if (on) later(1800, () => setK((q) => ({ ...q, toast: false })));
+        return { ...p, routineOn: on, toast: on };
+      });
+    } else if (act === 'close' && stage === 'sheet') {
+      setK((p) => ({ ...p, sheet: false, toast: false }));
+      setStage('done');
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-5">
+      <div onClick={onClick} className="[&_[data-act]]:cursor-pointer select-none">
+        <SaryPhone
+          state="hub"
+          width={width}
+          pressed={false}
+          added={false}
+          badge={3}
+          cartBar={false}
+          sheet={false}
+          routineOn={false}
+          toast={false}
+          {...k}
+        />
+      </div>
+      <div className="h-9 flex items-center gap-4 text-sm">
+        <span className="text-white/55">{HINTS[stage]}</span>
+        {stage !== 'idle' && (
+          <button type="button" onClick={reset} className="rounded-full border border-white/20 px-4 py-1.5 text-white/80 hover:text-white hover:border-white/50 transition-colors">
+            Start over
+          </button>
+        )}
+      </div>
     </div>
   );
 }

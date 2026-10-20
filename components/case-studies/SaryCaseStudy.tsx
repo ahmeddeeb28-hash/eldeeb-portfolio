@@ -5,7 +5,7 @@ import { Meta } from './_shared/Meta';
 import { CaseFilm, Eyebrow as BaseEyebrow, UseCaseExplorer, reveal, type UseCase as BaseUseCase } from './_shared/CaseBits';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 import { MarqueeGallery, type Screen } from './_shared/MarqueeGallery';
-import { SaryAddAllLoop, SaryPhone, type SaryState } from './sary/SaryPhone';
+import { SaryAddAllLoop, SaryAddAllPlay, SaryPhone, type SaryState } from './sary/SaryPhone';
 
 /* ── Sary · Buy Again Hub ────────────────────────────
    Repeat customers on Sary, the B2B grocery app. Sources: the
@@ -29,7 +29,7 @@ const CHAPTERS: Chapter[] = [
   { id: 'insight', num: '03', roman: 'III', label: 'Insights', beat: 'What we learned.' },
   { id: 'screens', num: '04', roman: 'IV', label: 'Screens', beat: 'Every screen, side by side.' },
   { id: 'cases', num: '05', roman: 'V', label: 'Use Cases', beat: 'Each case and its design.' },
-  { id: 'motion', num: '06', roman: 'VI', label: 'Motion', beat: 'Add all, frame by frame.' },
+  { id: 'motion', num: '06', roman: 'VI', label: 'Motion', beat: 'Try Add all yourself.' },
   { id: 'impact', num: '07', roman: 'VII', label: 'Impact', beat: 'What changed.' },
 ];
 
@@ -158,15 +158,6 @@ const USE_CASES: UseCase[] = [
     shown: 'Every store that adds its usual',
     measured: 'Reminders turned on, repeat-order rate',
   },
-];
-
-const MOTION = [
-  { k: 'K1', t: 'Tap', at: '0–120 ms', what: 'The button presses in and darkens. Light haptic.', why: 'Instant feedback. Nothing moves yet, so a mis-tap can still be cancelled.' },
-  { k: 'K2', t: 'Lift', at: '120–520 ms', what: 'The six preview items lift off the card and arc into the cart, 40 ms apart.', why: 'Owners trust Add all when they see their own products go in.' },
-  { k: 'K3', t: 'Land', at: '520–760 ms', what: 'The cart badge bumps and rolls from 3 to 21. The button turns green: Added.', why: 'Confirms the count without a toast and stops double adds.' },
-  { k: 'K4', t: 'Cart bar', at: '760–1060 ms', what: 'The cart bar slides up with the new total and Free delivery unlocked.', why: 'Money is the first thing an owner checks.' },
-  { k: 'K5', t: 'Sheet', at: '1060–1400 ms', what: 'A sheet rises with a tick, the summary and SAR saved.', why: 'Closes the loop with the value and the next step.' },
-  { k: 'K6', t: 'Routine', at: 'On tap', what: 'Remind me every Sunday: the switch slides and a toast confirms.', why: 'Turns a one-off reorder into a weekly habit.' },
 ];
 
 const RESULTS = [
@@ -396,40 +387,8 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
 
         {/* ── 06 MOTION ── */}
         <ChapterTitle chapter={CHAPTERS[5]} />
-        <section id="motion" className="mb-32 scroll-mt-24">
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-10 items-start">
-            <div>
-              <p className="text-white/60 text-base md:text-lg leading-relaxed mb-8 max-w-xl">
-                One tap restocks the usual basket. The items fly into the cart so the owner sees exactly what was added,
-                then the app offers to make it a weekly routine. About 1.4 seconds, and every step can be interrupted.
-              </p>
-              <ol className="grid gap-px rounded-2xl overflow-hidden border border-white/10 bg-white/10">
-                {MOTION.map((m, i) => (
-                  <motion.li
-                    key={m.k}
-                    {...reveal}
-                    transition={{ ...reveal.transition, delay: i * 0.04 }}
-                    className="bg-[#0D0D0D] p-5 grid grid-cols-[52px_1fr] gap-4"
-                  >
-                    <span className="font-mono text-xs pt-1" style={{ color: ACCENT }}>
-                      {m.k}
-                    </span>
-                    <span>
-                      <span className="flex flex-wrap items-baseline gap-x-3 mb-1">
-                        <span className="text-white font-bold">{m.t}</span>
-                        <span className="text-white/35 text-xs font-mono">{m.at}</span>
-                      </span>
-                      <span className="block text-white/70 text-sm leading-relaxed">{m.what}</span>
-                      <span className="block text-white/40 text-sm leading-relaxed mt-1">{m.why}</span>
-                    </span>
-                  </motion.li>
-                ))}
-              </ol>
-            </div>
-            <div className="flex justify-center lg:sticky lg:top-40">
-              <SaryAddAllLoop width={280} />
-            </div>
-          </div>
+        <section id="motion" className="mb-32 scroll-mt-24 flex justify-center">
+          <SaryAddAllPlay width={320} />
         </section>
 
         {/* ── 07 IMPACT ── */}
