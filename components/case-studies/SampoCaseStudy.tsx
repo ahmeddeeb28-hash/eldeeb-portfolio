@@ -2,8 +2,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useState, type ReactNode } from 'react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
-import { Meta } from './_shared/Meta';
-import { CaseFilm, Eyebrow as BaseEyebrow, reveal } from './_shared/CaseBits';
+import { CaseIntro, Takeaway } from './_shared/CaseLayout';
+import { CaseFilm, reveal } from './_shared/CaseBits';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 import { FocusFilm, type FocusScene, type FocusStep } from './sampo/FocusFilm';
 import {
@@ -203,11 +203,6 @@ const AUDIT: [string, string][] = [
   ['$ examples in a SAR-only product.', 'SAR 70 → SAR 69.99.'],
 ];
 
-const PRINCIPLES = ['Explain before you ask', 'Show ranges, not promises', 'Make leaving cheap', 'Let status travel'];
-
-const Eyebrow = ({ children, tone = ACCENT }: { children: ReactNode; tone?: string }) => (
-  <BaseEyebrow tone={tone}>{children}</BaseEyebrow>
-);
 
 function Ladder({ onPick, active }: { onPick: (i: number) => void; active: number }) {
   return (
@@ -276,21 +271,22 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         <ChapterTitle total="VII" chapter={CHAPTERS[0]} />
         <section id="overview" className="mb-32 scroll-mt-24">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
-            <p className="text-xs font-semibold mb-6" style={{ color: ACCENT }}>
-              Sampo AI · Pricing strategies · Saudi e-commerce
-            </p>
-            <h1 className="text-white text-5xl md:text-7xl font-semibold mb-8 leading-[0.95] tracking-tight max-w-4xl">
-              AI pricing merchants can trust, test and undo.
-            </h1>
-            <p className="text-white/50 text-lg md:text-xl leading-relaxed max-w-2xl mb-12">
-              An AI that changes store prices. As consultant and design team lead, I got the teams to agree on the feature and its impact, built the prototype with AI, and tested it before handoff.
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-6 py-6 border-y border-white/10 mb-12">
-              <Meta label="Role" value="Consultation &amp; Design team management" />
-              <Meta label="Timeline" value="Nov 2024 – Dec 2025" />
-              <Meta label="Platform" value="Merchant web dashboard" />
-              <Meta label="Market" value="Saudi Arabia · SAR · EN/AR" />
-            </div>
+            <CaseIntro
+              meta={[
+                ['Role', 'Consultation & Design team management'],
+                ['Platform', 'Merchant web dashboard'],
+                ['Market', 'Saudi Arabia · SAR · EN/AR'],
+                ['Product', 'Sampo AI · pricing strategies'],
+                ['Timeline', 'Nov 2024 – Dec 2025'],
+              ]}
+              title="AI pricing merchants can trust, test and undo."
+            >
+              <p>An AI that changes store prices for Saudi e-commerce merchants.</p>
+              <p>
+                As consultant and design team lead, I got the teams to agree on the feature and its impact, built the prototype
+                with AI, and tested it before handoff.
+              </p>
+            </CaseIntro>
             <CaseFilm
               src={FILM}
               poster={POSTER}
@@ -428,37 +424,44 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         {/* ── 07 CRAFT ── */}
         <ChapterTitle total="VII" chapter={CHAPTERS[6]} />
         <section id="craft" className="mb-16 scroll-mt-24">
-          <Eyebrow>Four rules for every pop-up</Eyebrow>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-16">
-            {RULES.map((r, i) => (
-              <motion.div key={r.k} {...reveal} transition={{ ...reveal.transition, delay: i * 0.05 }} className="rounded-[20px] border border-white/5 bg-[#0D0D0D] p-5">
-                <span className="font-mono text-xs" style={{ color: ACCENT }}>
-                  {r.k}
-                </span>
-                <p className="text-white font-bold mt-2">{r.t}</p>
-              </motion.div>
-            ))}
-          </div>
-
-          <Eyebrow>Fixes from the audit</Eyebrow>
-          <div className="rounded-[24px] border border-white/5 bg-[#0D0D0D] px-5 md:px-7 mb-16">
-            {AUDIT.map(([found, fix]) => (
-              <div key={found} className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 py-4 border-b border-white/5 last:border-0 text-sm">
-                <span className="text-white/45">
-                  <span className="text-[#FF8A8A] font-bold">Before · </span>
-                  {found}
-                </span>
-                <span className="text-white/85">
-                  <span className="font-bold" style={{ color: ACCENT }}>
-                    After ·{' '}
+          <motion.div {...reveal} className="mb-16">
+            <p className="text-white/45 text-sm mb-5">Four rules for every pop-up</p>
+            <ol className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-5">
+              {RULES.map((r) => (
+                <li key={r.k}>
+                  <span className="font-mono text-xs" style={{ color: ACCENT }}>
+                    {r.k}
                   </span>
-                  {fix}
-                </span>
-              </div>
-            ))}
-          </div>
+                  <p className="text-white font-medium mt-1">{r.t}</p>
+                </li>
+              ))}
+            </ol>
+          </motion.div>
 
-          <Eyebrow>One status, everywhere</Eyebrow>
+          <motion.div {...reveal} className="mb-16">
+            <div className="hidden md:grid grid-cols-2 gap-x-10 text-sm mb-4">
+              <span className="text-[#FF8A8A]">Before the audit</span>
+              <span style={{ color: ACCENT }}>After</span>
+            </div>
+            <ul className="grid gap-5">
+              {AUDIT.map(([found, fix]) => (
+                <li key={found} className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-1 text-[15px] leading-relaxed">
+                  <span className="text-white/45">
+                    <span className="md:hidden text-[#FF8A8A]">Before · </span>
+                    {found}
+                  </span>
+                  <span className="text-white/85">
+                    <span className="md:hidden" style={{ color: ACCENT }}>
+                      After ·{' '}
+                    </span>
+                    {fix}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          <p className="text-white/45 text-sm mb-5">One status, everywhere</p>
           <div className="flex flex-wrap items-center gap-3 mb-16 rounded-[24px] bg-[#F6F5FB] p-5">
             {(['Not active', 'Pending activation', 'A/B testing', 'Active', 'Completed'] as const).map((st, i, a) => (
               <motion.span
@@ -475,18 +478,10 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
             ))}
           </div>
 
-          <Eyebrow>What held it together</Eyebrow>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-            {PRINCIPLES.map((p, i) => (
-              <motion.div key={p} {...reveal} transition={{ ...reveal.transition, delay: i * 0.05 }} className="rounded-[20px] border border-white/5 bg-[#0D0D0D] p-5">
-                <span className="block font-semibold tabular-nums text-3xl mb-2" style={{ color: ACCENT }}>
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <p className="text-white font-bold">{p}</p>
-              </motion.div>
-            ))}
-          </div>
-          <p className="text-white/35 text-xs mt-6">All figures are sample data from the design boards.</p>
+          <Takeaway accent={ACCENT} deep="#2A1C8F" label="What held it together" note="All figures are sample data from the design boards.">
+            <span style={{ color: ACCENT }}>Explain before you ask.</span> Show ranges, not promises. Make leaving cheap. Let
+            status travel.
+          </Takeaway>
         </section>
       </div>
     </CaseShell>

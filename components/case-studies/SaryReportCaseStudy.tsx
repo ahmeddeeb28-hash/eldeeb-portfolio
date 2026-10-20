@@ -2,7 +2,7 @@ import { motion } from 'motion/react';
 import type { ReactNode } from 'react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
-import { Meta } from './_shared/Meta';
+import { CaseIntro } from './_shared/CaseLayout';
 import { Eyebrow as BaseEyebrow, reveal } from './_shared/CaseBits';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 import { ConversionTiles, Funnel, HeatReel } from './report/ReportUI';
@@ -52,20 +52,22 @@ export function SaryReportCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
         <ChapterTitle chapter={CHAPTERS[0]} />
         <section id="overview" className="mb-32 scroll-mt-24">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
-            <p className="text-sm text-white/45 mb-6">Sary, usability performance report, Q4 2022</p>
-            <h1 className="text-white text-5xl md:text-7xl font-semibold mb-8 leading-[0.98] tracking-[-0.04em] max-w-4xl">
-              Only 9.63% of shoppers reached Discover.
-            </h1>
-            <p className="text-white/55 text-lg md:text-xl leading-relaxed max-w-2xl mb-12">
-              Every quarter I wrote one report on how Sary’s app was doing, journey by journey: what converted, where shoppers
-              dropped off, and what we should fix next. This is the chapter on the Discover tab, campaigns and promotions.
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-6 py-6 border-y border-white/10 mb-12">
-              <Meta label="Role" value="Senior Product Designer · Experience Design" />
-              <Meta label="Period" value="Q4 2022 (Oct to Dec)" />
-              <Meta label="Product" value="Sary app · B2B grocery" />
-              <Meta label="Scope" value="7 journeys, reported quarterly" />
-            </div>
+            <CaseIntro
+              meta={[
+                ['Role', 'Senior Product Designer · Experience Design'],
+                ['Product', 'Sary app · B2B grocery'],
+                ['Market', 'Saudi Arabia'],
+                ['Period', 'Q4 2022 (Oct to Dec)'],
+                ['Scope', '7 journeys, reported quarterly'],
+              ]}
+              title="Only 9.63% of shoppers reached Discover."
+            >
+              <p>
+                Every quarter I wrote one report on how Sary’s app was doing, journey by journey: what converted, where
+                shoppers dropped off, and what we should fix next.
+              </p>
+              <p>This is the chapter on the Discover tab, campaigns and promotions.</p>
+            </CaseIntro>
             <div className="rounded-[28px] overflow-hidden p-6 md:p-10" style={{ background: PAPER }}>
               <div className="grid md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-8 items-center">
                 <div>

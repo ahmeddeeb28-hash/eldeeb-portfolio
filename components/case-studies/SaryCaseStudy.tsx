@@ -1,10 +1,8 @@
-import { motion, useInView } from 'motion/react';
-import { useRef } from 'react';
-import { CountUp } from './_shared/CountUp';
+import { motion } from 'motion/react';
+import { CaseIntro, LeadStats, Takeaway } from './_shared/CaseLayout';
 import { MousePointerClick } from 'lucide-react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
-import { Meta } from './_shared/Meta';
 import { CaseFilm, Eyebrow as BaseEyebrow, UseCaseExplorer, reveal, type UseCase as BaseUseCase } from './_shared/CaseBits';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 import { MarqueeGallery, type Screen } from './_shared/MarqueeGallery';
@@ -213,63 +211,6 @@ const SCREENS: Screen[][] = [
   [ph('review'), ph('hub'), ph('added')],
 ];
 
-/* Impact: the lead result (repeat purchases, what the project set
-   out to move) large and bold, the other three listed beside it,
-   then the takeaway and a line on what we keep watching. No cards or rules; the numbers
-   count up once when the section comes into view. */
-function Impact() {
-  const ref = useRef<HTMLDivElement>(null);
-  const seen = useInView(ref, { once: true, margin: '-15% 0px' });
-  const [lead, ...rest] = RESULTS;
-  const n = (v: string) => parseInt(v.replace(/[^0-9]/g, ''), 10);
-  return (
-    <div ref={ref}>
-      <motion.div {...reveal} className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-10 md:gap-16 items-center mb-20">
-        <div>
-          <p className="text-white font-bold tracking-[-0.05em] leading-none tabular-nums" style={{ fontSize: 'clamp(72px, 9vw, 112px)' }}>
-            <span style={{ color: ACCENT }}>+</span>
-            <CountUp from={0} to={n(lead.v)} run={seen} ms={1300} />%
-          </p>
-          <p className="text-white text-lg md:text-xl font-medium mt-4">{lead.k}</p>
-          <p className="text-white/50 text-sm md:text-base mt-1">The number this project was built to move.</p>
-        </div>
-        <ul className="grid gap-5 md:border-l md:border-white/10 md:pl-12">
-          {rest.map((x, i) => (
-            <li key={x.k} className="flex items-baseline gap-4">
-              <span className="text-white text-3xl font-semibold tracking-[-0.03em] tabular-nums w-[4.5ch] flex-none">
-                +<CountUp from={0} to={n(x.v)} run={seen} ms={1200} delay={150 + i * 120} />%
-              </span>
-              <span className="text-white/55 text-base">{x.k}</span>
-            </li>
-          ))}
-        </ul>
-      </motion.div>
-
-      <motion.div
-        {...reveal}
-        className="relative overflow-hidden rounded-[28px] border border-white/[0.07] px-7 py-10 md:px-14 md:py-16"
-        style={{
-          background: `radial-gradient(ellipse 60% 90% at 88% 10%, ${ACCENT}2E 0%, transparent 60%), radial-gradient(ellipse 50% 70% at 0% 100%, #1D368D55 0%, transparent 65%), #0F1117`,
-        }}
-      >
-        <span aria-hidden className="absolute right-6 md:right-12 -top-6 md:-top-10 text-[160px] md:text-[240px] leading-none font-semibold select-none" style={{ color: `${ACCENT}26` }}>
-          “
-        </span>
-        <div className="relative max-w-3xl">
-          <p className="text-white/45 text-sm mb-4">What I carry forward</p>
-          <p className="text-white text-2xl md:text-4xl font-semibold leading-snug tracking-[-0.02em]">
-            The <span style={{ color: ACCENT }}>biggest wins</span> don’t always need a big redesign. Learn what people
-            already do, and make that the easiest thing in the app.
-          </p>
-          <p className="text-white/45 text-[15px] leading-relaxed mt-8">
-            We keep watching the repeat-order rate, time to checkout, and the share of orders that start from Buy Again.
-          </p>
-        </div>
-      </motion.div>
-    </div>
-  );
-}
-
 export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
   return (
     <CaseShell
@@ -289,29 +230,26 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,2.2fr)] gap-12 md:gap-16 mb-16">
-              <div className="order-2 md:order-1 grid grid-cols-2 md:grid-cols-1 gap-x-8 gap-y-6 content-start pt-8 md:pt-0 border-t border-white/10 md:border-0">
-                <Meta label="Role" value="Lead Product Designer" />
-                <Meta label="Platform" value="Mobile app" />
-                <Meta label="Market" value="Saudi Arabia · B2B grocery" />
-                <Meta label="User" value="Grocery store owners" />
-                <Meta label="Year" value="2022" />
-                <Meta label="Deliverables" value="5 screens · motion · film" />
-              </div>
-              <div className="order-1 md:order-2">
-                <h1 className="text-white text-5xl md:text-7xl font-semibold mb-8 leading-[0.95] tracking-[-0.04em]">
-                  Restock in 3 taps, not 39.
-                </h1>
-                <p className="text-white/75 text-lg md:text-xl leading-relaxed mb-6">
-                  Sary is a B2B grocery marketplace in Saudi Arabia. Store owners use it to restock their shelves, and most
-                  of them buy the same few dozen products every week.
-                </p>
-                <p className="text-white/55 text-lg md:text-xl leading-relaxed">
-                  I designed a Buy Again hub that turns that routine into one tap, flags what’s running low before the
-                  shelf is empty, and suggests the next order on the store’s own restock day.
-                </p>
-              </div>
-            </div>
+            <CaseIntro
+              meta={[
+                ['Role', 'Lead Product Designer'],
+                ['Platform', 'Mobile app'],
+                ['Market', 'Saudi Arabia · B2B grocery'],
+                ['User', 'Grocery store owners'],
+                ['Year', '2022'],
+                ['Deliverables', '5 screens · motion · film'],
+              ]}
+              title="Restock in 3 taps, not 39."
+            >
+              <p>
+                Sary is a B2B grocery marketplace in Saudi Arabia. Store owners use it to restock their shelves, and most of
+                them buy the same few dozen products every week.
+              </p>
+              <p>
+                I designed a Buy Again hub that turns that routine into one tap, flags what’s running low before the shelf is
+                empty, and suggests the next order on the store’s own restock day.
+              </p>
+            </CaseIntro>
 
             <CaseFilm
               src={FILM}
@@ -469,7 +407,15 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         {/* ── 07 IMPACT ── */}
         <ChapterTitle chapter={CHAPTERS[6]} />
         <section id="impact" className="mb-16 scroll-mt-24">
-          <Impact />
+          <LeadStats lead={RESULTS[0]} note="The number this project was built to move." rest={RESULTS.slice(1)} accent={ACCENT} />
+          <Takeaway
+            accent={ACCENT}
+            deep="#1D368D"
+            note="We keep watching the repeat-order rate, time to checkout, and the share of orders that start from Buy Again."
+          >
+            The <span style={{ color: ACCENT }}>biggest wins</span> don’t always need a big redesign. Learn what people already
+            do, and make that the easiest thing in the app.
+          </Takeaway>
         </section>
       </div>
     </CaseShell>

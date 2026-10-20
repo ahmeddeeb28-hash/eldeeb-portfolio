@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
-import { Meta } from './_shared/Meta';
+import { CaseIntro, LeadStats, Takeaway } from './_shared/CaseLayout';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 import { FreshPhone, LoopingPhone, type PhoneState } from './fresh/FreshPhone';
 import { MarqueeGallery, type Screen } from './_shared/MarqueeGallery';
@@ -221,10 +221,10 @@ const KPIS = [
 const RESULTS: { k: string; v: string }[] = [];
 
 const SHIPPED = [
-  { v: '9', k: 'designed states' },
-  { v: '14.5s', k: 'motion timeline' },
-  { v: '47s', k: 'launch film' },
-  { v: '1', k: 'clock for ring and cancel' },
+  { v: '9', k: 'Designed states' },
+  { v: '14.5s', k: 'Motion timeline' },
+  { v: '47s', k: 'Launch film' },
+  { v: '1', k: 'Clock for ring and cancel' },
 ];
 
 /* Every Order placed state for the marquee gallery. The placing
@@ -259,22 +259,22 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="text-xs font-semibold mb-6" style={{ color: ACCENT }}>
-              fresh · food & grocery delivery
-            </p>
-            <h1 className="text-white text-5xl md:text-7xl font-semibold mb-8 leading-[0.95] tracking-tight max-w-4xl">
-              The five seconds after Pay.
-            </h1>
-            <p className="text-white/50 text-lg md:text-xl leading-relaxed max-w-2xl mb-12">
-              Most delivery apps show a spinner after you pay. I used those seconds to let people fix the two most costly mistakes, a wrong address and wrong items, then sent them straight to tracking.
-            </p>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-6 py-6 border-y border-white/10 mb-12">
-              <Meta label="Role" value="Lead Product Designer" />
-              <Meta label="Scope" value="Order placed moment" />
-              <Meta label="Deliverables" value="9 states · motion · film" />
-              <Meta label="Platform" value="iOS · Android" />
-            </div>
+            <CaseIntro
+              meta={[
+                ['Role', 'Lead Product Designer'],
+                ['Platform', 'iOS · Android'],
+                ['Product', 'fresh · food & grocery delivery'],
+                ['Scope', 'Order placed moment'],
+                ['Deliverables', '9 states · motion · film'],
+              ]}
+              title="The five seconds after Pay."
+            >
+              <p>Most delivery apps show a spinner after you pay.</p>
+              <p>
+                I used those seconds to let people fix the two most costly mistakes, a wrong address and wrong items, then
+                sent them straight to tracking.
+              </p>
+            </CaseIntro>
 
             <CaseFilm
               src={FILM}
@@ -433,89 +433,45 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
         {/* ── 07 IMPACT ── */}
         <ChapterTitle chapter={CHAPTERS[6]} />
         <section id="impact" className="mb-16 scroll-mt-24">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-16">
-            {SHIPPED.map((s, i) => (
-              <motion.div
-                key={s.k}
-                {...reveal}
-                transition={{ ...reveal.transition, delay: i * 0.06 }}
-                className="rounded-[24px] border border-white/5 bg-[#0D0D0D] p-6"
-              >
-                <p className="text-white text-4xl md:text-5xl font-semibold tracking-[-0.04em] mb-2">{s.v}</p>
-                <p className="text-white/45 text-sm">{s.k}</p>
-              </motion.div>
-            ))}
-          </div>
+          <LeadStats lead={SHIPPED[0]} note="Every moment between Pay and tracking, designed." rest={SHIPPED.slice(1)} accent={ACCENT} />
 
-          <Eyebrow>How we measure the lift</Eyebrow>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-10 items-start">
+          <motion.div {...reveal} className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-10 md:gap-16 mb-20">
             {(
               [
-                { dir: 'down', label: 'Should go down', color: '#FFB547', arrow: '↓' },
-                { dir: 'up', label: 'Should go up', color: ACCENT, arrow: '↑' },
+                { dir: 'down', label: 'Should go down', arrow: '↓', color: '#FFB547' },
+                { dir: 'up', label: 'Should go up', arrow: '↑', color: ACCENT },
               ] as const
-            ).map((g, gi) => (
-              <motion.div
-                key={g.dir}
-                {...reveal}
-                transition={{ ...reveal.transition, delay: gi * 0.08 }}
-                className="rounded-[24px] border border-white/5 bg-[#0D0D0D] p-6 md:p-7"
-              >
-                <div className="flex items-center gap-3 pb-5 border-b border-white/5">
-                  <span
-                    className="w-7 h-7 rounded-full grid place-items-center text-sm font-semibold"
-                    style={{ color: g.color, background: `${g.color}1A` }}
-                    aria-hidden
-                  >
-                    {g.arrow}
-                  </span>
-                  <span className="text-xs font-semibold" style={{ color: g.color }}>
-                    {g.label}
-                  </span>
-                </div>
-                <ul>
+            ).map((g) => (
+              <div key={g.dir}>
+                <p className="text-sm mb-4" style={{ color: g.color }}>
+                  {g.arrow} {g.label}
+                </p>
+                <ul className="grid gap-4">
                   {KPIS.filter((k) => k.dir === g.dir).map((k) => {
                     const result = RESULTS.find((r) => r.k === k.k);
                     return (
-                      <li
-                        key={k.k}
-                        className="flex items-start justify-between gap-6 py-4 border-b border-white/5 last:border-0 last:pb-0"
-                      >
+                      <li key={k.k} className="flex items-baseline justify-between gap-6">
                         <span>
-                          <span className="block text-white font-bold mb-1">{k.k}</span>
-                          <span className="block text-white/50 text-sm leading-relaxed">{k.d}</span>
+                          <span className="block text-white font-medium">{k.k}</span>
+                          <span className="block text-white/45 text-sm leading-relaxed">{k.d}</span>
                         </span>
-                        {result && (
-                          <span className="text-white text-2xl font-semibold tracking-[-0.03em] shrink-0">{result.v}</span>
-                        )}
+                        {result && <span className="text-white text-2xl font-semibold tracking-[-0.03em] shrink-0">{result.v}</span>}
                       </li>
                     );
                   })}
                 </ul>
-              </motion.div>
+              </div>
             ))}
-          </div>
-
-          {RESULTS.length === 0 && (
-            <motion.div
-              {...reveal}
-              className="rounded-[24px] border border-dashed border-white/15 p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-4 mb-20"
-            >
-              <span className="text-xs font-semibold" style={{ color: ACCENT }}>
-                Pilot in progress
-              </span>
-              <p className="text-white/60 text-sm leading-relaxed">
-                Each screen has a metric. Results will go here when the pilot ends.
-              </p>
-            </motion.div>
-          )}
-
-          <motion.div {...reveal} className="max-w-3xl">
-            <Eyebrow>What I carry forward</Eyebrow>
-            <p className="text-white text-2xl md:text-3xl font-bold leading-snug tracking-tight">
-              Small screens can carry big costs. Design for the moment people are already looking, and give them control while a fix is still cheap.
-            </p>
           </motion.div>
+
+          <Takeaway
+            accent={ACCENT}
+            deep="#103F2D"
+            note={RESULTS.length === 0 ? 'The pilot is running. Each screen has a metric, and results go here when it ends.' : undefined}
+          >
+            Small screens can carry <span style={{ color: ACCENT }}>big costs</span>. Design for the moment people are already
+            looking, and give them control while a fix is still cheap.
+          </Takeaway>
         </section>
       </div>
     </CaseShell>
