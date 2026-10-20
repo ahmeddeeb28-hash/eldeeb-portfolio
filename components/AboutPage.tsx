@@ -16,9 +16,8 @@ const CHAPTERS: Chapter[] = [
   { id: 'what', num: '02', roman: 'II', label: 'What I Do', beat: 'Where I help teams most.' },
   { id: 'experience', num: '03', roman: 'III', label: 'Experience', beat: 'Where I\u2019ve done the work.' },
   { id: 'timeline', num: '04', roman: 'IV', label: 'Timeline', beat: 'The milestones behind the titles.' },
-  { id: 'story', num: '05', roman: 'V', label: 'Story', beat: 'What the résumé leaves out.' },
-  { id: 'beyond', num: '06', roman: 'VI', label: 'Beyond Work', beat: 'Who I am off the clock.' },
-  { id: 'connect', num: '07', roman: 'VII', label: 'Connect', beat: "Let's talk." },
+  { id: 'beyond', num: '05', roman: 'V', label: 'Beyond Work', beat: 'Who I am off the clock.' },
+  { id: 'connect', num: '06', roman: 'VI', label: 'Connect', beat: "Let's talk." },
 ];
 
 /* ── Lightweight section header — a quieter cousin of ChapterTitle,
@@ -40,7 +39,7 @@ function SectionHeader({
   return (
     <div className={`flex flex-col gap-4 mb-14 md:mb-20 ${centered ? 'items-center text-center' : ''}`}>
       <div className={`flex items-center gap-4 ${centered ? 'justify-center' : ''}`}>
-        <span className="text-[#4AF2E5] font-mono text-[11px] font-black tracking-[0.35em]">{roman} / VII</span>
+        <span className="text-[#4AF2E5] font-mono text-[11px] font-black tracking-[0.35em]">{roman} / VI</span>
         <span className="block w-10 h-px" style={{ background: 'rgba(220,190,140,0.4)' }} />
         <span className="text-white/30 text-[10px] font-black uppercase tracking-[0.3em]">Chapter {num}</span>
       </div>
@@ -1761,7 +1760,7 @@ function BeyondWorkSection() {
   return (
     <section id="beyond" className="relative px-6 py-24 md:py-32 border-t border-white/5 overflow-hidden">
       <div className="mx-auto" style={{ maxWidth: ds.layout.contentMaxWidth }}>
-        <SectionHeader num="06" roman="VI" label="Beyond Work" beat="Curiosity follows me everywhere." />
+        <SectionHeader num="05" roman="V" label="Beyond Work" beat="Curiosity follows me everywhere." />
 
         {/* Emotional statement — Fraunces italic hero line, kept short so
             the collage does the emotional heavy lifting underneath. */}
@@ -2304,7 +2303,7 @@ function ConnectSection() {
   return (
     <section id="connect" className="relative px-6 pt-24 md:pt-32 pb-32 md:pb-40 border-t border-white/5">
       <div className="mx-auto" style={{ maxWidth: ds.layout.narrowMaxWidth }}>
-        <SectionHeader num="07" roman="VII" label="Connect" beat="Let's talk." align="center" />
+        <SectionHeader num="06" roman="VI" label="Connect" beat="Let's talk." align="center" />
         <p className="text-white/50 text-base md:text-lg leading-relaxed mb-10 mx-auto max-w-md text-center">
           If any of this resonated, or you just want to talk shop, I'm one message away.
         </p>
@@ -2340,7 +2339,8 @@ export function AboutPage({ onBack }: { onBack: () => void }) {
       <WhatIDoSection />
       <ExperienceSection />
       <TimelineSection />
-      <StorySection />
+      {/* Story is hidden for now; restore by rendering it again and adding its chapter back. */}
+      {false && <StorySection />}
       <BeyondWorkSection />
       <ConnectSection />
     </CaseShell>
