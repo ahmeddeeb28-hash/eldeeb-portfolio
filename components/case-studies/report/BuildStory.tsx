@@ -4,7 +4,7 @@ import { Sparkles } from 'lucide-react';
 import { TEAL } from './ReportData';
 
 /* ── How I ran it · the build as a story ─────────────
-   Five beats down a line that fills as you scroll. Each beat is a
+   Six beats down a line that fills as you scroll. Each beat is a
    short exchange: what I asked for, what Claude did, and a small
    picture of the result. The exchanges are true to how this page
    was made: I set the goal, made the calls and pushed back on the
@@ -173,7 +173,60 @@ function VisShip() {
   );
 }
 
-const BEATS: { n: string; t: string; me: string; ai: string; vis: ReactNode }[] = [
+function VisBecame() {
+  const bars = [100, 63.1, 23.3, 9.63];
+  const qs = ["Q4 '22", 'Next quarter', 'And the next'];
+  return (
+    <div className="h-full flex flex-col justify-center gap-5">
+      <div className="flex items-center gap-3">
+        <div className="flex-1 min-w-0 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+          <p className="text-white/45 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Before</p>
+          <p className="text-white/70 text-sm">A static board, read once</p>
+        </div>
+        <span className="text-2xl" style={{ color: TEAL }}>
+          →
+        </span>
+        <div className="flex-1 min-w-0 rounded-xl border px-4 py-3" style={{ borderColor: `${TEAL}66`, background: `${TEAL}12` }}>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-2" style={{ color: TEAL }}>
+            Now
+          </p>
+          <div className="grid gap-1">
+            {bars.map((b, i) => (
+              <motion.span
+                key={b}
+                className="h-1.5 rounded-full origin-left"
+                style={{ width: `${Math.max(b, 8)}%`, background: TEAL }}
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 + i * 0.15, duration: 0.5 }}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        {qs.map((q, i) => (
+          <motion.span
+            key={q}
+            initial={{ opacity: 0, x: -8 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 1 + i * 0.25 }}
+            className="flex items-center gap-2"
+          >
+            {i > 0 && <span className="text-white/30">→</span>}
+            <span className={`rounded-full px-3 py-1 border ${i ? 'border-dashed border-white/20 text-white/50' : 'text-white'}`} style={i ? undefined : { borderColor: `${TEAL}88` }}>
+              {q}
+            </span>
+          </motion.span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const BEATS: { n: string; t: string; me?: string; ai: string; vis: ReactNode }[] = [
   {
     n: '01',
     t: 'The brief',
@@ -209,6 +262,12 @@ const BEATS: { n: string; t: string; me: string; ai: string; vis: ReactNode }[] 
     ai: 'Built the chat, charts and decision cards, then tested every screen at both sizes.',
     vis: <VisShip />,
   },
+  {
+    n: '06',
+    t: 'What it became',
+    ai: 'The original was a static board. Now it is a page you can use: the funnel, the conversion tiles and the bars are drawn from the report’s numbers, not pasted as images, and the mismatch is fixed. The same pattern can run every quarter: new numbers in, a fresh report out.',
+    vis: <VisBecame />,
+  },
 ];
 
 export function BuildStory() {
@@ -239,8 +298,14 @@ export function BuildStory() {
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             >
               <p className="text-white text-2xl md:text-3xl font-black tracking-tight">{b.t}</p>
-              <Me>{b.me}</Me>
-              <Ai>{b.ai}</Ai>
+              {b.me ? (
+                <>
+                  <Me>{b.me}</Me>
+                  <Ai>{b.ai}</Ai>
+                </>
+              ) : (
+                <p className="text-white/70 text-base leading-relaxed">{b.ai}</p>
+              )}
             </motion.div>
             <div className={`min-w-0 min-h-[200px] rounded-[22px] border border-white/10 bg-[#0C0F12] p-5 ${i % 2 ? 'md:order-1 md:mr-10' : 'md:ml-10'}`}>{b.vis}</div>
           </div>
