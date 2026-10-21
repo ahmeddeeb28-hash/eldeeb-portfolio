@@ -267,33 +267,101 @@ export function ConversionTiles({ story }: { story?: Record<Quarter, { h: string
                         )}
                       </div>
                       <p className="text-[13px] text-[#5B6478] mt-1">{cur[1]} shoppers</p>
-                      <div className="mt-5 h-2 rounded-full bg-[#EEF2F7] overflow-hidden">
-                        <motion.div
-                          className="h-full rounded-full"
-                          style={{ background: q === 'Q4' ? SKY : VIOLET }}
-                          initial={{ width: 0 }}
-                          animate={{ width: seen ? `${cur[0]}%` : 0 }}
-                          transition={{ duration: 0.8, delay: 0.1 + i * 0.12 }}
-                        />
-                      </div>
                     </>
                   ) : (
-                    <p className="text-sm text-[#5B6478] py-6">Sliders launched in Q4, so there is no Q3 figure.</p>
+                    <>
+                      <b className="text-5xl font-semibold tracking-[-0.03em] text-[#C5CDDA]">n/a</b>
+                      <p className="text-[13px] text-[#5B6478] mt-1">Sliders launched in Q4.</p>
+                    </>
                   )}
                 </motion.div>
               </AnimatePresence>
-              {t.best && (
-                <div className="mt-5 pt-4 border-t border-[#EEF2F7] flex items-center justify-between text-[13px]">
-                  <span className="font-bold text-[#D92D3A] text-xs">{t.best[0]}</span>
-                  <span>
-                    <b>{t.best[1]}%</b> <span className="text-[#5B6478]">{t.best[2]}</span>
-                  </span>
-                </div>
-              )}
+              <Compare t={t} q={q} seen={seen} i={i} />
             </div>
           );
         })}
       </div>
+    </div>
+  );
+}
+
+/* Q3 against Q4 on one scale: the chosen quarter in colour, the other
+   muted, what Q4 lost since Q3 marked in pale red, and the all-time
+   best as a dashed line where the report has one. */
+const QCOL: Record<Quarter, string> = { Q3: VIOLET, Q4: SKY };
+function Compare({ t, q, seen, i }: { t: (typeof TILES)[number]; q: Quarter; seen: boolean; i: number }) {
+  const v3 = t.q.Q3?.[0] ?? null;
+  const v4 = t.q.Q4?.[0] ?? null;
+  const top = Math.max(v3 ?? 0, v4 ?? 0, t.best?.[1] ?? 0);
+  const scale = Math.ceil((top * 1.25) / 10) * 10; // a round end for the axis
+  const pct = (v: number) => `${(v / scale) * 100}%`;
+  const lost = v3 !== null && v4 !== null && v4 < v3 ? v3 - v4 : 0;
+  const rows: [Quarter, number | null][] = [
+    ['Q3', v3],
+    ['Q4', v4],
+  ];
+  return (
+    <div className="mt-9">
+      <div className="relative grid gap-2.5">
+        {t.best && (
+          <motion.div
+            className="absolute -top-5 bottom-0 z-10 flex flex-col items-center pointer-events-none"
+            style={{ left: pct(t.best[1]) }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: seen ? 1 : 0 }}
+            transition={{ delay: 1 + i * 0.12 }}
+          >
+            <span className="-translate-x-1/2 text-[10px] font-bold text-[#D92D3A] whitespace-nowrap absolute -top-0.5 left-0">
+              {t.best[0].split(' ·')[0]} best {t.best[1]}%
+            </span>
+            <span className="-translate-x-1/2 absolute left-0 top-4 bottom-0 border-l border-dashed border-[#D92D3A]" />
+          </motion.div>
+        )}
+        {rows.map(([k, v], r) => {
+          const on = k === q;
+          return (
+            <div key={k} className="grid grid-cols-[22px_minmax(0,1fr)_44px] items-center gap-2.5">
+              <span className="text-[11px] font-bold transition-colors" style={{ color: on ? QCOL[k] : '#A3ADBD' }}>
+                {k}
+              </span>
+              <div className="relative h-6 rounded-md bg-[#EEF2F7] overflow-hidden">
+                {v === null ? (
+                  <span className="absolute inset-0 grid place-items-center text-[10px] text-[#8A94A6] border border-dashed border-[#C5CDDA] rounded-md">
+                    Not live yet
+                  </span>
+                ) : (
+                  <>
+                    {/* what Q4 gave up since Q3 */}
+                    {k === 'Q4' && lost > 0 && (
+                      <motion.span
+                        className="absolute inset-y-0 rounded-r-md"
+                        style={{
+                          left: pct(v),
+                          background: 'repeating-linear-gradient(135deg, #FBD5D9 0 4px, #FDECEE 4px 8px)',
+                        }}
+                        initial={{ width: 0 }}
+                        animate={{ width: seen ? pct(lost) : 0 }}
+                        transition={{ duration: 0.5, delay: 0.9 + i * 0.12 }}
+                      />
+                    )}
+                    <motion.span
+                      className="absolute inset-y-0 left-0 rounded-md transition-[background-color,opacity] duration-300"
+                      style={{ background: QCOL[k], opacity: on ? 1 : 0.3 }}
+                      initial={{ width: 0 }}
+                      animate={{ width: seen ? pct(v) : 0 }}
+                      transition={{ duration: 0.8, delay: 0.1 + i * 0.12 + r * 0.15, ease: [0.22, 1, 0.36, 1] }}
+                    />
+                  </>
+                )}
+              </div>
+              <span className="text-right text-[12px] font-semibold tabular-nums transition-colors" style={{ color: on ? '#0F1B3D' : '#A3ADBD' }}>
+                {v === null ? '–' : `${v}%`}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      <p className="text-[10px] text-[#A3ADBD] mt-2 pl-8">Scale 0 to {scale}%</p>
     </div>
   );
 }
