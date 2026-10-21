@@ -1,6 +1,6 @@
-import { motion } from 'motion/react';
+import { motion, useMotionValueEvent, useScroll } from 'motion/react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { useCallback, useEffect, useRef, ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, ReactNode } from 'react';
 import { FloatingNav } from '../../FloatingNav';
 import { SECTION_IDS } from '../../../lib/scrollToSection';
 import Lenis from 'lenis';
@@ -91,6 +91,18 @@ export function CaseShell({
     else scrollToChapter(containerRef.current, id);
   };
 
+  // With the floating nav, the chapter bar tucks away while reading down
+  // and comes back on the first scroll up (always shown near the top).
+  const { scrollY } = useScroll({ container: containerRef });
+  const [barHidden, setBarHidden] = useState(false);
+  useMotionValueEvent(scrollY, 'change', (y) => {
+    if (!siteNav) return;
+    const prev = scrollY.getPrevious() ?? y;
+    if (y < 160) setBarHidden(false);
+    else if (y - prev > 4) setBarHidden(true);
+    else if (prev - y > 4) setBarHidden(false);
+  });
+
   // while the floating menu is open, hold this page still
   const lockScroll = useCallback(() => {
     const el = containerRef.current;
@@ -132,7 +144,10 @@ export function CaseShell({
           ]}
         />
       )}
-      <header className={`sticky top-0 z-40 bg-[#0A0A0A]/90 backdrop-blur-md border-b border-white/5 ${siteNav ? 'pt-[84px]' : ''}`}>
+      <header
+        className={`sticky top-0 z-40 bg-[#0A0A0A]/90 backdrop-blur-md border-b border-white/5 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${siteNav ? 'pt-[84px]' : ''}`}
+        style={{ transform: siteNav && barHidden ? 'translateY(-100%)' : 'translateY(0)' }}
+      >
         {!siteNav && (
         <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
           <button
