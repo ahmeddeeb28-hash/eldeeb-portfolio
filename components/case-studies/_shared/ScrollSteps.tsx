@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, useMotionValue, useReducedMotion } from 'motion/react';
+import { AnimatePresence, motion, useMotionValue, useReducedMotion, useTransform } from 'motion/react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 /* ── Scroll steps ────────────────────────────────────
@@ -69,35 +69,80 @@ export function ScrollSteps({ steps, accent, label }: { steps: Step[]; accent: s
     (scroller ?? window).scrollBy({ top: delta, behavior: reduced ? 'auto' : 'smooth' });
   };
 
+  // how far through the current step, 0..1, for its line segment
+  const stepFill = useTransform(fill, (v) => Math.min(1, Math.max(0, v * n - active)));
+
   const s = steps[active];
 
   return (
     <div ref={ref} className="relative" style={{ height: `calc(${n * PER_STEP * 100}svh + min(640px, calc(100svh - 160px)))` }}>
       <div
-        className="sticky grid grid-rows-[auto_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,0.8fr)_minmax(0,2fr)] gap-4 md:gap-12 items-stretch"
+        className="sticky grid grid-rows-[auto_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,0.85fr)_minmax(0,2fr)] gap-4 md:gap-5 items-stretch"
         style={{ top: STICK, height: 'min(640px, calc(100svh - 160px))' }}
       >
-        {/* the list: numbers on phones, numbers and titles from md up */}
-        <nav aria-label={label} className="relative md:flex md:items-center">
-          <ol className="relative w-full flex md:flex-col gap-2 md:gap-1 md:pl-6">
-            <span aria-hidden className="hidden md:block absolute left-0 top-3 bottom-3 w-px bg-white/10">
-              <motion.span className="absolute inset-0 origin-top" style={{ scaleY: fill, background: accent }} />
-            </span>
+        {/* the tabs: bars on phones; from md up a panel matching the card,
+            one row per step on a dot line that fills as you scroll */}
+        <nav aria-label={label} className="relative md:rounded-[24px] md:border md:border-white/[0.07] md:bg-[#0F0F12] md:p-2">
+          <ol className="relative w-full h-full flex md:flex-col gap-2 md:gap-0">
             {steps.map((x, i) => {
               const on = i === active;
+              const done = i < active;
               return (
-                <li key={x.t} className="flex-1 md:flex-none">
+                <li key={x.t} className="relative flex-1 md:flex md:flex-col">
+                  {/* the line down to the next dot */}
+                  {i < n - 1 && (
+                    <span aria-hidden className="hidden md:block absolute left-[27px] top-1/2 h-full w-px bg-white/10 overflow-hidden">
+                      <motion.span
+                        className="absolute inset-0 origin-top"
+                        style={{ background: accent, scaleY: on ? stepFill : done ? 1 : 0 }}
+                      />
+                    </span>
+                  )}
                   <button
                     type="button"
                     onClick={() => goTo(i)}
                     aria-current={on ? 'step' : undefined}
-                    className="w-full text-left flex items-center md:items-baseline gap-3 rounded-xl px-0 md:px-3 py-3 md:py-2.5"
+                    className={`relative w-full md:flex-1 text-left flex items-center gap-4 rounded-2xl px-0 md:px-4 py-3 transition-colors duration-300 ${
+                      on ? 'md:bg-white/[0.05]' : 'md:hover:bg-white/[0.025]'
+                    }`}
                   >
                     <span aria-hidden className="md:hidden block h-1 w-full rounded-full transition-colors" style={{ background: i <= active ? accent : 'rgba(255,255,255,0.12)' }} />
-                    <span className="hidden md:inline text-sm font-semibold tabular-nums flex-none transition-colors" style={{ color: on ? accent : 'rgba(255,255,255,0.35)' }}>
-                      {String(i + 1).padStart(2, '0')}
+                    {/* dot: check when done, lit when current, ring when ahead */}
+                    <span aria-hidden className="hidden md:grid relative flex-none w-6 h-6 place-items-center">
+                      {on && <span className="absolute inset-0 rounded-full animate-ping motion-reduce:hidden" style={{ background: `${accent}33` }} />}
+                      <span
+                        className="relative grid place-items-center rounded-full transition-all duration-300"
+                        style={{
+                          width: done || on ? 18 : 10,
+                          height: done || on ? 18 : 10,
+                          background: done ? accent : on ? `${accent}26` : 'transparent',
+                          border: `1.5px solid ${done || on ? accent : 'rgba(255,255,255,0.22)'}`,
+                        }}
+                      >
+                        {done && (
+                          <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
+                            <path d="M2.5 6.2 5 8.5l4.5-5" stroke="#0A0A0A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                        {on && <span className="w-1.5 h-1.5 rounded-full" style={{ background: accent }} />}
+                      </span>
                     </span>
-                    <span className={`hidden md:inline text-[15px] leading-snug transition-colors ${on ? 'text-white font-medium' : 'text-white/40 hover:text-white/70'}`}>{x.t}</span>
+                    <span className="hidden md:block min-w-0">
+                      <span className={`block text-[15px] leading-snug transition-colors duration-300 ${on ? 'text-white font-medium' : done ? 'text-white/60' : 'text-white/40'}`}>{x.t}</span>
+                      <AnimatePresence initial={false}>
+                        {on && x.out && (
+                          <motion.span
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                            className="block overflow-hidden text-xs text-white/40 pt-1"
+                          >
+                            {x.out.join(' · ')}
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </span>
                     <span className="sr-only md:hidden">{x.t}</span>
                   </button>
                 </li>
