@@ -16,6 +16,8 @@ import { CASE_STUDY_REGISTRY, HIDDEN_PROJECTS } from './components/case-studies/
 import { AnimatePresence } from 'motion/react';
 import { useRef, useState, useEffect, lazy, Suspense } from 'react';
 import { scrollToSection, scrollToTop } from './lib/scrollToSection';
+import { track, trackPage } from './lib/analytics';
+import { ConsentBanner } from './components/ConsentBanner';
 
 /* The Director's Cut is the heaviest view on the site and only opens
    on demand, so it ships as its own chunk. */
@@ -78,6 +80,12 @@ export default function App() {
     }
   }, []);
 
+  /* One GA4 page view per route, the first one included. Vercel
+     Analytics follows pushState on its own. */
+  useEffect(() => {
+    trackPage(routeToPath(route), document.title);
+  }, [route.view, activeProjectId]);
+
   /* Browser and hardware back/forward now derive the view from the
      URL instead of blindly closing whatever is open, so forward
      works as well as back. */
@@ -105,9 +113,15 @@ export default function App() {
     setRoute({ view: 'home' });
   };
 
-  const openProject = (id: string) => navigate({ view: 'case', id });
+  const openProject = (id: string) => {
+    track('case_study_open', { id, from: 'card' });
+    navigate({ view: 'case', id });
+  };
   const closeProject = goHome;
-  const openAboutPage = () => navigate({ view: 'about' });
+  const openAboutPage = () => {
+    track('about_open');
+    navigate({ view: 'about' });
+  };
   const closeAboutPage = goHome;
   /* From the About page's floating nav: back home, then to a section
      (or the top) once the homepage has faded back in. */
@@ -121,6 +135,7 @@ export default function App() {
     if (!activeProjectId) return;
     const keys = Object.keys(CASE_STUDY_REGISTRY).filter((k) => !HIDDEN_PROJECTS.has(k));
     const nextKey = keys[(keys.indexOf(activeProjectId) + 1) % keys.length];
+    track('case_study_open', { id: nextKey, from: 'next' });
     navigate({ view: 'case', id: nextKey });
   };
 
@@ -184,6 +199,7 @@ export default function App() {
         <Articles />
         <Footer onOpenAboutPage={openAboutPage} />
       </main>
+      <ConsentBanner />
     </div>
   );
 }

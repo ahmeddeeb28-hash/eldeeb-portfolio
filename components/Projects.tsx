@@ -32,6 +32,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { HIDDEN_PROJECTS } from './case-studies/registry';
+import { track } from '../lib/analytics';
 
 /* Live animated thumbnails, fetched only when their row renders. */
 const FreshCardStage = lazy(() =>
@@ -185,7 +186,22 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
   const rowRefs = useRef<Array<HTMLElement | null>>([]);
   const stackRef = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  // false until a row has actually reached the active band
+  const [reached, setReached] = useState(false);
   const reduced = useReducedMotion();
+
+  /* Card impressions, once per card per visit: with case_study_open
+     this gives each case study's click-through rate. */
+  const seenCards = useRef(new Set<string>());
+  useEffect(() => {
+    const p = projects[activeIndex];
+    if (!reached || !p?.hasStudy || paused || seenCards.current.has(p.id)) return;
+    const t = window.setTimeout(() => {
+      seenCards.current.add(p.id);
+      track('case_card_view', { id: p.id });
+    }, 800);
+    return () => window.clearTimeout(t);
+  }, [activeIndex, paused, reached]);
 
   /*
     Active-project tracking via IntersectionObserver — the "active zone"
@@ -202,7 +218,10 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const idx = rows.indexOf(entry.target as HTMLElement);
-            if (idx >= 0) setActiveIndex(idx);
+            if (idx >= 0) {
+              setActiveIndex(idx);
+              setReached(true);
+            }
           }
         });
       },

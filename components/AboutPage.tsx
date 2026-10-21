@@ -67,7 +67,7 @@ const ACCENT = 'rgba(220,190,140,1)';
 
 function IntroSection() {
   return (
-    <section id="intro" className="relative px-6 pt-20 md:pt-28 pb-24 md:pb-32">
+    <section id="intro" data-track-area="about-intro" className="relative px-6 pt-20 md:pt-28 pb-24 md:pb-32">
       <div className="mx-auto max-w-4xl text-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.92 }}
@@ -2301,7 +2301,7 @@ function PassportStrip({
 /* ── 06 · Connect ─────────────────────────────────────────────────── */
 function ConnectSection() {
   return (
-    <section id="connect" className="relative px-6 pt-24 md:pt-32 pb-32 md:pb-40 border-t border-white/5">
+    <section id="connect" data-track-area="about-connect" className="relative px-6 pt-24 md:pt-32 pb-32 md:pb-40 border-t border-white/5">
       <div className="mx-auto" style={{ maxWidth: ds.layout.narrowMaxWidth }}>
         <SectionHeader num="06" roman="VI" label="Connect" beat="Let's talk." align="center" />
         <p className="text-white/50 text-base md:text-lg leading-relaxed mb-10 mx-auto max-w-md text-center">
