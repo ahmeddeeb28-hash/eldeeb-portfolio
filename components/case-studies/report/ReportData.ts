@@ -18,8 +18,7 @@ export const FUNNEL: { k: string; n: number; pct: number }[] = [
   { k: 'Discover page', n: 3357, pct: 9.63 },
 ];
 
-/* what each funnel step tells us, in the report's own words:
-   what it counts, what we saw there, and what we changed */
+/* what each funnel step tells us, in the report's own words */
 export type StepStatus = 'start' | 'working' | 'fix' | 'grow';
 export const STATUS: Record<StepStatus, { label: string; color: string; deep: string }> = {
   start: { label: 'Starting point', color: '#3B5BA9', deep: NAVY },
@@ -27,29 +26,11 @@ export const STATUS: Record<StepStatus, { label: string; color: string; deep: st
   fix: { label: 'Needs a fix', color: '#F59E0B', deep: '#C2710C' },
   grow: { label: 'Room to grow', color: '#8B5CF6', deep: VIOLET },
 };
-export const FUNNEL_GUIDE: { status: StepStatus; counts: string; saw: string; did?: string }[] = [
-  {
-    status: 'start',
-    counts: 'Everyone who opened the catalogue in Q4. Every rate below is out of this number.',
-    saw: 'Clicks gather on the search bar, the banner and the basket.',
-  },
-  {
-    status: 'working',
-    counts: 'Catalogue visitors who used a section slider.',
-    saw: 'A dense scroll path through the new sections, plus some random taps.',
-  },
-  {
-    status: 'fix',
-    counts: 'Shoppers who went on to the campaign banners.',
-    saw: 'Banners and ads looked alike, so the same shopper opened the same banner more than once. Copying a code gave no success message.',
-    did: 'Apply the banner code to the basket automatically, with a clear, festive success message.',
-  },
-  {
-    status: 'grow',
-    counts: 'Shoppers who reached the Discover tab.',
-    saw: 'Few clicks beyond the categories: the page offered nothing the catalogue did not.',
-    did: 'Make Discover worth visiting: sections built from what shoppers search for and the ads they open.',
-  },
+export const FUNNEL_GUIDE: { status: StepStatus; note: string }[] = [
+  { status: 'start', note: 'Every rate below is out of this number.' },
+  { status: 'working', note: 'A dense scroll path through the new sections.' },
+  { status: 'fix', note: 'Banners looked like ads, and a copied code gave no success message.' },
+  { status: 'grow', note: 'Few clicks beyond the categories.' },
 ];
 
 export type Quarter = 'Q3' | 'Q4';

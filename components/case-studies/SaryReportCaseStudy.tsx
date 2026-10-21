@@ -108,7 +108,7 @@ export function SaryReportCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
           <motion.div {...reveal} className="rounded-[28px] p-5 md:p-10" style={{ background: PAPER }}>
             <Funnel />
             <p className="text-[13px] mt-6" style={{ color: '#5B6478' }}>
-              Each step shows how many shoppers reached it, out of everyone who viewed the catalogue in Q4.
+              Each step shows how many shoppers reached it, out of everyone who viewed the catalogue in Q4. Point at or tap a step to see what we found there.
             </p>
           </motion.div>
         </section>

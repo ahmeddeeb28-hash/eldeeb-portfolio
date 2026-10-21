@@ -40,8 +40,8 @@ export function Funnel() {
   const ref = useRef<HTMLDivElement>(null);
   const seen = useInView(ref, { once: true, margin: '-15% 0px' });
   const reduced = useReducedMotion();
-  const [sel, setSel] = useState(0);
-  const held = useRef(false); // a visitor picked a step: stop the tour
+  // the step under the pointer, and where the tooltip sits (px in the funnel box)
+  const [tip, setTip] = useState<{ i: number; x: number; y: number } | null>(null);
   const drops = useDrops(28);
   const n = FUNNEL.length;
   const H = n * ROW + (n - 1) * GAP;
@@ -49,189 +49,137 @@ export function Funnel() {
   const wAt = (i: number) => (i < n ? widths[i] : widths[n - 1] * 0.86);
   const yTop = (i: number) => i * (ROW + GAP);
 
-  // walk through the steps once the funnel is in view
-  useEffect(() => {
-    if (!seen || reduced) return;
-    const t = window.setInterval(() => {
-      if (!held.current) setSel((x) => (x + 1) % n);
-    }, 4200);
-    return () => window.clearInterval(t);
-  }, [seen, reduced, n]);
-  const pick = (i: number) => {
-    held.current = true;
-    setSel(i);
+  const place = (i: number, e?: { clientX: number; clientY: number }) => {
+    const box = ref.current?.getBoundingClientRect();
+    if (!box) return;
+    // follow the mouse; on a tap, pin beside the band's right edge
+    const x = e ? e.clientX - box.left : box.width * (0.5 + wAt(i) / 200);
+    const y = e ? e.clientY - box.top : yTop(i) + ROW / 2;
+    setTip({ i, x, y });
   };
 
-  const f = FUNNEL[sel];
-  const g = FUNNEL_GUIDE[sel];
-  const st = STATUS[g.status];
-  const prev = sel > 0 ? FUNNEL[sel - 1] : null;
-  const kept = prev ? (f.n / prev.n) * 100 : 100;
+  const t = tip && {
+    f: FUNNEL[tip.i],
+    g: FUNNEL_GUIDE[tip.i],
+    st: STATUS[FUNNEL_GUIDE[tip.i].status],
+    prev: tip.i > 0 ? FUNNEL[tip.i - 1] : null,
+  };
+  const flip = tip && ref.current ? tip.x > ref.current.offsetWidth - 250 : false;
 
   return (
-    <div ref={ref} className="grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] gap-8 lg:gap-10 items-center">
-      <div>
-        <div className="relative" style={{ height: H + 40 }}>
-          {FUNNEL.map((x, i) => {
-            const t = wAt(i);
-            const btm = wAt(i + 1);
-            const L1 = (100 - t) / 2;
-            const L2 = (100 - btm) / 2;
-            const on = sel === i;
-            const s2 = STATUS[FUNNEL_GUIDE[i].status];
-            return (
-              <motion.button
-                key={x.k}
-                type="button"
-                onMouseEnter={() => pick(i)}
-                onFocus={() => pick(i)}
-                onClick={() => pick(i)}
-                aria-pressed={on}
-                aria-label={`${x.k}: ${fmt(x.n)}, ${s2.label}`}
-                className="absolute left-0 right-0 grid place-items-center text-center cursor-pointer"
-                style={{
-                  top: yTop(i),
-                  height: ROW,
-                  clipPath: `polygon(${L1}% 0, ${100 - L1}% 0, ${100 - L2}% 100%, ${L2}% 100%)`,
-                  background: `linear-gradient(180deg, ${s2.color}, ${s2.deep})`,
-                }}
-                initial={{ opacity: 0, y: -14 }}
-                animate={seen ? { opacity: on ? 1 : 0.6, y: 0 } : { opacity: 0, y: -14 }}
-                transition={{ duration: 0.5, delay: seen ? i * 0.12 : 0, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <span className="leading-tight px-2">
-                  <span className="block text-[11px] sm:text-xs font-semibold text-white/85">{x.k}</span>
-                  <span className="block text-base sm:text-xl font-bold text-white tabular-nums">
-                    {fmt(x.n)} <span className="text-white/75 text-xs sm:text-sm font-semibold">· <Rate v={x.pct} run={seen} delay={i * 180} /></span>
-                  </span>
-                </span>
-              </motion.button>
-            );
-          })}
-
-          {/* the dots: pour in, filter out at the sides, a few reach the end */}
-          {seen && !reduced && (
-            <div aria-hidden className="absolute inset-0 pointer-events-none">
-              {drops.map((d, i) => {
-                const side = d.r < 0 ? -1 : 1;
-                const stops: { x: number; y: number }[] = [];
-                const last = Math.min(d.v, n - 1);
-                for (let k = 0; k <= last + 1; k++) stops.push({ x: 50 + d.r * wAt(k) * 0.8, y: k <= n - 1 ? yTop(k) : H });
-                const end =
-                  d.v >= n
-                    ? { x: 50 + d.r * 10, y: H + 34 } // through the bottom
-                    : { x: 50 + side * (wAt(d.v + 1) / 2 + 9), y: yTop(d.v) + ROW * 0.9 }; // out through the side
-                const pts = [...stops.slice(0, d.v >= n ? stops.length : last + 1), end];
-                return (
-                  <motion.span
-                    key={i}
-                    className="absolute w-2 h-2 -ml-1 -mt-1 rounded-full"
-                    style={{ background: '#fff', border: `1.5px solid ${NAVY}`, boxShadow: d.v >= n ? `0 0 10px ${TEAL}` : 'none' }}
-                    initial={{ left: `${pts[0].x}%`, top: -18, opacity: 0 }}
-                    animate={{
-                      left: [`${pts[0].x}%`, ...pts.map((p) => `${p.x}%`)],
-                      top: [-18, ...pts.map((p) => p.y)],
-                      opacity: [0, ...pts.map((_, k) => (k === pts.length - 1 ? 0 : 1))],
-                    }}
-                    transition={{ duration: 1.1 + pts.length * 0.55, delay: 0.8 + d.delay, repeat: Infinity, repeatDelay: 1.2, ease: 'easeIn' }}
-                  />
-                );
-              })}
-            </div>
-          )}
-        </div>
-        {/* what the colors mean */}
-        <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 mt-1">
-          {Object.values(STATUS).map((x) => (
-            <li key={x.label} className="flex items-center gap-1.5 text-[11px] font-medium" style={{ color: '#5B6478' }}>
-              <span className="w-2.5 h-2.5 rounded-[3px]" style={{ background: x.color }} />
-              {x.label}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* the guide for the selected step */}
-      <div className="rounded-[20px] bg-white p-5 md:p-6 border min-h-[300px]" style={{ borderColor: '#E3ECF5' }} aria-live="polite">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={sel}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="flex items-center justify-between gap-3 mb-3">
-              <p className="text-lg font-bold" style={{ color: NAVY }}>
-                {f.k}
-              </p>
-              <span className="text-[11px] font-semibold rounded-full px-2.5 py-1 whitespace-nowrap" style={{ background: `${st.color}1F`, color: st.deep }}>
-                {st.label}
-              </span>
-            </div>
-            <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-3xl font-bold tabular-nums" style={{ color: NAVY }}>
-                {fmt(f.n)}
-              </span>
-              <span className="text-sm font-semibold" style={{ color: '#5B6478' }}>
-                {f.pct}% of all shoppers
-              </span>
-            </div>
-            {prev && (
-              <div className="mt-3 mb-4">
-                <div className="flex justify-between text-xs mb-1.5" style={{ color: '#5B6478' }}>
-                  <span>
-                    {kept.toFixed(1)}% of {prev.k.toLowerCase()} kept going
-                  </span>
-                  <span className="font-semibold" style={{ color: '#C2410C' }}>
-                    {fmt(prev.n - f.n)} left
-                  </span>
-                </div>
-                <div className="h-2 rounded-full overflow-hidden" style={{ background: '#FDE7D7' }}>
-                  <motion.div className="h-full rounded-full" style={{ background: st.color }} initial={{ width: 0 }} animate={{ width: `${kept}%` }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }} />
-                </div>
-              </div>
-            )}
-            <dl className="grid gap-3 mt-4 text-[13px] leading-relaxed">
-              <div>
-                <dt className="font-semibold mb-0.5" style={{ color: NAVY }}>
-                  What it counts
-                </dt>
-                <dd style={{ color: '#5B6478' }}>{g.counts}</dd>
-              </div>
-              <div>
-                <dt className="font-semibold mb-0.5" style={{ color: NAVY }}>
-                  What we saw
-                </dt>
-                <dd style={{ color: '#5B6478' }}>{g.saw}</dd>
-              </div>
-              {g.did && (
-                <div className="rounded-xl px-3 py-2.5" style={{ background: `${st.color}14` }}>
-                  <dt className="font-semibold mb-0.5" style={{ color: st.deep }}>
-                    The fix
-                  </dt>
-                  <dd style={{ color: '#3D4659' }}>{g.did}</dd>
-                </div>
-              )}
-            </dl>
-          </motion.div>
-        </AnimatePresence>
-        {/* step dots for the tour */}
-        <div className="flex gap-1.5 mt-5" role="tablist" aria-label="Funnel steps">
-          {FUNNEL.map((x, i) => (
-            <button
+    <div className="mx-auto max-w-[760px]">
+      <div ref={ref} className="relative" style={{ height: H + 40 }} onPointerLeave={(e) => e.pointerType === 'mouse' && setTip(null)}>
+        {FUNNEL.map((x, i) => {
+          const tw = wAt(i);
+          const btm = wAt(i + 1);
+          const L1 = (100 - tw) / 2;
+          const L2 = (100 - btm) / 2;
+          const on = tip?.i === i;
+          const s2 = STATUS[FUNNEL_GUIDE[i].status];
+          return (
+            <motion.button
               key={x.k}
               type="button"
-              role="tab"
-              aria-selected={i === sel}
-              aria-label={x.k}
-              onClick={() => pick(i)}
-              className="h-1.5 flex-1 rounded-full transition-colors"
-              style={{ background: i === sel ? STATUS[FUNNEL_GUIDE[i].status].color : '#E3ECF5' }}
-            />
-          ))}
-        </div>
+              onPointerMove={(e) => e.pointerType === 'mouse' && place(i, e)}
+              onFocus={() => place(i)}
+              onClick={() => tip?.i !== i && place(i)}
+              aria-label={`${x.k}: ${fmt(x.n)}, ${s2.label}`}
+              className="absolute left-0 right-0 grid place-items-center text-center cursor-pointer"
+              style={{
+                top: yTop(i),
+                height: ROW,
+                clipPath: `polygon(${L1}% 0, ${100 - L1}% 0, ${100 - L2}% 100%, ${L2}% 100%)`,
+                background: `linear-gradient(180deg, ${s2.color}, ${s2.deep})`,
+              }}
+              initial={{ opacity: 0, y: -14 }}
+              animate={seen ? { opacity: !tip || on ? 1 : 0.55, y: 0 } : { opacity: 0, y: -14 }}
+              transition={{ duration: 0.4, delay: seen && !tip ? i * 0.12 : 0, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <span className="leading-tight px-2">
+                <span className="block text-[11px] sm:text-xs font-semibold text-white/85">{x.k}</span>
+                <span className="block text-base sm:text-xl font-bold text-white tabular-nums">
+                  {fmt(x.n)} <span className="text-white/75 text-xs sm:text-sm font-semibold">· <Rate v={x.pct} run={seen} delay={i * 180} /></span>
+                </span>
+              </span>
+            </motion.button>
+          );
+        })}
+
+        {/* the dots: pour in, filter out at the sides, a few reach the end */}
+        {seen && !reduced && (
+          <div aria-hidden className="absolute inset-0 pointer-events-none">
+            {drops.map((d, i) => {
+              const side = d.r < 0 ? -1 : 1;
+              const stops: { x: number; y: number }[] = [];
+              const last = Math.min(d.v, n - 1);
+              for (let k = 0; k <= last + 1; k++) stops.push({ x: 50 + d.r * wAt(k) * 0.8, y: k <= n - 1 ? yTop(k) : H });
+              const end =
+                d.v >= n
+                  ? { x: 50 + d.r * 10, y: H + 34 } // through the bottom
+                  : { x: 50 + side * (wAt(d.v + 1) / 2 + 9), y: yTop(d.v) + ROW * 0.9 }; // out through the side
+              const pts = [...stops.slice(0, d.v >= n ? stops.length : last + 1), end];
+              return (
+                <motion.span
+                  key={i}
+                  className="absolute w-2 h-2 -ml-1 -mt-1 rounded-full"
+                  style={{ background: '#fff', border: `1.5px solid ${NAVY}`, boxShadow: d.v >= n ? `0 0 10px ${TEAL}` : 'none' }}
+                  initial={{ left: `${pts[0].x}%`, top: -18, opacity: 0 }}
+                  animate={{
+                    left: [`${pts[0].x}%`, ...pts.map((p) => `${p.x}%`)],
+                    top: [-18, ...pts.map((p) => p.y)],
+                    opacity: [0, ...pts.map((_, k) => (k === pts.length - 1 ? 0 : 1))],
+                  }}
+                  transition={{ duration: 1.1 + pts.length * 0.55, delay: 0.8 + d.delay, repeat: Infinity, repeatDelay: 1.2, ease: 'easeIn' }}
+                />
+              );
+            })}
+          </div>
+        )}
+
+        {/* the tooltip: status, drop-off, one line from the report */}
+        <AnimatePresence>
+          {t && tip && (
+            <motion.div
+              key="tip"
+              role="status"
+              className="absolute z-10 w-[230px] rounded-2xl bg-white p-3.5 pointer-events-none"
+              style={{ boxShadow: '0 14px 34px -12px rgba(15,30,70,0.35)', border: '1px solid #E3ECF5' }}
+              initial={{ opacity: 0, scale: 0.94 }}
+              animate={{ opacity: 1, scale: 1, left: flip ? tip.x - 246 : tip.x + 16, top: Math.max(0, tip.y - 40) }}
+              exit={{ opacity: 0, scale: 0.94 }}
+              transition={{ opacity: { duration: 0.15 }, scale: { duration: 0.15 }, default: { type: 'spring', stiffness: 520, damping: 40 } }}
+            >
+              <div className="flex items-center justify-between gap-2 mb-1.5">
+                <span className="text-[13px] font-bold" style={{ color: NAVY }}>
+                  {t.f.k}
+                </span>
+                <span className="text-[10px] font-semibold rounded-full px-2 py-0.5 whitespace-nowrap" style={{ background: `${t.st.color}22`, color: t.st.deep }}>
+                  {t.st.label}
+                </span>
+              </div>
+              {t.prev && (
+                <p className="text-[11px] mb-1.5" style={{ color: '#5B6478' }}>
+                  <b style={{ color: NAVY }}>{((t.f.n / t.prev.n) * 100).toFixed(1)}%</b> kept going ·{' '}
+                  <b style={{ color: '#C2410C' }}>{fmt(t.prev.n - t.f.n)}</b> left
+                </p>
+              )}
+              <p className="text-[11px] leading-snug" style={{ color: '#3D4659' }}>
+                {t.g.note}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
+
+      {/* what the colors mean */}
+      <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 mt-1">
+        {Object.values(STATUS).map((x) => (
+          <li key={x.label} className="flex items-center gap-1.5 text-[11px] font-medium" style={{ color: '#5B6478' }}>
+            <span className="w-2.5 h-2.5 rounded-[3px]" style={{ background: x.color }} />
+            {x.label}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
