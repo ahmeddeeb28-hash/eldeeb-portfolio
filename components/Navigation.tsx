@@ -1,52 +1,47 @@
-import { useState, useEffect } from 'react';
-import { Download, Linkedin } from 'lucide-react';
-
-const CV_URL = '/cv/Ahmad_Eldeeb_Lead_Product_Designer_CV.pdf';
-import { motion } from 'motion/react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
+import { motion, useReducedMotion, useScroll } from 'motion/react';
+import { Download, Linkedin, X } from 'lucide-react';
 import { SECTION_IDS, scrollToSection, scrollToTop } from '../lib/scrollToSection';
 
+const CV_URL = '/cv/Ahmad_Eldeeb_Lead_Product_Designer_CV.pdf';
 const LINKEDIN_URL = 'https://www.linkedin.com/in/el-deeb-39032b131/';
+
+/* ── Floating navigation ─────────────────────────────
+   One compact pill fixed at the top centre on every screen size:
+   the AE. monogram on the left, a four-dot menu button on the
+   right. A lighter layer inside the pill fills from left to right
+   with progress through the page.
+
+   The menu button grows the same pill into a tall panel (wider,
+   nearly the full viewport height) holding the numbered links and
+   the CV and LinkedIn actions. Only width and height animate, so
+   nothing inside stretches; the contents fade and rise in after.
+
+   Closes on the toggle, Escape, a click outside or picking a link.
+   While open the page behind can't scroll (its position is kept),
+   focus moves into the panel and returns to the toggle on close,
+   and the links are inert while collapsed. */
 
 interface NavigationProps {
   onOpenAboutPage?: () => void;
 }
 
-export function Navigation({ onOpenAboutPage }: NavigationProps) {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const [activeId, setActiveId] = useState<string | null>(null);
+const EASE = [0.22, 1, 0.36, 1] as const;
+const PILL_H = 56;
+const PILL_W = 400;
+const PANEL_W = 460;
 
-  // Smart show/hide: reveal on scroll up, tuck away on scroll down (after a threshold).
-  useEffect(() => {
-    let ticking = false;
-    let lastY = window.scrollY;
-    const handleScroll = () => {
-      if (ticking) return;
-      window.requestAnimationFrame(() => {
-        const y = window.scrollY;
-        const delta = y - lastY;
-        setIsScrolled(y > 40);
-        // Always show near the very top; also clear stale active highlight
-        if (y < 80) {
-          setHidden(false);
-          setActiveId(null);
-        } else if (delta > 6) {
-          // Scrolling down past threshold → hide
-          setHidden(true);
-          if (mobileOpen) setMobileOpen(false);
-        } else if (delta < -6) {
-          // Scrolling up → show
-          setHidden(false);
-        }
-        lastY = y;
-        ticking = false;
-      });
-      ticking = true;
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [mobileOpen]);
+export function Navigation({ onOpenAboutPage }: NavigationProps) {
+  const [open, setOpen] = useState(false);
+  const [vw, setVw] = useState(() => (typeof window === 'undefined' ? 1440 : window.innerWidth));
+  const [panelH, setPanelH] = useState(640);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const reduced = useReducedMotion();
+  const panelRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const sizerRef = useRef<HTMLDivElement>(null);
+  const firstLinkRef = useRef<HTMLElement | null>(null);
+  const { scrollYProgress } = useScroll();
 
   const navItems: { label: string; targetId?: string; onClick?: () => void }[] = [
     { label: 'Work', targetId: SECTION_IDS.work },
@@ -57,402 +52,271 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
     { label: 'Articles', targetId: SECTION_IDS.articles },
   ];
 
-  // Track active section for the underline indicator
+  // Panel height comes from a hidden sizer so CSS can handle 100dvh and the
+  // safe areas; motion then animates between plain pixel values.
+  const measure = useCallback(() => {
+    setVw(window.innerWidth);
+    if (sizerRef.current) setPanelH(sizerRef.current.offsetHeight);
+  }, []);
+  useLayoutEffect(() => {
+    measure();
+    window.addEventListener('resize', measure);
+    window.visualViewport?.addEventListener('resize', measure);
+    return () => {
+      window.removeEventListener('resize', measure);
+      window.visualViewport?.removeEventListener('resize', measure);
+    };
+  }, [measure]);
+
+  // Highlight the section in view inside the menu
   useEffect(() => {
-    const ids = navItems.map((i) => i.targetId).filter(Boolean) as string[];
-    const nodes = ids
-      .map((id) => document.getElementById(id))
+    const nodes = navItems
+      .map((i) => i.targetId && document.getElementById(i.targetId))
       .filter((n): n is HTMLElement => Boolean(n));
-    if (nodes.length === 0) return;
-    const observer = new IntersectionObserver(
+    if (!nodes.length) return;
+    const io = new IntersectionObserver(
       (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible) setActiveId(visible.target.id);
+        const hit = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (hit) setActiveId(hit.target.id);
       },
-      { rootMargin: '-40% 0px -50% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] }
+      { rootMargin: '-40% 0px -50% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] },
     );
-    nodes.forEach((n) => observer.observe(n));
-    return () => observer.disconnect();
+    nodes.forEach((n) => io.observe(n));
+    return () => io.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const scrollToId = scrollToSection;
+  const close = useCallback((returnFocus = true) => {
+    setOpen(false);
+    if (returnFocus) requestAnimationFrame(() => toggleRef.current?.focus());
+  }, []);
+
+  // While open: lock page scroll (keeping its position), close on Escape or
+  // a click outside, keep Tab inside the panel, focus the first link.
+  useEffect(() => {
+    if (!open) return;
+    const html = document.documentElement;
+    const gap = window.innerWidth - html.clientWidth;
+    const prev = { overflow: html.style.overflow, pad: html.style.paddingRight };
+    html.style.overflow = 'hidden';
+    if (gap > 0) html.style.paddingRight = `${gap}px`;
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        close();
+      } else if (e.key === 'Tab' && panelRef.current) {
+        const f = panelRef.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled])');
+        const first = f[0];
+        const last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    const onDown = (e: PointerEvent) => {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) close(false);
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', onDown);
+    const t = window.setTimeout(() => firstLinkRef.current?.focus({ preventScroll: true }), reduced ? 0 : 260);
+    return () => {
+      html.style.overflow = prev.overflow;
+      html.style.paddingRight = prev.pad;
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', onDown);
+      window.clearTimeout(t);
+    };
+  }, [open, close, reduced]);
+
+  const go = (item: (typeof navItems)[number]) => {
+    close(false);
+    // let the scroll lock release before moving the page
+    window.setTimeout(() => {
+      if (item.onClick) item.onClick();
+      else if (item.targetId) scrollToSection(item.targetId);
+    }, 40);
+  };
+
+  const pillW = Math.min(PILL_W, vw - 32);
+  const panelW = Math.min(PANEL_W, vw - 24);
+  const sizeT = reduced ? { duration: 0 } : { type: 'spring' as const, bounce: 0.12, duration: 0.6 };
 
   return (
     <>
-      {/* Floating pill — desktop: wrapper handles centering, motion handles animation */}
-      <div className="fixed z-50 hidden md:flex top-0 left-0 right-0 justify-center pointer-events-none" style={{ top: '20px' }}>
-      <motion.nav
-        initial={{ opacity: 0, y: -24 }}
-        animate={{ opacity: hidden ? 0 : 1, y: hidden ? -32 : 0 }}
-        transition={{ duration: hidden ? 0.35 : 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="flex items-center pointer-events-auto"
+      {/* measures the open height: viewport minus top and bottom margins and safe areas */}
+      <div
+        ref={sizerRef}
+        aria-hidden
         style={{
-          borderRadius: '9999px',
-          padding: '10px 10px 10px 22px',
-          backdropFilter: isScrolled ? 'blur(28px)' : 'blur(18px)',
-          WebkitBackdropFilter: isScrolled ? 'blur(28px)' : 'blur(18px)',
-          background: isScrolled ? 'rgba(10,10,10,0.88)' : 'rgba(10,10,10,0.7)',
-          border: isScrolled ? '1px solid rgba(220,190,140,0.22)' : '1px solid rgba(220,190,140,0.18)',
-          boxShadow: isScrolled
-            ? '0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)'
-            : '0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(220,190,140,0.06) inset',
-          gap: '28px',
-          transition: 'background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease',
-          whiteSpace: 'nowrap',
-          position: 'relative',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: 1,
+          height: 'calc(100dvh - 2 * max(14px, env(safe-area-inset-top)) - env(safe-area-inset-bottom))',
+          visibility: 'hidden',
+          pointerEvents: 'none',
         }}
+      />
+
+      <div
+        className="fixed inset-x-0 z-50 flex justify-center pointer-events-none"
+        style={{ top: 'max(14px, env(safe-area-inset-top))' }}
       >
-        {/* Whole-pill pulsing outline — an unmistakable heartbeat around the entire mark */}
-        <motion.span
-          aria-hidden="true"
-          animate={{ opacity: [0, 0.55, 0], scale: [1, 1.02, 1] }}
-          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-          style={{
-            position: 'absolute',
-            inset: '-1px',
-            borderRadius: '9999px',
-            border: '1px solid rgba(220,190,140,0.7)',
-            pointerEvents: 'none',
+        <motion.div
+          ref={panelRef}
+          className="relative pointer-events-auto overflow-hidden flex flex-col"
+          initial={reduced ? false : { opacity: 0, y: -16, width: pillW, height: PILL_H }}
+          animate={{
+            opacity: 1,
+            y: 0,
+            width: open ? panelW : pillW,
+            height: open ? panelH : PILL_H,
+            borderRadius: open ? 24 : 20,
+            backgroundColor: open ? 'rgba(14,14,16,0.86)' : 'rgba(14,14,16,0.62)',
           }}
-        />
+          transition={{ ...sizeT, opacity: { duration: 0.4 }, y: { duration: 0.5, ease: EASE } }}
+          style={{
+            backdropFilter: 'blur(24px) saturate(140%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(140%)',
+            border: '1px solid rgba(255,255,255,0.09)',
+            boxShadow: '0 12px 40px -12px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05)',
+          }}
+        >
+          {/* scroll progress: a lighter layer behind the top row, filling with the page */}
+          <div aria-hidden className="absolute left-1 right-1 top-1 overflow-hidden pointer-events-none" style={{ height: PILL_H - 10, borderRadius: 16 }}>
+            <motion.div className="h-full origin-left" style={{ scaleX: scrollYProgress, background: 'rgba(255,255,255,0.08)' }} />
+          </div>
 
-        {/* Monogram seal — bordered mark with a pulsing ring for an official, premium signature */}
-        <div style={{ position: 'relative', width: '34px', height: '34px', flexShrink: 0 }}>
-          <a
-            href="/"
-            aria-label="Ahmad Eldeeb, back to top"
-            onClick={(e) => { e.preventDefault(); scrollToTop(); }}
-            style={{
-              position: 'relative',
-              zIndex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-              height: '100%',
-              borderRadius: '9px',
-              border: '1px solid rgba(220,190,140,0.4)',
-              background: 'linear-gradient(160deg, rgba(240,217,168,0.14), rgba(201,168,118,0.05))',
-              fontSize: '14px',
-              fontWeight: '800',
-              color: '#fff',
-              letterSpacing: '-0.02em',
-              textDecoration: 'none',
-            }}
-          >
-            AE.
-          </a>
-          <motion.span
-            animate={{
-              opacity: [0.7, 0, 0.7],
-              scale: [1, 1.4, 1],
-              boxShadow: [
-                '0 0 0px rgba(220,190,140,0)',
-                '0 0 14px rgba(220,190,140,0.7)',
-                '0 0 0px rgba(220,190,140,0)',
-              ],
-            }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeOut' }}
-            style={{
-              position: 'absolute',
-              inset: 0,
-              borderRadius: '9px',
-              border: '1px solid rgba(220,190,140,0.85)',
-              pointerEvents: 'none',
-            }}
-          />
-        </div>
-
-        <div style={{ width: '1px', height: '18px', background: 'rgba(255,255,255,0.12)' }} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '22px' }}>
-          {navItems.map((item) => {
-            const isActive = item.targetId ? activeId === item.targetId : false;
-            const baseStyle: React.CSSProperties = {
-              position: 'relative',
-              fontSize: '14px',
-              fontWeight: 500,
-              color: isActive ? '#fff' : 'rgba(255,255,255,0.65)',
-              background: 'none',
-              border: 'none',
-              padding: '4px 0',
-              cursor: 'pointer',
-              letterSpacing: '0.01em',
-              transition: 'color 200ms ease',
-              fontFamily: 'inherit',
-              textDecoration: 'none',
-            };
-            const Underline = (
+          {/* top row: monogram + wordmark, menu toggle */}
+          <div className="relative flex items-center justify-between flex-none pl-3 pr-1.5" style={{ height: PILL_H - 2 }}>
+            <a
+              href="/"
+              aria-label="Ahmad Eldeeb, back to top"
+              onClick={(e) => {
+                e.preventDefault();
+                if (open) close(false);
+                scrollToTop();
+              }}
+              className="flex items-center gap-2.5 min-h-[44px] rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+              style={{ textDecoration: 'none' }}
+            >
+              <span style={monogram}>AE.</span>
+              <span className="text-white text-[15px] font-semibold tracking-[-0.01em] whitespace-nowrap">Ahmad Eldeeb</span>
+            </a>
+            <button
+              ref={toggleRef}
+              type="button"
+              aria-label={open ? 'Close menu' : 'Open menu'}
+              aria-expanded={open}
+              aria-controls="site-menu"
+              onClick={() => (open ? close() : setOpen(true))}
+              className="relative w-11 h-11 rounded-[14px] grid place-items-center text-white hover:bg-white/[0.08] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+            >
               <motion.span
                 aria-hidden
+                className="absolute grid grid-cols-2 gap-[5px]"
                 initial={false}
-                animate={{ scaleX: isActive ? 1 : 0, opacity: isActive ? 1 : 0 }}
-                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                  bottom: -2,
-                  height: 1,
-                  background:
-                    'linear-gradient(90deg, rgba(220,190,140,0) 0%, rgba(220,190,140,0.85) 50%, rgba(220,190,140,0) 100%)',
-                  transformOrigin: 'center',
-                }}
-              />
-            );
-            const enterHover = (el: HTMLElement) => {
-              el.style.color = '#fff';
-              const dash = el.querySelector<HTMLElement>('[data-hover-dash]');
-              if (dash && !isActive) {
-                dash.style.transform = 'scaleX(1)';
-                dash.style.opacity = '0.55';
-              }
-            };
-            const leaveHover = (el: HTMLElement) => {
-              el.style.color = isActive ? '#fff' : 'rgba(255,255,255,0.65)';
-              const dash = el.querySelector<HTMLElement>('[data-hover-dash]');
-              if (dash && !isActive) {
-                dash.style.transform = 'scaleX(0)';
-                dash.style.opacity = '0';
-              }
-            };
-            const HoverDash = (
-              <span
-                data-hover-dash
+                animate={{ opacity: open ? 0 : 1, rotate: open ? 45 : 0, scale: open ? 0.6 : 1 }}
+                transition={{ duration: reduced ? 0 : 0.25 }}
+              >
+                {[0, 1, 2, 3].map((i) => (
+                  <span key={i} className="w-[5px] h-[5px] rounded-full bg-white" />
+                ))}
+              </motion.span>
+              <motion.span
                 aria-hidden
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                  bottom: -2,
-                  height: 1,
-                  background: 'rgba(255,255,255,0.6)',
-                  transform: 'scaleX(0)',
-                  opacity: 0,
-                  transformOrigin: 'center',
-                  transition: 'transform 260ms ease, opacity 260ms ease',
-                }}
-              />
-            );
-
-            if (item.onClick) {
-              return (
-                <button
-                  key={item.label}
-                  onClick={item.onClick}
-                  style={baseStyle}
-                  onMouseEnter={(e) => enterHover(e.currentTarget)}
-                  onMouseLeave={(e) => leaveHover(e.currentTarget)}
-                >
-                  {item.label}
-                  {HoverDash}
-                  {Underline}
-                </button>
-              );
-            }
-            return (
-              <a
-                key={item.label}
-                href={`#${item.targetId}`}
-                onClick={(e) => {
-                  if (item.targetId) {
-                    e.preventDefault();
-                    scrollToId(item.targetId);
-                  }
-                }}
-                style={baseStyle}
-                onMouseEnter={(e) => enterHover(e.currentTarget)}
-                onMouseLeave={(e) => leaveHover(e.currentTarget)}
+                className="absolute"
+                initial={false}
+                animate={{ opacity: open ? 1 : 0, rotate: open ? 0 : -45, scale: open ? 1 : 0.6 }}
+                transition={{ duration: reduced ? 0 : 0.25 }}
               >
-                {item.label}
-                {HoverDash}
-                {Underline}
-              </a>
-            );
-          })}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <motion.a
-            href={CV_URL}
-            download
-            animate={{
-              boxShadow: [
-                '0 2px 14px rgba(220,190,140,0.22)',
-                '0 4px 36px rgba(220,190,140,0.6)',
-                '0 2px 14px rgba(220,190,140,0.22)',
-              ],
-              scale: [1, 1.015, 1],
-            }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            whileHover={{ scale: 1.06 }}
-            whileTap={{ scale: 0.97 }}
-            style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 20px', borderRadius: '9999px', background: '#fff', border: '1px solid rgba(220,190,140,0.6)', color: '#0A0A0A', fontSize: '13px', fontWeight: '600', textDecoration: 'none', letterSpacing: '0.01em' }}
-          >
-            <Download size={13} strokeWidth={2.5} />
-            Download CV
-          </motion.a>
-          <motion.a
-            href={LINKEDIN_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="LinkedIn"
-            whileHover={{ scale: 1.08, boxShadow: '0 4px 20px rgba(74,242,229,0.55)' }}
-            whileTap={{ scale: 0.95 }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '36px',
-              height: '36px',
-              flexShrink: 0,
-              borderRadius: '9999px',
-              background: 'rgba(74,242,229,1)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              color: '#0A0A0A',
-              boxShadow: '0 2px 10px rgba(74,242,229,0.35)',
-            }}
-          >
-            <Linkedin size={16} strokeWidth={2} fill="currentColor" />
-          </motion.a>
-        </div>
-      </motion.nav>
-      </div>
-
-      {/* Mobile top bar */}
-      <motion.div
-        initial={{ opacity: 0, y: -16 }}
-        animate={{ opacity: hidden ? 0 : 1, y: hidden ? -24 : 0 }}
-        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed top-0 left-0 right-0 z-50 flex md:hidden items-center justify-between px-5 py-4"
-        style={{ backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', background: 'rgba(10,10,10,0.75)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}
-      >
-        <div style={{ position: 'relative', width: '30px', height: '30px' }}>
-          <a
-            href="/"
-            aria-label="Ahmad Eldeeb, back to top"
-            onClick={(e) => { e.preventDefault(); scrollToTop(); }}
-            style={{
-              position: 'relative',
-              zIndex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-              height: '100%',
-              borderRadius: '8px',
-              border: '1px solid rgba(220,190,140,0.4)',
-              background: 'linear-gradient(160deg, rgba(240,217,168,0.14), rgba(201,168,118,0.05))',
-              fontSize: '13px',
-              fontWeight: '800',
-              color: '#fff',
-              letterSpacing: '-0.02em',
-              textDecoration: 'none',
-            }}
-          >
-            AE.
-          </a>
-          <motion.span
-            animate={{
-              opacity: [0.7, 0, 0.7],
-              scale: [1, 1.4, 1],
-              boxShadow: [
-                '0 0 0px rgba(220,190,140,0)',
-                '0 0 12px rgba(220,190,140,0.7)',
-                '0 0 0px rgba(220,190,140,0)',
-              ],
-            }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeOut' }}
-            style={{
-              position: 'absolute',
-              inset: 0,
-              borderRadius: '8px',
-              border: '1px solid rgba(220,190,140,0.85)',
-              pointerEvents: 'none',
-            }}
-          />
-        </div>
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
-          aria-label="Toggle menu"
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-            <span style={{ display: 'block', width: '22px', height: '2px', background: '#fff', transition: 'all 0.2s', transform: mobileOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }} />
-            <span style={{ display: 'block', width: '22px', height: '2px', background: '#fff', transition: 'all 0.2s', opacity: mobileOpen ? 0 : 1 }} />
-            <span style={{ display: 'block', width: '22px', height: '2px', background: '#fff', transition: 'all 0.2s', transform: mobileOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }} />
+                <X className="w-5 h-5" strokeWidth={2} />
+              </motion.span>
+            </button>
           </div>
-        </button>
-      </motion.div>
 
-      {mobileOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed top-[57px] left-0 right-0 z-40 flex flex-col px-5 py-4 md:hidden"
-          style={{ background: 'rgba(10,10,10,0.97)', backdropFilter: 'blur(24px)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}
-        >
-          {navItems.map((item) =>
-            item.onClick ? (
-              <button
-                key={item.label}
-                onClick={() => { setMobileOpen(false); item.onClick?.(); }}
-                style={{ padding: '13px 0', fontSize: '16px', fontWeight: '500', color: 'rgba(255,255,255,0.75)', background: 'none', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)', textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit' }}
-              >
-                {item.label}
-              </button>
-            ) : (
+          {/* the menu: rendered always, inert and hidden while collapsed */}
+          <motion.nav
+            id="site-menu"
+            aria-label="Main"
+            inert={!open}
+            aria-hidden={!open}
+            className="relative flex-1 min-h-0 flex flex-col px-6 pb-6"
+            initial={false}
+            animate={{ opacity: open ? 1 : 0, y: open ? 0 : -10 }}
+            transition={reduced ? { duration: 0 } : { duration: open ? 0.4 : 0.15, delay: open ? 0.18 : 0, ease: EASE }}
+          >
+            <ol className="flex-1 min-h-0 overflow-y-auto overscroll-contain pt-8 grid content-start gap-1">
+              {navItems.map((item, i) => {
+                const active = item.targetId && activeId === item.targetId;
+                return (
+                  <li key={item.label}>
+                    <a
+                      ref={i === 0 ? (el) => { firstLinkRef.current = el; } : undefined}
+                      href={item.targetId ? `#${item.targetId}` : '/about'}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        go(item);
+                      }}
+                      className={`group flex items-baseline gap-4 min-h-[52px] py-2 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 ${
+                        active ? 'text-white' : 'text-white/80 hover:text-white'
+                      }`}
+                      style={{ textDecoration: 'none' }}
+                    >
+                      <span className="text-[13px] tabular-nums text-white/35 w-6">{String(i + 1).padStart(2, '0')}</span>
+                      <span className="text-[30px] md:text-[34px] font-semibold tracking-[-0.03em] leading-tight transition-transform duration-300 group-hover:translate-x-1">
+                        {item.label}
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ol>
+
+            <div className="flex-none flex items-center gap-2.5 pt-6 border-t border-white/10">
               <a
-                key={item.label}
-                href={`#${item.targetId}`}
-                onClick={(e) => {
-                  setMobileOpen(false);
-                  if (item.targetId) {
-                    e.preventDefault();
-                    // small delay so the panel collapses before scrolling
-                    setTimeout(() => scrollToId(item.targetId!), 60);
-                  }
-                }}
-                style={{ padding: '13px 0', fontSize: '16px', fontWeight: '500', color: 'rgba(255,255,255,0.75)', textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+                href={CV_URL}
+                download
+                onClick={() => close(false)}
+                className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] rounded-2xl bg-white text-[#0A0A0A] text-[15px] font-semibold hover:bg-white/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+                style={{ textDecoration: 'none' }}
               >
-                {item.label}
+                <Download size={16} strokeWidth={2.25} />
+                Download CV
               </a>
-            )
-          )}
-          <div style={{ marginTop: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <a
-              href={CV_URL}
-              download
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '11px 20px', borderRadius: '9999px', background: '#fff', color: '#0A0A0A', fontSize: '14px', fontWeight: '600', textDecoration: 'none' }}
-            >
-              <Download size={14} /> Download CV
-            </a>
-            <a
-              href={LINKEDIN_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="LinkedIn"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '42px',
-                height: '42px',
-                flexShrink: 0,
-                borderRadius: '9999px',
-                background: 'rgba(74,242,229,1)',
-                border: '1px solid rgba(255,255,255,0.2)',
-                color: '#0A0A0A',
-                boxShadow: '0 2px 10px rgba(74,242,229,0.35)',
-              }}
-            >
-              <Linkedin size={19} strokeWidth={2} fill="currentColor" />
-            </a>
-          </div>
+              <a
+                href={LINKEDIN_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                className="w-12 h-12 flex-none rounded-2xl grid place-items-center bg-white/10 text-white hover:bg-white/15 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+              >
+                <Linkedin size={18} strokeWidth={2} fill="currentColor" />
+              </a>
+            </div>
+          </motion.nav>
         </motion.div>
-      )}
+      </div>
     </>
   );
 }
+
+const monogram: CSSProperties = {
+  display: 'grid',
+  placeItems: 'center',
+  width: 32,
+  height: 32,
+  borderRadius: 9,
+  border: '1px solid rgba(220,190,140,0.4)',
+  background: 'linear-gradient(160deg, rgba(240,217,168,0.14), rgba(201,168,118,0.05))',
+  fontSize: 13,
+  fontWeight: 800,
+  color: '#fff',
+  letterSpacing: '-0.02em',
+  flex: 'none',
+};
