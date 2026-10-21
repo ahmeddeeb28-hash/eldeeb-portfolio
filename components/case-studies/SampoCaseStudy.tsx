@@ -273,11 +273,9 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
             <CaseIntro
               meta={[
+                ['Company', 'Sampo AI'],
                 ['Role', 'Consultation & Design team management'],
-                ['Platform', 'Merchant web dashboard'],
-                ['Market', 'Saudi Arabia · SAR · EN/AR'],
-                ['Product', 'Sampo AI · pricing strategies'],
-                ['Timeline', 'Nov 2024 – Dec 2025'],
+                ['Year', '2024 – 2025'],
               ]}
               title="AI pricing merchants can trust, test and undo."
             >

@@ -15,6 +15,7 @@ import { Footer } from './components/Footer';
 import { CASE_STUDY_REGISTRY, HIDDEN_PROJECTS } from './components/case-studies/registry';
 import { AnimatePresence } from 'motion/react';
 import { useRef, useState, useEffect, lazy, Suspense } from 'react';
+import { scrollToSection, scrollToTop } from './lib/scrollToSection';
 
 /* The Director's Cut is the heaviest view on the site and only opens
    on demand, so it ships as its own chunk. */
@@ -108,6 +109,12 @@ export default function App() {
   const closeProject = goHome;
   const openAboutPage = () => navigate({ view: 'about' });
   const closeAboutPage = goHome;
+  /* From the About page's floating nav: back home, then to a section
+     (or the top) once the homepage has faded back in. */
+  const leaveAboutTo = (sectionId: string | null) => {
+    goHome();
+    window.setTimeout(() => (sectionId ? scrollToSection(sectionId) : scrollToTop()), 520);
+  };
 
   const ActiveCase = activeProjectId ? CASE_STUDY_REGISTRY[activeProjectId] : null;
   const goToNextCase = () => {
@@ -135,7 +142,7 @@ export default function App() {
         )}
 
         <AnimatePresence>
-          {aboutPageOpen && <AboutPage key="about-page" onBack={closeAboutPage} />}
+          {aboutPageOpen && <AboutPage key="about-page" onBack={closeAboutPage} onNavigate={leaveAboutTo} />}
         </AnimatePresence>
       </Suspense>
 

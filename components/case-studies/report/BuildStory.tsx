@@ -1,6 +1,6 @@
 import { motion, useScroll, useSpring } from 'motion/react';
 import { useRef, type ReactNode } from 'react';
-import { FUNNEL, PAPER_INK } from './ReportData';
+import { FUNNEL, PAPER_INK, TILES } from './ReportData';
 
 /* ── How I rebuilt it with Claude · told as a story ──
    Six beats down a line that fills as you scroll. Each beat is what
@@ -62,23 +62,85 @@ function VisBrief() {
   );
 }
 
+/* The report board in miniature, from its own data and heatmaps:
+   a scan line passes top to bottom and ticks each part as read. */
 function VisRead() {
-  const rows = ['Funnel, 4 steps', 'Banners, Q2 to Q4', 'Pop-up, Q3 and Q4', 'Heatmaps, 4 screens', 'Insights, 3', 'Issues, 2', 'Suggestions, 3'];
+  const NAVY = '#1E3A8A';
+  const parts = ['Funnel', 'Conversion', 'Heatmaps', 'Findings'];
+  const tick = (i: number) => (
+    <motion.span
+      initial={{ scale: 0, opacity: 0 }}
+      whileInView={{ scale: 1, opacity: 1 }}
+      viewport={view}
+      transition={{ delay: 0.5 + i * 0.45, type: 'spring', stiffness: 400, damping: 20 }}
+      className="ml-auto w-4 h-4 rounded-full grid place-items-center text-[9px] text-white"
+      style={{ background: '#0E8A5F' }}
+      aria-hidden
+    >
+      ✓
+    </motion.span>
+  );
+  const label = (i: number) => (
+    <p className="flex items-center text-[10px] font-semibold mb-1.5" style={{ color: NAVY }}>
+      {parts[i]}
+      {tick(i)}
+    </p>
+  );
   return (
-    <div className="h-full flex flex-col justify-center gap-2 text-sm">
-      {rows.map((r, i) => (
-        <motion.div
-          key={r}
-          initial={{ opacity: 0, x: -12 }}
-          whileInView={{ opacity: 1, x: 0 }}
+    <div className="h-full grid place-items-center">
+      <div className="relative w-full max-w-[320px] rounded-2xl p-3.5 overflow-hidden" style={{ background: '#F4F8FC' }} aria-label="The report board: funnel, conversion tiles, heatmaps and findings">
+        {/* scan line */}
+        <motion.span
+          aria-hidden
+          className="absolute inset-x-0 h-10 pointer-events-none"
+          style={{ background: 'linear-gradient(180deg, transparent, rgba(30,58,138,0.14), transparent)' }}
+          initial={{ top: '-15%' }}
+          whileInView={{ top: '105%' }}
           viewport={view}
-          transition={{ delay: 0.15 + i * 0.12 }}
-          className="flex items-center gap-3 text-white/70"
-        >
-          <span className="w-1 h-1 rounded-full bg-white/50" />
-          {r}
-        </motion.div>
-      ))}
+          transition={{ duration: 2, ease: 'easeInOut', delay: 0.2 }}
+        />
+        <div className="mb-3">
+          {label(0)}
+          <div className="grid gap-1">
+            {FUNNEL.map((f) => (
+              <span key={f.k} className="h-1.5 rounded-full" style={{ width: `${Math.max(f.pct, 6)}%`, background: 'linear-gradient(90deg, #00C9B7, #4FA8E8)' }} />
+            ))}
+          </div>
+        </div>
+        <div className="mb-3">
+          {label(1)}
+          <div className="grid grid-cols-3 gap-1.5">
+            {TILES.map((t) => (
+              <div key={t.k} className="rounded-lg bg-white px-1.5 py-1.5 shadow-[0_1px_2px_rgba(16,33,46,0.06)]">
+                <p className="text-[7px] leading-tight truncate" style={{ color: '#5B6478' }}>
+                  {t.k}
+                </p>
+                <p className="text-[12px] font-bold tabular-nums" style={{ color: NAVY }}>
+                  {t.q.Q4?.[0]}%
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="mb-3">
+          {label(2)}
+          <div className="grid grid-cols-4 gap-1.5">
+            {[1, 2, 3, 4].map((n) => (
+              <img key={n} src={`${IMG}/heat-${n}.webp`} alt="" className="w-full aspect-[318/636] object-cover object-top rounded-md" />
+            ))}
+          </div>
+        </div>
+        <div>
+          {label(3)}
+          <div className="flex flex-wrap gap-1">
+            {['3 insights', '2 issues', '3 fixes'].map((c) => (
+              <span key={c} className="rounded-full bg-white px-2 py-0.5 text-[9px] font-semibold" style={{ color: NAVY }}>
+                {c}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,12 +1,11 @@
 import { motion, useInView } from 'motion/react';
 import { useRef, type ReactNode } from 'react';
-import { Meta } from './Meta';
 import { reveal } from './CaseBits';
 import { CountUp } from './CountUp';
 
 /* ── Shared case-study layout pieces ─────────────────
-   CaseIntro: the opening, with the facts (role, platform, market…)
-   in a narrow column on the left and the headline and context on
+   CaseIntro: the opening, with the facts (company, role, year) in
+   a narrow column on the left and the headline and context on
    the right. On phones the headline comes first.
 
    LeadStats: the result that matters most, large and bold, with
@@ -24,11 +23,14 @@ export function CaseIntro({ meta, title, children }: { meta: [string, string][];
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,2.2fr)] gap-12 md:gap-16 mb-16"
     >
-      <div className="order-2 md:order-1 grid grid-cols-2 md:grid-cols-1 gap-x-8 gap-y-6 content-start pt-8 md:pt-0 border-t border-white/10 md:border-0">
+      <dl className="order-2 md:order-1 grid grid-cols-1 sm:grid-cols-3 md:grid-cols-1 gap-x-8 gap-y-6 content-start pt-8 md:pt-0 border-t border-white/10 md:border-0">
         {meta.map(([label, value]) => (
-          <Meta key={label} label={label} value={value} />
+          <div key={label}>
+            <dt className="text-white/40 text-xs mb-1.5">{label}</dt>
+            <dd className="text-white text-base md:text-lg font-medium leading-snug">{value}</dd>
+          </div>
         ))}
-      </div>
+      </dl>
       <div className="order-1 md:order-2">
         <h1 className="text-white text-5xl md:text-7xl font-semibold mb-8 leading-[0.95] tracking-[-0.04em]">{title}</h1>
         <div className="grid gap-6 text-lg md:text-xl leading-relaxed text-white/55 [&>p:first-child]:text-white/75">{children}</div>

@@ -261,11 +261,9 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
           >
             <CaseIntro
               meta={[
+                ['Company', 'fresh'],
                 ['Role', 'Lead Product Designer'],
-                ['Platform', 'iOS · Android'],
-                ['Product', 'fresh · food & grocery delivery'],
-                ['Scope', 'Order placed moment'],
-                ['Deliverables', '9 states · motion · film'],
+                ['Year', 'Now'],
               ]}
               title="The five seconds after Pay."
             >
