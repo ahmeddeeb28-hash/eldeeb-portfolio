@@ -116,7 +116,7 @@ function StickyNote({
 export function PremiumHero() {
   const heroRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const activeView = 0; // one warm accent now that the persona tabs are gone
+  const activeView = 0; // one cool accent now that the persona tabs are gone
   const [ctaOffset, setCtaOffset] = useState({ x: 0, y: 0 });
   const [photoFailed, setPhotoFailed] = useState(false);
   const [hoveredNote, setHoveredNote] = useState<string | null>(null);
@@ -127,8 +127,9 @@ export function PremiumHero() {
       index: '01',
       headline: 'Teams that grow.',
       description: 'Four years leading multinational design teams across e-commerce, SaaS and fintech, with teams in Europe and the Gulf. At Sary I managed 8 designers across 3 squads. I run design reviews, keep the bar high and help senior designers grow.',
-      accent: 'rgba(255, 140, 100, 1)',
-      accentDim: 'rgba(255, 140, 100, 0.5)',
+      // cool silver and graphite, matching the floating nav
+      accent: '#B4BAC6',
+      accentDim: 'rgba(140, 150, 170, 0.32)',
       gradient: 'linear-gradient(135deg, #FFE9C7 0%, #F5C78A 50%, #E7A868 100%)',
       words: ['leadership', 'mentoring', 'design reviews', 'quality', 'alignment', 'growth'],
     },
@@ -238,7 +239,7 @@ export function PremiumHero() {
             inset: '-8%',
             background: [
               `radial-gradient(ellipse 55% 60% at 22% 28%, color-mix(in srgb, ${currentView.accentDim} 55%, transparent) 0%, color-mix(in srgb, ${currentView.accentDim} 22%, transparent) 40%, transparent 72%)`,
-              'radial-gradient(ellipse 50% 55% at 82% 80%, rgba(220,190,140,0.10) 0%, rgba(220,190,140,0.04) 42%, transparent 72%)',
+              'radial-gradient(ellipse 50% 55% at 82% 80%, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 42%, transparent 72%)',
               `radial-gradient(ellipse 35% 40% at 52% 48%, color-mix(in srgb, ${currentView.accentDim} 25%, transparent) 0%, transparent 70%)`,
             ].join(', '),
           }}
@@ -253,7 +254,7 @@ export function PremiumHero() {
             top: mousePosition.y - 260,
             width: '520px',
             height: '520px',
-            background: 'radial-gradient(closest-side, rgba(220,190,140,0.08) 0%, transparent 100%)',
+            background: 'radial-gradient(closest-side, rgba(255,255,255,0.04) 0%, transparent 100%)',
             transition: 'left 0.4s ease-out, top 0.4s ease-out',
           }}
         />
