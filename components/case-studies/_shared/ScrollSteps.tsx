@@ -81,54 +81,27 @@ export function ScrollSteps({ steps, accent, label }: { steps: Step[]; accent: s
         style={{ top: STICK, height: 'min(640px, calc(100svh - 160px))' }}
       >
         {/* the tabs: bars on phones; from md up a panel matching the card,
-            one row per step on a dot line that fills as you scroll */}
+            one row per step. The current row lifts, shows what the step
+            produced, and fills a bar along its foot as you scroll. */}
         <nav aria-label={label} className="relative md:rounded-[24px] md:border md:border-white/[0.07] md:bg-[#0F0F12] md:p-2">
-          <ol className="relative w-full h-full flex md:flex-col gap-2 md:gap-0">
+          <ol className="relative w-full h-full flex md:flex-col gap-2 md:gap-1">
             {steps.map((x, i) => {
               const on = i === active;
               const done = i < active;
               return (
                 <li key={x.t} className="relative flex-1 md:flex md:flex-col">
-                  {/* the line down to the next dot */}
-                  {i < n - 1 && (
-                    <span aria-hidden className="hidden md:block absolute left-[27px] top-1/2 h-full w-px bg-white/10 overflow-hidden">
-                      <motion.span
-                        className="absolute inset-0 origin-top"
-                        style={{ background: accent, scaleY: on ? stepFill : done ? 1 : 0 }}
-                      />
-                    </span>
-                  )}
+                  {i > 0 && !on && i - 1 !== active && <span aria-hidden className="hidden md:block absolute top-[-2px] left-4 right-4 h-px bg-white/[0.06]" />}
                   <button
                     type="button"
                     onClick={() => goTo(i)}
                     aria-current={on ? 'step' : undefined}
-                    className={`relative w-full md:flex-1 text-left flex items-center gap-4 rounded-2xl px-0 md:px-4 py-3 transition-colors duration-300 ${
+                    className={`relative w-full md:flex-1 text-left flex items-center rounded-2xl overflow-hidden px-0 md:px-5 py-3 transition-colors duration-300 ${
                       on ? 'md:bg-white/[0.05]' : 'md:hover:bg-white/[0.025]'
                     }`}
                   >
                     <span aria-hidden className="md:hidden block h-1 w-full rounded-full transition-colors" style={{ background: i <= active ? accent : 'rgba(255,255,255,0.12)' }} />
-                    {/* dot: check when done, lit when current, ring when ahead */}
-                    <span aria-hidden className="hidden md:grid relative flex-none w-6 h-6 place-items-center">
-                      {on && <span className="absolute inset-0 rounded-full animate-ping motion-reduce:hidden" style={{ background: `${accent}33` }} />}
-                      <span
-                        className="relative grid place-items-center rounded-full transition-all duration-300"
-                        style={{
-                          width: done || on ? 18 : 10,
-                          height: done || on ? 18 : 10,
-                          background: done ? accent : on ? `${accent}26` : 'transparent',
-                          border: `1.5px solid ${done || on ? accent : 'rgba(255,255,255,0.22)'}`,
-                        }}
-                      >
-                        {done && (
-                          <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
-                            <path d="M2.5 6.2 5 8.5l4.5-5" stroke="#0A0A0A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        )}
-                        {on && <span className="w-1.5 h-1.5 rounded-full" style={{ background: accent }} />}
-                      </span>
-                    </span>
                     <span className="hidden md:block min-w-0">
-                      <span className={`block text-[15px] leading-snug transition-colors duration-300 ${on ? 'text-white font-medium' : done ? 'text-white/60' : 'text-white/40'}`}>{x.t}</span>
+                      <span className={`block text-[15px] leading-snug transition-colors duration-300 ${on ? 'text-white font-medium' : done ? 'text-white/60' : 'text-white/35'}`}>{x.t}</span>
                       <AnimatePresence initial={false}>
                         {on && x.out && (
                           <motion.span
@@ -136,13 +109,23 @@ export function ScrollSteps({ steps, accent, label }: { steps: Step[]; accent: s
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
                             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                            className="block overflow-hidden text-xs text-white/40 pt-1"
+                            className="flex flex-wrap gap-1.5 overflow-hidden pt-2.5"
                           >
-                            {x.out.join(' · ')}
+                            {x.out.map((o) => (
+                              <span key={o} className="text-[11px] rounded-full px-2 py-0.5" style={{ color: '#CFCBFF', background: `${accent}1A` }}>
+                                {o}
+                              </span>
+                            ))}
                           </motion.span>
                         )}
                       </AnimatePresence>
                     </span>
+                    {/* progress through this step */}
+                    {on && (
+                      <span aria-hidden className="hidden md:block absolute left-5 right-5 bottom-3 h-[2px] rounded-full bg-white/[0.08] overflow-hidden">
+                        <motion.span className="absolute inset-0 origin-left rounded-full" style={{ background: accent, scaleX: stepFill }} />
+                      </span>
+                    )}
                     <span className="sr-only md:hidden">{x.t}</span>
                   </button>
                 </li>
@@ -172,7 +155,7 @@ export function ScrollSteps({ steps, accent, label }: { steps: Step[]; accent: s
                 <h3 className="text-white text-xl md:text-3xl font-semibold tracking-[-0.03em] leading-tight mb-2 md:mb-3">{s.t}</h3>
                 <p className="text-white/60 text-sm md:text-base leading-relaxed max-w-2xl">{s.d}</p>
                 {s.out && (
-                  <div className="flex flex-wrap gap-2 mt-4">
+                  <div className="flex flex-wrap gap-2 mt-4 md:hidden">
                     {s.out.map((o) => (
                       <span key={o} className="text-xs font-medium rounded-full px-3 py-1.5" style={{ color: '#CFCBFF', background: `${accent}1A` }}>
                         {o}
