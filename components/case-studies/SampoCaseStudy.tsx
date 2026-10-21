@@ -5,6 +5,7 @@ import { ChapterTitle } from './_shared/ChapterTitle';
 import { CaseIntro, Takeaway } from './_shared/CaseLayout';
 import { CaseFilm, reveal } from './_shared/CaseBits';
 import { ScrollSteps } from './_shared/ScrollSteps';
+import { AgreedVisual, DiagnosisVisual, FixesVisual, PrototypeVisual, RulesVisual } from './sampo/ProcessVisuals';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 import { FocusFilm, type FocusScene, type FocusStep } from './sampo/FocusFilm';
 import {
@@ -212,6 +213,22 @@ const AUDIT: [string, string][] = [
 ];
 
 
+// one picture per process step, in the order of PROCESS
+const PROCESS_VISUALS = [
+  <DiagnosisVisual key="d" problems={PROBLEMS.map((p) => p.k)} rungs={RUNGS.map((r) => r.t)} />,
+  <AgreedVisual
+    key="a"
+    cols={[
+      ['Feature', ['Read', 'Preview in 3 modes', 'Test', 'Undo']],
+      ['Utilization', ['Activation rate', 'Time to first strategy']],
+      ['Impact', ['Revenue lift', 'Profit lift', '7-day disable rate']],
+    ]}
+  />,
+  <PrototypeVisual key="p" />,
+  <FixesVisual key="f" fixes={AUDIT.slice(0, 3)} />,
+  <RulesVisual key="r" />,
+];
+
 function Ladder({ onPick, active }: { onPick: (i: number) => void; active: number }) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 items-end mb-10" role="tablist" aria-label="Trust ladder">
@@ -379,7 +396,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-12">
             My job was to get product, data and engineering to one plan, and to prove it with something people could click.
           </motion.p>
-          <ScrollSteps steps={PROCESS} accent={ACCENT} label="Process steps" />
+          <ScrollSteps steps={PROCESS.map((p, i) => ({ ...p, visual: PROCESS_VISUALS[i] }))} accent={ACCENT} label="Process steps" />
           <motion.div
             {...reveal}
             className="mt-10 rounded-[24px] p-6 md:p-8 border grid md:grid-cols-3 gap-6"

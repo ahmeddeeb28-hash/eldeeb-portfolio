@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useMotionValue, useReducedMotion } from 'motion/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 /* ── Scroll steps ────────────────────────────────────
    A long list of steps told one at a time. The section is tall and
@@ -10,7 +10,7 @@ import { useEffect, useRef, useState } from 'react';
    Progress is read from whatever element scrolls the page (the case
    study overlay, or the window), so it works in both. */
 
-export type Step = { t: string; d: string; out?: string[] };
+export type Step = { t: string; d: string; out?: string[]; visual?: ReactNode };
 
 const STICK = 128; // under the sticky chapter bar
 const PER_STEP = 0.55; // viewport heights of scroll per step
@@ -72,10 +72,10 @@ export function ScrollSteps({ steps, accent, label }: { steps: Step[]; accent: s
   const s = steps[active];
 
   return (
-    <div ref={ref} className="relative" style={{ height: `calc(${n * PER_STEP * 100}svh + min(460px, calc(100svh - 170px)))` }}>
+    <div ref={ref} className="relative" style={{ height: `calc(${n * PER_STEP * 100}svh + min(640px, calc(100svh - 160px)))` }}>
       <div
         className="sticky grid grid-rows-[auto_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,0.8fr)_minmax(0,2fr)] gap-4 md:gap-12 items-stretch"
-        style={{ top: STICK, height: 'min(460px, calc(100svh - 170px))' }}
+        style={{ top: STICK, height: 'min(640px, calc(100svh - 160px))' }}
       >
         {/* the list: numbers on phones, numbers and titles from md up */}
         <nav aria-label={label} className="relative md:flex md:items-center">
@@ -108,7 +108,7 @@ export function ScrollSteps({ steps, accent, label }: { steps: Step[]; accent: s
 
         {/* the step on show */}
         <div
-          className="relative overflow-hidden rounded-[24px] border border-white/[0.07] p-6 md:p-10 flex flex-col"
+          className="relative overflow-hidden rounded-[24px] border border-white/[0.07] p-4 md:p-6 flex flex-col"
           style={{ background: `radial-gradient(ellipse 70% 80% at 100% 0%, ${accent}1F 0%, transparent 60%), #0F0F12` }}
           aria-live="polite"
         >
@@ -121,14 +121,13 @@ export function ScrollSteps({ steps, accent, label }: { steps: Step[]; accent: s
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               className="flex flex-col h-full"
             >
-              <p className="text-sm text-white/40 tabular-nums mb-auto">
-                <span style={{ color: accent }}>{String(active + 1).padStart(2, '0')}</span> of {String(n).padStart(2, '0')}
-              </p>
-              <div className="mt-8">
-                <h3 className="text-white text-2xl md:text-4xl font-semibold tracking-[-0.03em] leading-tight mb-4 max-w-2xl">{s.t}</h3>
-                <p className="text-white/60 text-base md:text-lg leading-relaxed max-w-2xl">{s.d}</p>
+              {/* the visual and the text share the same inner edges */}
+              {s.visual && <div className="flex-1 min-h-0 rounded-[16px] overflow-hidden">{s.visual}</div>}
+              <div className={`px-1 md:px-2 ${s.visual ? 'pt-5 md:pt-6 pb-1' : 'mt-auto'}`}>
+                <h3 className="text-white text-xl md:text-3xl font-semibold tracking-[-0.03em] leading-tight mb-2 md:mb-3">{s.t}</h3>
+                <p className="text-white/60 text-sm md:text-base leading-relaxed max-w-2xl">{s.d}</p>
                 {s.out && (
-                  <div className="flex flex-wrap gap-2 mt-6">
+                  <div className="flex flex-wrap gap-2 mt-4">
                     {s.out.map((o) => (
                       <span key={o} className="text-xs font-medium rounded-full px-3 py-1.5" style={{ color: '#CFCBFF', background: `${accent}1A` }}>
                         {o}
