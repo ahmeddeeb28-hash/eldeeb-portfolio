@@ -40,7 +40,6 @@ const CHAPTERS: Chapter[] = [
   { id: 'process', num: '04', roman: 'IV', label: 'Process', beat: 'Agreed, prototyped, tested.' },
   { id: 'flows', num: '05', roman: 'V', label: 'The Flows', beat: 'Five rungs, five screens.' },
   { id: 'dashboard', num: '06', roman: 'VI', label: 'Dashboard', beat: 'Answers before decoration.' },
-  { id: 'craft', num: '07', roman: 'VII', label: 'Craft', beat: 'The details that hold it.' },
 ];
 
 const GLANCE: [string, string][] = [
@@ -299,7 +298,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
     <CaseShell chapters={CHAPTERS} metaLine="Sampo AI · Pricing" onBack={onBack} onNext={onNext} resetKey="sampo-ai-pricing" pillId="sampo-tab-pill">
       <div className="max-w-6xl mx-auto px-6 pt-16 pb-24">
         {/* ── 01 OVERVIEW ── */}
-        <ChapterTitle total="VII" chapter={CHAPTERS[0]} />
+        <ChapterTitle total="VI" chapter={CHAPTERS[0]} />
         <section id="overview" className="mb-32 scroll-mt-24">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
             <CaseIntro
@@ -347,7 +346,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         </section>
 
         {/* ── 02 PROBLEM ── */}
-        <ChapterTitle total="VII" chapter={CHAPTERS[1]} tone="red" />
+        <ChapterTitle total="VI" chapter={CHAPTERS[1]} tone="red" />
         <section id="problem" className="mb-32 scroll-mt-24">
           <motion.p {...reveal} className="text-white text-3xl md:text-5xl font-semibold leading-[1.1] tracking-tight max-w-4xl mb-12">
             Merchants were asked to trust a black box with their margin.
@@ -367,7 +366,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         </section>
 
         {/* ── 03 CONCEPT ── */}
-        <ChapterTitle total="VII" chapter={CHAPTERS[2]} tone="teal" />
+        <ChapterTitle total="VI" chapter={CHAPTERS[2]} tone="teal" />
         <section id="concept" className="mb-32 scroll-mt-24">
           <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] mb-10 max-w-3xl">
             Control is handed over one rung at a time.
@@ -394,7 +393,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         </section>
 
         {/* ── 04 PROCESS ── */}
-        <ChapterTitle total="VII" chapter={CHAPTERS[3]} tone="teal" />
+        <ChapterTitle total="VI" chapter={CHAPTERS[3]} tone="teal" />
         <section id="process" className="mb-32 scroll-mt-24">
           <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] mb-4 max-w-3xl">
             I ran it as a consultant: agree first, then prototype, then test.
@@ -403,24 +402,10 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
             My job was to get product, data and engineering to one plan, and to prove it with something people could click.
           </motion.p>
           <ScrollSteps steps={PROCESS.map((p, i) => ({ ...p, visual: PROCESS_VISUALS[i] }))} accent={ACCENT} label="Process steps" />
-          <motion.div
-            {...reveal}
-            className="mt-10 rounded-[24px] p-6 md:p-8 border grid md:grid-cols-3 gap-6"
-            style={{ borderColor: `${ACCENT}44`, background: `${ACCENT}0D` }}
-          >
-            {AGREED.map(([k, v]) => (
-              <div key={k}>
-                <p className="text-xs font-semibold mb-2" style={{ color: ACCENT }}>
-                  {k}
-                </p>
-                <p className="text-white/85 text-sm md:text-base leading-relaxed">{v}</p>
-              </div>
-            ))}
-          </motion.div>
         </section>
 
         {/* ── 05 FLOWS ── */}
-        <ChapterTitle total="VII" chapter={CHAPTERS[4]} tone="teal" />
+        <ChapterTitle total="VI" chapter={CHAPTERS[4]} tone="teal" />
         <section id="flows" className="mb-32 scroll-mt-24">
           <p className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-10">
             Every screen here is the prototype I built with Claude and tested with the team. Watch each flow, or click the screen and use it.
@@ -429,52 +414,10 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         </section>
 
         {/* ── 06 DASHBOARD ── */}
-        <ChapterTitle total="VII" chapter={CHAPTERS[5]} />
-        <section id="dashboard" className="mb-32 scroll-mt-24">
+        <ChapterTitle total="VI" chapter={CHAPTERS[5]} />
+        <section id="dashboard" className="mb-16 scroll-mt-24">
           <Dashboard />
-        </section>
-
-        {/* ── 07 CRAFT ── */}
-        <ChapterTitle total="VII" chapter={CHAPTERS[6]} />
-        <section id="craft" className="mb-16 scroll-mt-24">
-          <motion.div {...reveal} className="mb-16">
-            <p className="text-white/45 text-sm mb-5">Four rules for every pop-up</p>
-            <ol className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-5">
-              {RULES.map((r) => (
-                <li key={r.k}>
-                  <span className="font-mono text-xs" style={{ color: ACCENT }}>
-                    {r.k}
-                  </span>
-                  <p className="text-white font-medium mt-1">{r.t}</p>
-                </li>
-              ))}
-            </ol>
-          </motion.div>
-
-          <motion.div {...reveal} className="mb-16">
-            <div className="hidden md:grid grid-cols-2 gap-x-10 text-sm mb-4">
-              <span className="text-[#FF8A8A]">Before the audit</span>
-              <span style={{ color: ACCENT }}>After</span>
-            </div>
-            <ul className="grid gap-5">
-              {AUDIT.map(([found, fix]) => (
-                <li key={found} className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-1 text-[15px] leading-relaxed">
-                  <span className="text-white/45">
-                    <span className="md:hidden text-[#FF8A8A]">Before · </span>
-                    {found}
-                  </span>
-                  <span className="text-white/85">
-                    <span className="md:hidden" style={{ color: ACCENT }}>
-                      After ·{' '}
-                    </span>
-                    {fix}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-
-          <p className="text-white/45 text-sm mb-5">One status, everywhere</p>
+          <p className="text-white/45 text-sm mb-5 mt-16">One status, everywhere</p>
           <div className="flex flex-wrap items-center gap-3 mb-16 rounded-[24px] bg-[#F6F5FB] p-5">
             {(['Not active', 'Pending activation', 'A/B testing', 'Active', 'Completed'] as const).map((st, i, a) => (
               <motion.span
@@ -496,6 +439,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
             status travel.
           </Takeaway>
         </section>
+
       </div>
     </CaseShell>
   );

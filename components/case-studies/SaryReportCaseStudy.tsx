@@ -165,9 +165,9 @@ export function SaryReportCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
         {/* ── 06 WITH AI ── */}
         <ChapterTitle chapter={CHAPTERS[5]} tone="teal" />
         <section id="ai" className="mb-16 scroll-mt-24">
-          <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-16">
+          <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-10">
             The board was finished in 2022 and read once. This year I rebuilt it with Claude, so the numbers can be explored
-            instead of skimmed. This is how that went, step by step.
+            instead of skimmed. Here is what it was, and what it is now.
           </motion.p>
           <BuildStory />
           <p className="text-white/35 text-xs mt-16">Figures are from Sary’s Q4 2022 report. Heatmaps and screens are from the original board.</p>

@@ -1,379 +1,126 @@
-import { motion, useScroll, useSpring } from 'motion/react';
-import { useRef, type ReactNode } from 'react';
-import { FUNNEL, PAPER_INK, TILES } from './ReportData';
+import { motion } from 'motion/react';
+import { ArrowDown } from 'lucide-react';
+import { FLOW, HEAT } from './ReportData';
 
-/* ── How I rebuilt it with Claude · told as a story ──
-   Six beats down a line that fills as you scroll. Each beat is what
-   I asked for, what Claude did, and a small picture of the result.
-   The beats are true to how this page was made: I set the goal,
-   made the calls and pushed back; Claude read the report and did
-   the build. Colours stay neutral so the report's own blue leads. */
+/* ── How I rebuilt it with Claude ────────────────────
+   Kept plain and real: the original board's own heatmaps and
+   screens on the left, the live pieces on this page on the right,
+   then three short rows on what changed. No mock pictures. */
 
 const IMG = '/images/case-studies/sary-report';
-const INK = PAPER_INK;
+const reveal = {
+  initial: { opacity: 0, y: 16 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: '-10% 0px' },
+  transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
+};
 
-const view = { once: true } as const;
+const LIVE: { id: string; t: string; d: string }[] = [
+  { id: 'funnel', t: 'The funnel', d: 'Drawn from the report’s counts. Point at a step for what we found.' },
+  { id: 'conversion', t: 'Conversion tiles', d: 'Switch between Q3 and Q4 to compare.' },
+  { id: 'heatmaps', t: 'Heatmap reel', d: 'The board’s four heatmaps, zoomed to each hot spot.' },
+];
 
-function Exchange({ me, ai }: { me?: string; ai: string }) {
-  return (
-    <div className="grid gap-4">
-      {me && (
-        <blockquote className="border-l-2 border-white/60 pl-4 text-white text-base md:text-lg leading-relaxed">
-          “{me}”
-        </blockquote>
-      )}
-      <p className="text-white/60 text-sm md:text-base leading-relaxed">
-        {me && <span className="text-white/40">Claude: </span>}
-        {ai}
-      </p>
-    </div>
-  );
-}
-
-/* the six pictures */
-function VisBrief() {
-  return (
-    <div className="h-full grid place-items-center">
-      <div className="flex items-center gap-4">
-        <motion.img
-          src={`${IMG}/heat-2.webp`}
-          alt=""
-          className="h-32 sm:h-40 rounded-2xl"
-          initial={{ rotate: -6, x: -20, opacity: 0 }}
-          whileInView={{ rotate: -4, x: 0, opacity: 1 }}
-          viewport={view}
-          transition={{ duration: 0.7 }}
-        />
-        <motion.span initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={view} transition={{ delay: 0.5 }} className="text-2xl text-white/40">
-          →
-        </motion.span>
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          whileInView={{ scale: 1, opacity: 1 }}
-          viewport={view}
-          transition={{ delay: 0.7, duration: 0.5 }}
-          className="rounded-2xl px-5 py-4 text-sm font-semibold"
-          style={{ background: '#F4F8FC', color: '#1E3A8A' }}
-        >
-          A page people can use
-        </motion.div>
-      </div>
-    </div>
-  );
-}
-
-/* The report board in miniature, from its own data and heatmaps:
-   a scan line passes top to bottom and ticks each part as read. */
-function VisRead() {
-  const NAVY = '#1E3A8A';
-  const parts = ['Funnel', 'Conversion', 'Heatmaps', 'Findings'];
-  const tick = (i: number) => (
-    <motion.span
-      initial={{ scale: 0, opacity: 0 }}
-      whileInView={{ scale: 1, opacity: 1 }}
-      viewport={view}
-      transition={{ delay: 0.5 + i * 0.45, type: 'spring', stiffness: 400, damping: 20 }}
-      className="ml-auto w-4 h-4 rounded-full grid place-items-center text-[9px] text-white"
-      style={{ background: '#0E8A5F' }}
-      aria-hidden
-    >
-      ✓
-    </motion.span>
-  );
-  const label = (i: number) => (
-    <p className="flex items-center text-[10px] font-semibold mb-1.5" style={{ color: NAVY }}>
-      {parts[i]}
-      {tick(i)}
-    </p>
-  );
-  return (
-    <div className="h-full grid place-items-center">
-      <div className="relative w-full max-w-[320px] rounded-2xl p-3.5 overflow-hidden" style={{ background: '#F4F8FC' }} aria-label="The report board: funnel, conversion tiles, heatmaps and findings">
-        {/* scan line */}
-        <motion.span
-          aria-hidden
-          className="absolute inset-x-0 h-10 pointer-events-none"
-          style={{ background: 'linear-gradient(180deg, transparent, rgba(30,58,138,0.14), transparent)' }}
-          initial={{ top: '-15%' }}
-          whileInView={{ top: '105%' }}
-          viewport={view}
-          transition={{ duration: 2, ease: 'easeInOut', delay: 0.2 }}
-        />
-        <div className="mb-3">
-          {label(0)}
-          <div className="grid gap-1">
-            {FUNNEL.map((f) => (
-              <span key={f.k} className="h-1.5 rounded-full" style={{ width: `${Math.max(f.pct, 6)}%`, background: 'linear-gradient(90deg, #00C9B7, #4FA8E8)' }} />
-            ))}
-          </div>
-        </div>
-        <div className="mb-3">
-          {label(1)}
-          <div className="grid grid-cols-3 gap-1.5">
-            {TILES.map((t) => (
-              <div key={t.k} className="rounded-lg bg-white px-1.5 py-1.5 shadow-[0_1px_2px_rgba(16,33,46,0.06)]">
-                <p className="text-[7px] leading-tight truncate" style={{ color: '#5B6478' }}>
-                  {t.k}
-                </p>
-                <p className="text-[12px] font-bold tabular-nums" style={{ color: NAVY }}>
-                  {t.q.Q4?.[0]}%
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="mb-3">
-          {label(2)}
-          <div className="grid grid-cols-4 gap-1.5">
-            {[1, 2, 3, 4].map((n) => (
-              <img key={n} src={`${IMG}/heat-${n}.webp`} alt="" className="w-full aspect-[318/636] object-cover object-top rounded-md" />
-            ))}
-          </div>
-        </div>
-        <div>
-          {label(3)}
-          <div className="flex flex-wrap gap-1">
-            {['3 insights', '2 issues', '3 fixes'].map((c) => (
-              <span key={c} className="rounded-full bg-white px-2 py-0.5 text-[9px] font-semibold" style={{ color: NAVY }}>
-                {c}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function VisCheck() {
-  return (
-    <div className="h-full flex flex-col justify-center gap-4">
-      <div className="rounded-xl border border-white/10 px-4 py-3">
-        <p className="text-xs text-white/45 mb-1">On the board</p>
-        <p className="text-white/70 text-sm">
-          Discover 9.63%{' '}
-          <span className="relative">
-            (31,503 of 34,860)
-            <motion.span
-              className="absolute left-0 right-0 top-1/2 h-px bg-[#E07A6A] origin-left"
-              initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={view}
-              transition={{ delay: 0.6, duration: 0.5 }}
-            />
-          </span>
-        </p>
-      </div>
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={view}
-        transition={{ delay: 1.1 }}
-        className="rounded-xl px-4 py-3"
-        style={{ background: '#F4F8FC' }}
-      >
-        <p className="text-xs mb-1" style={{ color: '#5B6478' }}>
-          On this page
-        </p>
-        <p className="text-sm font-medium" style={{ color: '#1E3A8A' }}>
-          Discover 9.63%, 3,357 of 34,860 reached it
-        </p>
-      </motion.div>
-    </div>
-  );
-}
-
-function VisReframe() {
-  return (
-    <div className="h-full flex items-center justify-center gap-3">
-      <div className="relative rounded-2xl border border-white/10 px-4 py-5 flex-1 max-w-40 text-center">
-        <p className="text-white/45 text-xs">First try</p>
-        <p className="text-white/80 text-sm font-semibold mt-1">An AI chat concept</p>
-        <motion.span
-          className="absolute inset-x-3 top-1/2 h-px bg-[#E07A6A] origin-left -rotate-12"
-          initial={{ scaleX: 0 }}
-          whileInView={{ scaleX: 1 }}
-          viewport={view}
-          transition={{ delay: 0.5, duration: 0.4 }}
-        />
-      </div>
-      <span className="text-xl text-white/40">→</span>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.92 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={view}
-        transition={{ delay: 0.9, duration: 0.5 }}
-        className="rounded-2xl px-4 py-5 flex-1 max-w-44 text-center"
-        style={{ background: '#F4F8FC' }}
-      >
-        <p className="text-xs" style={{ color: '#5B6478' }}>
-          What shipped
-        </p>
-        <p className="text-sm font-semibold mt-1" style={{ color: '#1E3A8A' }}>
-          The report, told in my words
-        </p>
-      </motion.div>
-    </div>
-  );
-}
-
-function VisShip() {
-  return (
-    <div className="h-full flex items-center justify-center gap-4">
-      {[
-        { w: 'w-24 sm:w-28', h: 'h-44 sm:h-52', r: 'rounded-[18px]' },
-        { w: 'w-40 sm:w-56', h: 'h-28 sm:h-32', r: 'rounded-xl' },
-      ].map((d, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={view}
-          transition={{ delay: 0.2 + i * 0.3 }}
-          className={`${d.w} ${d.h} ${d.r} border border-white/15 p-3 grid content-start gap-1.5`}
-        >
-          {FUNNEL.map((f, k) => (
-            <motion.span
-              key={f.k}
-              className="h-1.5 rounded-full origin-left"
-              style={{ width: `${Math.max(f.pct, 8)}%`, background: INK }}
-              initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={view}
-              transition={{ delay: 0.6 + i * 0.3 + k * 0.1, duration: 0.5 }}
-            />
-          ))}
-          <span className="text-[10px] text-white/40 mt-1">{i ? 'Desktop' : 'Phone'}</span>
-        </motion.div>
-      ))}
-    </div>
-  );
-}
-
-function VisBecame() {
-  const qs = ["Q4 '22", 'Next quarter', 'And the next'];
-  return (
-    <div className="h-full flex flex-col justify-center gap-5">
-      <div className="flex items-center gap-3">
-        <div className="flex-1 min-w-0 rounded-xl border border-white/10 px-4 py-3">
-          <p className="text-white/45 text-xs mb-2">Before</p>
-          <p className="text-white/70 text-sm">A static board, read once</p>
-        </div>
-        <span className="text-xl text-white/40">→</span>
-        <div className="flex-1 min-w-0 rounded-xl px-4 py-3" style={{ background: '#F4F8FC' }}>
-          <p className="text-xs mb-2" style={{ color: '#5B6478' }}>
-            Now
-          </p>
-          <div className="grid gap-1">
-            {FUNNEL.map((f, i) => (
-              <motion.span
-                key={f.k}
-                className="h-1.5 rounded-full origin-left"
-                style={{ width: `${Math.max(f.pct, 8)}%`, background: '#1E3A8A' }}
-                initial={{ scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                viewport={view}
-                transition={{ delay: 0.4 + i * 0.15, duration: 0.5 }}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="flex flex-wrap items-center gap-2 text-xs">
-        {qs.map((q, i) => (
-          <motion.span
-            key={q}
-            initial={{ opacity: 0, x: -8 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={view}
-            transition={{ delay: 1 + i * 0.25 }}
-            className="flex items-center gap-2"
-          >
-            {i > 0 && <span className="text-white/30">→</span>}
-            <span className={`rounded-full px-3 py-1 border ${i ? 'border-dashed border-white/20 text-white/45' : 'border-white/50 text-white'}`}>{q}</span>
-          </motion.span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-const BEATS: { n: string; t: string; me?: string; ai: string; vis: ReactNode }[] = [
+const CHANGED: { t: string; d: string }[] = [
   {
-    n: '01',
-    t: 'The brief',
-    me: 'Here is my Q4 usability report in Figma. Rebuild it as a page people can use.',
-    ai: 'Opened both report files and listed what the board had to say.',
-    vis: <VisBrief />,
+    t: 'Every number checked',
+    d: 'The board listed drop-offs as “of 34,860”. Here every rate is the shoppers who reached the step, so 9.63% reads as 3,357 people.',
   },
   {
-    n: '02',
-    t: 'Reading the report',
-    me: 'Use the real numbers only. Nothing invented.',
-    ai: 'Read every layer of the board: the funnel, three conversion tiles, four heatmaps and the team’s findings.',
-    vis: <VisRead />,
+    t: 'Drawn from the data, not pasted',
+    d: 'The funnel, tiles and bars are built from the report’s figures. Only the heatmaps and screens are images, taken from the board.',
   },
   {
-    n: '03',
-    t: 'Checking the numbers',
-    me: 'Show every rate as shoppers who reached the step.',
-    ai: 'Flagged a mismatch: the board listed drop-offs as “of 34,860”. Converted them to who reached each step.',
-    vis: <VisCheck />,
-  },
-  {
-    n: '04',
-    t: 'Pushing back',
-    me: 'The chat version feels generated. Bring back the report, and make it read like my story.',
-    ai: 'Went back to the report’s own layout and colours, kept the checked numbers and cut the decoration.',
-    vis: <VisReframe />,
-  },
-  {
-    n: '05',
-    t: 'Shipping it',
-    me: 'Check it on desktop and phone before it goes live.',
-    ai: 'Built the funnel, tiles and heatmap reel from the data, then tested every screen at both sizes.',
-    vis: <VisShip />,
-  },
-  {
-    n: '06',
-    t: 'What it became',
-    ai: 'The original was a static board. Now it is a page you can use: the funnel, the conversion tiles and the bars are drawn from the report’s numbers, not pasted as images, and the mismatch is fixed. The same steps can run every quarter: new numbers in, a fresh report out.',
-    vis: <VisBecame />,
+    t: 'My calls, Claude’s build',
+    d: 'I set the brief, chose what to keep and pushed back when it felt generated. Claude read the board, checked the numbers and wrote the code.',
   },
 ];
 
+const jump = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
 export function BuildStory() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 70%', 'end 60%'] });
-  const fill = useSpring(scrollYProgress, { stiffness: 120, damping: 30 });
   return (
-    <div ref={ref} className="relative">
-      <div className="absolute left-[15px] md:left-1/2 top-2 bottom-2 w-px bg-white/10" aria-hidden />
-      <motion.div className="absolute left-[15px] md:left-1/2 top-2 bottom-2 w-px origin-top bg-white/60" style={{ scaleY: fill }} aria-hidden />
-      <div className="grid gap-16 md:gap-24">
-        {BEATS.map((b, i) => (
-          <div key={b.n} className="relative grid md:grid-cols-2 gap-6 md:gap-16 pl-11 md:pl-0">
-            <motion.span
-              className="absolute left-0 md:left-1/2 md:-translate-x-1/2 top-0 w-8 h-8 rounded-full grid place-items-center text-xs tabular-nums bg-[#0A0A0A] border border-white/30 text-white/70"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: '-20% 0px' }}
-            >
-              {b.n}
-            </motion.span>
-            <motion.div
-              className={`min-w-0 grid gap-4 content-start ${i % 2 ? 'md:order-2 md:pl-10' : 'md:pr-10'}`}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-20% 0px' }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <p className="text-white text-xl md:text-2xl font-semibold tracking-tight">{b.t}</p>
-              <Exchange me={b.me} ai={b.ai} />
-            </motion.div>
-            <div className={`min-w-0 min-h-[200px] rounded-[20px] border border-white/10 p-5 ${i % 2 ? 'md:order-1 md:mr-10' : 'md:ml-10'}`}>{b.vis}</div>
+    <div className="grid gap-14 md:gap-20">
+      {/* before and now */}
+      <div className="grid lg:grid-cols-2 gap-4">
+        <motion.div {...reveal} className="rounded-[24px] border border-white/10 p-5 md:p-7">
+          <p className="text-white text-lg font-semibold mb-1">The 2022 board</p>
+          <p className="text-white/50 text-sm mb-6">Screens and heatmaps on a Figma board, with the numbers beside them. Read once.</p>
+          <div className="grid grid-cols-4 gap-2.5">
+            {HEAT.map((h, i) => (
+              <motion.figure
+                key={h.img}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 + i * 0.08, duration: 0.5 }}
+                className="grid gap-1.5"
+              >
+                <img src={`${IMG}/${h.img}.webp`} alt={`${h.t} heatmap from the report`} className="w-full rounded-lg" loading="lazy" />
+                <figcaption className="text-white/40 text-[11px] text-center">{h.t}</figcaption>
+              </motion.figure>
+            ))}
+            {FLOW.map((t, i) => (
+              <motion.figure
+                key={t}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 + i * 0.08, duration: 0.5 }}
+                className="grid gap-1.5"
+              >
+                <img src={`${IMG}/flow-${i + 1}.webp`} alt={`${t} screen from the report`} className="w-full rounded-lg" loading="lazy" />
+                <figcaption className="text-white/40 text-[11px] text-center leading-tight">{t}</figcaption>
+              </motion.figure>
+            ))}
           </div>
-        ))}
+        </motion.div>
+
+        <motion.div {...reveal} className="rounded-[24px] p-5 md:p-7 flex flex-col self-start" style={{ background: '#F4F8FC' }}>
+          <p className="text-lg font-semibold mb-1" style={{ color: '#1E3A8A' }}>
+            This page
+          </p>
+          <p className="text-sm mb-6" style={{ color: '#5B6478' }}>
+            The same report, rebuilt so the numbers can be explored. Jump to each piece.
+          </p>
+          <ul className="grid gap-2.5">
+            {LIVE.map((x) => (
+              <li key={x.id}>
+                <button
+                  type="button"
+                  onClick={() => jump(x.id)}
+                  className="group w-full text-left rounded-2xl bg-white px-4 py-3.5 flex items-center gap-4 border transition-[border-color,box-shadow] hover:shadow-[0_10px_24px_-14px_rgba(30,58,138,0.5)]"
+                  style={{ borderColor: '#E3ECF5' }}
+                >
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[15px] font-semibold" style={{ color: '#1E3A8A' }}>
+                      {x.t}
+                    </span>
+                    <span className="block text-[13px] leading-snug" style={{ color: '#5B6478' }}>
+                      {x.d}
+                    </span>
+                  </span>
+                  <ArrowDown className="w-4 h-4 flex-none transition-transform group-hover:translate-y-0.5" style={{ color: '#1E3A8A' }} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+      </div>
+
+      {/* what changed */}
+      <div>
+        <motion.p {...reveal} className="text-white text-xl md:text-2xl font-semibold tracking-tight mb-6">
+          What changed
+        </motion.p>
+        <ul className="grid md:grid-cols-3 gap-x-10 gap-y-8">
+          {CHANGED.map((c, i) => (
+            <motion.li key={c.t} {...reveal} transition={{ ...reveal.transition, delay: i * 0.08 }} className="border-t border-white/10 pt-5">
+              <p className="text-white font-semibold mb-2">{c.t}</p>
+              <p className="text-white/55 text-sm md:text-[15px] leading-relaxed">{c.d}</p>
+            </motion.li>
+          ))}
+        </ul>
       </div>
     </div>
   );
