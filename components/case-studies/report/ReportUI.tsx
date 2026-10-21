@@ -11,35 +11,123 @@ import { FUNNEL, HEAT, NAVY, SKY, TEAL, TILES, VIOLET, type Quarter } from './Re
 const IMG = '/images/case-studies/sary-report';
 const fmt = (n: number) => n.toLocaleString('en-US');
 
-export function Funnel({ dark = false }: { dark?: boolean }) {
+/* A real funnel: each step is a band as wide as its share (on a
+   square-root scale, so Discover's 9.6% stays readable), and dots
+   pour in at the top. At every step some drift out through the side,
+   in the same proportions as the shoppers who left there; about one
+   in ten reaches Discover. Hover or tap a step for its drop-off. */
+const ROW = 76;
+const GAP = 6;
+const wOf = (pct: number) => 46 + 54 * Math.sqrt(pct / 100); // % of width
+
+function useDrops(count: number) {
+  // where each dot leaves: 0..n-1 is the step it drops out after, n means it reached the end
+  return useState(() => {
+    const out: number[] = [];
+    for (let d = 0; d < count; d++) {
+      const share = (d + 0.5) / count; // spread evenly through 0..1
+      // passes step k+1 while its share is inside the shoppers who reached it
+      let k = 0;
+      while (k < FUNNEL.length - 1 && share >= 1 - FUNNEL[k + 1].pct / 100) k++;
+      out.push(k === FUNNEL.length - 1 ? FUNNEL.length : k);
+    }
+    // the order they fall in should look random, but stay the same every render
+    return out.map((v, i) => ({ v, r: ((i * 7919) % 97) / 97 - 0.5, delay: ((i * 37) % count) * 0.22 }));
+  })[0];
+}
+
+export function Funnel() {
   const ref = useRef<HTMLDivElement>(null);
   const seen = useInView(ref, { once: true, margin: '-15% 0px' });
-  const ink = dark ? '#fff' : NAVY;
+  const reduced = useReducedMotion();
+  const [hot, setHot] = useState<number | null>(null);
+  const drops = useDrops(28);
+  const n = FUNNEL.length;
+  const H = n * ROW + (n - 1) * GAP;
+  const widths = FUNNEL.map((f) => wOf(f.pct));
+  const wAt = (i: number) => (i < n ? widths[i] : widths[n - 1] * 0.86);
+  const yTop = (i: number) => i * (ROW + GAP);
+
   return (
-    <div ref={ref} className="grid gap-3">
-      {FUNNEL.map((f, i) => (
-        <div key={f.k} className="grid grid-cols-[minmax(0,1fr)_72px] sm:grid-cols-[150px_minmax(0,1fr)_120px] items-center gap-x-3 gap-y-1.5 sm:gap-5">
-          <span className="col-span-2 sm:col-span-1 text-xs sm:text-sm font-semibold" style={{ color: dark ? 'rgba(255,255,255,0.75)' : NAVY }}>
-            {f.k}
-          </span>
-          <div className="relative h-12 rounded-xl overflow-hidden" style={{ background: dark ? 'rgba(255,255,255,0.06)' : '#EEF6FB' }}>
-            <motion.div
-              className="absolute inset-y-0 left-0 rounded-xl flex items-center px-3"
-              style={{ background: `linear-gradient(90deg, ${TEAL}, ${SKY})` }}
-              initial={{ width: 0 }}
-              animate={{ width: seen ? `${Math.max(f.pct, 6)}%` : 0 }}
-              transition={{ duration: 0.9, delay: i * 0.25, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <span className="text-xs font-bold text-white whitespace-nowrap">{fmt(f.n)}</span>
-            </motion.div>
-          </div>
-          <span className="text-right">
-            <b className="block text-lg tabular-nums" style={{ color: ink }}>
-              <Rate v={f.pct} run={seen} delay={i * 250} />
-            </b>
-          </span>
+    <div ref={ref} className="relative mx-auto max-w-[760px]" style={{ height: H + 40 }} onMouseLeave={() => setHot(null)}>
+      {/* the bands */}
+      {FUNNEL.map((f, i) => {
+        const t = wAt(i);
+        const btm = wAt(i + 1);
+        const L1 = (100 - t) / 2;
+        const L2 = (100 - btm) / 2;
+        const on = hot === i;
+        const lost = i > 0 ? FUNNEL[i - 1].n - f.n : 0;
+        return (
+          <motion.button
+            key={f.k}
+            type="button"
+            onMouseEnter={() => setHot(i)}
+            onFocus={() => setHot(i)}
+            onClick={() => setHot(i)}
+            aria-pressed={on}
+            className="absolute left-0 right-0 grid place-items-center text-center cursor-pointer"
+            style={{
+              top: yTop(i),
+              height: ROW,
+              clipPath: `polygon(${L1}% 0, ${100 - L1}% 0, ${100 - L2}% 100%, ${L2}% 100%)`,
+              background: `linear-gradient(180deg, ${[TEAL, '#2DB8D0', SKY, NAVY][i]}, ${[ '#2DB8D0', SKY, '#3A6FC2', NAVY][i]})`,
+            }}
+            initial={{ opacity: 0, y: -14 }}
+            animate={seen ? { opacity: hot === null || on ? 1 : 0.55, y: 0 } : { opacity: 0, y: -14 }}
+            transition={{ duration: 0.55, delay: seen && hot === null ? i * 0.18 : 0, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <span className="leading-tight px-2">
+              <span className="block text-[11px] sm:text-xs font-semibold text-white/85">{f.k}</span>
+              <span className="block text-base sm:text-xl font-bold text-white tabular-nums">
+                {fmt(f.n)} <span className="text-white/75 text-xs sm:text-sm font-semibold">· <Rate v={f.pct} run={seen} delay={i * 180} /></span>
+              </span>
+              {i > 0 && (
+                <span
+                  className="block text-[10px] sm:text-[11px] font-semibold text-white/90 overflow-hidden transition-all duration-300"
+                  style={{ maxHeight: on ? 16 : 0, opacity: on ? 1 : 0 }}
+                >
+                  {fmt(lost)} left before this step
+                </span>
+              )}
+            </span>
+          </motion.button>
+        );
+      })}
+
+      {/* the dots: pour in, filter out at the sides, a few reach the end */}
+      {seen && !reduced && (
+        <div aria-hidden className="absolute inset-0 pointer-events-none">
+          {drops.map((d, i) => {
+            const side = d.r < 0 ? -1 : 1;
+            const stops: { x: number; y: number }[] = [];
+            const last = Math.min(d.v, n - 1);
+            for (let k = 0; k <= last + 1; k++) {
+              const y = k <= n - 1 ? yTop(k) : H;
+              stops.push({ x: 50 + d.r * wAt(k) * 0.8, y });
+            }
+            const end = d.v >= n
+              ? { x: 50 + d.r * 10, y: H + 34 } // through the bottom
+              : { x: 50 + side * (wAt(d.v + 1) / 2 + 9), y: yTop(d.v) + ROW * 0.9 }; // out through the side
+            const pts = [...stops.slice(0, d.v >= n ? stops.length : last + 1), end];
+            const dur = 1.1 + pts.length * 0.55;
+            return (
+              <motion.span
+                key={i}
+                className="absolute w-2 h-2 -ml-1 -mt-1 rounded-full"
+                style={{ background: '#fff', border: `1.5px solid ${NAVY}`, boxShadow: d.v >= n ? `0 0 10px ${TEAL}` : 'none' }}
+                initial={{ left: `${pts[0].x}%`, top: -18, opacity: 0 }}
+                animate={{
+                  left: [`${pts[0].x}%`, ...pts.map((p) => `${p.x}%`)],
+                  top: [-18, ...pts.map((p) => p.y)],
+                  opacity: [0, ...pts.map((_, k) => (k === pts.length - 1 ? 0 : 1))],
+                }}
+                transition={{ duration: dur, delay: 0.8 + d.delay, repeat: Infinity, repeatDelay: 1.2, ease: 'easeIn' }}
+              />
+            );
+          })}
         </div>
-      ))}
+      )}
     </div>
   );
 }
