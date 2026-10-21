@@ -155,7 +155,6 @@ export function PremiumHero() {
   ];
 
   const currentView = heroViews[activeView];
-  const tickerWords = heroViews.flatMap((v) => v.words);
 
   const stickyNotes: StickyNoteData[] = [
     {
@@ -532,40 +531,6 @@ export function PremiumHero() {
         </motion.div>
       </motion.div>
 
-      {/* Infinite marquee ticker */}
-      <div
-        className="absolute bottom-0 left-0 right-0 z-10 overflow-hidden"
-        style={{
-          borderTop: '1px solid rgba(255,255,255,0.06)',
-          background: 'linear-gradient(180deg, transparent 0%, rgba(10,10,10,0.6) 40%, rgba(10,10,10,0.95) 100%)',
-          paddingTop: '18px',
-          paddingBottom: '20px',
-        }}
-      >
-        <motion.div
-          animate={{ x: ['0%', '-50%'] }}
-          transition={{ duration: 32, repeat: Infinity, ease: 'linear' }}
-          className="flex items-center whitespace-nowrap"
-          style={{ width: 'max-content' }}
-        >
-          {[...tickerWords, ...tickerWords].map((word, i) => (
-            <span key={i} className="flex items-center">
-              <span
-                style={{
-                  fontFamily: "'Fraunces', serif",
-                  fontStyle: 'italic',
-                  fontSize: '1.1rem',
-                  color: 'rgba(255,255,255,0.28)',
-                  padding: '0 20px',
-                }}
-              >
-                {word}
-              </span>
-              <span style={{ color: 'rgba(220,190,140,0.4)', fontSize: '0.6rem' }}>●</span>
-            </span>
-          ))}
-        </motion.div>
-      </div>
     </section>
   );
 }
