@@ -41,6 +41,13 @@ const CHAPTERS: Chapter[] = [
   { id: 'craft', num: '07', roman: 'VII', label: 'Craft', beat: 'The details that hold it.' },
 ];
 
+const GLANCE: [string, string][] = [
+  ['Product', 'An AI pricing engine for Saudi e-commerce stores'],
+  ['Users', 'Merchants who run their own online store'],
+  ['Worked with', 'Product, data and engineering'],
+  ['Delivered', 'Five flows, a dashboard and a working prototype, plus 4 components and 4 pop-up rules'],
+];
+
 const PROBLEMS = [
   { k: 'Opaque logic', d: 'Strategies read like internal specs.' },
   { k: 'A one-way door', d: 'No preview, no way back. Doing nothing felt safest.' },
@@ -279,11 +286,27 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
               ]}
               title="AI pricing merchants can trust, test and undo."
             >
-              <p>An AI that changes store prices for Saudi e-commerce merchants.</p>
               <p>
-                As consultant and design team lead, I got the teams to agree on the feature and its impact, built the prototype
-                with AI, and tested it before handoff.
+                Sampo AI sets prices for online stores in Saudi Arabia. A merchant picks a pricing strategy, like an offer for
+                returning visitors, and the engine changes prices on its own.
               </p>
+              <p>
+                The engine worked, but merchants hesitated to hand it their prices. They couldn’t see why it would change a
+                price, what it would do to their store, or how to take it back, so doing nothing felt safest.
+              </p>
+              <p>
+                I came in as a consultant and led the design team. I got product, data and engineering to agree on the feature
+                and how we’d measure it, built the prototype with Claude, tested it with the team flow by flow, and handed over
+                the rules to keep building with.
+              </p>
+              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-5 mt-4 pt-8 border-t border-white/10 text-base">
+                {GLANCE.map(([k, v]) => (
+                  <div key={k}>
+                    <dt className="text-white/40 text-xs mb-1">{k}</dt>
+                    <dd className="text-white/80 leading-snug">{v}</dd>
+                  </div>
+                ))}
+              </dl>
             </CaseIntro>
             <CaseFilm
               src={FILM}
