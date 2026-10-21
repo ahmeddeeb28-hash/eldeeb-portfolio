@@ -4,6 +4,7 @@ import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
 import { CaseIntro, Takeaway } from './_shared/CaseLayout';
 import { CaseFilm, reveal } from './_shared/CaseBits';
+import { ScrollSteps } from './_shared/ScrollSteps';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 import { FocusFilm, type FocusScene, type FocusStep } from './sampo/FocusFilm';
 import {
@@ -378,39 +379,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-12">
             My job was to get product, data and engineering to one plan, and to prove it with something people could click.
           </motion.p>
-          <ol className="relative grid gap-4">
-            <span className="absolute left-[23px] top-6 bottom-6 w-px bg-gradient-to-b from-[#8B85FF]/60 via-[#8B85FF]/20 to-transparent hidden sm:block" aria-hidden />
-            {PROCESS.map((p, i) => (
-              <motion.li
-                key={p.t}
-                initial={{ opacity: 0, x: -16 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: '-10% 0px' }}
-                transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                className="relative grid grid-cols-[48px_minmax(0,1fr)] gap-4 sm:gap-6"
-              >
-                <span
-                  className="w-12 h-12 rounded-full grid place-items-center text-sm font-semibold border"
-                  style={{ borderColor: `${ACCENT}66`, background: '#0D0B1F', color: ACCENT }}
-                >
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <div className="rounded-[20px] border border-white/8 bg-[#0D0D0D] p-5 md:p-6 grid md:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] gap-4 md:gap-8 items-start">
-                  <div>
-                    <p className="text-white text-lg md:text-xl font-bold tracking-tight mb-1.5">{p.t}</p>
-                    <p className="text-white/55 text-sm md:text-base leading-relaxed">{p.d}</p>
-                  </div>
-                  <div className="flex flex-wrap gap-2 md:justify-end">
-                    {p.out.map((o) => (
-                      <span key={o} className="text-xs font-semibold rounded-full px-3 py-1.5 border" style={{ borderColor: `${ACCENT}44`, color: '#CFCBFF', background: `${ACCENT}12` }}>
-                        {o}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </motion.li>
-            ))}
-          </ol>
+          <ScrollSteps steps={PROCESS} accent={ACCENT} label="Process steps" />
           <motion.div
             {...reveal}
             className="mt-10 rounded-[24px] p-6 md:p-8 border grid md:grid-cols-3 gap-6"
