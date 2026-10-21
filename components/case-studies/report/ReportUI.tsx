@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
-import { FUNNEL, HEAT, NAVY, SKY, TEAL, TILES, VIOLET, type Quarter } from './ReportData';
+import { FUNNEL, FUNNEL_GUIDE, HEAT, NAVY, SKY, STATUS, TEAL, TILES, VIOLET, type Quarter } from './ReportData';
 
 /* ── Report UI ───────────────────────────────────────
    The usability report rebuilt as live pieces: a funnel that
@@ -11,35 +11,175 @@ import { FUNNEL, HEAT, NAVY, SKY, TEAL, TILES, VIOLET, type Quarter } from './Re
 const IMG = '/images/case-studies/sary-report';
 const fmt = (n: number) => n.toLocaleString('en-US');
 
-export function Funnel({ dark = false }: { dark?: boolean }) {
+/* A real funnel: each step is a band as wide as its share (on a
+   square-root scale, so Discover's 9.6% stays readable), and dots
+   pour in at the top. At every step some drift out through the side,
+   in the same proportions as the shoppers who left there; about one
+   in ten reaches Discover. Hover or tap a step for its drop-off. */
+const ROW = 76;
+const GAP = 6;
+const wOf = (pct: number) => 46 + 54 * Math.sqrt(pct / 100); // % of width
+
+function useDrops(count: number) {
+  // where each dot leaves: 0..n-1 is the step it drops out after, n means it reached the end
+  return useState(() => {
+    const out: number[] = [];
+    for (let d = 0; d < count; d++) {
+      const share = (d + 0.5) / count; // spread evenly through 0..1
+      // passes step k+1 while its share is inside the shoppers who reached it
+      let k = 0;
+      while (k < FUNNEL.length - 1 && share >= 1 - FUNNEL[k + 1].pct / 100) k++;
+      out.push(k === FUNNEL.length - 1 ? FUNNEL.length : k);
+    }
+    // the order they fall in should look random, but stay the same every render
+    return out.map((v, i) => ({ v, r: ((i * 7919) % 97) / 97 - 0.5, delay: ((i * 37) % count) * 0.22 }));
+  })[0];
+}
+
+export function Funnel() {
   const ref = useRef<HTMLDivElement>(null);
   const seen = useInView(ref, { once: true, margin: '-15% 0px' });
-  const ink = dark ? '#fff' : NAVY;
+  const reduced = useReducedMotion();
+  // the step under the pointer, and where the tooltip sits (px in the funnel box)
+  const [tip, setTip] = useState<{ i: number; x: number; y: number } | null>(null);
+  const drops = useDrops(28);
+  const n = FUNNEL.length;
+  const H = n * ROW + (n - 1) * GAP;
+  const widths = FUNNEL.map((f) => wOf(f.pct));
+  const wAt = (i: number) => (i < n ? widths[i] : widths[n - 1] * 0.86);
+  const yTop = (i: number) => i * (ROW + GAP);
+
+  const place = (i: number, e?: { clientX: number; clientY: number }) => {
+    const box = ref.current?.getBoundingClientRect();
+    if (!box) return;
+    // follow the mouse; on a tap, pin beside the band's right edge
+    const x = e ? e.clientX - box.left : box.width * (0.5 + wAt(i) / 200);
+    const y = e ? e.clientY - box.top : yTop(i) + ROW / 2;
+    setTip({ i, x, y });
+  };
+
+  const t = tip && {
+    f: FUNNEL[tip.i],
+    g: FUNNEL_GUIDE[tip.i],
+    st: STATUS[FUNNEL_GUIDE[tip.i].status],
+    prev: tip.i > 0 ? FUNNEL[tip.i - 1] : null,
+  };
+  const flip = tip && ref.current ? tip.x > ref.current.offsetWidth - 250 : false;
+
   return (
-    <div ref={ref} className="grid gap-3">
-      {FUNNEL.map((f, i) => (
-        <div key={f.k} className="grid grid-cols-[minmax(0,1fr)_72px] sm:grid-cols-[150px_minmax(0,1fr)_120px] items-center gap-x-3 gap-y-1.5 sm:gap-5">
-          <span className="col-span-2 sm:col-span-1 text-xs sm:text-sm font-semibold" style={{ color: dark ? 'rgba(255,255,255,0.75)' : NAVY }}>
-            {f.k}
-          </span>
-          <div className="relative h-12 rounded-xl overflow-hidden" style={{ background: dark ? 'rgba(255,255,255,0.06)' : '#EEF6FB' }}>
-            <motion.div
-              className="absolute inset-y-0 left-0 rounded-xl flex items-center px-3"
-              style={{ background: `linear-gradient(90deg, ${TEAL}, ${SKY})` }}
-              initial={{ width: 0 }}
-              animate={{ width: seen ? `${Math.max(f.pct, 6)}%` : 0 }}
-              transition={{ duration: 0.9, delay: i * 0.25, ease: [0.22, 1, 0.36, 1] }}
+    <div className="mx-auto max-w-[760px]">
+      <div ref={ref} className="relative" style={{ height: H + 40 }} onPointerLeave={(e) => e.pointerType === 'mouse' && setTip(null)}>
+        {FUNNEL.map((x, i) => {
+          const tw = wAt(i);
+          const btm = wAt(i + 1);
+          const L1 = (100 - tw) / 2;
+          const L2 = (100 - btm) / 2;
+          const on = tip?.i === i;
+          const s2 = STATUS[FUNNEL_GUIDE[i].status];
+          return (
+            <motion.button
+              key={x.k}
+              type="button"
+              onPointerMove={(e) => e.pointerType === 'mouse' && place(i, e)}
+              onFocus={() => place(i)}
+              onClick={() => tip?.i !== i && place(i)}
+              aria-label={`${x.k}: ${fmt(x.n)}, ${s2.label}`}
+              className="absolute left-0 right-0 grid place-items-center text-center cursor-pointer"
+              style={{
+                top: yTop(i),
+                height: ROW,
+                clipPath: `polygon(${L1}% 0, ${100 - L1}% 0, ${100 - L2}% 100%, ${L2}% 100%)`,
+                background: `linear-gradient(180deg, ${s2.color}, ${s2.deep})`,
+              }}
+              initial={{ opacity: 0, y: -14 }}
+              animate={seen ? { opacity: !tip || on ? 1 : 0.55, y: 0 } : { opacity: 0, y: -14 }}
+              transition={{ duration: 0.4, delay: seen && !tip ? i * 0.12 : 0, ease: [0.22, 1, 0.36, 1] }}
             >
-              <span className="text-xs font-bold text-white whitespace-nowrap">{fmt(f.n)}</span>
-            </motion.div>
+              <span className="leading-tight px-2">
+                <span className="block text-[11px] sm:text-xs font-semibold text-white/85">{x.k}</span>
+                <span className="block text-base sm:text-xl font-bold text-white tabular-nums">
+                  {fmt(x.n)} <span className="text-white/75 text-xs sm:text-sm font-semibold">· <Rate v={x.pct} run={seen} delay={i * 180} /></span>
+                </span>
+              </span>
+            </motion.button>
+          );
+        })}
+
+        {/* the dots: pour in, filter out at the sides, a few reach the end */}
+        {seen && !reduced && (
+          <div aria-hidden className="absolute inset-0 pointer-events-none">
+            {drops.map((d, i) => {
+              const side = d.r < 0 ? -1 : 1;
+              const stops: { x: number; y: number }[] = [];
+              const last = Math.min(d.v, n - 1);
+              for (let k = 0; k <= last + 1; k++) stops.push({ x: 50 + d.r * wAt(k) * 0.8, y: k <= n - 1 ? yTop(k) : H });
+              const end =
+                d.v >= n
+                  ? { x: 50 + d.r * 10, y: H + 34 } // through the bottom
+                  : { x: 50 + side * (wAt(d.v + 1) / 2 + 9), y: yTop(d.v) + ROW * 0.9 }; // out through the side
+              const pts = [...stops.slice(0, d.v >= n ? stops.length : last + 1), end];
+              return (
+                <motion.span
+                  key={i}
+                  className="absolute w-2 h-2 -ml-1 -mt-1 rounded-full"
+                  style={{ background: '#fff', border: `1.5px solid ${NAVY}`, boxShadow: d.v >= n ? `0 0 10px ${TEAL}` : 'none' }}
+                  initial={{ left: `${pts[0].x}%`, top: -18, opacity: 0 }}
+                  animate={{
+                    left: [`${pts[0].x}%`, ...pts.map((p) => `${p.x}%`)],
+                    top: [-18, ...pts.map((p) => p.y)],
+                    opacity: [0, ...pts.map((_, k) => (k === pts.length - 1 ? 0 : 1))],
+                  }}
+                  transition={{ duration: 1.1 + pts.length * 0.55, delay: 0.8 + d.delay, repeat: Infinity, repeatDelay: 1.2, ease: 'easeIn' }}
+                />
+              );
+            })}
           </div>
-          <span className="text-right">
-            <b className="block text-lg tabular-nums" style={{ color: ink }}>
-              <Rate v={f.pct} run={seen} delay={i * 250} />
-            </b>
-          </span>
-        </div>
-      ))}
+        )}
+
+        {/* the tooltip: status, drop-off, one line from the report */}
+        <AnimatePresence>
+          {t && tip && (
+            <motion.div
+              key="tip"
+              role="status"
+              className="absolute z-10 w-[230px] rounded-2xl bg-white p-3.5 pointer-events-none"
+              style={{ boxShadow: '0 14px 34px -12px rgba(15,30,70,0.35)', border: '1px solid #E3ECF5' }}
+              initial={{ opacity: 0, scale: 0.94 }}
+              animate={{ opacity: 1, scale: 1, left: flip ? tip.x - 246 : tip.x + 16, top: Math.max(0, tip.y - 40) }}
+              exit={{ opacity: 0, scale: 0.94 }}
+              transition={{ opacity: { duration: 0.15 }, scale: { duration: 0.15 }, default: { type: 'spring', stiffness: 520, damping: 40 } }}
+            >
+              <div className="flex items-center justify-between gap-2 mb-1.5">
+                <span className="text-[13px] font-bold" style={{ color: NAVY }}>
+                  {t.f.k}
+                </span>
+                <span className="text-[10px] font-semibold rounded-full px-2 py-0.5 whitespace-nowrap" style={{ background: `${t.st.color}22`, color: t.st.deep }}>
+                  {t.st.label}
+                </span>
+              </div>
+              {t.prev && (
+                <p className="text-[11px] mb-1.5" style={{ color: '#5B6478' }}>
+                  <b style={{ color: NAVY }}>{((t.f.n / t.prev.n) * 100).toFixed(1)}%</b> kept going ·{' '}
+                  <b style={{ color: '#C2410C' }}>{fmt(t.prev.n - t.f.n)}</b> left
+                </p>
+              )}
+              <p className="text-[11px] leading-snug" style={{ color: '#3D4659' }}>
+                {t.g.note}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* what the colors mean */}
+      <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 mt-1">
+        {Object.values(STATUS).map((x) => (
+          <li key={x.label} className="flex items-center gap-1.5 text-[11px] font-medium" style={{ color: '#5B6478' }}>
+            <span className="w-2.5 h-2.5 rounded-[3px]" style={{ background: x.color }} />
+            {x.label}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -63,7 +203,8 @@ export function Rate({ v, run, delay = 0 }: { v: number; run: boolean; delay?: n
   return <>{val >= 10 ? val.toFixed(1) : val.toFixed(2)}%</>;
 }
 
-export function ConversionTiles() {
+/* the story above the tiles follows the quarter switch */
+export function ConversionTiles({ story }: { story?: Record<Quarter, { h: string; d: string }> }) {
   const [q, setQ] = useState<Quarter>('Q4');
   const ref = useRef<HTMLDivElement>(null);
   const seen = useInView(ref, { once: true, margin: '-15% 0px' });
@@ -83,6 +224,22 @@ export function ConversionTiles() {
           </button>
         ))}
       </div>
+      {story && (
+        <div className="min-h-[200px] md:min-h-[190px] mb-8">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={q}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <h2 className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] mb-4 max-w-4xl">{story[q].h}</h2>
+              <p className="text-white/55 text-base md:text-lg leading-relaxed max-w-3xl">{story[q].d}</p>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {TILES.map((t, i) => {
           const cur = t.q[q];
@@ -110,33 +267,101 @@ export function ConversionTiles() {
                         )}
                       </div>
                       <p className="text-[13px] text-[#5B6478] mt-1">{cur[1]} shoppers</p>
-                      <div className="mt-5 h-2 rounded-full bg-[#EEF2F7] overflow-hidden">
-                        <motion.div
-                          className="h-full rounded-full"
-                          style={{ background: q === 'Q4' ? SKY : VIOLET }}
-                          initial={{ width: 0 }}
-                          animate={{ width: seen ? `${cur[0]}%` : 0 }}
-                          transition={{ duration: 0.8, delay: 0.1 + i * 0.12 }}
-                        />
-                      </div>
                     </>
                   ) : (
-                    <p className="text-sm text-[#5B6478] py-6">Sliders launched in Q4, so there is no Q3 figure.</p>
+                    <>
+                      <b className="text-5xl font-semibold tracking-[-0.03em] text-[#C5CDDA]">n/a</b>
+                      <p className="text-[13px] text-[#5B6478] mt-1">Sliders launched in Q4.</p>
+                    </>
                   )}
                 </motion.div>
               </AnimatePresence>
-              {t.best && (
-                <div className="mt-5 pt-4 border-t border-[#EEF2F7] flex items-center justify-between text-[13px]">
-                  <span className="font-bold text-[#D92D3A] text-xs">{t.best[0]}</span>
-                  <span>
-                    <b>{t.best[1]}%</b> <span className="text-[#5B6478]">{t.best[2]}</span>
-                  </span>
-                </div>
-              )}
+              <Compare t={t} q={q} seen={seen} i={i} />
             </div>
           );
         })}
       </div>
+    </div>
+  );
+}
+
+/* Q3 against Q4 on one scale: the chosen quarter in colour, the other
+   muted, what Q4 lost since Q3 marked in pale red, and the all-time
+   best as a dashed line where the report has one. */
+const QCOL: Record<Quarter, string> = { Q3: VIOLET, Q4: SKY };
+function Compare({ t, q, seen, i }: { t: (typeof TILES)[number]; q: Quarter; seen: boolean; i: number }) {
+  const v3 = t.q.Q3?.[0] ?? null;
+  const v4 = t.q.Q4?.[0] ?? null;
+  const top = Math.max(v3 ?? 0, v4 ?? 0, t.best?.[1] ?? 0);
+  const scale = Math.ceil((top * 1.25) / 10) * 10; // a round end for the axis
+  const pct = (v: number) => `${(v / scale) * 100}%`;
+  const lost = v3 !== null && v4 !== null && v4 < v3 ? v3 - v4 : 0;
+  const rows: [Quarter, number | null][] = [
+    ['Q3', v3],
+    ['Q4', v4],
+  ];
+  return (
+    <div className="mt-9">
+      <div className="relative grid gap-2.5">
+        {t.best && (
+          <motion.div
+            className="absolute -top-5 bottom-0 z-10 flex flex-col items-center pointer-events-none"
+            style={{ left: pct(t.best[1]) }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: seen ? 1 : 0 }}
+            transition={{ delay: 1 + i * 0.12 }}
+          >
+            <span className="-translate-x-1/2 text-[10px] font-bold text-[#D92D3A] whitespace-nowrap absolute -top-0.5 left-0">
+              {t.best[0].split(' ·')[0]} best {t.best[1]}%
+            </span>
+            <span className="-translate-x-1/2 absolute left-0 top-4 bottom-0 border-l border-dashed border-[#D92D3A]" />
+          </motion.div>
+        )}
+        {rows.map(([k, v], r) => {
+          const on = k === q;
+          return (
+            <div key={k} className="grid grid-cols-[22px_minmax(0,1fr)_44px] items-center gap-2.5">
+              <span className="text-[11px] font-bold transition-colors" style={{ color: on ? QCOL[k] : '#A3ADBD' }}>
+                {k}
+              </span>
+              <div className="relative h-6 rounded-md bg-[#EEF2F7] overflow-hidden">
+                {v === null ? (
+                  <span className="absolute inset-0 grid place-items-center text-[10px] text-[#8A94A6] border border-dashed border-[#C5CDDA] rounded-md">
+                    Not live yet
+                  </span>
+                ) : (
+                  <>
+                    {/* what Q4 gave up since Q3 */}
+                    {k === 'Q4' && lost > 0 && (
+                      <motion.span
+                        className="absolute inset-y-0 rounded-r-md"
+                        style={{
+                          left: pct(v),
+                          background: 'repeating-linear-gradient(135deg, #FBD5D9 0 4px, #FDECEE 4px 8px)',
+                        }}
+                        initial={{ width: 0 }}
+                        animate={{ width: seen ? pct(lost) : 0 }}
+                        transition={{ duration: 0.5, delay: 0.9 + i * 0.12 }}
+                      />
+                    )}
+                    <motion.span
+                      className="absolute inset-y-0 left-0 rounded-md transition-[background-color,opacity] duration-300"
+                      style={{ background: QCOL[k], opacity: on ? 1 : 0.3 }}
+                      initial={{ width: 0 }}
+                      animate={{ width: seen ? pct(v) : 0 }}
+                      transition={{ duration: 0.8, delay: 0.1 + i * 0.12 + r * 0.15, ease: [0.22, 1, 0.36, 1] }}
+                    />
+                  </>
+                )}
+              </div>
+              <span className="text-right text-[12px] font-semibold tabular-nums transition-colors" style={{ color: on ? '#0F1B3D' : '#A3ADBD' }}>
+                {v === null ? '–' : `${v}%`}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      <p className="text-[10px] text-[#A3ADBD] mt-2 pl-8">Scale 0 to {scale}%</p>
     </div>
   );
 }

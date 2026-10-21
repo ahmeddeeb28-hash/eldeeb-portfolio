@@ -147,6 +147,7 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
   return (
     <footer
       id="footer-section-lock"
+      data-track-area="footer"
       className="footer-locked relative overflow-hidden bg-[#0A0A0A]"
       style={{ paddingTop: '88px', paddingBottom: '0' }}
     >

@@ -121,7 +121,7 @@ export function CaseShell({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] bg-[#0A0A0A] overflow-y-auto"
+      className="fixed inset-0 z-[100] bg-[#0A0A0A] overflow-y-auto overflow-x-hidden"
     >
       <div ref={contentRef}>
       {/* Sticky header: back row + chapter tabs */}

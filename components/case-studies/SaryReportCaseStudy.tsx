@@ -108,7 +108,7 @@ export function SaryReportCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
           <motion.div {...reveal} className="rounded-[28px] p-5 md:p-10" style={{ background: PAPER }}>
             <Funnel />
             <p className="text-[13px] mt-6" style={{ color: '#5B6478' }}>
-              Each step shows how many shoppers reached it, out of everyone who viewed the catalogue in Q4.
+              Each step shows how many shoppers reached it, out of everyone who viewed the catalogue in Q4. Point at or tap a step to see what we found there.
             </p>
           </motion.div>
         </section>
@@ -117,15 +117,20 @@ export function SaryReportCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
         <ChapterTitle chapter={CHAPTERS[2]} />
         <section id="conversion" className="mb-32 scroll-mt-24">
           <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-4">
-            Next I put each campaign surface next to the quarter before.
+            Next I put each campaign surface next to the quarter before. Switch the quarter to read each one.
           </motion.p>
-          <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] mb-4 max-w-3xl">
-            The pop-up held. Banners slipped.
-          </motion.h2>
-          <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-10">
-            Switch the quarter to compare. Banners stayed under our best quarter, Q2.
-          </motion.p>
-          <ConversionTiles />
+          <ConversionTiles
+            story={{
+              Q4: {
+                h: 'Banners slipped. The pop-up held near 40%.',
+                d: 'Banners fell 1.7 points from Q3 to 13.8%, still under our best quarter, Q2, at 16.7%. The pop-up dipped 1.6 points but still reached 13,565 shoppers. Sliders were new this quarter, and 63.1% of catalogue visitors used one.',
+              },
+              Q3: {
+                h: 'Before the slip: banners at 15.5%, the pop-up at 40.8%.',
+                d: 'Banners were already under Q2’s 16.7%. The pop-up was the strongest surface, reaching 15,169 of 37,180 shoppers. Section sliders were not live yet.',
+              },
+            }}
+          />
         </section>
 
         {/* ── 04 HEATMAPS ── */}
@@ -165,9 +170,9 @@ export function SaryReportCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
         {/* ── 06 WITH AI ── */}
         <ChapterTitle chapter={CHAPTERS[5]} tone="teal" />
         <section id="ai" className="mb-16 scroll-mt-24">
-          <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-16">
+          <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-10">
             The board was finished in 2022 and read once. This year I rebuilt it with Claude, so the numbers can be explored
-            instead of skimmed. This is how that went, step by step.
+            instead of skimmed. Here is what it was, and what it is now.
           </motion.p>
           <BuildStory />
           <p className="text-white/35 text-xs mt-16">Figures are from Sary’s Q4 2022 report. Heatmaps and screens are from the original board.</p>

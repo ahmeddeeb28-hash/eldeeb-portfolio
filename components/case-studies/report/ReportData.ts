@@ -18,6 +18,21 @@ export const FUNNEL: { k: string; n: number; pct: number }[] = [
   { k: 'Discover page', n: 3357, pct: 9.63 },
 ];
 
+/* what each funnel step tells us, in the report's own words */
+export type StepStatus = 'start' | 'working' | 'fix' | 'grow';
+export const STATUS: Record<StepStatus, { label: string; color: string; deep: string }> = {
+  start: { label: 'Starting point', color: '#3B5BA9', deep: NAVY },
+  working: { label: 'Working', color: '#14B8A6', deep: '#0F8F84' },
+  fix: { label: 'Needs a fix', color: '#F59E0B', deep: '#C2710C' },
+  grow: { label: 'Room to grow', color: '#8B5CF6', deep: VIOLET },
+};
+export const FUNNEL_GUIDE: { status: StepStatus; note: string }[] = [
+  { status: 'start', note: 'Every rate below is out of this number.' },
+  { status: 'working', note: 'A dense scroll path through the new sections.' },
+  { status: 'fix', note: 'Banners looked like ads, and a copied code gave no success message.' },
+  { status: 'grow', note: 'Few clicks beyond the categories.' },
+];
+
 export type Quarter = 'Q3' | 'Q4';
 
 export const TILES: {

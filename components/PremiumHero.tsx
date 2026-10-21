@@ -221,6 +221,7 @@ export function PremiumHero() {
   return (
     <section
       ref={heroRef}
+      data-track-area="hero"
       className="relative min-h-screen overflow-hidden flex items-center"
       style={{ backgroundColor: '#0A0A0A' }}
     >

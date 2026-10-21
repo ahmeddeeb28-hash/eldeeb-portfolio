@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
+import { track } from '../lib/analytics';
 import * as Dialog from '@radix-ui/react-dialog';
 import { ArrowLeft, ArrowRight, ArrowUpRight, Compass, Users, Boxes, BarChart3, FlaskConical, BookOpen, Lock, X, Mail, Check, Copy, Linkedin } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
@@ -229,6 +230,7 @@ function AccessDialog({
         body: JSON.stringify({ ...fields, area: area.title, website: honeypot }),
       });
       setRequest(res.ok ? 'sent' : 'fallback');
+      if (res.ok) track('access_request_sent', { area: area.title });
     } catch {
       setRequest('fallback');
     }

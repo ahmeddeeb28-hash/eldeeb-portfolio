@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { motion, useReducedMotion, type MotionValue } from 'motion/react';
 import { Download, Linkedin, X } from 'lucide-react';
+import { track } from '../lib/analytics';
 
 const CV_URL = '/cv/Ahmad_Eldeeb_Lead_Product_Designer_CV.pdf';
 const LINKEDIN_URL = 'https://www.linkedin.com/in/el-deeb-39032b131/';
@@ -190,7 +191,11 @@ export function FloatingNav({ items, progress, onLogo, logoLabel, lockScroll, fo
               aria-label={open ? 'Close menu' : 'Open menu'}
               aria-expanded={open}
               aria-controls="site-menu"
-              onClick={() => (open ? close() : setOpen(true))}
+              onClick={() => {
+                if (open) return close();
+                setOpen(true);
+                track('nav_open');
+              }}
               className="relative w-11 h-11 rounded-[14px] grid place-items-center text-white hover:bg-white/[0.08] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
             >
               <motion.span
@@ -219,6 +224,7 @@ export function FloatingNav({ items, progress, onLogo, logoLabel, lockScroll, fo
           {/* the menu: rendered always, inert and hidden while collapsed */}
           <motion.nav
             id="site-menu"
+            data-track-area="nav"
             aria-label="Main"
             inert={!open}
             aria-hidden={!open}
@@ -237,6 +243,7 @@ export function FloatingNav({ items, progress, onLogo, logoLabel, lockScroll, fo
                       href={item.href}
                       onClick={(e) => {
                         e.preventDefault();
+                        track('nav_link', { label: item.label });
                         go(item.onSelect);
                       }}
                       className={`group flex items-baseline gap-4 min-h-[52px] py-2 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 ${

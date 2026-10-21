@@ -21,7 +21,9 @@ export function CaseIntro({ meta, title, children }: { meta: [string, string][];
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,2.2fr)] gap-12 md:gap-16 mb-16"
+      className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,2.6fr)] gap-12 md:gap-20 mb-16 [--intro-w:calc(100vw-48px)] md:[--intro-w:min(1440px,calc(100vw-128px))]"
+      // wider than the reading column: spans the page with a side gutter
+      style={{ width: 'var(--intro-w)', marginLeft: 'calc(50% - var(--intro-w) / 2)' }}
     >
       <dl className="order-2 md:order-1 grid grid-cols-1 sm:grid-cols-3 md:grid-cols-1 gap-x-8 gap-y-6 content-start pt-8 md:pt-0 border-t border-white/10 md:border-0">
         {meta.map(([label, value]) => (
