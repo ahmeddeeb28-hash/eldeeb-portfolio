@@ -215,18 +215,24 @@ const AUDIT: [string, string][] = [
 
 // one picture per process step, in the order of PROCESS
 const PROCESS_VISUALS = [
-  <DiagnosisVisual key="d" problems={PROBLEMS.map((p) => p.k)} rungs={RUNGS.map((r) => r.t)} />,
+  <DiagnosisVisual
+    key="d"
+    problems={PROBLEMS.map((p) => p.k)}
+    rungs={RUNGS.map((r) => r.t)}
+    // opaque logic → Understand; one-way door → Preview, Commit, Reverse; silent → Monitor
+    answers={[[0], [1, 2, 4], [3]]}
+  />,
   <AgreedVisual
     key="a"
     cols={[
-      ['Feature', ['Read', 'Preview in 3 modes', 'Test', 'Undo']],
-      ['Utilization', ['Activation rate', 'Time to first strategy']],
-      ['Impact', ['Revenue lift', 'Profit lift', '7-day disable rate']],
+      { k: 'Feature', items: ['Read', 'Preview in 3 modes', 'Test', 'Undo'], full: AGREED[0][1] },
+      { k: 'Utilization', items: ['Activation rate', 'Time to first strategy'], full: AGREED[1][1] },
+      { k: 'Impact', items: ['Revenue lift', 'Profit lift', '7-day disable rate'], full: AGREED[2][1] },
     ]}
   />,
   <PrototypeVisual key="p" />,
   <FixesVisual key="f" fixes={AUDIT.slice(0, 3)} />,
-  <RulesVisual key="r" />,
+  <RulesVisual key="r" rules={RULES} />,
 ];
 
 function Ladder({ onPick, active }: { onPick: (i: number) => void; active: number }) {
