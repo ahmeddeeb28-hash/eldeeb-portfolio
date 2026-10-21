@@ -368,12 +368,9 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           >
             <CaseIntro
               meta={[
+                ['Company', 'Sary'],
                 ['Role', 'Lead Product Designer'],
-                ['Platform', 'Mobile app'],
-                ['Market', 'Saudi Arabia · B2B grocery'],
-                ['User', 'Grocery store owners'],
                 ['Year', '2022'],
-                ['Deliverables', '5 screens · motion · film'],
               ]}
               title="Restock in 3 taps, not 39."
             >

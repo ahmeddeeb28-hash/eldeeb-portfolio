@@ -54,11 +54,9 @@ export function SaryReportCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
             <CaseIntro
               meta={[
+                ['Company', 'Sary'],
                 ['Role', 'Senior Product Designer · Experience Design'],
-                ['Product', 'Sary app · B2B grocery'],
-                ['Market', 'Saudi Arabia'],
-                ['Period', 'Q4 2022 (Oct to Dec)'],
-                ['Scope', '7 journeys, reported quarterly'],
+                ['Year', 'Q4 2022'],
               ]}
               title="Only 9.63% of shoppers reached Discover."
             >
