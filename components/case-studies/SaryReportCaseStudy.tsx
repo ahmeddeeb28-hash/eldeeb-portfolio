@@ -117,15 +117,20 @@ export function SaryReportCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
         <ChapterTitle chapter={CHAPTERS[2]} />
         <section id="conversion" className="mb-32 scroll-mt-24">
           <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-4">
-            Next I put each campaign surface next to the quarter before.
+            Next I put each campaign surface next to the quarter before. Switch the quarter to read each one.
           </motion.p>
-          <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] mb-4 max-w-3xl">
-            The pop-up held. Banners slipped.
-          </motion.h2>
-          <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-10">
-            Switch the quarter to compare. Banners stayed under our best quarter, Q2.
-          </motion.p>
-          <ConversionTiles />
+          <ConversionTiles
+            story={{
+              Q4: {
+                h: 'Banners slipped. The pop-up held near 40%.',
+                d: 'Banners fell 1.7 points from Q3 to 13.8%, still under our best quarter, Q2, at 16.7%. The pop-up dipped 1.6 points but still reached 13,565 shoppers. Sliders were new this quarter, and 63.1% of catalogue visitors used one.',
+              },
+              Q3: {
+                h: 'Before the slip: banners at 15.5%, the pop-up at 40.8%.',
+                d: 'Banners were already under Q2’s 16.7%. The pop-up was the strongest surface, reaching 15,169 of 37,180 shoppers. Section sliders were not live yet.',
+              },
+            }}
+          />
         </section>
 
         {/* ── 04 HEATMAPS ── */}

@@ -203,7 +203,8 @@ export function Rate({ v, run, delay = 0 }: { v: number; run: boolean; delay?: n
   return <>{val >= 10 ? val.toFixed(1) : val.toFixed(2)}%</>;
 }
 
-export function ConversionTiles() {
+/* the story above the tiles follows the quarter switch */
+export function ConversionTiles({ story }: { story?: Record<Quarter, { h: string; d: string }> }) {
   const [q, setQ] = useState<Quarter>('Q4');
   const ref = useRef<HTMLDivElement>(null);
   const seen = useInView(ref, { once: true, margin: '-15% 0px' });
@@ -223,6 +224,22 @@ export function ConversionTiles() {
           </button>
         ))}
       </div>
+      {story && (
+        <div className="min-h-[200px] md:min-h-[190px] mb-8">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={q}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <h2 className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] mb-4 max-w-4xl">{story[q].h}</h2>
+              <p className="text-white/55 text-base md:text-lg leading-relaxed max-w-3xl">{story[q].d}</p>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {TILES.map((t, i) => {
           const cur = t.q[q];
