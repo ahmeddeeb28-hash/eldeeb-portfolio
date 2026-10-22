@@ -33,6 +33,7 @@ import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { HIDDEN_PROJECTS } from './case-studies/registry';
 import { track } from '../lib/analytics';
+import { CaseReel } from './CaseReel';
 
 /* Live animated thumbnails, fetched only when their row renders. */
 const FreshCardStage = lazy(() =>
@@ -407,185 +408,11 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
         </motion.p>
       </div>
 
-      {/* ── PROJECTS STACK ──────────────────────────────────────────────
-         Sticky timeline rail (left) sits beside the content column of
-         project rows (right). The rail's fill line progresses as
-         the whole section scrolls; year+node markers highlight when
-         their project enters the central active band. Each row still
-         has its own big inline year + hairline rule + category label
-         header, and its own subtle image parallax so the scroll reads
-         continuous — not snapped.
-         ────────────────────────────────────────────────────────────────── */}
-      <div
-        ref={stackRef}
-        className="relative mx-auto flex flex-col"
-        style={{
-          maxWidth: 1240,
-          padding: '0 24px 120px',
-        }}
-      >
-        {/* ── CONNECTING RAIL — continuous, spans the whole stack ────
-           A single grey hairline runs top-to-bottom behind every rail
-           marker, so the years read as one connected timeline instead
-           of four disconnected labels. The teal fill scales down the
-           same line, driven by the whole-stack scroll progress — so
-           the fill grows naturally as you move through the section
-           and never leaves a gap between markers.
-           ────────────────────────────────────────────────────────────── */}
-        <div
-          aria-hidden
-          className="hidden md:block"
-          style={{
-            position: 'absolute',
-            left: 24 + 5, // outer padding (24) + dot half-width offset
-            top: 4,
-            bottom: 124, // clears the section's bottom padding
-            width: 1,
-            background: 'rgba(255,255,255,0.08)',
-            pointerEvents: 'none',
-          }}
-        />
-        <motion.div
-          aria-hidden
-          className="hidden md:block"
-          style={{
-            position: 'absolute',
-            left: 24 + 5,
-            top: 4,
-            bottom: 124,
-            width: 1,
-            background:
-              'linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.35) 100%)',
-            transformOrigin: 'top',
-            scaleY: reduced ? 1 : railFillScaleY,
-            pointerEvents: 'none',
-          }}
-        />
-
-        {/* ── PROJECT ROWS: each row is its OWN two-column flex ────────
-           Ben Shih's rail pattern relies on each sticky year label being
-           bounded by ITS project's row — not one big shared container.
-           That's why we render one per-project row here, each a flex row
-           with [sticky marker | content]. The sticky element's containing
-           block is this row, so the year pins at top:96 for exactly as
-           long as its project is scrolling past, then hands off cleanly
-           to the next row's year. The continuous grey line + progressive
-           teal fill above are still absolute-positioned over the stack,
-           so the rail visually reads as one line the entire way down.
-           ────────────────────────────────────────────────────────────── */}
-        {projects.map((p, i) => {
-          const isRailActive = activeIndex === i;
-          const rowMarginTop = i === 0 ? 0 : 128;
-          return (
-            <div
-              key={p.id}
-              className="flex flex-col md:flex-row"
-              style={{
-                marginTop: rowMarginTop,
-                columnGap: 36,
-                alignItems: 'flex-start',
-              }}
-            >
-              {/* Rail marker cell — STICKY, bounded by this row.
-                 As the reader scrolls into this project the year pins at
-                 top:96; when the row's bottom passes the sticky point it
-                 releases and the next project's year begins its own
-                 journey. This is the exact Ben Shih pattern. */}
-              <div
-                className="hidden md:flex"
-                style={{
-                  flex: '0 0 120px',
-                  alignSelf: 'flex-start',
-                  alignItems: 'center',
-                  gap: 18,
-                  // No marginLeft — cell starts flush with the section
-                  // padding-left (24px). Dot is 11px wide → its centre lands
-                  // at 24 + 5.5 = 29.5px, which is exactly the centre of the
-                  // 1px vertical line at left:29. Pixel-perfect handshake.
-                  paddingTop: 4,
-                  position: 'sticky',
-                  top: 96, // clears the ~80px nav + a little breathing room
-                  zIndex: 2,
-                }}
-              >
-                {/* Node dot — a filled teal disc when the row is active,
-                   a hollow ring when idle. Same 11px footprint in either
-                   state so the vertical line threads cleanly through
-                   every node (no bounce, no size shift, no drift). */}
-                <motion.span
-                  aria-hidden
-                  initial={false}
-                  animate={{
-                    backgroundColor: isRailActive
-                      ? '#FFFFFF'
-                      : '#0A0A0A', // sit on top of the line
-                    borderColor: isRailActive
-                      ? '#FFFFFF'
-                      : 'rgba(255,255,255,0.55)',
-                    boxShadow: isRailActive
-                      ? '0 0 0 4px rgba(255,255,255,0.12)'
-                      : '0 0 0 0 rgba(255,255,255,0)',
-                  }}
-                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                  style={{
-                    display: 'inline-block',
-                    width: 11,
-                    height: 11,
-                    borderRadius: '50%',
-                    border: '1.5px solid rgba(255,255,255,0.55)',
-                    backgroundColor: '#0A0A0A',
-                    boxSizing: 'border-box',
-                    flexShrink: 0,
-                  }}
-                />
-                {/* Year label. Tabular numerics keep the column of digits
-                   aligned down the rail. */}
-                <motion.span
-                  initial={false}
-                  animate={{
-                    color: isRailActive
-                      ? 'rgba(255,255,255,0.98)'
-                      : 'rgba(255,255,255,0.42)',
-                    fontSize: isRailActive ? 28 : 24,
-                  }}
-                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                  style={{
-                    fontFamily: 'Inter, system-ui, sans-serif',
-                    fontFeatureSettings: '"tnum" 1',
-                    fontWeight: 700,
-                    fontSize: 24,
-                    letterSpacing: '-0.02em',
-                    lineHeight: 1,
-                    color: 'rgba(255,255,255,0.42)',
-                    display: 'inline-block',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {p.year}
-                </motion.span>
-              </div>
-
-              {/* Content cell — the project itself. Flex-1 so it fills the
-                 remaining width of this row's two-column layout. */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <ProjectRow
-                  project={p}
-                  index={i}
-                  isActive={activeIndex === i}
-                  reduced={!!reduced}
-                  paused={paused}
-                  onClick={
-                    onProjectClick && p.hasStudy
-                      ? () => onProjectClick(p.id)
-                      : undefined
-                  }
-                  rowRef={(el) => (rowRefs.current[i] = el)}
-                />
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      {/* ── PROJECTS ─────────────────────────────────────────────────────
+         The case reel: large panels set left and right in turn, each
+         playing its own story as it scrolls in. The earlier timeline
+         rows (ProjectRow below) are kept for reference but not shown. */}
+      <CaseReel projects={projects} onOpen={onProjectClick} />
     </section>
   );
 }
