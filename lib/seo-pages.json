@@ -1,0 +1,47 @@
+{
+  "site": "https://deeb.design",
+  "pages": {
+    "/": {
+      "title": "Ahmad Eldeeb — Lead Product Designer · AI & Data Science",
+      "description": "Research-driven product design at the intersection of design, artificial intelligence, and human-centered thinking.",
+      "image": "/og-image.png",
+      "imageAlt": "Ahmad Eldeeb — Lead Product Designer. Driving growth and AI.",
+      "type": "website"
+    },
+    "/about": {
+      "title": "My Story · Ahmad Eldeeb",
+      "description": "I lead product design teams and design digital products, design systems and AI tools. My work spans e-commerce, SaaS, fintech, AI and gaming, with teams across Europe and the Gulf.",
+      "image": "/og-image.png",
+      "imageAlt": "Ahmad Eldeeb — Lead Product Designer",
+      "type": "profile"
+    },
+    "/work/sary-repeat-customers": {
+      "title": "Sary Buy Again: Restock in 3 taps, not 39 · Ahmad Eldeeb",
+      "description": "Restocking 18 usual items went from 39 taps to 3. A Buy Again hub for grocery stores lifted repeat purchases 28% and order value 27%.",
+      "image": "/og/sary-repeat-customers.jpg",
+      "imageAlt": "Sary Buy Again case study: the Buy Again hub, with repeat purchases up 28%",
+      "type": "article"
+    },
+    "/work/sary-usability-report": {
+      "title": "Sary Usability Report: only 9.63% reached Discover · Ahmad Eldeeb",
+      "description": "Only 9.63% of shoppers reached Discover. My quarterly report on funnels, conversion and heatmaps, rebuilt with AI as a live page.",
+      "image": "/og/sary-usability-report.jpg",
+      "imageAlt": "Sary usability report case study: the funnel from 34,860 shoppers to 3,357",
+      "type": "article"
+    },
+    "/work/sampo-ai-pricing": {
+      "title": "Sampo AI: pricing merchants can trust · Ahmad Eldeeb",
+      "description": "An AI that sets store prices, made trustworthy: every strategy explained, A/B tested in three modes before anything goes live, and undone in one click.",
+      "image": "/og/sampo-ai-pricing.jpg",
+      "imageAlt": "Sampo AI pricing case study: the mode selector, tested before going live",
+      "type": "article"
+    },
+    "/work/fresh-order-placed": {
+      "title": "fresh: the five seconds after Pay · Ahmad Eldeeb",
+      "description": "I replaced the spinner after Pay with a 5 second window to fix the address or items, then a direct handoff to tracking.",
+      "image": "/og/fresh-order-placed.jpg",
+      "imageAlt": "fresh order placed case study: the placed screen, straight on to tracking",
+      "type": "article"
+    }
+  }
+}

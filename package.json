@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "npm run prefetch && vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/og-pages.mjs",
     "preview": "vite preview",
     "prefetch": "npx tsx scripts/prefetch-case-studies.ts",
     "migrate:sary": "npx tsx scripts/migrate-sary.ts",
