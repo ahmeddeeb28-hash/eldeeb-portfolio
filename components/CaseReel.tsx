@@ -254,50 +254,6 @@ const LOCKUP: Record<string, (th: Theme) => ReactNode> = {
   'fresh-order-placed': () => <FreshWord color="#0E7A4E" size={26} />,
 };
 
-/* the large mark behind each card, rising into place with its story */
-const BIG_MARK: Record<string, ReactNode> = {
-  'sary-repeat-customers': (
-    <svg viewBox="0 0 64 32" className="w-full h-full">
-      <path fillRule="evenodd" clipRule="evenodd" d={SARY_LOGO_PATH} fill="#fff" />
-    </svg>
-  ),
-  'sary-usability-report': (
-    <svg viewBox="0 0 64 32" className="w-full h-full">
-      <path fillRule="evenodd" clipRule="evenodd" d={SARY_LOGO_PATH} fill="#1E3A8A" />
-    </svg>
-  ),
-  'sampo-ai-pricing': (
-    <span className="grid place-items-center w-full h-full rounded-[28%] font-black italic text-white" style={{ background: 'linear-gradient(135deg, #5B54F0, #4338CA)', fontSize: '1em' }}>
-      S
-    </span>
-  ),
-  'fresh-order-placed': <FreshWord color="#0E7A4E" size="1em" />,
-};
-const BIG_PLACE: Record<string, string> = {
-  'sary-repeat-customers': 'left-[-4%] bottom-[-10%] w-[58%] aspect-[2/1]',
-  'sary-usability-report': 'right-[2%] bottom-[-6%] w-[44%] aspect-[2/1]',
-  'sampo-ai-pricing': 'left-[-5%] bottom-[-14%] w-[30%] aspect-square text-[clamp(120px,16vw,260px)] -rotate-12',
-  'fresh-order-placed': 'left-[-3%] bottom-[-7%] text-[clamp(110px,15vw,240px)]',
-};
-const BIG_FADE: Record<string, string> = {
-  'sary-repeat-customers': 'opacity-[0.09]',
-  'sary-usability-report': 'opacity-[0.06]',
-  'sampo-ai-pricing': 'opacity-[0.14]',
-  'fresh-order-placed': 'opacity-[0.1]',
-};
-
-function BigMark({ id, p }: { id: string; p: MotionValue<number> }) {
-  const y = useTransform(p, [0, 0.6], [60, 0], { clamp: true });
-  const scale = useTransform(p, [0, 0.6], [0.88, 1], { clamp: true });
-  const opacity = useTransform(p, [0, 0.35], [0, 1], { clamp: true });
-  if (!BIG_MARK[id]) return null;
-  return (
-    <motion.div aria-hidden className={`pointer-events-none absolute ${BIG_PLACE[id]}`} style={{ y, scale, opacity }}>
-      <div className={`w-full h-full ${BIG_FADE[id]}`}>{BIG_MARK[id]}</div>
-    </motion.div>
-  );
-}
-
 /* ── themes: each card dressed in its own product ───────────────────
    Sary in its navy with the wordmark, the report as a printed page,
    Sampo in indigo with its mode dial, fresh in its own mint. One
@@ -357,12 +313,6 @@ const THEMES: Record<string, Theme> = {
     btn: { bg: '#8B85FF', ink: '#14122B' },
     beatOn: '#8B85FF',
     beatOff: 'rgba(139,133,255,0.2)',
-    decor: (
-      <svg viewBox="0 0 200 110" aria-hidden className="absolute right-[6%] top-[6%] w-[46%] opacity-[0.16] pointer-events-none">
-        <path d="M10 100 A90 90 0 0 1 190 100" fill="none" stroke="#CFCBFF" strokeWidth="2" />
-        <path d="M30 100 A70 70 0 0 1 170 100" fill="none" stroke="#CFCBFF" strokeWidth="10" strokeLinecap="round" strokeDasharray="160 400" />
-      </svg>
-    ),
   },
   'fresh-order-placed': {
     bg: 'radial-gradient(ellipse 70% 80% at 85% 15%, #CFF3DD 0%, transparent 60%), linear-gradient(160deg, #EAF8F0 0%, #D6F0E1 100%)',
@@ -375,12 +325,6 @@ const THEMES: Record<string, Theme> = {
     btn: { bg: '#0E7A4E', ink: '#FFFFFF' },
     beatOn: '#0E7A4E',
     beatOff: 'rgba(14,122,78,0.18)',
-    decor: (
-      <svg viewBox="0 0 100 100" aria-hidden className="absolute -left-[8%] -bottom-[22%] w-[48%] opacity-[0.12] pointer-events-none -rotate-90">
-        <circle cx="50" cy="50" r="44" fill="none" stroke="#0E7A4E" strokeWidth="1.2" />
-        <circle cx="50" cy="50" r="44" fill="none" stroke="#0E7A4E" strokeWidth="5" strokeLinecap="round" strokeDasharray="190 400" />
-      </svg>
-    ),
   },
 };
 
@@ -499,12 +443,17 @@ function Card({
         }}
       >
         {th.decor}
-        <BigMark id={project.id} p={story} />
         {/* the story side */}
         <div className="relative z-10 flex flex-col justify-between gap-5 p-6 md:p-10 lg:p-12">
           <div>
-            {LOCKUP[project.id] && <div className="mb-5 md:mb-7">{LOCKUP[project.id](th)}</div>}
-            {project.category && <p className="text-sm md:text-base mb-4" style={{ color: th.kicker }}>{project.category}</p>}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5 md:mb-6">
+              {LOCKUP[project.id] && LOCKUP[project.id](th)}
+              {project.category && (
+                <span className="text-sm md:text-base" style={{ color: th.kicker }}>
+                  {project.category}
+                </span>
+              )}
+            </div>
             <h3 className="font-extrabold tracking-[-0.055em] leading-[0.92]" style={{ fontSize: 'clamp(38px, 5.2vw, 92px)', color: th.ink }}>{copy.name}</h3>
             <p className="text-base md:text-xl leading-snug mt-4 md:mt-5 max-w-xl tracking-[-0.01em]" style={{ color: th.sub }}>{copy.line}</p>
           </div>
