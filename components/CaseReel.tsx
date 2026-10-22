@@ -24,6 +24,31 @@ import { track } from '../lib/analytics';
 
 type Project = { id: string; title: string; category?: string; hasStudy?: boolean };
 
+/* real figures from each case study; `lead` is drawn larger */
+type Stat = { v: number; pre?: string; suf?: string; dp?: number; k: string; note?: string };
+const STATS: Record<string, Stat[]> = {
+  'sary-repeat-customers': [
+    { v: 28, pre: '+', suf: '%', k: 'Repeat purchases' },
+    { v: 27, pre: '+', suf: '%', k: 'Average order value' },
+    { v: 42, pre: '+', suf: '%', k: 'Use of suggestions' },
+  ],
+  'sary-usability-report': [
+    { v: 9.63, suf: '%', dp: 2, k: 'Reached Discover' },
+    { v: 34860, k: 'Opened the catalogue' },
+    { v: 63.1, suf: '%', dp: 1, k: 'Used a section slider' },
+  ],
+  'sampo-ai-pricing': [
+    { v: 17, pre: '+', suf: '%', k: 'Winning mode, revenue', note: 'sample test' },
+    { v: 3, k: 'Modes tested before live' },
+    { v: 1, k: 'Click to undo' },
+  ],
+  'fresh-order-placed': [
+    { v: 5, suf: 's', k: 'To fix the order after Pay' },
+    { v: 9, k: 'Designed states' },
+    { v: 1, k: 'Clock for ring and cancel' },
+  ],
+};
+
 const COPY: Record<string, { name: string; line: string; tint: string; beats: string[] }> = {
   'sary-repeat-customers': {
     name: 'Sary Buy Again',
@@ -179,6 +204,36 @@ const STAGE: Record<string, (props: { p: MotionValue<number> }) => ReactNode> = 
   'fresh-order-placed': FreshStage,
 };
 
+/* the numbers count up with the card's story */
+function Stats({ p, stats, tint }: { p: MotionValue<number>; stats: Stat[]; tint: string }) {
+  const v = useStep(p);
+  const t = clamp01(v / 0.45);
+  const eased = 1 - Math.pow(1 - t, 3);
+  const show = (s: Stat) => {
+    const n = s.v * eased;
+    const body = s.dp ? n.toFixed(s.dp) : Math.round(n).toLocaleString('en-US');
+    return `${s.pre ?? ''}${body}${s.suf ?? ''}`;
+  };
+  const [lead, ...rest] = stats;
+  return (
+    <div className="grid grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,1fr)] gap-2.5">
+      <div className="rounded-2xl p-4 md:p-5 border border-white/10" style={{ background: `linear-gradient(160deg, ${tint}66, rgba(255,255,255,0.03))` }}>
+        <p className="text-white font-semibold tabular-nums leading-none tracking-[-0.04em] text-3xl md:text-[44px]">{show(lead)}</p>
+        <p className="text-white/70 text-xs md:text-[13px] mt-2 leading-snug">
+          {lead.k}
+          {lead.note && <span className="text-white/40"> · {lead.note}</span>}
+        </p>
+      </div>
+      {rest.map((s2) => (
+        <div key={s2.k} className="rounded-2xl p-4 md:p-5 border border-white/[0.07] bg-white/[0.035]">
+          <p className="text-white font-semibold tabular-nums leading-none tracking-[-0.03em] text-2xl md:text-[30px]">{show(s2)}</p>
+          <p className="text-white/50 text-xs md:text-[13px] mt-2 leading-snug">{s2.k}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /* ── one card ──────────────────────────────────────────────────────── */
 
 const STICK = 88; // under the floating nav
@@ -241,11 +296,11 @@ function Card({
     <motion.div
       ref={ref}
       className="sticky w-full"
-      style={{ top: STICK + i * 12, height: `min(760px, calc(100svh - ${STICK + 24 + (n - 1) * 12}px))`, zIndex: i + 1, marginBottom: i < n - 1 ? `${GAP_VH * 100}svh` : 0 }}
+      style={{ top: STICK + i * 12, height: `min(880px, calc(100svh - ${STICK + 16 + (n - 1) * 12}px))`, zIndex: i + 1, marginBottom: i < n - 1 ? `${GAP_VH * 100}svh` : 0 }}
     >
       <motion.div
         onClick={onOpen}
-        className={`relative h-full w-full overflow-hidden rounded-[28px] border border-white/[0.08] grid grid-rows-[auto_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.4fr)] ${onOpen ? 'cursor-pointer' : ''}`}
+        className={`relative h-full w-full overflow-hidden rounded-[28px] border border-white/[0.08] grid grid-rows-[auto_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] ${onOpen ? 'cursor-pointer' : ''}`}
         style={{
           x: reduced ? 0 : x,
           rotate: reduced ? 0 : rot,
@@ -256,12 +311,17 @@ function Card({
         }}
       >
         {/* the story side */}
-        <div className="relative z-10 flex flex-col justify-between gap-5 p-6 md:p-10">
+        <div className="relative z-10 flex flex-col justify-between gap-5 p-6 md:p-10 lg:p-12">
           <div>
             {project.category && <p className="text-white/45 text-xs md:text-sm mb-3">{project.category}</p>}
             <h3 className="text-white text-2xl md:text-4xl font-semibold tracking-[-0.03em] leading-tight">{copy.name}</h3>
             <p className="text-white/55 text-sm md:text-base leading-relaxed mt-3 max-w-md">{copy.line}</p>
           </div>
+          {STATS[project.id] && (
+            <div className="hidden sm:block">
+              <Stats p={story} stats={STATS[project.id]} tint={copy.tint} />
+            </div>
+          )}
           <div className="grid gap-5">
             <div className="hidden md:block">
               <Beat p={story} beats={copy.beats} />
@@ -335,7 +395,7 @@ export function CaseReel({ projects, onOpen }: { projects: (Project & { category
   );
 
   return (
-    <div ref={ref} className="relative mx-auto max-w-[1240px] px-4 md:px-6 pb-24">
+    <div ref={ref} className="relative mx-auto max-w-[1440px] px-3 md:px-6 pb-24">
       {list.map((p, i) => (
         <Card key={p.id} project={p} i={i} n={n} enter={enters[i]} story={stories[i]} cover={covers[i]} onOpen={onOpen && p.hasStudy ? () => onOpen(p.id) : undefined} />
       ))}
