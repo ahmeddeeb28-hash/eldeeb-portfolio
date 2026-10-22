@@ -218,16 +218,16 @@ function Stats({ p, stats, tint }: { p: MotionValue<number>; stats: Stat[]; tint
   return (
     <div className="grid grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,1fr)] gap-2.5">
       <div className="rounded-2xl p-4 md:p-5 border border-white/10" style={{ background: `linear-gradient(160deg, ${tint}66, rgba(255,255,255,0.03))` }}>
-        <p className="text-white font-semibold tabular-nums leading-none tracking-[-0.04em] text-3xl md:text-[44px]">{show(lead)}</p>
-        <p className="text-white/70 text-xs md:text-[13px] mt-2 leading-snug">
+        <p className="text-white font-semibold tabular-nums leading-none tracking-[-0.05em] text-4xl md:text-[clamp(40px,4vw,64px)]">{show(lead)}</p>
+        <p className="text-white/70 text-xs md:text-sm mt-2.5 leading-snug">
           {lead.k}
           {lead.note && <span className="text-white/40"> · {lead.note}</span>}
         </p>
       </div>
       {rest.map((s2) => (
         <div key={s2.k} className="rounded-2xl p-4 md:p-5 border border-white/[0.07] bg-white/[0.035]">
-          <p className="text-white font-semibold tabular-nums leading-none tracking-[-0.03em] text-2xl md:text-[30px]">{show(s2)}</p>
-          <p className="text-white/50 text-xs md:text-[13px] mt-2 leading-snug">{s2.k}</p>
+          <p className="text-white font-semibold tabular-nums leading-none tracking-[-0.04em] text-3xl md:text-[clamp(28px,2.6vw,42px)]">{show(s2)}</p>
+          <p className="text-white/50 text-xs md:text-sm mt-2.5 leading-snug">{s2.k}</p>
         </div>
       ))}
     </div>
@@ -245,7 +245,7 @@ function Beat({ p, beats }: { p: MotionValue<number>; beats: string[] }) {
   return (
     <div className="min-h-[3.2em]">
       <AnimatePresence mode="wait" initial={false}>
-        <motion.p key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="text-white/80 text-[15px] md:text-base leading-snug">
+        <motion.p key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="text-white/85 text-base md:text-xl leading-snug tracking-[-0.01em]">
           {beats[i]}
         </motion.p>
       </AnimatePresence>
@@ -300,7 +300,7 @@ function Card({
     >
       <motion.div
         onClick={onOpen}
-        className={`relative h-full w-full overflow-hidden rounded-[28px] border border-white/[0.08] grid grid-rows-[auto_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] ${onOpen ? 'cursor-pointer' : ''}`}
+        className={`relative h-full w-full overflow-hidden rounded-[28px] border border-white/[0.08] grid grid-rows-[auto_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1.2fr)] ${onOpen ? 'cursor-pointer' : ''}`}
         style={{
           x: reduced ? 0 : x,
           rotate: reduced ? 0 : rot,
@@ -313,9 +313,9 @@ function Card({
         {/* the story side */}
         <div className="relative z-10 flex flex-col justify-between gap-5 p-6 md:p-10 lg:p-12">
           <div>
-            {project.category && <p className="text-white/45 text-xs md:text-sm mb-3">{project.category}</p>}
-            <h3 className="text-white text-2xl md:text-4xl font-semibold tracking-[-0.03em] leading-tight">{copy.name}</h3>
-            <p className="text-white/55 text-sm md:text-base leading-relaxed mt-3 max-w-md">{copy.line}</p>
+            {project.category && <p className="text-white/45 text-sm md:text-base mb-4">{project.category}</p>}
+            <h3 className="text-white font-semibold tracking-[-0.045em] leading-[0.95]" style={{ fontSize: 'clamp(34px, 4.6vw, 80px)' }}>{copy.name}</h3>
+            <p className="text-white/60 text-base md:text-xl leading-snug mt-4 md:mt-5 max-w-xl tracking-[-0.01em]">{copy.line}</p>
           </div>
           {STATS[project.id] && (
             <div className="hidden sm:block">
@@ -333,7 +333,7 @@ function Card({
                   e.stopPropagation();
                   onOpen();
                 }}
-                className="group w-fit inline-flex items-center gap-2 rounded-full bg-white text-[#0A0A0A] text-sm font-semibold pl-5 pr-4 py-2.5 transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="group w-fit inline-flex items-center gap-2 rounded-full bg-white text-[#0A0A0A] text-[15px] font-semibold pl-6 pr-5 py-3 transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 View case
                 <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
