@@ -215,11 +215,11 @@ function SaryWord({ color, h }: { color: string; h: number }) {
   );
 }
 
-function SampoSquare({ size }: { size: number }) {
+function SampoSquare({ size, color, cut }: { size: number; color: string; cut: string }) {
   return (
     <span
-      className="grid place-items-center text-white font-black italic flex-none"
-      style={{ width: size, height: size, borderRadius: size * 0.28, fontSize: size * 0.56, background: 'linear-gradient(135deg, #5B54F0, #4338CA)', boxShadow: '0 8px 20px -8px rgba(67,56,202,0.8)' }}
+      className="grid place-items-center font-black italic flex-none"
+      style={{ width: size, height: size, borderRadius: size * 0.28, fontSize: size * 0.56, background: color, color: cut }}
     >
       S
     </span>
@@ -235,23 +235,56 @@ function FreshWord({ color, size }: { color: string; size: number | string }) {
   );
 }
 
+/* The logo is stamped into the card: a slightly deeper tone of the
+   card's own colour, a thin highlight on its lower edge and a soft
+   shade on its upper edge, as if pressed into the surface. Done with
+   drop-shadows so it works in every browser; the brand is still named
+   for screen readers. */
+type Engrave = { ink: string; cut: string; filter: string };
+const ENGRAVE: Record<string, Engrave> = {
+  'sary-repeat-customers': {
+    ink: 'rgba(5,12,44,0.62)',
+    cut: '#1A3384',
+    filter: 'drop-shadow(0 1px 0 rgba(255,255,255,0.3)) drop-shadow(0 -1px 0 rgba(0,0,0,0.45))',
+  },
+  'sary-usability-report': {
+    ink: 'rgba(30,58,138,0.26)',
+    cut: '#EEF4FB',
+    filter: 'drop-shadow(0 1px 0 rgba(255,255,255,1)) drop-shadow(0 -1px 0 rgba(15,27,61,0.28))',
+  },
+  'sampo-ai-pricing': {
+    ink: 'rgba(6,4,26,0.6)',
+    cut: '#2C2378',
+    filter: 'drop-shadow(0 1px 0 rgba(207,203,255,0.38)) drop-shadow(0 -1px 0 rgba(0,0,0,0.5))',
+  },
+  'fresh-order-placed': {
+    ink: 'rgba(14,92,58,0.3)',
+    cut: '#E3F5EA',
+    filter: 'drop-shadow(0 1px 0 rgba(255,255,255,0.95)) drop-shadow(0 -1px 0 rgba(10,61,39,0.28))',
+  },
+};
+
 /* the lockup at the top of each card */
-const LOCKUP: Record<string, (th: Theme) => ReactNode> = {
-  'sary-repeat-customers': () => <SaryWord color="#fff" h={36} />,
-  'sary-usability-report': () => (
+const LOCKUP: Record<string, (e: Engrave) => ReactNode> = {
+  'sary-repeat-customers': (e) => <SaryWord color={e.ink} h={40} />,
+  'sary-usability-report': (e) => (
     <span className="inline-flex items-center gap-2.5">
-      <SaryWord color="#1E3A8A" h={34} />
-      <span className="h-4 w-px bg-[#1E3A8A]/25" />
-      <span className="text-[#1E3A8A] text-sm font-semibold">Q4 ’22 report</span>
+      <SaryWord color={e.ink} h={38} />
+      <span className="h-5 w-[2px] rounded-full" style={{ background: e.ink }} />
+      <span className="text-[15px] font-bold" style={{ color: e.ink }}>
+        Q4 ’22 report
+      </span>
     </span>
   ),
-  'sampo-ai-pricing': () => (
+  'sampo-ai-pricing': (e) => (
     <span className="inline-flex items-center gap-2.5">
-      <SampoSquare size={30} />
-      <b className="text-white text-[15px] tracking-[0.12em]">SAMPO AI</b>
+      <SampoSquare size={32} color={e.ink} cut={e.cut} />
+      <b className="text-[16px] tracking-[0.12em]" style={{ color: e.ink }}>
+        SAMPO AI
+      </b>
     </span>
   ),
-  'fresh-order-placed': () => <FreshWord color="#0E7A4E" size={26} />,
+  'fresh-order-placed': (e) => <FreshWord color={e.ink} size={30} />,
 };
 
 /* ── themes: each card dressed in its own product ───────────────────
@@ -447,7 +480,11 @@ function Card({
         <div className="relative z-10 flex flex-col justify-between gap-5 p-6 md:p-10 lg:p-12">
           <div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5 md:mb-6">
-              {LOCKUP[project.id] && LOCKUP[project.id](th)}
+              {LOCKUP[project.id] && (
+                <span className="inline-flex" style={{ filter: ENGRAVE[project.id].filter }}>
+                  {LOCKUP[project.id](ENGRAVE[project.id])}
+                </span>
+              )}
               {project.category && (
                 <span className="text-sm md:text-base" style={{ color: th.kicker }}>
                   {project.category}
