@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useInView, useMotionValueEvent, useReducedMotion, useScroll, useTransform, type MotionValue } from 'motion/react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Leaf } from 'lucide-react';
 import { FUNNEL } from './case-studies/report/ReportData';
 import { SaryPhone } from './case-studies/sary/SaryPhone';
 import { FreshPhone, type PhoneState } from './case-studies/fresh/FreshPhone';
@@ -205,6 +205,99 @@ const STAGE: Record<string, (props: { p: MotionValue<number> }) => ReactNode> = 
   'fresh-order-placed': FreshStage,
 };
 
+/* ── the four brand marks ─────────────────────────────────────────── */
+
+function SaryWord({ color, h }: { color: string; h: number }) {
+  return (
+    <svg viewBox="0 0 64 32" style={{ height: h, width: h * 2 }} aria-label="Sary">
+      <path fillRule="evenodd" clipRule="evenodd" d={SARY_LOGO_PATH} fill={color} />
+    </svg>
+  );
+}
+
+function SampoSquare({ size }: { size: number }) {
+  return (
+    <span
+      className="grid place-items-center text-white font-black italic flex-none"
+      style={{ width: size, height: size, borderRadius: size * 0.28, fontSize: size * 0.56, background: 'linear-gradient(135deg, #5B54F0, #4338CA)', boxShadow: '0 8px 20px -8px rgba(67,56,202,0.8)' }}
+    >
+      S
+    </span>
+  );
+}
+
+function FreshWord({ color, size }: { color: string; size: number | string }) {
+  return (
+    <span className="inline-flex items-center gap-[0.12em] font-extrabold tracking-[-0.04em] leading-none" style={{ color, fontSize: size }} aria-label="fresh">
+      <Leaf style={{ width: '0.85em', height: '0.85em' }} strokeWidth={2.6} />
+      fresh
+    </span>
+  );
+}
+
+/* the lockup at the top of each card */
+const LOCKUP: Record<string, (th: Theme) => ReactNode> = {
+  'sary-repeat-customers': () => <SaryWord color="#fff" h={36} />,
+  'sary-usability-report': () => (
+    <span className="inline-flex items-center gap-2.5">
+      <SaryWord color="#1E3A8A" h={34} />
+      <span className="h-4 w-px bg-[#1E3A8A]/25" />
+      <span className="text-[#1E3A8A] text-sm font-semibold">Q4 ’22 report</span>
+    </span>
+  ),
+  'sampo-ai-pricing': () => (
+    <span className="inline-flex items-center gap-2.5">
+      <SampoSquare size={30} />
+      <b className="text-white text-[15px] tracking-[0.12em]">SAMPO AI</b>
+    </span>
+  ),
+  'fresh-order-placed': () => <FreshWord color="#0E7A4E" size={26} />,
+};
+
+/* the large mark behind each card, rising into place with its story */
+const BIG_MARK: Record<string, ReactNode> = {
+  'sary-repeat-customers': (
+    <svg viewBox="0 0 64 32" className="w-full h-full">
+      <path fillRule="evenodd" clipRule="evenodd" d={SARY_LOGO_PATH} fill="#fff" />
+    </svg>
+  ),
+  'sary-usability-report': (
+    <svg viewBox="0 0 64 32" className="w-full h-full">
+      <path fillRule="evenodd" clipRule="evenodd" d={SARY_LOGO_PATH} fill="#1E3A8A" />
+    </svg>
+  ),
+  'sampo-ai-pricing': (
+    <span className="grid place-items-center w-full h-full rounded-[28%] font-black italic text-white" style={{ background: 'linear-gradient(135deg, #5B54F0, #4338CA)', fontSize: '1em' }}>
+      S
+    </span>
+  ),
+  'fresh-order-placed': <FreshWord color="#0E7A4E" size="1em" />,
+};
+const BIG_PLACE: Record<string, string> = {
+  'sary-repeat-customers': 'left-[-4%] bottom-[-10%] w-[58%] aspect-[2/1]',
+  'sary-usability-report': 'right-[2%] bottom-[-6%] w-[44%] aspect-[2/1]',
+  'sampo-ai-pricing': 'left-[-5%] bottom-[-14%] w-[30%] aspect-square text-[clamp(120px,16vw,260px)] -rotate-12',
+  'fresh-order-placed': 'left-[-3%] bottom-[-7%] text-[clamp(110px,15vw,240px)]',
+};
+const BIG_FADE: Record<string, string> = {
+  'sary-repeat-customers': 'opacity-[0.09]',
+  'sary-usability-report': 'opacity-[0.06]',
+  'sampo-ai-pricing': 'opacity-[0.14]',
+  'fresh-order-placed': 'opacity-[0.1]',
+};
+
+function BigMark({ id, p }: { id: string; p: MotionValue<number> }) {
+  const y = useTransform(p, [0, 0.6], [60, 0], { clamp: true });
+  const scale = useTransform(p, [0, 0.6], [0.88, 1], { clamp: true });
+  const opacity = useTransform(p, [0, 0.35], [0, 1], { clamp: true });
+  if (!BIG_MARK[id]) return null;
+  return (
+    <motion.div aria-hidden className={`pointer-events-none absolute ${BIG_PLACE[id]}`} style={{ y, scale, opacity }}>
+      <div className={`w-full h-full ${BIG_FADE[id]}`}>{BIG_MARK[id]}</div>
+    </motion.div>
+  );
+}
+
 /* ── themes: each card dressed in its own product ───────────────────
    Sary in its navy with the wordmark, the report as a printed page,
    Sampo in indigo with its mode dial, fresh in its own mint. One
@@ -235,11 +328,6 @@ const THEMES: Record<string, Theme> = {
     btn: { bg: '#FFFFFF', ink: '#1D368D' },
     beatOn: '#FFFFFF',
     beatOff: 'rgba(255,255,255,0.2)',
-    decor: (
-      <svg viewBox="0 0 64 32" aria-hidden className="absolute -left-[6%] -bottom-[14%] w-[62%] opacity-[0.07] pointer-events-none">
-        <path fillRule="evenodd" clipRule="evenodd" d={SARY_LOGO_PATH} fill="#fff" />
-      </svg>
-    ),
   },
   'sary-usability-report': {
     bg: 'linear-gradient(180deg, #F4F8FC 0%, #E6EEF8 100%)',
@@ -255,9 +343,6 @@ const THEMES: Record<string, Theme> = {
     decor: (
       <>
         <div aria-hidden className="absolute left-0 right-0 top-0 h-1.5 bg-[#1E3A8A] pointer-events-none" />
-        <p aria-hidden className="absolute right-[4%] -bottom-[6%] font-extrabold tracking-[-0.06em] leading-none text-[#1E3A8A] opacity-[0.05] pointer-events-none select-none" style={{ fontSize: 'clamp(140px, 20vw, 320px)' }}>
-          9.63%
-        </p>
       </>
     ),
   },
@@ -414,9 +499,11 @@ function Card({
         }}
       >
         {th.decor}
+        <BigMark id={project.id} p={story} />
         {/* the story side */}
         <div className="relative z-10 flex flex-col justify-between gap-5 p-6 md:p-10 lg:p-12">
           <div>
+            {LOCKUP[project.id] && <div className="mb-5 md:mb-7">{LOCKUP[project.id](th)}</div>}
             {project.category && <p className="text-sm md:text-base mb-4" style={{ color: th.kicker }}>{project.category}</p>}
             <h3 className="font-extrabold tracking-[-0.055em] leading-[0.92]" style={{ fontSize: 'clamp(38px, 5.2vw, 92px)', color: th.ink }}>{copy.name}</h3>
             <p className="text-base md:text-xl leading-snug mt-4 md:mt-5 max-w-xl tracking-[-0.01em]" style={{ color: th.sub }}>{copy.line}</p>
