@@ -235,32 +235,35 @@ function FreshWord({ color, size }: { color: string; size: number | string }) {
   );
 }
 
-/* The logo is stamped into the card: a slightly deeper tone of the
-   card's own colour, a thin highlight on its lower edge and a soft
-   shade on its upper edge, as if pressed into the surface. Done with
+/* The logo is stamped into the card: a tone of the card's own colour,
+   a shade on its upper edge and a thin highlight on its lower edge, as
+   if pressed into the surface. Done with
    drop-shadows so it works in every browser; the brand is still named
    for screen readers. */
 type Engrave = { ink: string; cut: string; filter: string };
+/* Each ink clears 4.5:1 against the card behind it (measured on the
+   colour where the lockup sits), so the logo and the "Q4 ’22 report"
+   text stay readable; the pressed-in look comes from the edges. */
 const ENGRAVE: Record<string, Engrave> = {
   'sary-repeat-customers': {
-    ink: 'rgba(5,12,44,0.62)',
-    cut: '#1A3384',
-    filter: 'drop-shadow(0 1px 0 rgba(255,255,255,0.3)) drop-shadow(0 -1px 0 rgba(0,0,0,0.45))',
+    ink: '#C0C7DF', // 6.4:1 on #1D368D
+    cut: '#1D368D',
+    filter: 'drop-shadow(0 -1px 0 rgba(4,10,40,0.75)) drop-shadow(0 1px 0 rgba(255,255,255,0.14))',
   },
   'sary-usability-report': {
-    ink: 'rgba(30,58,138,0.26)',
-    cut: '#EEF4FB',
-    filter: 'drop-shadow(0 1px 0 rgba(255,255,255,1)) drop-shadow(0 -1px 0 rgba(15,27,61,0.28))',
+    ink: '#4860A1', // 5.6:1 on #F2F6FB
+    cut: '#F2F6FB',
+    filter: 'drop-shadow(0 1px 0 rgba(255,255,255,1)) drop-shadow(0 -1px 0 rgba(15,27,61,0.35))',
   },
   'sampo-ai-pricing': {
-    ink: 'rgba(6,4,26,0.6)',
-    cut: '#2C2378',
-    filter: 'drop-shadow(0 1px 0 rgba(207,203,255,0.38)) drop-shadow(0 -1px 0 rgba(0,0,0,0.5))',
+    ink: '#ACA8DF', // 6.8:1 on #211A60
+    cut: '#211A60',
+    filter: 'drop-shadow(0 -1px 0 rgba(4,2,20,0.8)) drop-shadow(0 1px 0 rgba(207,203,255,0.16))',
   },
   'fresh-order-placed': {
-    ink: 'rgba(14,92,58,0.3)',
-    cut: '#E3F5EA',
-    filter: 'drop-shadow(0 1px 0 rgba(255,255,255,0.95)) drop-shadow(0 -1px 0 rgba(10,61,39,0.28))',
+    ink: '#2E7355', // 5.1:1 on #E6F6ED
+    cut: '#E6F6ED',
+    filter: 'drop-shadow(0 1px 0 rgba(255,255,255,1)) drop-shadow(0 -1px 0 rgba(10,61,39,0.35))',
   },
 };
 
@@ -309,7 +312,7 @@ const THEMES: Record<string, Theme> = {
   'sary-repeat-customers': {
     bg: 'radial-gradient(ellipse 80% 90% at 85% 10%, #2B4BC0 0%, transparent 62%), linear-gradient(160deg, #1D368D 0%, #0E1A47 70%)',
     border: 'rgba(255,255,255,0.16)',
-    kicker: 'rgba(255,255,255,0.55)',
+    kicker: 'rgba(255,255,255,0.66)', // 5.6:1 on the Sary navy
     ink: '#FFFFFF',
     sub: 'rgba(255,255,255,0.7)',
     lead: { bg: '#FFFFFF', ink: '#1D368D', sub: '#4A5A8C', border: 'transparent' },
