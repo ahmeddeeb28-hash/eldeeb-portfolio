@@ -217,8 +217,8 @@ function Stats({ p, stats, tint }: { p: MotionValue<number>; stats: Stat[]; tint
   const [lead, ...rest] = stats;
   return (
     <div className="grid grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,1fr)] gap-2.5">
-      <div className="rounded-2xl p-4 md:p-5 border border-white/10" style={{ background: `linear-gradient(160deg, ${tint}66, rgba(255,255,255,0.03))` }}>
-        <p className="text-white font-semibold tabular-nums leading-none tracking-[-0.05em] text-4xl md:text-[clamp(40px,4vw,64px)]">{show(lead)}</p>
+      <div className="rounded-2xl p-4 md:p-5 border border-white/20 shadow-[0_20px_40px_-20px_rgba(0,0,0,0.7)]" style={{ background: `linear-gradient(160deg, ${tint}, ${tint}33)` }}>
+        <p className="text-white font-extrabold tabular-nums leading-none tracking-[-0.055em] text-4xl md:text-[clamp(44px,4.4vw,72px)]">{show(lead)}</p>
         <p className="text-white/70 text-xs md:text-sm mt-2.5 leading-snug">
           {lead.k}
           {lead.note && <span className="text-white/40"> · {lead.note}</span>}
@@ -226,7 +226,7 @@ function Stats({ p, stats, tint }: { p: MotionValue<number>; stats: Stat[]; tint
       </div>
       {rest.map((s2) => (
         <div key={s2.k} className="rounded-2xl p-4 md:p-5 border border-white/[0.07] bg-white/[0.035]">
-          <p className="text-white font-semibold tabular-nums leading-none tracking-[-0.04em] text-3xl md:text-[clamp(28px,2.6vw,42px)]">{show(s2)}</p>
+          <p className="text-white font-bold tabular-nums leading-none tracking-[-0.045em] text-3xl md:text-[clamp(30px,2.8vw,46px)]">{show(s2)}</p>
           <p className="text-white/50 text-xs md:text-sm mt-2.5 leading-snug">{s2.k}</p>
         </div>
       ))}
@@ -245,7 +245,7 @@ function Beat({ p, beats }: { p: MotionValue<number>; beats: string[] }) {
   return (
     <div className="min-h-[3.2em]">
       <AnimatePresence mode="wait" initial={false}>
-        <motion.p key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="text-white/85 text-base md:text-xl leading-snug tracking-[-0.01em]">
+        <motion.p key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="text-white text-base md:text-xl font-semibold leading-snug tracking-[-0.015em]">
           {beats[i]}
         </motion.p>
       </AnimatePresence>
@@ -300,13 +300,13 @@ function Card({
     >
       <motion.div
         onClick={onOpen}
-        className={`relative h-full w-full overflow-hidden rounded-[28px] border border-white/[0.08] grid grid-rows-[auto_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1.2fr)] ${onOpen ? 'cursor-pointer' : ''}`}
+        className={`relative h-full w-full overflow-hidden rounded-[32px] border border-white/[0.14] grid grid-rows-[auto_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1.2fr)] ${onOpen ? 'cursor-pointer' : ''}`}
         style={{
           x: reduced ? 0 : x,
           rotate: reduced ? 0 : rot,
           scale: reduced ? 1 : scale,
           transformOrigin: right ? '100% 0%' : '0% 0%',
-          background: `radial-gradient(ellipse 70% 80% at ${right ? '15%' : '85%'} 20%, ${copy.tint}B3 0%, transparent 65%), radial-gradient(ellipse 60% 60% at ${right ? '90%' : '10%'} 100%, ${copy.tint}55 0%, transparent 70%), #0F1014`,
+          background: `radial-gradient(ellipse 75% 85% at ${right ? '15%' : '85%'} 15%, ${copy.tint} 0%, transparent 68%), radial-gradient(ellipse 65% 65% at ${right ? '90%' : '10%'} 100%, ${copy.tint}99 0%, transparent 72%), #0D0E12`,
           boxShadow: '0 -30px 60px -30px rgba(0,0,0,0.9)',
         }}
       >
@@ -314,7 +314,7 @@ function Card({
         <div className="relative z-10 flex flex-col justify-between gap-5 p-6 md:p-10 lg:p-12">
           <div>
             {project.category && <p className="text-white/45 text-sm md:text-base mb-4">{project.category}</p>}
-            <h3 className="text-white font-semibold tracking-[-0.045em] leading-[0.95]" style={{ fontSize: 'clamp(34px, 4.6vw, 80px)' }}>{copy.name}</h3>
+            <h3 className="text-white font-extrabold tracking-[-0.055em] leading-[0.92]" style={{ fontSize: 'clamp(38px, 5.2vw, 92px)' }}>{copy.name}</h3>
             <p className="text-white/60 text-base md:text-xl leading-snug mt-4 md:mt-5 max-w-xl tracking-[-0.01em]">{copy.line}</p>
           </div>
           {STATS[project.id] && (
