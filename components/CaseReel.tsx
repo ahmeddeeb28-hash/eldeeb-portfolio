@@ -6,6 +6,7 @@ import { SaryPhone } from './case-studies/sary/SaryPhone';
 import { FreshPhone, type PhoneState } from './case-studies/fresh/FreshPhone';
 import { DesktopFrame, PreviewView, type ModeId } from './case-studies/sampo/SampoUI';
 import { track } from '../lib/analytics';
+import { SARY_LOGO_PATH } from './case-studies/sary/saryLogoPath';
 
 /* ── Case reel ───────────────────────────────────────
    The Work section as one scroll sequence. Each case is a large card
@@ -156,12 +157,12 @@ function ReportStage({ p }: { p: MotionValue<number> }) {
             </div>
           );
         })}
-        <p className="mt-3 text-center text-white">
+        <p className="mt-3 text-center text-[#0F1B3D]">
           <span className="block text-3xl md:text-4xl font-semibold tabular-nums tracking-tight">{Math.round(shown).toLocaleString('en-US')}</span>
-          <span className="text-white/55 text-xs">shoppers {v > 0.62 ? 'reached Discover' : 'still in'}</span>
+          <span className="text-[#5B6478] text-xs">shoppers {v > 0.62 ? 'reached Discover' : 'still in'}</span>
         </p>
       </div>
-      <div className="relative h-[86%] aspect-[318/636] rounded-[28px] overflow-hidden bg-black border-[5px] border-[#1b1d22] shadow-[0_30px_60px_-30px_rgba(0,0,0,0.8)] hidden sm:block" style={{ opacity: 0.25 + 0.75 * heat, transform: `translateY(${(1 - heat) * 16}px)` }}>
+      <div className="relative h-[86%] aspect-[318/636] rounded-[28px] overflow-hidden bg-black border-[5px] border-[#1b1d22] shadow-[0_30px_60px_-30px_rgba(15,27,61,0.55)] hidden sm:block" style={{ opacity: 0.25 + 0.75 * heat, transform: `translateY(${(1 - heat) * 16}px)` }}>
         <img src="/images/case-studies/sary-report/heat-2.webp" alt="" aria-hidden className="w-full h-full object-cover" />
         <span className="absolute left-2 bottom-2 rounded-full bg-black/65 text-white text-[10px] font-semibold px-2 py-0.5">Discover heatmap</span>
       </div>
@@ -204,8 +205,102 @@ const STAGE: Record<string, (props: { p: MotionValue<number> }) => ReactNode> = 
   'fresh-order-placed': FreshStage,
 };
 
+/* ── themes: each card dressed in its own product ───────────────────
+   Sary in its navy with the wordmark, the report as a printed page,
+   Sampo in indigo with its mode dial, fresh in its own mint. One
+   motif each, kept faint, so the screens stay the focus. */
+type Theme = {
+  bg: string;
+  border: string;
+  kicker: string;
+  ink: string;
+  sub: string;
+  lead: { bg: string; ink: string; sub: string; border: string };
+  tile: { bg: string; ink: string; sub: string; border: string };
+  btn: { bg: string; ink: string };
+  beatOn: string;
+  beatOff: string;
+  decor?: ReactNode;
+};
+
+const THEMES: Record<string, Theme> = {
+  'sary-repeat-customers': {
+    bg: 'radial-gradient(ellipse 80% 90% at 85% 10%, #2B4BC0 0%, transparent 62%), linear-gradient(160deg, #1D368D 0%, #0E1A47 70%)',
+    border: 'rgba(255,255,255,0.16)',
+    kicker: 'rgba(255,255,255,0.55)',
+    ink: '#FFFFFF',
+    sub: 'rgba(255,255,255,0.7)',
+    lead: { bg: '#FFFFFF', ink: '#1D368D', sub: '#4A5A8C', border: 'transparent' },
+    tile: { bg: 'rgba(255,255,255,0.1)', ink: '#FFFFFF', sub: 'rgba(255,255,255,0.65)', border: 'rgba(255,255,255,0.14)' },
+    btn: { bg: '#FFFFFF', ink: '#1D368D' },
+    beatOn: '#FFFFFF',
+    beatOff: 'rgba(255,255,255,0.2)',
+    decor: (
+      <svg viewBox="0 0 64 32" aria-hidden className="absolute -left-[6%] -bottom-[14%] w-[62%] opacity-[0.07] pointer-events-none">
+        <path fillRule="evenodd" clipRule="evenodd" d={SARY_LOGO_PATH} fill="#fff" />
+      </svg>
+    ),
+  },
+  'sary-usability-report': {
+    bg: 'linear-gradient(180deg, #F4F8FC 0%, #E6EEF8 100%)',
+    border: 'rgba(30,58,138,0.14)',
+    kicker: '#5B6478',
+    ink: '#0F1B3D',
+    sub: '#3D4A66',
+    lead: { bg: '#1E3A8A', ink: '#FFFFFF', sub: 'rgba(255,255,255,0.75)', border: 'transparent' },
+    tile: { bg: '#FFFFFF', ink: '#1E3A8A', sub: '#5B6478', border: 'rgba(30,58,138,0.12)' },
+    btn: { bg: '#1E3A8A', ink: '#FFFFFF' },
+    beatOn: '#1E3A8A',
+    beatOff: 'rgba(30,58,138,0.15)',
+    decor: (
+      <>
+        <div aria-hidden className="absolute left-0 right-0 top-0 h-1.5 bg-[#1E3A8A] pointer-events-none" />
+        <p aria-hidden className="absolute right-[4%] -bottom-[6%] font-extrabold tracking-[-0.06em] leading-none text-[#1E3A8A] opacity-[0.05] pointer-events-none select-none" style={{ fontSize: 'clamp(140px, 20vw, 320px)' }}>
+          9.63%
+        </p>
+      </>
+    ),
+  },
+  'sampo-ai-pricing': {
+    bg: 'radial-gradient(ellipse 70% 80% at 80% 20%, #4C3FD9 0%, transparent 62%), linear-gradient(160deg, #20185E 0%, #0B0820 75%)',
+    border: 'rgba(139,133,255,0.28)',
+    kicker: 'rgba(207,203,255,0.7)',
+    ink: '#FFFFFF',
+    sub: 'rgba(225,222,255,0.75)',
+    lead: { bg: '#8B85FF', ink: '#14122B', sub: 'rgba(20,18,43,0.7)', border: 'transparent' },
+    tile: { bg: 'rgba(139,133,255,0.12)', ink: '#FFFFFF', sub: 'rgba(207,203,255,0.7)', border: 'rgba(139,133,255,0.25)' },
+    btn: { bg: '#8B85FF', ink: '#14122B' },
+    beatOn: '#8B85FF',
+    beatOff: 'rgba(139,133,255,0.2)',
+    decor: (
+      <svg viewBox="0 0 200 110" aria-hidden className="absolute right-[6%] top-[6%] w-[46%] opacity-[0.16] pointer-events-none">
+        <path d="M10 100 A90 90 0 0 1 190 100" fill="none" stroke="#CFCBFF" strokeWidth="2" />
+        <path d="M30 100 A70 70 0 0 1 170 100" fill="none" stroke="#CFCBFF" strokeWidth="10" strokeLinecap="round" strokeDasharray="160 400" />
+      </svg>
+    ),
+  },
+  'fresh-order-placed': {
+    bg: 'radial-gradient(ellipse 70% 80% at 85% 15%, #CFF3DD 0%, transparent 60%), linear-gradient(160deg, #EAF8F0 0%, #D6F0E1 100%)',
+    border: 'rgba(14,122,78,0.18)',
+    kicker: '#3E7A5C',
+    ink: '#0A3D27',
+    sub: '#2F5E47',
+    lead: { bg: '#0E7A4E', ink: '#FFFFFF', sub: 'rgba(255,255,255,0.8)', border: 'transparent' },
+    tile: { bg: '#FFFFFF', ink: '#0A3D27', sub: '#4E7A63', border: 'rgba(14,122,78,0.14)' },
+    btn: { bg: '#0E7A4E', ink: '#FFFFFF' },
+    beatOn: '#0E7A4E',
+    beatOff: 'rgba(14,122,78,0.18)',
+    decor: (
+      <svg viewBox="0 0 100 100" aria-hidden className="absolute -left-[8%] -bottom-[22%] w-[48%] opacity-[0.12] pointer-events-none -rotate-90">
+        <circle cx="50" cy="50" r="44" fill="none" stroke="#0E7A4E" strokeWidth="1.2" />
+        <circle cx="50" cy="50" r="44" fill="none" stroke="#0E7A4E" strokeWidth="5" strokeLinecap="round" strokeDasharray="190 400" />
+      </svg>
+    ),
+  },
+};
+
 /* the numbers count up with the card's story */
-function Stats({ p, stats, tint }: { p: MotionValue<number>; stats: Stat[]; tint: string }) {
+function Stats({ p, stats, th }: { p: MotionValue<number>; stats: Stat[]; th: Theme }) {
   const v = useStep(p);
   const t = clamp01(v / 0.45);
   const eased = 1 - Math.pow(1 - t, 3);
@@ -217,17 +312,23 @@ function Stats({ p, stats, tint }: { p: MotionValue<number>; stats: Stat[]; tint
   const [lead, ...rest] = stats;
   return (
     <div className="grid grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,1fr)] gap-2.5">
-      <div className="rounded-2xl p-4 md:p-5 border border-white/20 shadow-[0_20px_40px_-20px_rgba(0,0,0,0.7)]" style={{ background: `linear-gradient(160deg, ${tint}, ${tint}33)` }}>
-        <p className="text-white font-extrabold tabular-nums leading-none tracking-[-0.055em] text-4xl md:text-[clamp(44px,4.4vw,72px)]">{show(lead)}</p>
-        <p className="text-white/70 text-xs md:text-sm mt-2.5 leading-snug">
+      <div className="rounded-2xl p-4 md:p-5 shadow-[0_20px_40px_-22px_rgba(0,0,0,0.55)]" style={{ background: th.lead.bg, border: `1px solid ${th.lead.border}` }}>
+        <p className="font-extrabold tabular-nums leading-none tracking-[-0.055em] text-4xl md:text-[clamp(44px,4.4vw,72px)]" style={{ color: th.lead.ink }}>
+          {show(lead)}
+        </p>
+        <p className="text-xs md:text-sm mt-2.5 leading-snug" style={{ color: th.lead.sub }}>
           {lead.k}
-          {lead.note && <span className="text-white/40"> · {lead.note}</span>}
+          {lead.note && <span className="opacity-70"> · {lead.note}</span>}
         </p>
       </div>
       {rest.map((s2) => (
-        <div key={s2.k} className="rounded-2xl p-4 md:p-5 border border-white/[0.07] bg-white/[0.035]">
-          <p className="text-white font-bold tabular-nums leading-none tracking-[-0.045em] text-3xl md:text-[clamp(30px,2.8vw,46px)]">{show(s2)}</p>
-          <p className="text-white/50 text-xs md:text-sm mt-2.5 leading-snug">{s2.k}</p>
+        <div key={s2.k} className="rounded-2xl p-4 md:p-5" style={{ background: th.tile.bg, border: `1px solid ${th.tile.border}` }}>
+          <p className="font-bold tabular-nums leading-none tracking-[-0.045em] text-3xl md:text-[clamp(30px,2.8vw,46px)]" style={{ color: th.tile.ink }}>
+            {show(s2)}
+          </p>
+          <p className="text-xs md:text-sm mt-2.5 leading-snug" style={{ color: th.tile.sub }}>
+            {s2.k}
+          </p>
         </div>
       ))}
     </div>
@@ -239,19 +340,19 @@ function Stats({ p, stats, tint }: { p: MotionValue<number>; stats: Stat[]; tint
 const STICK = 88; // under the floating nav
 const GAP_VH = 0.9; // scroll spent on each card's story, in viewport heights
 
-function Beat({ p, beats }: { p: MotionValue<number>; beats: string[] }) {
+function Beat({ p, beats, th }: { p: MotionValue<number>; beats: string[]; th: Theme }) {
   const v = useStep(p);
   const i = Math.min(beats.length - 1, Math.floor(clamp01(v) * beats.length * 0.999));
   return (
     <div className="min-h-[3.2em]">
       <AnimatePresence mode="wait" initial={false}>
-        <motion.p key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="text-white text-base md:text-xl font-semibold leading-snug tracking-[-0.015em]">
+        <motion.p key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="text-base md:text-xl font-semibold leading-snug tracking-[-0.015em]" style={{ color: th.ink }}>
           {beats[i]}
         </motion.p>
       </AnimatePresence>
       <div className="flex gap-1.5 mt-3">
         {beats.map((b, k) => (
-          <span key={b} className="h-1 flex-1 rounded-full transition-colors duration-300" style={{ background: k <= i ? '#fff' : 'rgba(255,255,255,0.15)' }} />
+          <span key={b} className="h-1 flex-1 rounded-full transition-colors duration-300" style={{ background: k <= i ? th.beatOn : th.beatOff }} />
         ))}
       </div>
     </div>
@@ -278,6 +379,7 @@ function Card({
   const reduced = useReducedMotion();
   const right = i % 2 === 1;
   const copy = COPY[project.id];
+  const th = THEMES[project.id];
   const Stage = STAGE[project.id];
   const x = useTransform(enter, [0, 1], [right ? '14%' : '-14%', '0%']);
   const rot = useTransform(enter, [0, 1], [right ? 4 : -4, 0]);
@@ -300,31 +402,33 @@ function Card({
     >
       <motion.div
         onClick={onOpen}
-        className={`relative h-full w-full overflow-hidden rounded-[32px] border border-white/[0.14] grid grid-rows-[auto_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1.2fr)] ${onOpen ? 'cursor-pointer' : ''}`}
+        className={`relative h-full w-full overflow-hidden rounded-[32px] grid grid-rows-[auto_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1.2fr)] ${onOpen ? 'cursor-pointer' : ''}`}
         style={{
           x: reduced ? 0 : x,
           rotate: reduced ? 0 : rot,
           scale: reduced ? 1 : scale,
           transformOrigin: right ? '100% 0%' : '0% 0%',
-          background: `radial-gradient(ellipse 75% 85% at ${right ? '15%' : '85%'} 15%, ${copy.tint} 0%, transparent 68%), radial-gradient(ellipse 65% 65% at ${right ? '90%' : '10%'} 100%, ${copy.tint}99 0%, transparent 72%), #0D0E12`,
+          background: th.bg,
+          border: `1px solid ${th.border}`,
           boxShadow: '0 -30px 60px -30px rgba(0,0,0,0.9)',
         }}
       >
+        {th.decor}
         {/* the story side */}
         <div className="relative z-10 flex flex-col justify-between gap-5 p-6 md:p-10 lg:p-12">
           <div>
-            {project.category && <p className="text-white/45 text-sm md:text-base mb-4">{project.category}</p>}
-            <h3 className="text-white font-extrabold tracking-[-0.055em] leading-[0.92]" style={{ fontSize: 'clamp(38px, 5.2vw, 92px)' }}>{copy.name}</h3>
-            <p className="text-white/60 text-base md:text-xl leading-snug mt-4 md:mt-5 max-w-xl tracking-[-0.01em]">{copy.line}</p>
+            {project.category && <p className="text-sm md:text-base mb-4" style={{ color: th.kicker }}>{project.category}</p>}
+            <h3 className="font-extrabold tracking-[-0.055em] leading-[0.92]" style={{ fontSize: 'clamp(38px, 5.2vw, 92px)', color: th.ink }}>{copy.name}</h3>
+            <p className="text-base md:text-xl leading-snug mt-4 md:mt-5 max-w-xl tracking-[-0.01em]" style={{ color: th.sub }}>{copy.line}</p>
           </div>
           {STATS[project.id] && (
             <div className="hidden sm:block">
-              <Stats p={story} stats={STATS[project.id]} tint={copy.tint} />
+              <Stats p={story} stats={STATS[project.id]} th={th} />
             </div>
           )}
           <div className="grid gap-5">
             <div className="hidden md:block">
-              <Beat p={story} beats={copy.beats} />
+              <Beat p={story} beats={copy.beats} th={th} />
             </div>
             {onOpen && (
               <button
@@ -333,7 +437,8 @@ function Card({
                   e.stopPropagation();
                   onOpen();
                 }}
-                className="group w-fit inline-flex items-center gap-2 rounded-full bg-white text-[#0A0A0A] text-[15px] font-semibold pl-6 pr-5 py-3 transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="group w-fit inline-flex items-center gap-2 rounded-full text-[15px] font-semibold pl-6 pr-5 py-3 transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                style={{ background: th.btn.bg, color: th.btn.ink, outlineColor: th.btn.bg }}
               >
                 View case
                 <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
