@@ -1,5 +1,5 @@
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'motion/react';
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 
 /* ── fresh phone ─────────────────────────────────────
    The "Order placed" screens rebuilt in code from the
@@ -44,6 +44,11 @@ const RING = 766.5; // 2πr for r = 122
 const display = '"Bricolage Grotesque", Inter, system-ui, sans-serif';
 const ui = 'Manrope, Inter, system-ui, sans-serif';
 
+/* where the order goes; the playground swaps it when the address changes */
+export type Place = { title: string; sub: string };
+const HOME: Place = { title: 'Home', sub: '24 Mercer St, Apt 5 · New York' };
+const PlaceCtx = createContext<Place>(HOME);
+
 const card: CSSProperties = {
   background: F.card,
   border: `1px solid ${F.hair}`,
@@ -55,8 +60,10 @@ export function FreshPhone({
   state,
   progress = 0,
   width = 300,
+  place = HOME,
 }: {
   state: PhoneState;
+  place?: Place;
   /* 0 → 1 across the five second placing window */
   progress?: number;
   width?: number;
@@ -87,7 +94,9 @@ export function FreshPhone({
         }}
       >
         <StatusBar />
-        <Screen state={state} progress={progress} />
+        <PlaceCtx.Provider value={place}>
+          <Screen state={state} progress={progress} />
+        </PlaceCtx.Provider>
         <div
           style={{
             position: 'absolute',
@@ -168,14 +177,14 @@ function Screen({ state, progress }: { state: PhoneState; progress: number }) {
     case 'edit-address':
       return (
         <>
-          <Placing progress={0.36} paused dim />
+          <Placing progress={progress || 0.36} paused dim />
           <AddressSheet />
         </>
       );
     case 'edit-items':
       return (
         <>
-          <Placing progress={0.52} paused dim />
+          <Placing progress={progress || 0.52} paused dim />
           <ItemsSheet />
         </>
       );
@@ -298,9 +307,10 @@ function Ring({ progress }: { progress: number }) {
   );
 }
 
-function EditPill() {
+function EditPill({ act }: { act?: string }) {
   return (
     <span
+      data-act={act}
       style={{
         height: 30,
         padding: '0 12px',
@@ -375,7 +385,7 @@ function OrderSummary({ top, receipt, scheduled }: { top: number; receipt?: bool
       {receipt ? (
         <span style={{ font: `800 13px ${ui}`, color: F.deep }}>Receipt</span>
       ) : (
-        <EditPill />
+        <EditPill act="items" />
       )}
     </div>
   );
@@ -412,7 +422,7 @@ function PlaceText({
         }}
       >
         {sub}
-        {edit && <EditPill />}
+        {edit && <EditPill act="address" />}
       </p>
     </div>
   );
@@ -429,6 +439,7 @@ function Placing({
   dim?: boolean;
   sent?: boolean;
 }) {
+  const place = useContext(PlaceCtx);
   const s = Math.ceil(5 * (1 - progress));
   const label = sent || s <= 0 ? 'Sending to Vapiano' : paused ? 'Paused while you edit' : `Cancel for free in the next ${s}s`;
   return (
@@ -438,12 +449,7 @@ function Placing({
         <Disc />
         <Ring progress={progress} />
       </div>
-      <PlaceText
-        eyebrow={sent ? 'Sending your order to' : 'Placing your order to'}
-        title="Home"
-        sub="24 Mercer St, Apt 5 · New York"
-        edit={!sent}
-      />
+      <PlaceText eyebrow={sent ? 'Sending your order to' : 'Placing your order to'} title={place.title} sub={place.sub} edit={!sent} />
       <OrderSummary top={560} />
       {sent ? (
         <div
@@ -473,6 +479,7 @@ function Placing({
               <small style={{ font: `700 12.5px ${ui}`, color: F.sub }}>{label}</small>
             </span>
             <span
+              data-act="cancel"
               style={{
                 marginLeft: 'auto',
                 height: 42,
@@ -550,9 +557,10 @@ function Sheet({ children, title, sub }: { children: ReactNode; title: string; s
   );
 }
 
-function Cta({ children, light }: { children: ReactNode; light?: boolean }) {
+function Cta({ children, light, act }: { children: ReactNode; light?: boolean; act?: string }) {
   return (
     <div
+      data-act={act}
       style={{
         height: 56,
         borderRadius: 16,
@@ -614,7 +622,7 @@ function AddressSheet() {
           </div>
         ))}
       </div>
-      <Cta>Deliver to Work</Cta>
+      <Cta act="confirm">Deliver to Work</Cta>
     </Sheet>
   );
 }
@@ -672,7 +680,7 @@ function ItemsSheet() {
           </div>
         ))}
       </div>
-      <Cta>Save changes</Cta>
+      <Cta act="confirm">Save changes</Cta>
     </Sheet>
   );
 }
@@ -732,6 +740,7 @@ function Bag({ size, top }: { size: number; top: number }) {
 
 function Burst() {
   const reduced = useReducedMotion();
+  const place = useContext(PlaceCtx);
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
       <Glow strong />
@@ -760,7 +769,7 @@ function Burst() {
       >
         <Bag size={300} top={110} />
       </motion.div>
-      <PlaceText eyebrow="Order placed for" title="Home" sub="24 Mercer St, Apt 5 · New York" />
+      <PlaceText eyebrow="Order placed for" title={place.title} sub={place.sub} />
       <OrderSummary top={560} receipt />
     </div>
   );
@@ -768,6 +777,7 @@ function Burst() {
 
 function Placed({ scheduled }: { scheduled?: boolean }) {
   const reduced = useReducedMotion();
+  const place = useContext(PlaceCtx);
   const rise = (i: number) => ({
     initial: reduced ? false : { opacity: 0, y: 40 },
     animate: { opacity: 1, y: 0 },
@@ -779,8 +789,8 @@ function Placed({ scheduled }: { scheduled?: boolean }) {
       <Bag size={216} top={84} />
       <PlaceText
         eyebrow={scheduled ? 'Order scheduled for' : 'Order placed for'}
-        title={scheduled ? 'Tomorrow 12:30' : 'Home'}
-        sub="24 Mercer St, Apt 5 · New York"
+        title={scheduled ? 'Tomorrow 12:30' : place.title}
+        sub={place.sub}
         top={312}
       />
       <div style={{ position: 'absolute', left: 20, right: 20, top: 432, display: 'grid', gap: 12 }}>

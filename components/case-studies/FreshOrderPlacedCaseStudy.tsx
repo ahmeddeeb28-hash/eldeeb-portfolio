@@ -4,6 +4,8 @@ import { ChapterTitle } from './_shared/ChapterTitle';
 import { CaseIntro, LeadStats, Takeaway } from './_shared/CaseLayout';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 import { FreshPhone, LoopingPhone, type PhoneState } from './fresh/FreshPhone';
+import { FreshPlay } from './fresh/FreshPlay';
+import { MousePointerClick } from 'lucide-react';
 import { MarqueeGallery, type Screen } from './_shared/MarqueeGallery';
 import { CaseFilm, Eyebrow as BaseEyebrow, UseCaseExplorer, reveal, type UseCase as BaseUseCase } from './_shared/CaseBits';
 
@@ -33,7 +35,8 @@ const CHAPTERS: Chapter[] = [
   { id: 'standards', num: '04', roman: 'IV', label: 'Standards', beat: 'Rules for every screen.' },
   { id: 'screens', num: '05', roman: 'V', label: 'Screens', beat: 'Every state, side by side.' },
   { id: 'cases', num: '06', roman: 'VI', label: 'Use Cases', beat: 'Each state and its design.' },
-  { id: 'impact', num: '07', roman: 'VII', label: 'Impact', beat: 'What we measure.' },
+  { id: 'motion', num: '07', roman: 'VII', label: 'Motion', beat: 'Try the five seconds yourself.' },
+  { id: 'impact', num: '08', roman: 'VIII', label: 'Impact', beat: 'What we measure.' },
 ];
 
 /* Where the problem showed up. Summaries, not quotes. */
@@ -428,8 +431,32 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
           />
         </section>
 
-        {/* ── 07 IMPACT ── */}
+        {/* ── 07 MOTION ── */}
         <ChapterTitle chapter={CHAPTERS[6]} />
+        <section id="motion" className="mb-32 scroll-mt-24">
+          {/* framed as a playground, so it reads as something to try before anyone taps */}
+          <motion.div {...reveal} className="rounded-[28px] border border-white/10 bg-[#111214] overflow-hidden">
+            <div className="flex items-center justify-between gap-4 px-5 md:px-7 py-4 border-b border-white/[0.06]">
+              <span className="flex items-center gap-2.5 text-sm font-medium text-white whitespace-nowrap">
+                <MousePointerClick className="w-4 h-4" style={{ color: ACCENT }} />
+                Interactive prototype
+              </span>
+              <span className="flex items-center gap-2 rounded-full border border-white/10 px-3 py-1 text-xs text-white/60 whitespace-nowrap">
+                <span className="relative flex w-1.5 h-1.5">
+                  <span className="absolute inset-0 rounded-full opacity-60 motion-safe:animate-ping" style={{ background: ACCENT }} />
+                  <span className="relative w-1.5 h-1.5 rounded-full" style={{ background: ACCENT }} />
+                </span>
+                Live<span className="hidden sm:inline"> · tap to try</span>
+              </span>
+            </div>
+            <div className="flex justify-center px-4 py-10 md:py-16">
+              <FreshPlay width={300} />
+            </div>
+          </motion.div>
+        </section>
+
+        {/* ── 08 IMPACT ── */}
+        <ChapterTitle chapter={CHAPTERS[7]} />
         <section id="impact" className="mb-16 scroll-mt-24">
           <LeadStats lead={SHIPPED[0]} note="Every moment between Pay and tracking, designed." rest={SHIPPED.slice(1)} accent={ACCENT} />
 
