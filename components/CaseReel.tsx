@@ -252,22 +252,37 @@ const RHYTHM: [string, string[]][] = [
 ];
 function TeamStage({ p }: { p: MotionValue<number> }) {
   const v = useStep(p);
-  const lit = Math.floor(clamp01((v - 0.05) / 0.7) * RHYTHM.length + 0.0001);
+  const lit = Math.max(1, Math.floor(clamp01((v - 0.05) / 0.7) * RHYTHM.length + 0.0001));
+  const now = Math.min(lit, RHYTHM.length) - 1;
   const loop = v >= 0.8;
   return (
-    <div className="absolute inset-0 flex items-center justify-center px-[6%] text-white">
-      <div className="w-full max-w-[520px]">
-        <ol className="relative">
-          <span aria-hidden className="absolute left-[6px] top-2 bottom-2 w-px bg-[#2DD4BF]/40" />
+    <div className="absolute inset-0 flex items-center justify-center px-[5%] text-white">
+      <div className="w-full max-w-[640px]">
+        <ol className="grid gap-1.5 md:gap-2.5">
           {RHYTHM.map(([k, items], i) => {
-            const on = i < lit;
+            const cur = i === now;
+            const on = i <= now;
             return (
-              <li key={k} className="relative grid grid-cols-[minmax(0,92px)_minmax(0,1fr)] sm:grid-cols-[minmax(0,110px)_minmax(0,1fr)] gap-3 pl-6 py-1.5 md:py-2.5 transition-opacity duration-300" style={{ opacity: on ? 1 : 0.28 }}>
-                <span aria-hidden className="absolute left-0 top-2.5 md:top-3.5 w-[13px] h-[13px] rounded-full border-2 border-[#2DD4BF] transition-colors" style={{ background: on ? '#2DD4BF' : '#0B2A29' }} />
-                <span className="text-xs md:text-sm font-bold text-[#2DD4BF] pt-0.5">Every {k.toLowerCase()}</span>
-                <span className="flex flex-wrap gap-1 md:gap-1.5">
+              <li
+                key={k}
+                className="grid grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[auto_minmax(0,1fr)] items-center gap-3 md:gap-5 rounded-xl md:rounded-2xl px-3.5 md:px-5 py-2 md:py-3.5 transition-all duration-300"
+                style={{
+                  background: cur ? '#2DD4BF' : on ? 'rgba(45,212,191,0.12)' : 'rgba(255,255,255,0.03)',
+                  color: cur ? '#06201E' : '#FFFFFF',
+                  opacity: on ? 1 : 0.4,
+                  transform: cur ? 'scale(1.02)' : 'none',
+                  boxShadow: cur ? '0 18px 40px -18px rgba(45,212,191,0.7)' : 'none',
+                }}
+              >
+                <span className="text-lg md:text-xl xl:text-2xl font-extrabold tracking-[-0.03em] leading-none whitespace-nowrap md:w-[9.5em]">Every {k.toLowerCase()}</span>
+                <span className="md:hidden text-xs font-semibold tabular-nums opacity-70">{items.length}</span>
+                <span className="hidden md:flex flex-wrap gap-1.5">
                   {items.map((it) => (
-                    <span key={it} className="rounded-md px-1.5 md:px-2 py-0.5 md:py-1 text-[10px] md:text-xs font-medium whitespace-nowrap bg-white/[0.08]">
+                    <span
+                      key={it}
+                      className="rounded-lg px-2.5 py-1 text-sm font-semibold whitespace-nowrap"
+                      style={{ background: cur ? 'rgba(6,32,30,0.12)' : 'rgba(255,255,255,0.08)' }}
+                    >
                       {it}
                     </span>
                   ))}
@@ -276,7 +291,7 @@ function TeamStage({ p }: { p: MotionValue<number> }) {
             );
           })}
         </ol>
-        <p className="mt-2 md:mt-3 pl-6 text-[11px] md:text-sm text-[#CFF5EF] transition-opacity duration-300" style={{ opacity: loop ? 0.85 : 0 }}>
+        <p className="mt-3 md:mt-4 text-xs md:text-base font-semibold text-[#2DD4BF] transition-opacity duration-300" style={{ opacity: loop ? 1 : 0 }}>
           ↺ The quarter sets what the days work on
         </p>
       </div>

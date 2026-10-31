@@ -1,7 +1,6 @@
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useRef, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
-import { SECTION_IDS, scrollToSection } from '../lib/scrollToSection';
 
 interface StickyNoteData {
   id: string;
@@ -354,8 +353,7 @@ export function PremiumHero() {
             className="flex flex-wrap items-center gap-8"
           >
             <motion.a
-              href={`#${SECTION_IDS.work}`}
-              onClick={(e) => { e.preventDefault(); scrollToSection(SECTION_IDS.work); }}
+              href="mailto:ahmeddeeb28@gmail.com?subject=Hiring%3A%20Lead%20Product%20Designer"
               onMouseMove={handleCtaMove}
               onMouseLeave={() => setCtaOffset({ x: 0, y: 0 })}
               animate={{
@@ -381,7 +379,7 @@ export function PremiumHero() {
                 border: '1px solid rgba(220,190,140,0.6)',
               }}
             >
-              <span className="relative z-10">View Selected Work</span>
+              <span className="relative z-10">Hire me</span>
               <ArrowRight className="relative z-10 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
             </motion.a>
 
@@ -399,7 +397,7 @@ export function PremiumHero() {
               onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.95)')}
               onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')}
             >
-              or say hello
+              Say hello
               <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </a>
           </motion.div>
