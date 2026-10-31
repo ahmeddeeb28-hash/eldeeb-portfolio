@@ -90,7 +90,7 @@ const COPY: Record<string, { name: string; line: string; tint: string; beats: st
   'sary-design-leadership': {
     name: 'Design leadership',
     line: 'How I lead design teams: one owner per objective, a steady rhythm, one source of truth.',
-    tint: '#0F4C4A',
+    tint: '#0343F8',
     beats: ['Building the team behind the product', 'Making a priority actionable', 'Turning critique into a decision', 'Coaching through the work'],
   },
   'sary-repeat-customers': {
@@ -204,9 +204,26 @@ function ReportStage({ p }: { p: MotionValue<number> }) {
           <span className="text-[#5B6478] text-xs">shoppers {v > 0.62 ? 'reached Discover' : 'still in'}</span>
         </p>
       </div>
-      <div className="relative h-[86%] aspect-[318/636] rounded-[28px] overflow-hidden bg-black border-[5px] border-[#1b1d22] shadow-[0_30px_60px_-30px_rgba(15,27,61,0.55)] hidden sm:block lg:hidden xl:block" style={{ opacity: 0.25 + 0.75 * heat, transform: `translateY(${(1 - heat) * 16}px)` }}>
-        <img src="/images/case-studies/sary-report/heat-2.webp" alt="" aria-hidden className="w-full h-full object-cover" />
-        <span className="absolute left-2 bottom-2 rounded-full bg-black/65 text-white text-[10px] font-semibold px-2 py-0.5">Discover heatmap</span>
+      {/* one clean frame around the real screen: the heatmap screenshot is
+          cropped to its content, the bezel, island and status bar are drawn */}
+      <div
+        className="@container relative h-[86%] aspect-[0.49] hidden sm:block lg:hidden xl:block"
+        style={{ opacity: 0.25 + 0.75 * heat, transform: `translateY(${(1 - heat) * 16}px)` }}
+      >
+       <div className="relative h-full w-full rounded-[13cqi] bg-[#0B0C0F] p-[3.2cqi] shadow-[0_40px_70px_-30px_rgba(15,27,61,0.6),0_0_0_1px_rgba(15,27,61,0.18)]">
+        <div className="relative h-full w-full rounded-[10cqi] overflow-hidden bg-white flex flex-col">
+          <div className="relative flex-none h-[11cqi] flex items-center justify-between px-[8cqi] text-[#0F1B3D] text-[4.6cqi] font-semibold">
+            <span>9:41</span>
+            <span aria-hidden className="absolute left-1/2 top-[2.4cqi] -translate-x-1/2 h-[7.5cqi] w-[30cqi] rounded-full bg-[#0B0C0F]" />
+            <span aria-hidden className="flex items-center gap-[1.4cqi]">
+              <span className="w-[5cqi] h-[2.6cqi] rounded-[0.8cqi] border border-[#0F1B3D]/70" />
+            </span>
+          </div>
+          <img src="/images/case-studies/sary-report/heat-2-screen.webp" alt="" aria-hidden className="flex-1 min-h-0 w-full object-cover object-top" />
+          <span aria-hidden className="absolute bottom-[2.2cqi] left-1/2 -translate-x-1/2 h-[1.3cqi] w-[34cqi] rounded-full bg-[#0F1B3D]/80" />
+        </div>
+        <span className="absolute left-[7cqi] bottom-[9cqi] rounded-full bg-[#0F1B3D]/80 backdrop-blur text-white text-[4.4cqi] font-semibold px-[3.5cqi] py-[1.2cqi]">Discover heatmap</span>
+       </div>
       </div>
     </div>
   );
@@ -374,9 +391,9 @@ type Engrave = { ink: string; cut: string; filter: string };
    text stay readable; the pressed-in look comes from the edges. */
 const ENGRAVE: Record<string, Engrave> = {
   'sary-design-leadership': {
-    ink: '#9FD9CF', // on the deep teal #0F4C4A
-    cut: '#0F4C4A',
-    filter: 'drop-shadow(0 -1px 0 rgba(2,20,18,0.8)) drop-shadow(0 1px 0 rgba(207,245,239,0.16))',
+    ink: '#0343F8', // 6.9:1 on #F2F3EE
+    cut: '#F2F3EE',
+    filter: 'drop-shadow(0 1px 0 rgba(255,255,255,1)) drop-shadow(0 -1px 0 rgba(1,20,80,0.3))',
   },
   'sary-repeat-customers': {
     ink: '#C0C7DF', // 6.4:1 on #1D368D
@@ -448,16 +465,17 @@ type Theme = {
 
 const THEMES: Record<string, Theme> = {
   'sary-design-leadership': {
-    bg: 'radial-gradient(ellipse 80% 90% at 85% 10%, #17706B 0%, transparent 62%), linear-gradient(160deg, #0F4C4A 0%, #062221 72%)',
-    border: 'rgba(45,212,191,0.22)',
-    kicker: 'rgba(207,245,239,0.7)',
-    ink: '#FFFFFF',
-    sub: 'rgba(225,248,244,0.75)',
-    lead: { bg: '#2DD4BF', ink: '#06201E', sub: 'rgba(6,32,30,0.72)', border: 'transparent' },
-    tile: { bg: 'rgba(45,212,191,0.1)', ink: '#FFFFFF', sub: 'rgba(207,245,239,0.7)', border: 'rgba(45,212,191,0.22)' },
-    btn: { bg: '#2DD4BF', ink: '#06201E' },
-    beatOn: '#2DD4BF',
-    beatOff: 'rgba(45,212,191,0.2)',
+    // the illustrations' own paper, ink and royal blue
+    bg: 'radial-gradient(ellipse 70% 80% at 88% 12%, rgba(3,67,248,0.10) 0%, transparent 60%), linear-gradient(160deg, #F2F3EE 0%, #E9E9E2 100%)',
+    border: 'rgba(16,18,22,0.12)',
+    kicker: '#55565E',
+    ink: '#101216',
+    sub: '#3F4048',
+    lead: { bg: '#0343F8', ink: '#FFFFFF', sub: 'rgba(255,255,255,0.8)', border: 'transparent' },
+    tile: { bg: '#FFFFFF', ink: '#101216', sub: '#55565E', border: 'rgba(16,18,22,0.14)' },
+    btn: { bg: '#101216', ink: '#F2F3EE' },
+    beatOn: '#0343F8',
+    beatOff: 'rgba(16,18,22,0.14)',
   },
   'sary-repeat-customers': {
     bg: 'radial-gradient(ellipse 80% 90% at 85% 10%, #2B4BC0 0%, transparent 62%), linear-gradient(160deg, #1D368D 0%, #0E1A47 70%)',

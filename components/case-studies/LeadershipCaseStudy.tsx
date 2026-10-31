@@ -14,8 +14,8 @@ import type { Chapter, CaseStudyComponentProps } from './_shared/types';
    and one visual. Sources: the CV, Sary's design plan and review
    in Notion, and LinkedIn recommendations. */
 
-const ACCENT = '#2DD4BF';
-const DEEP = '#0F4C4A';
+const ACCENT = '#D4F03A'; // the lime from the illustrations
+const DEEP = '#0343F8'; // their royal blue
 const PANEL = '#0F1413';
 const LINE = 'rgba(255,255,255,0.08)';
 
@@ -179,7 +179,7 @@ function Shape() {
   return (
     <Panel>
       <div className="flex flex-col items-center">
-        <span className="rounded-xl px-4 py-2 text-sm font-bold text-[#06201E]" style={{ background: ACCENT }}>
+        <span className="rounded-xl px-4 py-2 text-sm font-bold text-[#101216]" style={{ background: ACCENT }}>
           Design lead
         </span>
         <span aria-hidden className="w-px h-5" style={{ background: line }} />
