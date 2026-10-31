@@ -19,8 +19,8 @@ import { FreshPhone, type PhoneState, type Place } from './FreshPhone';
 type Stage = 'idle' | 'placing' | 'address' | 'items' | 'sent' | 'burst' | 'placed' | 'cancelled';
 
 const HINTS: Record<Stage, string> = {
-  idle: 'Pay to place the order',
-  placing: 'Change the address, fix the items, or cancel. Or let it run',
+  idle: 'Tap the phone to pay. You then have five seconds to change anything',
+  placing: 'Tap Edit or Cancel while the ring runs, or let it place',
   address: 'The clock is paused. Tap Deliver to Work',
   items: 'The clock is paused. Tap Save changes',
   sent: 'Time is up: sent to the kitchen',
@@ -142,7 +142,7 @@ export function FreshPlay({ width = 300 }: { width?: number }) {
   return (
     <div className="flex flex-col items-center gap-5">
       <style>{PLAY_CSS}</style>
-      <div onClick={onClick} data-stage={stage} className="fresh-play select-none">
+      <div onClick={onClick} data-stage={stage} className="fresh-play relative select-none">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             // the placing screen and its sheets stay one screen; the rest cross-fade
@@ -155,6 +155,26 @@ export function FreshPlay({ width = 300 }: { width?: number }) {
             <FreshPhone state={PHONE[stage]} progress={progress} width={width} place={place} />
           </motion.div>
         </AnimatePresence>
+        {/* before Pay the whole phone is the start button, so a first tap anywhere on it does something */}
+        {stage === 'idle' && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              pay();
+            }}
+            aria-label="Pay $24.19 and start the five second window"
+            className="group absolute inset-0 z-10 rounded-[44px] bg-black/25 hover:bg-black/15 transition-colors cursor-pointer"
+          >
+            <span className="absolute left-1/2 top-[74%] -translate-x-1/2 -translate-y-1/2 whitespace-nowrap inline-flex items-center gap-2.5 rounded-full bg-[#103F2D] text-white font-semibold text-[15px] pl-4 pr-5 py-3 shadow-[0_18px_40px_-12px_rgba(0,0,0,0.6)] group-hover:brightness-110 group-active:brightness-90 transition">
+              <span className="relative flex w-2.5 h-2.5" aria-hidden>
+                <span className="absolute inset-0 rounded-full bg-[#5FE0A2] opacity-70 motion-safe:animate-ping" />
+                <span className="relative w-2.5 h-2.5 rounded-full bg-[#5FE0A2]" />
+              </span>
+              Tap to pay $24.19
+            </span>
+          </button>
+        )}
       </div>
       <div className="min-h-9 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-center" aria-live="polite">
         <span className="flex items-start gap-2.5 text-white/70 text-left max-w-[320px] sm:max-w-none">
@@ -166,15 +186,6 @@ export function FreshPlay({ width = 300 }: { width?: number }) {
           )}
           {HINTS[stage]}
         </span>
-        {stage === 'idle' && (
-          <button
-            type="button"
-            onClick={pay}
-            className="rounded-full bg-[#5FE0A2] text-[#0A3D27] font-semibold px-5 py-2 hover:brightness-105 active:scale-95 transition"
-          >
-            Pay $24.19
-          </button>
-        )}
         {stage !== 'idle' && (
           <button
             type="button"
