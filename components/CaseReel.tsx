@@ -50,6 +50,15 @@ const STATS: Record<string, Stat[]> = {
   ],
 };
 
+/* My part in each case, as each case study states it. A line recruiters
+   look for first: who did what. */
+const ROLE: Record<string, string> = {
+  'sary-repeat-customers': 'Lead Product Designer at Sary, owned the Buy Again hub',
+  'sary-usability-report': 'Senior Product Designer, Experience Design: wrote the quarterly report',
+  'sampo-ai-pricing': 'Design consultant and design team lead: aligned founders, product and engineering, built and tested the prototype',
+  'fresh-order-placed': 'Lead Product Designer, the order placed moment end to end',
+};
+
 const COPY: Record<string, { name: string; line: string; tint: string; beats: string[] }> = {
   'sary-repeat-customers': {
     name: 'Sary Buy Again',
@@ -496,6 +505,14 @@ function Card({
             </div>
             <h3 className="font-extrabold tracking-[-0.055em] leading-[0.92]" style={{ fontSize: 'clamp(38px, 5.2vw, 92px)', color: th.ink }}>{copy.name}</h3>
             <p className="text-base md:text-xl leading-snug mt-4 md:mt-5 max-w-xl tracking-[-0.01em]" style={{ color: th.sub }}>{copy.line}</p>
+            {ROLE[project.id] && (
+              <p className="text-sm md:text-[15px] leading-snug mt-3 max-w-xl" style={{ color: th.kicker }}>
+                <span className="font-semibold" style={{ color: th.ink }}>
+                  My role:
+                </span>{' '}
+                {ROLE[project.id]}
+              </p>
+            )}
           </div>
           {STATS[project.id] && (
             <div className="hidden sm:block">
