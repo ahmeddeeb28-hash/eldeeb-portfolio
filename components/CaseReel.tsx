@@ -29,9 +29,9 @@ type Project = { id: string; title: string; category?: string; hasStudy?: boolea
 type Stat = { v: number; pre?: string; suf?: string; dp?: number; k: string; note?: string };
 const STATS: Record<string, Stat[]> = {
   'sary-design-leadership': [
-    { v: 40, pre: '+', suf: '%', k: 'Design velocity', note: 'cycle time' },
-    { v: 30, suf: '%', k: 'Faster handoff' },
-    { v: 25, suf: '+', k: 'Engineers on the system' },
+    { v: 8, k: 'Designers in one team' },
+    { v: 3, k: 'Streams, 5 products' },
+    { v: 40, pre: '+', suf: '%', k: 'Design velocity' },
   ],
   'sary-repeat-customers': [
     { v: 28, pre: '+', suf: '%', k: 'Repeat purchases' },
@@ -60,10 +60,10 @@ const STATS: Record<string, Stat[]> = {
 type RoleFacts = { role: string; team?: string; owned?: string; duration?: string; proof?: string };
 const ROLE: Record<string, RoleFacts> = {
   'sary-design-leadership': {
-    role: 'Product Design Lead',
-    team: '8 designers, 3 squads, 5 countries',
+    role: 'Senior Product Designer → Product Design Lead',
+    team: '8 designers, 3 streams, 5 countries',
     owned: 'OKRs, rituals, the design system and hiring',
-    duration: 'Jan – Sep 2023',
+    duration: 'Sep 2021 – Sep 2023',
     proof: 'Mohammed Aldossary, Sary’s co-founder & CEO',
   },
   'sary-repeat-customers': {
@@ -90,10 +90,10 @@ const ROLE: Record<string, RoleFacts> = {
 
 const COPY: Record<string, { name: string; line: string; tint: string; beats: string[] }> = {
   'sary-design-leadership': {
-    name: 'Sary design leadership',
-    line: 'Eight designers across three squads, set up to ship: owners, rhythm, one source of truth.',
+    name: 'Design leadership',
+    line: 'One design team across Demand, Supply and Logistics: retailers, suppliers and drivers.',
     tint: '#0F4C4A',
-    beats: ['One lead, eight designers', 'Spread across Demand, Supply and Logistics', 'Five design tools down to one', 'Phase 1 of the system shipped'],
+    beats: ['One lead, one team of eight', 'Three streams, each with its own users', 'Five products on one design system', 'Held together by rituals, OKRs and hiring'],
   },
   'sary-repeat-customers': {
     name: 'Sary Buy Again',
@@ -242,66 +242,56 @@ function FreshStage({ p }: { p: MotionValue<number> }) {
   );
 }
 
-/* the team: one lead, eight designers fanning out to three squads,
-   five tools folding into one, then the quarter's results */
-const SQUAD_NAMES = ['Demand', 'Supply', 'Logistics'];
-const TOOLS = ['t1', 't2', 't3', 't4', 'Figma']; // only Figma is named; the other four aren't listed in the source
+/* the team as its architecture: the lead, one design team, and the
+   three streams it served with their users and products. Builds up
+   with the card's story; the shared layer lights last. */
+const ARCH: { name: string; users: string; products: string[] }[] = [
+  { name: 'Demand', users: 'Retailers', products: ['Flagship app', 'POS'] },
+  { name: 'Supply', users: 'Suppliers', products: ['Ark'] },
+  { name: 'Logistics', users: 'Drivers', products: ['Launchpad', 'Lighthouse'] },
+];
 function TeamStage({ p }: { p: MotionValue<number> }) {
   const v = useStep(p);
-  const fan = clamp01((v - 0.12) / 0.3);
-  const fold = clamp01((v - 0.5) / 0.2);
-  const done = v >= 0.78;
-  // dots per group only draw the fan (3, 3, 2); not a confirmed headcount split
-  const groups = [3, 3, 2];
+  const show = (at: number) => ({ opacity: clamp01((v - at) / 0.12), transform: `translateY(${(1 - clamp01((v - at) / 0.12)) * 8}px)` });
+  const shared = v >= 0.72;
+  const line = 'rgba(45,212,191,0.45)';
   return (
-    <div className="absolute inset-0 overflow-hidden flex flex-col items-center justify-center gap-3 md:gap-6 px-[4%] text-white">
-      <span className="rounded-full px-3.5 py-1 md:px-4 md:py-1.5 text-xs md:text-sm font-bold text-[#06201E] bg-[#2DD4BF]">Design lead</span>
-      <svg aria-hidden viewBox="0 0 300 24" className="w-[min(78%,360px)] h-4 md:h-6 -my-1" style={{ opacity: fan }}>
-        <path d="M150 0 V10 M50 24 V10 H250 V24 M150 10 V24" fill="none" stroke="#2DD4BF" strokeOpacity="0.5" strokeWidth="2" />
-      </svg>
-      <div className="flex items-start justify-center" style={{ gap: `${6 + fan * 34}px` }}>
-        {groups.map((n, g) => (
-          <div key={g} className="flex flex-col items-center gap-2">
-            <div className="flex gap-1.5">
-              {Array.from({ length: n }, (_, i) => (
-                <span key={i} className="w-5 h-5 md:w-7 md:h-7 rounded-full border-2 border-[#2DD4BF] bg-[#0B3433]" />
-              ))}
-            </div>
-            <span className="text-[11px] md:text-sm font-semibold whitespace-nowrap text-[#CFF5EF]" style={{ opacity: fan }}>
-              {SQUAD_NAMES[g]}
-            </span>
-          </div>
-        ))}
-      </div>
-      <div className="hidden sm:flex items-center justify-center gap-2 min-h-[52px] mt-1 md:mt-3">
-        {done ? (
-          <div className="grid grid-cols-3 gap-2 text-center">
-            {[['Phase 1', 'System shipped'], ['8 / 3', 'Dashboards'], ['68', 'First SUS']].map(([a, b2]) => (
-              <div key={b2} className="rounded-xl px-2.5 py-2 md:px-3 bg-white/[0.06] border border-white/10">
-                <p className="text-base md:text-2xl font-extrabold tracking-tight leading-none whitespace-nowrap">{a}</p>
-                <p className="text-[10px] md:text-[11px] text-white/60 mt-1 whitespace-nowrap">{b2}</p>
+    <div className="absolute inset-0 flex items-center justify-center px-[5%] text-white">
+      <div className="w-full max-w-[560px] flex flex-col items-center">
+        <span className="rounded-xl px-3.5 py-1.5 text-xs md:text-sm font-bold text-[#06201E] bg-[#2DD4BF]">Product Design Lead</span>
+        <span aria-hidden className="w-px h-4 md:h-5" style={{ background: line }} />
+        <div className="w-full rounded-xl md:rounded-2xl border px-3 py-2 md:py-2.5 text-center" style={{ ...show(0.08), borderColor: line, background: 'rgba(45,212,191,0.08)' }}>
+          <p className="text-[11px] md:text-sm font-bold">One design team · 8 designers · 5 countries</p>
+        </div>
+        {/* stems: a bar across, one down to each stream */}
+        <div aria-hidden className="relative w-full h-4 md:h-6" style={show(0.2)}>
+          <span className="absolute left-1/2 top-0 w-px h-1/2" style={{ background: line }} />
+          <span className="absolute left-[16.66%] right-[16.66%] top-1/2 h-px" style={{ background: line }} />
+          {[16.66, 50, 83.33].map((x) => (
+            <span key={x} className="absolute top-1/2 w-px h-1/2" style={{ left: `${x}%`, background: line }} />
+          ))}
+        </div>
+        <div className="grid grid-cols-3 gap-1.5 md:gap-2.5 w-full">
+          {ARCH.map((s, i) => (
+            <div key={s.name} className="rounded-xl md:rounded-2xl border p-2 md:p-3.5 min-w-0" style={{ ...show(0.24 + i * 0.1), borderColor: 'rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)' }}>
+              <p className="text-xs md:text-base font-bold truncate">{s.name}</p>
+              <p className="text-[10px] md:text-xs text-[#CFF5EF]/70 truncate">{s.users}</p>
+              <div className="hidden sm:grid gap-1 mt-2 md:mt-3">
+                {s.products.map((pr) => (
+                  <span key={pr} className="rounded-md px-1.5 md:px-2 py-1 text-[10px] md:text-xs font-medium truncate" style={{ background: 'rgba(45,212,191,0.14)', color: '#E6FBF7' }}>
+                    {pr}
+                  </span>
+                ))}
               </div>
-            ))}
-          </div>
-        ) : (
-          <>
-            {TOOLS.map((t) => {
-              const keep = t === 'Figma';
-              const o = keep ? 1 : 1 - fold;
-              return (
-                <span
-                  key={t}
-                  aria-hidden
-                  className="rounded-lg h-7 md:h-8 grid place-items-center text-xs font-semibold"
-                  style={{ width: keep ? 60 : 26, opacity: o, transform: `scale(${keep ? 1 + fold * 0.15 : 1 - fold * 0.4})`, background: keep ? '#2DD4BF' : 'rgba(255,255,255,0.1)', color: '#06201E', display: o <= 0.02 ? 'none' : undefined }}
-                >
-                  {keep ? 'Figma' : ''}
-                </span>
-              );
-            })}
-            <span className="text-xs md:text-sm text-white/70 ml-1.5 tabular-nums whitespace-nowrap">{fold < 1 ? '5 design tools' : '1 tool'}</span>
-          </>
-        )}
+            </div>
+          ))}
+        </div>
+        {/* what every stream shares */}
+        <div className="hidden sm:flex w-full mt-2.5 md:mt-3 rounded-xl border px-3 py-2 text-[10px] md:text-xs justify-center gap-x-3 gap-y-1 flex-wrap transition-colors duration-300" style={{ ...show(0.6), borderColor: shared ? line : 'rgba(255,255,255,0.1)', color: shared ? '#E6FBF7' : 'rgba(255,255,255,0.55)' }}>
+          {['Design system', 'Research ops', 'Rituals', 'OKRs', 'Hiring'].map((x) => (
+            <span key={x} className="whitespace-nowrap">{x}</span>
+          ))}
+        </div>
       </div>
     </div>
   );
