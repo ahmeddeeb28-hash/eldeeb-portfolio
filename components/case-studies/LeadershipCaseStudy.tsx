@@ -1,19 +1,17 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
-import { CaseIntro, LeadStats, Takeaway } from './_shared/CaseLayout';
+import { CaseIntro, Takeaway } from './_shared/CaseLayout';
 import { reveal } from './_shared/CaseBits';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 
-/* ── Design leadership · Sary, then Lobah ─────────────
-   How I led design at Sary from Senior Product Designer to
-   Product Design Lead (Sep 2021 – Sep 2023), and the game design
-   team I lead at Lobah now. Sources: the CV, Sary's design plan
-   and quarterly review in Notion (objectives, key results, stream
-   work, research volume), and LinkedIn recommendations. Roles only,
-   no names. Headcounts per stream are not shown: they changed
-   through the period and aren't confirmed. */
+/* ── Design leadership · Sary ────────────────────────
+   One story, one idea per chapter: the team, how it was built,
+   how it ran, what it committed to, what changed, how we hired,
+   and where I lead now. Each chapter is a heading, one sentence
+   and one visual. Sources: the CV, Sary's design plan and quarterly
+   review in Notion, and LinkedIn recommendations. Roles only. */
 
 const ACCENT = '#2DD4BF';
 const DEEP = '#0F4C4A';
@@ -21,239 +19,134 @@ const PANEL = '#0F1413';
 const LINE = 'rgba(255,255,255,0.08)';
 
 const CHAPTERS: Chapter[] = [
-  { id: 'overview', num: '01', roman: 'I', label: 'Overview', beat: 'The teams I lead.' },
-  { id: 'architecture', num: '02', roman: 'II', label: 'Architecture', beat: 'Three streams, one team.' },
-  { id: 'rituals', num: '03', roman: 'III', label: 'Rituals', beat: 'One connected rhythm.' },
-  { id: 'okrs', num: '04', roman: 'IV', label: 'OKRs', beat: 'Baseline to target.' },
-  { id: 'system', num: '05', roman: 'V', label: 'System & speed', beat: 'One source of truth.' },
+  { id: 'overview', num: '01', roman: 'I', label: 'Overview', beat: 'The team.' },
+  { id: 'structure', num: '02', roman: 'II', label: 'Structure', beat: 'Three streams, one team.' },
+  { id: 'rituals', num: '03', roman: 'III', label: 'Rituals', beat: 'How it ran.' },
+  { id: 'objectives', num: '04', roman: 'IV', label: 'Objectives', beat: 'What we committed to.' },
+  { id: 'results', num: '05', roman: 'V', label: 'Results', beat: 'What changed.' },
   { id: 'hiring', num: '06', roman: 'VI', label: 'Hiring', beat: 'Same brief, same bar.' },
-  { id: 'lobah', num: '07', roman: 'VII', label: 'Lobah', beat: 'Leading a game design team.' },
+  { id: 'now', num: '07', roman: 'VII', label: 'Now', beat: 'Lobah.' },
 ];
 const TOTAL = 'VII';
 
-/* ── 01 the teams I've led ───────────────────────── */
-
-const TEAMS: { where: string; when: string; role: string; facts: [string, string][]; scope: string[] }[] = [
-  {
-    where: 'Sary',
-    when: 'Sep 2021 – Sep 2023',
-    role: 'Senior Product Designer → Product Design Lead',
-    facts: [
-      ['8', 'designers, plus associate UX researchers'],
-      ['3', 'streams: Demand, Supply, Logistics'],
-      ['5', 'countries'],
-    ],
-    scope: ['B2B grocery marketplace', 'Retailers, suppliers, drivers', 'Mobile and web'],
-  },
-  {
-    where: 'Lobah',
-    when: 'Jan 2025 – now',
-    role: 'Lead Game Product Designer',
-    facts: [
-      ['4+', 'game UI and UX designers'],
-      ['4', 'products: Samla, IceBreaker, Jackaroo, Lobahplay'],
-      ['2', 'platforms: PC and mobile'],
-    ],
-    scope: ['Games and a gaming hub', 'Players', 'PC and mobile'],
-  },
-];
-
-function TeamsLed() {
+/* every chapter has the same shape: heading, one sentence, one visual */
+function Section({ i, tone, title, lead, children }: { i: number; tone?: 'teal'; title: string; lead: string; children: ReactNode }) {
+  const c = CHAPTERS[i];
   return (
-    <div className="grid lg:grid-cols-2 gap-3">
-      {TEAMS.map((t, i) => (
-        <motion.article
-          key={t.where}
-          {...reveal}
-          transition={{ ...reveal.transition, delay: i * 0.08 }}
-          className="rounded-[24px] border p-6 md:p-8"
-          style={{ background: PANEL, borderColor: LINE }}
-        >
-          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 mb-1">
-            <p className="text-white text-2xl font-bold tracking-tight">{t.where}</p>
-            <p className="text-white/45 text-sm tabular-nums">{t.when}</p>
-          </div>
-          <p className="text-sm font-medium mb-6" style={{ color: ACCENT }}>
-            {t.role}
-          </p>
-          <dl className="grid grid-cols-3 gap-4 pb-6 mb-5 border-b" style={{ borderColor: LINE }}>
-            {t.facts.map(([v, k]) => (
-              <div key={k}>
-                <dt className="sr-only">{k}</dt>
-                <dd className="text-white text-4xl md:text-5xl font-extrabold tracking-[-0.05em] tabular-nums leading-none">{v}</dd>
-                <p className="text-white/55 text-xs md:text-sm mt-2 leading-snug">{k}</p>
-              </div>
-            ))}
-          </dl>
-          <p className="text-white/50 text-sm">{t.scope.join('  ·  ')}</p>
-        </motion.article>
-      ))}
-    </div>
+    <>
+      <ChapterTitle chapter={c} total={TOTAL} tone={tone} />
+      <section id={c.id} className="mb-28 md:mb-36 scroll-mt-24">
+        <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] leading-[1.05] max-w-3xl">
+          {title}
+        </motion.h2>
+        <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mt-4 mb-10 md:mb-12">
+          {lead}
+        </motion.p>
+        <motion.div {...reveal}>{children}</motion.div>
+      </section>
+    </>
   );
 }
 
-/* ── 02 architecture: three streams, one team ─────── */
+/* ── 01 the team in four numbers ─────────────────── */
 
-type Stream = {
-  name: string;
-  users: string;
-  products: string[];
-  areas: string[];
-  did: string[];
-  proof: [string, string][];
-};
+const SCALE: [string, string][] = [
+  ['8', 'designers'],
+  ['3', 'streams'],
+  ['5', 'products'],
+  ['5', 'countries'],
+];
 
+/* ── 02 structure ─────────────────────────────────── */
+
+type Stream = { name: string; users: string; products: string; did: string[] };
 const STREAMS: Stream[] = [
   {
     name: 'Demand',
-    users: 'Retailers: baqalas and cafes',
-    products: ['Flagship app', 'POS'],
-    areas: ['Storefront', 'Catalogue', 'Checkout & Payment'],
-    did: [
-      'Revamped the ordering flow, from basket to tracking',
-      'Readied the SKU page, Reorder, Cart and Category page for launch',
-      'Order tracking service blueprint and an online ordering friction audit',
-      'POS e-invoices and credit notes for the new e-invoicing rules, then the POS pilot',
-    ],
-    proof: [
-      ['133', 'Baqala interviews in 3 cities'],
-      ['30', 'Cafe interviews'],
-      ['+6%', 'Order conversion'],
-    ],
+    users: 'Retailers',
+    products: 'Flagship app, POS',
+    did: ['Ordering flow revamped, basket to tracking', 'SKU, Cart, Reorder and Category pages readied for launch', 'Baqala persona: 133 interviews in 3 cities'],
   },
   {
     name: 'Supply',
-    users: 'Suppliers and vendors',
-    products: ['Ark, the supplier platform'],
-    areas: ['Vendor', 'Growth'],
-    did: [
-      'Designed the new supplier onboarding gate',
-      'Purchase orders in Ark',
-      'Started a vendor persona from field visits',
-      'Brought Ark into Fullstory so the stream could be measured',
-    ],
-    proof: [['25', 'Vendors met for the persona']],
+    users: 'Suppliers',
+    products: 'Ark',
+    did: ['New supplier onboarding gate', 'Purchase orders in Ark', 'Vendor persona from field visits'],
   },
   {
     name: 'Logistics',
-    users: 'Drivers and fleet operations',
-    products: ['Launchpad, the driver app', 'Lighthouse, fleet management'],
-    areas: ['Driver app and delivery'],
-    did: [
-      'Launchpad 1.5: landing, itinerary, loading and review, en route, cash collection',
-      'Interviews and usability tests with drivers, shaped around their daily route',
-      'SUS run as interviews with drivers, not a form',
-      'Lighthouse tables, navigation, shipments and invoices',
-    ],
-    proof: [['68', 'First SUS score, Flagship and Launchpad']],
+    users: 'Drivers',
+    products: 'Launchpad, Lighthouse',
+    did: ['Launchpad 1.5, the driver app revamp', 'Usability tests with drivers on their route', 'Lighthouse fleet tables and navigation'],
   },
 ];
 
-const SHARED = ['Design system', 'Research ops: personas, Fullstory, SUS', 'Rituals', 'Hiring and growth'];
-
-function Architecture() {
+function Structure() {
   const [sel, setSel] = useState(0);
-  const s = STREAMS[sel];
   const reduced = useReducedMotion();
+  const s = STREAMS[sel];
   return (
-    <div className="rounded-[28px] border overflow-hidden" style={{ background: PANEL, borderColor: LINE }}>
-      <div className="p-5 md:p-10">
-        {/* leadership line */}
-        <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 text-sm">
-          <span className="rounded-xl px-3.5 py-2 bg-white/[0.06] text-white font-semibold">Head of Product</span>
-          <span aria-hidden className="hidden sm:block w-6 h-px bg-white/25" />
-          <span className="rounded-xl px-3.5 py-2 font-bold text-[#06201E]" style={{ background: ACCENT }}>
-            Product Design Lead
-          </span>
-          <span aria-hidden className="hidden sm:block w-6 h-px bg-white/25" />
-          <span className="rounded-xl px-3.5 py-2 bg-white/[0.06] text-white font-semibold">PMs in each stream</span>
-        </div>
-        <div aria-hidden className="mx-auto w-px h-6 bg-white/20" />
-        {/* the one team, shared across every stream */}
-        <div className="rounded-2xl border px-4 py-4 md:px-6 text-center" style={{ borderColor: `${ACCENT}55`, background: `${ACCENT}0D` }}>
-          <p className="text-white font-bold">One design team · 8 designers and associate UX researchers · 5 countries</p>
-          <p className="text-white/55 text-xs md:text-sm mt-1.5">Shared across all three: {SHARED.join('  ·  ')}</p>
-        </div>
-        {/* stems down to the streams */}
-        <div aria-hidden className="hidden md:grid grid-cols-3 h-6">
-          {STREAMS.map((x, i) => (
-            <span key={x.name} className="mx-auto w-px h-full transition-colors" style={{ background: i === sel ? ACCENT : 'rgba(255,255,255,0.2)' }} />
+    <div className="rounded-[28px] border p-5 md:p-10" style={{ background: PANEL, borderColor: LINE }}>
+      {/* lead → one team → three streams */}
+      <div className="flex flex-col items-center">
+        <span className="rounded-xl px-4 py-2 text-sm font-bold text-[#06201E]" style={{ background: ACCENT }}>
+          Product Design Lead
+        </span>
+        <span aria-hidden className="w-px h-5" style={{ background: `${ACCENT}66` }} />
+        <span className="rounded-xl px-4 py-2 text-sm font-semibold text-white border" style={{ borderColor: `${ACCENT}55` }}>
+          One design team
+        </span>
+        <div aria-hidden className="relative w-full h-6 hidden md:block">
+          <span className="absolute left-1/2 top-0 w-px h-1/2" style={{ background: `${ACCENT}66` }} />
+          <span className="absolute left-[16.66%] right-[16.66%] top-1/2 h-px" style={{ background: `${ACCENT}66` }} />
+          {[16.66, 50, 83.33].map((x) => (
+            <span key={x} className="absolute top-1/2 w-px h-1/2" style={{ left: `${x}%`, background: `${ACCENT}66` }} />
           ))}
         </div>
-        <div className="grid md:grid-cols-3 gap-2.5 mt-3 md:mt-0" role="tablist" aria-label="Streams">
-          {STREAMS.map((x, i) => {
-            const on = i === sel;
-            return (
-              <button
-                key={x.name}
-                type="button"
-                role="tab"
-                aria-selected={on}
-                onClick={() => setSel(i)}
-                onMouseEnter={() => setSel(i)}
-                className="text-left rounded-2xl p-4 md:p-5 border transition-colors"
-                style={{ borderColor: on ? ACCENT : LINE, background: on ? `${ACCENT}14` : 'rgba(255,255,255,0.02)' }}
-              >
-                <p className="flex items-center justify-between gap-2">
-                  <span className="text-white text-lg font-bold">{x.name}</span>
-                  <span className="text-xs tabular-nums" style={{ color: on ? ACCENT : 'rgba(255,255,255,0.4)' }}>
-                    {x.areas.length} {x.areas.length === 1 ? 'area' : 'areas'}
-                  </span>
-                </p>
-                <p className="text-white/55 text-sm mt-0.5">{x.users}</p>
-                <p className="text-white/80 text-sm mt-3">{x.products.join(' · ')}</p>
-              </button>
-            );
-          })}
-        </div>
       </div>
-      {/* what the team did in the selected stream */}
-      <div className="border-t p-5 md:p-10" style={{ borderColor: LINE, background: 'rgba(255,255,255,0.015)' }}>
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={s.name}
-            initial={reduced ? false : { opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduced ? undefined : { opacity: 0, y: -8 }}
-            transition={{ duration: 0.25 }}
-            className="grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-8"
-          >
-            <div>
-              <p className="text-white/45 text-sm mb-3">
-                What the team did in <span className="text-white">{s.name}</span>
-              </p>
-              <ol className="grid gap-3">
-                {s.did.map((d, i) => (
-                  <li key={d} className="grid grid-cols-[28px_minmax(0,1fr)] gap-3 items-baseline">
-                    <span className="text-sm tabular-nums font-semibold" style={{ color: ACCENT }}>
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <span className="text-white/85 leading-snug">{d}</span>
-                  </li>
-                ))}
-              </ol>
-              <p className="text-white/40 text-xs mt-5">Product areas: {s.areas.join(', ')}</p>
-            </div>
-            <div className="grid gap-3 content-start">
-              {s.proof.map(([v, k]) => (
-                <div key={k} className="flex items-baseline gap-4 border-b pb-3" style={{ borderColor: LINE }}>
-                  <span className="text-white text-4xl font-extrabold tracking-[-0.05em] tabular-nums min-w-[3.2ch]">{v}</span>
-                  <span className="text-white/60 text-sm">{k}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </AnimatePresence>
+      <div className="grid md:grid-cols-3 gap-2.5 mt-4 md:mt-0" role="tablist" aria-label="Streams">
+        {STREAMS.map((x, i) => {
+          const on = i === sel;
+          return (
+            <button
+              key={x.name}
+              type="button"
+              role="tab"
+              aria-selected={on}
+              onClick={() => setSel(i)}
+              className="text-left rounded-2xl p-5 border transition-colors"
+              style={{ borderColor: on ? ACCENT : LINE, background: on ? `${ACCENT}12` : 'transparent' }}
+            >
+              <span className="block text-white text-xl font-bold">{x.name}</span>
+              <span className="block text-white/55 text-sm mt-1">
+                {x.users} · {x.products}
+              </span>
+            </button>
+          );
+        })}
       </div>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.ul
+          key={s.name}
+          initial={reduced ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={reduced ? undefined : { opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="grid md:grid-cols-3 gap-x-8 gap-y-3 mt-8 pt-6 border-t"
+          style={{ borderColor: LINE }}
+        >
+          {s.did.map((d) => (
+            <li key={d} className="text-white/80 leading-snug pl-4 border-l-2" style={{ borderColor: ACCENT }}>
+              {d}
+            </li>
+          ))}
+        </motion.ul>
+      </AnimatePresence>
     </div>
   );
 }
 
-/* ── 03 rituals: one connected rhythm ──────────────
-   Each ritual has what goes in and what comes out; the output
-   of one is the input of the next, and the quarterly review
-   sets what the daily stand-ups work on. The slider zooms out
-   from a day to a quarter. */
+/* ── 03 rituals ──────────────────────────────────── */
 
 type Ritual = { name: string; meta: string; input: string; output: string };
 const CADENCES: { k: string; items: Ritual[] }[] = [
@@ -297,21 +190,13 @@ const CADENCES: { k: string; items: Ritual[] }[] = [
   },
 ];
 
-/* a ladder: one step per cadence on a single line, each ritual with
-   what it produces; the quarter loops back to the day */
 function Rhythm() {
   return (
     <div className="rounded-[28px] border p-5 md:p-10" style={{ background: PANEL, borderColor: LINE }}>
       <ol className="relative">
-        {/* the line every step hangs on */}
         <span aria-hidden className="absolute left-[7px] top-2 bottom-2 w-px" style={{ background: `${ACCENT}55` }} />
         {CADENCES.map((c, i) => (
-          <motion.li
-            key={c.k}
-            {...reveal}
-            transition={{ ...reveal.transition, delay: i * 0.06 }}
-            className="relative grid md:grid-cols-[150px_minmax(0,1fr)] gap-x-6 gap-y-3 pl-8 pb-8 last:pb-0"
-          >
+          <li key={c.k} className="relative grid md:grid-cols-[160px_minmax(0,1fr)] gap-x-6 gap-y-3 pl-8 pb-8 last:pb-0">
             <span aria-hidden className="absolute left-0 top-1 w-[15px] h-[15px] rounded-full border-2" style={{ borderColor: ACCENT, background: i === CADENCES.length - 1 ? ACCENT : PANEL }} />
             <p className="text-lg font-bold leading-none pt-0.5" style={{ color: ACCENT }}>
               Every {c.k.toLowerCase()}
@@ -320,420 +205,155 @@ function Rhythm() {
               {c.items.map((it) => (
                 <div key={it.name}>
                   <p className="text-white font-semibold">{it.name}</p>
-                  <p className="text-white/55 text-sm leading-snug mt-0.5">{it.output}</p>
+                  <p className="text-white/50 text-sm leading-snug mt-0.5">{it.output}</p>
                 </div>
               ))}
             </div>
-          </motion.li>
+          </li>
         ))}
       </ol>
-      <p className="mt-8 pt-5 border-t text-white/70 text-sm flex items-start gap-2.5" style={{ borderColor: LINE }}>
-        <span aria-hidden style={{ color: ACCENT }}>↺</span>
-        The quarter’s objectives set what the daily stand-up works on, and the loop starts again.
-      </p>
     </div>
   );
 }
 
-/* ── 04 OKRs: baseline to target ───────────────────── */
+/* ── 04 objectives: three of the six, as a plain table ── */
 
-type KR = { k: string; from?: number; to?: number; text?: string };
-const OKRS: { o: string; mine?: boolean; krs: KR[]; moved: string }[] = [
-  {
-    o: 'Define metrics to measure design impact',
-    mine: true,
-    krs: [
-      { k: 'SUS surveys', from: 0, to: 3 },
-      { k: 'Fullstory dashboards', from: 0, to: 3 },
-      { k: 'Fullstory segments', from: 0, to: 2 },
-    ],
-    moved: '8 dashboards built against a target of 3. Sary’s first SUS survey scored 68.',
-  },
-  {
-    o: 'Enhance core flows',
-    krs: [
-      { k: 'Flows fixed', from: 0, to: 3 },
-      { k: 'Direct success rate', text: 'above 70%' },
-      { k: 'Flow abandonment', text: '30% or less' },
-    ],
-    moved: 'The ordering flow revamped from basket to tracking. Order conversion up 6%.',
-  },
-  {
-    o: 'Increase user engagement',
-    krs: [
-      { k: 'Customers interviewed', from: 48, to: 60 },
-      { k: 'Formal personas', from: 2, to: 5 },
-    ],
-    moved: 'Baqala persona round two: 133 interviews in 3 cities. Cafe and vendor personas started.',
-  },
-  {
-    o: 'Expand design to Supply and Logistics',
-    krs: [
-      { k: 'Stream workshops and plans', from: 0, to: 2 },
-      { k: 'Core flows per stream', from: 0, to: 4 },
-    ],
-    moved: 'The team took on Ark, Lighthouse and Launchpad alongside Demand.',
-  },
-  {
-    o: 'Consolidate tools',
-    krs: [
-      { k: 'Design tools', from: 5, to: 1 },
-      { k: 'Developers in Figma', from: 8, to: 20 },
-    ],
-    moved: 'All designs and the dev team moved to Figma. One source of truth.',
-  },
-  {
-    o: 'First look at Sary 2.0',
-    krs: [
-      { k: 'Flows researched', from: 0, to: 3 },
-      { k: 'Wireframe flows', from: 0, to: 3 },
-      { k: 'UI trials', from: 0, to: 4 },
-      { k: 'Flow prototypes', from: 0, to: 2 },
-    ],
-    moved: 'Phase 1 of Sary 2.0 delivered.',
-  },
+const OBJECTIVES: { o: string; target: string; moved: string; mine?: boolean }[] = [
+  { o: 'Measure design impact', target: '3 dashboards, 3 SUS surveys', moved: '8 dashboards. First SUS score: 68', mine: true },
+  { o: 'Fix the core flows', target: '3 flows, success above 70%', moved: 'Ordering flow revamped. Conversion +6%' },
+  { o: 'One tool for design and engineering', target: '5 tools to 1, 8 to 20 developers', moved: 'Everyone on Figma' },
 ];
 
-/* one key result as a track: the baseline as a ring, the target as a dot */
-function Track({ kr }: { kr: KR }) {
-  const reduced = useReducedMotion();
-  if (kr.from === undefined || kr.to === undefined)
-    return (
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 items-baseline">
-        <span className="text-white/60 text-sm">{kr.k}</span>
-        <span className="text-white text-sm font-semibold">{kr.text}</span>
-      </div>
-    );
-  const max = Math.max(kr.from, kr.to) * 1.15 || 1;
-  const a = (kr.from / max) * 100;
-  const b = (kr.to / max) * 100;
-  const lo = Math.min(a, b);
-  const w = Math.abs(b - a);
+function Objectives() {
   return (
-    <div>
-      <div className="flex items-baseline justify-between gap-3 mb-1.5">
-        <span className="text-white/60 text-sm">{kr.k}</span>
-        <span className="text-white text-sm font-semibold tabular-nums">
-          {kr.from} → {kr.to}
-        </span>
+    <div className="rounded-[28px] border overflow-hidden" style={{ background: PANEL, borderColor: LINE }}>
+      <div className="hidden md:grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1.1fr)] gap-6 px-8 py-4 text-white/40 text-sm border-b" style={{ borderColor: LINE }}>
+        <span>Objective</span>
+        <span>Target</span>
+        <span>What moved</span>
       </div>
-      <div className="relative h-2 rounded-full bg-white/[0.06]">
-        <motion.span
-          className="absolute top-0 h-full rounded-full"
-          style={{ left: `${lo}%`, background: `${ACCENT}99`, transformOrigin: b >= a ? '0 50%' : '100% 50%' }}
-          initial={reduced ? false : { width: 0 }}
-          whileInView={{ width: `${w}%` }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        />
-        <span className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full border-2 bg-[#0F1413]" style={{ left: `${a}%`, borderColor: 'rgba(255,255,255,0.5)' }} />
-        <span className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full" style={{ left: `${b}%`, background: ACCENT }} />
-      </div>
-    </div>
-  );
-}
-
-function OkrBoard() {
-  return (
-    <div className="grid md:grid-cols-2 gap-3">
-      {OKRS.map((k, i) => (
-        <motion.article
-          key={k.o}
-          {...reveal}
-          transition={{ ...reveal.transition, delay: (i % 2) * 0.06 }}
-          className="rounded-[24px] border p-6 md:p-7 flex flex-col"
-          style={{ background: PANEL, borderColor: k.mine ? `${ACCENT}66` : LINE }}
-        >
-          <div className="flex items-start justify-between gap-3 mb-5">
-            <p className="text-white text-lg md:text-xl font-bold tracking-tight leading-snug">
-              <span className="text-white/35 tabular-nums mr-2">{String(i + 1).padStart(2, '0')}</span>
-              {k.o}
-            </p>
+      {OBJECTIVES.map((k) => (
+        <div key={k.o} className="grid md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1.1fr)] gap-x-6 gap-y-1 px-5 md:px-8 py-5 md:py-6 border-b last:border-0" style={{ borderColor: LINE }}>
+          <p className="text-white text-lg font-semibold">
+            {k.o}
             {k.mine && (
-              <span className="flex-none text-[11px] font-semibold rounded-full px-2.5 py-1 text-[#06201E]" style={{ background: ACCENT }}>
-                I owned this
+              <span className="ml-2 align-middle text-[11px] font-semibold rounded-full px-2 py-0.5 text-[#06201E]" style={{ background: ACCENT }}>
+                Mine
               </span>
             )}
-          </div>
-          <div className="grid gap-4 mb-6">
-            {k.krs.map((kr) => (
-              <Track key={kr.k} kr={kr} />
-            ))}
-          </div>
-          <p className="mt-auto text-white/80 text-sm leading-relaxed border-t pt-4" style={{ borderColor: LINE }}>
-            <span className="font-semibold" style={{ color: ACCENT }}>
-              What moved ·{' '}
-            </span>
+          </p>
+          <p className="text-white/55">{k.target}</p>
+          <p className="font-semibold" style={{ color: ACCENT }}>
             {k.moved}
           </p>
-        </motion.article>
+        </div>
       ))}
     </div>
   );
 }
 
-/* ── 07 Lobah ─────────────────────────────────────── */
+/* ── 05 results: each number once ───────────────── */
 
-const LOBAH_PRODUCTS: [string, string][] = [
-  ['Samla', 'AAA game'],
-  ['IceBreaker', 'Game'],
-  ['Jackaroo', 'Board game'],
-  ['Lobahplay', 'The gaming hub'],
-];
-const LOBAH_QUOTES: [string, string][] = [
-  [
-    'He has a great talent for organizing work, skillfully delegating tasks based on his team members’ individual strengths, while also fostering their professional growth, acting as a true mentor in the process.',
-    'Polina Kosheleva, Senior Game UI Artist · reported to Ahmad',
-  ],
-  [
-    'Under his leadership, everything was well-organized, transparent, and clearly communicated. He created an environment where everyone felt supported, heard, and appreciated.',
-    'Sandra Mistal, UI Designer · reported to Ahmad',
-  ],
-  [
-    'Ahmed is a serious designer and a great manager, he would be a great addition to any team.',
-    'Axel Xiberras, UX UI Designer · reported to Ahmad',
-  ],
+const RESULTS: [string, string][] = [
+  ['+40%', 'Design velocity: brief to dev-ready'],
+  ['30%', 'Faster design-to-dev handoff'],
+  ['25+', 'Engineers building from the system'],
+  ['5 → 1', 'Design tools, everyone on Figma'],
 ];
 
-const PROFILES: [string, string, string][] = [
-  ['Senior Product Designer', '4–5 years', 'Owns a squad’s problem space end to end, governs the design system and knows when to let a squad diverge, runs workshops, measures outcomes, mentors juniors.'],
-  ['Product Design Lead', '5+ years, led 3+ designers', 'Owns the design roadmap, grows designers’ careers, takes part in hiring, documents core patterns so engineers can build independently.'],
-  ['Senior / Lead Product Researcher', 'Bilingual Arabic and English', 'Runs evaluative research across products, turns findings into backlog items, coaches designers and PMs on research.'],
-];
-const PROCESS = ['Application and intro chat', 'Portfolio and experience interview', 'Take-home task, 6 days max', 'Presentation call', 'Feedback in 2–4 weeks'];
-const SCORECARD = ['Document organisation and storytelling', 'Problem-solving and rationale', 'Quality of the final outcome', 'Time management and prioritisation'];
-const LOOKED_FOR = ['Systems thinking, not one-off screens', 'Decisions grounded in data and research', 'Influence with PMs, engineers and leadership', 'A track record of mentoring others'];
+/* ── 06 hiring ───────────────────────────────────── */
 
+const PROCESS = ['Intro chat', 'Portfolio interview', 'Take-home, 6 days', 'Presentation', 'Decision in 2–4 weeks'];
 
 export function LeadershipCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
   return (
     <CaseShell chapters={CHAPTERS} metaLine="Design leadership" onBack={onBack} onNext={onNext} resetKey="sary-design-leadership" pillId="lead-tab-pill">
-      <div className="max-w-6xl mx-auto px-6 pt-16 pb-24">
+      <div className="max-w-5xl mx-auto px-6 pt-16 pb-24">
         {/* ── 01 OVERVIEW ── */}
         <ChapterTitle chapter={CHAPTERS[0]} total={TOTAL} />
-        <section id="overview" className="mb-32 scroll-mt-24">
+        <section id="overview" className="mb-28 md:mb-36 scroll-mt-24">
           <CaseIntro
             meta={[
-              ['Company', 'Sary, then Lobah'],
+              ['Company', 'Sary'],
               ['Role', 'Senior Product Designer → Product Design Lead'],
-              ['Years', 'Sep 2021 – Sep 2023 · 2025 – now'],
+              ['Years', '2021 – 2023'],
             ]}
             title="One design team across three streams."
           >
-            <p>
-              Sary is a B2B marketplace connecting retailers with suppliers across Saudi Arabia. I joined in 2021 as Senior
-              Product Designer and grew into Product Design Lead, running one design team across the Demand, Supply and
-              Logistics streams.
-            </p>
-            <p>
-              This is how that team was built: the architecture, the rhythm that held it together, the objectives we set and
-              measured, the system we shipped, and how we hired. It ends with the game design team I lead at Lobah today.
-            </p>
+            <p>At Sary, a B2B grocery marketplace, I grew from Senior Product Designer to Product Design Lead and ran one design team for retailers, suppliers and drivers.</p>
           </CaseIntro>
-          <LeadStats
-            lead={{ v: '+40%', k: 'Design velocity' }}
-            note="Design cycle time, brief to dev-ready"
-            rest={[
-              { v: '30%', k: 'Faster design-to-dev handoff' },
-              { v: '25+', k: 'Engineers building from the system' },
-              { v: '8', k: 'Analytics dashboards, target was 3' },
-            ]}
-            accent={ACCENT}
-          />
-          <p className="text-white/45 text-sm mt-16 mb-4">The teams I lead</p>
-          <TeamsLed />
-        </section>
-
-        {/* ── 02 ARCHITECTURE ── */}
-        <ChapterTitle chapter={CHAPTERS[1]} total={TOTAL} tone="teal" />
-        <section id="architecture" className="mb-32 scroll-mt-24">
-          <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] mb-4 max-w-3xl">
-            Three streams, one team.
-          </motion.h2>
-          <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-10">
-            We worked as a matrix. Designers sat with a stream and its PM day to day, and came back to one team for the
-            system, the research and the standard. Pick a stream to see who it served and what we did there.
-          </motion.p>
-          <motion.div {...reveal}>
-            <Architecture />
-          </motion.div>
-        </section>
-
-        {/* ── 03 RITUALS ── */}
-        <ChapterTitle chapter={CHAPTERS[2]} total={TOTAL} />
-        <section id="rituals" className="mb-32 scroll-mt-24">
-          <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] mb-4 max-w-3xl">
-            One rhythm, from a day to a quarter.
-          </motion.h2>
-          <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-10">
-            Five cadences, each with a clear output. Read it top to bottom: a day, a week, two weeks, a month, a quarter.
-          </motion.p>
-          <motion.div {...reveal}>
-            <Rhythm />
-          </motion.div>
-        </section>
-
-        {/* ── 04 OKRS ── */}
-        <ChapterTitle chapter={CHAPTERS[3]} total={TOTAL} tone="teal" />
-        <section id="okrs" className="mb-32 scroll-mt-24">
-          <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] mb-4 max-w-3xl">
-            Six objectives, each with one owner.
-          </motion.h2>
-          <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-10">
-            The design team’s first quarter with fixed objectives, from Sary’s design plan. Each track runs from the baseline
-            <span className="inline-block w-2.5 h-2.5 rounded-full border-2 border-white/50 mx-1.5 align-middle" aria-hidden /> to the target
-            <span className="inline-block w-2.5 h-2.5 rounded-full mx-1.5 align-middle" style={{ background: ACCENT }} aria-hidden />.
-          </motion.p>
-          <OkrBoard />
-        </section>
-
-        {/* ── 05 SYSTEM & SPEED ── */}
-        <ChapterTitle chapter={CHAPTERS[4]} total={TOTAL} />
-        <section id="system" className="mb-32 scroll-mt-24">
-          <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] mb-6 max-w-3xl">
-            One tokenized system, built from directly.
-          </motion.h2>
-          <motion.p {...reveal} className="text-white/60 text-lg md:text-xl leading-relaxed max-w-3xl mb-12">
-            “Adopted” meant one tokenized system that engineers across all three streams built from directly, adapting it per
-            product without one-off designs. Phase 1 of the mobile system shipped in the team’s first OKR quarter.
-          </motion.p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {[
-              ['+40%', 'Design velocity', 'Design cycle time, brief to dev-ready'],
-              ['30%', 'Faster handoff', 'Design to development'],
-              ['25+', 'Engineers', 'Building from the system'],
-              ['8 → 20', 'Developers in Figma', 'With 5 design tools cut to 1'],
-            ].map(([v, k, d], i) => (
-              <motion.div key={k} {...reveal} transition={{ ...reveal.transition, delay: i * 0.06 }} className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5">
-                <p className="text-white text-4xl font-extrabold tracking-[-0.04em] tabular-nums">{v}</p>
-                <p className="text-white font-semibold mt-2">{k}</p>
-                <p className="text-white/50 text-sm">{d}</p>
-              </motion.div>
+          <motion.dl {...reveal} className="grid grid-cols-2 md:grid-cols-4 border-t border-b" style={{ borderColor: LINE }}>
+            {SCALE.map(([v, k], i) => (
+              <div key={k} className={`py-8 ${i ? 'md:border-l md:pl-8' : ''} ${i % 2 ? 'border-l pl-6 md:pl-8' : ''}`} style={{ borderColor: LINE }}>
+                <dt className="sr-only">{k}</dt>
+                <dd className="text-white text-6xl md:text-7xl font-extrabold tracking-[-0.06em] leading-none tabular-nums">{v}</dd>
+                <p className="text-white/50 mt-3">{k}</p>
+              </div>
             ))}
-          </div>
+          </motion.dl>
         </section>
 
-        {/* ── 06 HIRING ── */}
-        <ChapterTitle chapter={CHAPTERS[5]} total={TOTAL} tone="teal" />
-        <section id="hiring" className="mb-24 scroll-mt-24">
-          <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] mb-4 max-w-3xl">
-            The same brief and the same bar for every finalist.
-          </motion.h2>
-          <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-12">
-            I built Sary’s design hiring process from scratch and used it to hire senior and principal-level designers. Every
-            role had a clear profile, every finalist got the same take-home brief, and we scored each one on the same criteria:
-            fair decisions across a team spread over five countries.
-          </motion.p>
+        <Section i={1} tone="teal" title="Three streams, one team." lead="Designers worked day to day inside a stream with its PM, and came back to one team for the system, the research and the standard. Pick a stream.">
+          <Structure />
+        </Section>
 
-          <p className="text-white/45 text-sm mb-4">Role profiles I wrote</p>
-          <div className="grid lg:grid-cols-3 gap-3 mb-14">
-            {PROFILES.map(([t, y, d], i) => (
-              <motion.div key={t} {...reveal} transition={{ ...reveal.transition, delay: i * 0.06 }} className="rounded-2xl border border-white/[0.08] bg-[#0F1413] p-6">
-                <p className="text-white text-lg font-bold">{t}</p>
-                <p className="text-sm font-semibold mt-1 mb-3" style={{ color: ACCENT }}>
-                  {y}
-                </p>
-                <p className="text-white/60 text-sm leading-relaxed">{d}</p>
-              </motion.div>
+        <Section i={2} title="A rhythm from a day to a quarter." lead="Each ritual has one job. Read it top to bottom.">
+          <Rhythm />
+        </Section>
+
+        <Section i={3} tone="teal" title="Objectives with one owner each." lead="Our first quarter with fixed objectives had six. These three show the shape of it.">
+          <Objectives />
+        </Section>
+
+        <Section i={4} title="What changed." lead="Phase 1 of the design system shipped that quarter, and engineers across all three streams built from it.">
+          <dl className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">
+            {RESULTS.map(([v, k]) => (
+              <div key={k}>
+                <dt className="sr-only">{k}</dt>
+                <dd className="text-5xl md:text-6xl font-extrabold tracking-[-0.05em] leading-none tabular-nums" style={{ color: ACCENT }}>
+                  {v}
+                </dd>
+                <p className="text-white/60 mt-3 leading-snug">{k}</p>
+              </div>
             ))}
-          </div>
+          </dl>
+        </Section>
 
-          <p className="text-white/45 text-sm mb-4">The process</p>
-          <ol className="grid sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-14">
+        <Section i={5} tone="teal" title="The same brief and the same bar." lead="I built Sary’s design hiring process from scratch and used it to hire senior and principal designers across five countries.">
+          <ol className="grid grid-cols-1 sm:grid-cols-5 border-t" style={{ borderColor: LINE }}>
             {PROCESS.map((p, i) => (
-              <motion.li key={p} {...reveal} transition={{ ...reveal.transition, delay: i * 0.05 }} className="rounded-2xl border border-white/[0.08] p-5">
-                <span className="grid place-items-center w-8 h-8 rounded-full text-sm font-bold text-[#06201E] mb-3" style={{ background: ACCENT }}>
-                  {i + 1}
+              <li key={p} className="pt-5 pb-2 sm:pr-4 grid grid-cols-[32px_minmax(0,1fr)] sm:block gap-2">
+                <span className="text-sm font-semibold tabular-nums" style={{ color: ACCENT }}>
+                  {String(i + 1).padStart(2, '0')}
                 </span>
-                <p className="text-white font-semibold leading-snug">{p}</p>
-              </motion.li>
+                <span className="text-white font-semibold sm:block sm:mt-2">{p}</span>
+              </li>
             ))}
           </ol>
+          <p className="text-white/55 leading-relaxed mt-8 max-w-3xl">
+            Every finalist got the same open brief, a venue-booking app with a sports community, and was scored on the same
+            four things: storytelling, rationale, quality and prioritisation.
+          </p>
+        </Section>
 
-          <div className="grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] gap-3 mb-20">
-            <motion.div {...reveal} className="rounded-[24px] p-6 md:p-8" style={{ background: `linear-gradient(160deg, ${DEEP}, #0B1F1E)` }}>
-              <p className="text-white text-xl font-bold mb-2">The take-home brief</p>
-              <p className="text-white/70 leading-relaxed mb-4">
-                An open problem: a venue-booking app with a social sports community, covering booking, payment, cancellation,
-                cost-sharing, matchmaking, gamification and tournaments. Left open on purpose, to see how far a senior
-                candidate takes it.
-              </p>
-              <p className="text-white/50 text-sm mb-2">Business goals to design for</p>
-              <div className="flex flex-wrap gap-1.5 mb-4">
-                {['Daily active users', 'Bookings per user', 'Download → booking', 'Total GMV'].map((x) => (
-                  <span key={x} className="text-xs font-medium rounded-full px-2.5 py-1 text-[#CFF5EF]" style={{ background: `${ACCENT}26` }}>
-                    {x}
-                  </span>
-                ))}
-              </div>
-              <p className="text-white/50 text-sm mb-2">Deliverables</p>
-              <p className="text-white/80 text-sm">Personas (pains, needs, motivations), user scenarios, high-fidelity wireframes.</p>
-            </motion.div>
-            <motion.div {...reveal} className="grid gap-3">
-              <div className="rounded-[24px] border border-white/[0.08] p-6">
-                <p className="text-white font-bold mb-3">Scorecard</p>
-                <ul className="grid gap-2">
-                  {SCORECARD.map((x) => (
-                    <li key={x} className="flex gap-2.5 text-white/75 text-sm">
-                      <span style={{ color: ACCENT }}>✓</span>
-                      {x}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="rounded-[24px] border border-white/[0.08] p-6">
-                <p className="text-white font-bold mb-3">What I looked for at senior and principal level</p>
-                <ul className="grid gap-2">
-                  {LOOKED_FOR.map((x) => (
-                    <li key={x} className="flex gap-2.5 text-white/75 text-sm">
-                      <span style={{ color: ACCENT }}>✓</span>
-                      {x}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </motion.div>
-          </div>
+        <Section i={6} title="Now: a game design team at Lobah." lead="Since 2025 I lead 4+ game UI and UX designers across Samla, IceBreaker, Jackaroo and Lobahplay, on PC and mobile.">
+          <figure className="border-l-2 pl-6 max-w-3xl" style={{ borderColor: ACCENT }}>
+            <blockquote className="text-white text-xl md:text-2xl leading-snug">
+              “He has a great talent for organizing work, skillfully delegating tasks based on his team members’ individual
+              strengths, while also fostering their professional growth, acting as a true mentor in the process.”
+            </blockquote>
+            <figcaption className="text-white/45 text-sm mt-4">Polina Kosheleva, Senior Game UI Artist, reported to Ahmad</figcaption>
+          </figure>
+        </Section>
 
-          <Takeaway
-            accent={ACCENT}
-            deep={DEEP}
-            label="What I carry forward"
-            note="“His ability to distill complex data into actionable insights has been invaluable for our strategic decision-making. He has fostered a culture of innovation within our design team.” — Mohammed Aldossary, Co-founder & CEO, Sary"
-          >
-            A young team didn’t need more pressure. It needed an owner for every objective, a rhythm people could rely on, and
-            one source of truth.
-          </Takeaway>
-        </section>
-
-        {/* ── 07 LOBAH ── */}
-        <ChapterTitle chapter={CHAPTERS[6]} total={TOTAL} />
-        <section id="lobah" className="mb-16 scroll-mt-24">
-          <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] mb-4 max-w-3xl">
-            Now: a game design team at Lobah.
-          </motion.h2>
-          <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-10">
-            Since January 2025 I’ve led a team of 4+ game UI and UX designers across four products, on PC and mobile. We
-            redesigned onboarding and progression to shorten time to play.
-          </motion.p>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-12">
-            {LOBAH_PRODUCTS.map(([n, d], i) => (
-              <motion.div key={n} {...reveal} transition={{ ...reveal.transition, delay: i * 0.05 }} className="rounded-2xl border p-5" style={{ borderColor: LINE, background: PANEL }}>
-                <p className="text-white text-xl font-bold">{n}</p>
-                <p className="text-white/50 text-sm mt-1">{d}</p>
-              </motion.div>
-            ))}
-          </div>
-          <p className="text-white/45 text-sm mb-4">From the designers who report to me</p>
-          <div className="grid lg:grid-cols-3 gap-3">
-            {LOBAH_QUOTES.map(([q, by], i) => (
-              <motion.figure key={by} {...reveal} transition={{ ...reveal.transition, delay: i * 0.06 }} className="rounded-[24px] border p-6 flex flex-col" style={{ borderColor: LINE }}>
-                <blockquote className="text-white/85 leading-relaxed flex-1">“{q}”</blockquote>
-                <figcaption className="text-white/45 text-sm mt-5">{by}</figcaption>
-              </motion.figure>
-            ))}
-          </div>
-        </section>
+        <Takeaway
+          accent={ACCENT}
+          deep={DEEP}
+          note="“He has fostered a culture of innovation within our design team, enhancing collaboration and elevating our deliverables.” — Mohammed Aldossary, Co-founder & CEO, Sary"
+        >
+          A young team didn’t need more pressure. It needed an owner for every objective, a rhythm people could rely on, and one
+          source of truth.
+        </Takeaway>
       </div>
     </CaseShell>
   );
