@@ -14,12 +14,13 @@ import { ArrowLeft, ArrowRight, Linkedin } from 'lucide-react';
 
 const LINKEDIN_URL = 'https://www.linkedin.com/in/el-deeb-39032b131/details/recommendations/';
 
-type Quote = { text: string; name: string; role: string; relation: string; tint: string };
+type Quote = { text: string; name: string; role: string; relation: string; tint: string; photo: string };
 
 const QUOTES: Quote[] = [
   {
     text: 'His ability to distill complex data into actionable insights has been invaluable for our strategic decision-making. He has fostered a culture of innovation within our design team, enhancing collaboration and elevating our deliverables.',
     name: 'Mohammed Aldossary',
+    photo: '/images/people/aldossary.webp',
     role: 'Co-founder & CEO at Sary · Ex Careem',
     relation: 'Worked together at Sary',
     tint: '#2DD4BF',
@@ -27,6 +28,7 @@ const QUOTES: Quote[] = [
   {
     text: 'Ahmed has the capacity to come up with creative solutions to complex problems and takes sound decisions based on his communication with PMs and his understanding of his team members’ needs, and has a positive attitude towards trying new things and is always willing to explore new challenges.',
     name: 'Yasser Nazmy',
+    photo: '/images/people/nazmy.webp',
     role: 'Design Director at HungerStation, Delivery Hero',
     relation: 'Worked together',
     tint: '#F5C451',
@@ -34,6 +36,7 @@ const QUOTES: Quote[] = [
   {
     text: 'Ahmad is an excellent lead, working with him was both comfortable and interesting! He is always attentive to detail, passionate about his work, and fully committed to everything he does! He has a great talent for organizing work, skillfully delegating tasks based on his team members’ individual strengths, while also fostering their professional growth, acting as a true mentor in the process.',
     name: 'Polina Kosheleva',
+    photo: '/images/people/polina.webp',
     role: 'Senior Game UI Artist · UX Designer',
     relation: 'Reported to Ahmad directly',
     tint: '#8B85FF',
@@ -41,6 +44,7 @@ const QUOTES: Quote[] = [
   {
     text: 'Ahmed is an exceptional leader, and I feel incredibly fortunate to have been part of his team. Under his leadership, everything was well-organized, transparent, and clearly communicated. He created an environment where everyone felt supported, heard, and appreciated.',
     name: 'Sandra Mistal',
+    photo: '/images/people/sandra.webp',
     role: 'UI Designer · 2D Artist, games',
     relation: 'Reported to Ahmad directly',
     tint: '#F472B6',
@@ -48,6 +52,7 @@ const QUOTES: Quote[] = [
   {
     text: 'Ahmad’s adept management of report rituals, coupled with his exceptional efforts in customizing reports to reflect product performance, showcases his skill in integrating new cultural dynamics between design and product growth.',
     name: 'Asad Ali Shah',
+    photo: '/images/people/asad.webp',
     role: 'Director of Growth · Advisor, business development',
     relation: 'Worked together',
     tint: '#A78BFA',
@@ -55,6 +60,7 @@ const QUOTES: Quote[] = [
   {
     text: 'I have had the pleasure to work under Ahmed’s management for many months, and his attention to detail, positive attitude and knowledge of UX and UI design both in the game industry and outside of it cannot be highlighted enough. Ahmed is a serious designer and a great manager, he would be a great addition to any team.',
     name: 'Axel Xiberras',
+    photo: '/images/people/axel.webp',
     role: 'UX UI Designer',
     relation: 'Reported to Ahmad directly',
     tint: '#60A5FA',
@@ -62,18 +68,12 @@ const QUOTES: Quote[] = [
   {
     text: 'Ahmed is one of those designers who gets to the heart of a problem and solves it elegantly and effectively. He didn’t just present findings; he defined what success looked like and showed exactly how our work would move the needle.',
     name: 'Mohamed Kamal',
+    photo: '/images/people/kamal.webp',
     role: 'Senior Product Designer at HungerStation · ex-Sary',
     relation: 'Worked on the same team',
     tint: '#34D399',
   },
 ];
-
-const initials = (name: string) =>
-  name
-    .split(' ')
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join('');
 
 export function Testimonials() {
   const row = useRef<HTMLDivElement>(null);
@@ -143,9 +143,17 @@ export function Testimonials() {
               <p className="text-white text-lg md:text-[21px] leading-[1.45] tracking-[-0.01em]">{q.text}</p>
             </blockquote>
             <figcaption className="flex items-center gap-3.5">
-              <span aria-hidden className="grid place-items-center w-11 h-11 rounded-full text-sm font-bold text-[#0A0A0A] flex-none" style={{ background: q.tint }}>
-                {initials(q.name)}
-              </span>
+              <img
+                src={q.photo}
+                alt=""
+                aria-hidden
+                loading="lazy"
+                decoding="async"
+                width={48}
+                height={48}
+                className="w-12 h-12 rounded-full object-cover flex-none"
+                style={{ boxShadow: `0 0 0 2px ${q.tint}` }}
+              />
               <span className="min-w-0">
                 <span className="block text-white font-semibold text-[15px]">{q.name}</span>
                 <span className="block text-white/55 text-[13px] leading-snug">{q.role}</span>

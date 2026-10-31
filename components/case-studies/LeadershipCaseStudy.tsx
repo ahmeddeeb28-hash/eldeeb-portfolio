@@ -23,12 +23,26 @@ const CHAPTERS: Chapter[] = [
   { id: 'overview', num: '01', roman: 'I', label: 'Overview', beat: 'How I lead.' },
   { id: 'principles', num: '02', roman: 'II', label: 'Principles', beat: 'What I hold to.' },
   { id: 'rituals', num: '03', roman: 'III', label: 'Rituals', beat: 'The rhythm.' },
-  { id: 'shape', num: '04', roman: 'IV', label: 'Team shape', beat: 'Streams and one team.' },
-  { id: 'objectives', num: '05', roman: 'V', label: 'Objectives', beat: 'One owner each.' },
-  { id: 'people', num: '06', roman: 'VI', label: 'People', beat: 'Hire and grow.' },
-  { id: 'proof', num: '07', roman: 'VII', label: 'Proof', beat: 'Where it worked.' },
+  { id: 'practice', num: '04', roman: 'IV', label: 'In practice', beat: 'Three moments.' },
+  { id: 'shape', num: '05', roman: 'V', label: 'Team shape', beat: 'Streams and one team.' },
+  { id: 'objectives', num: '06', roman: 'VI', label: 'Objectives', beat: 'One owner each.' },
+  { id: 'people', num: '07', roman: 'VII', label: 'People', beat: 'Hire and grow.' },
+  { id: 'proof', num: '08', roman: 'VIII', label: 'Proof', beat: 'Where it worked.' },
 ];
-const TOTAL = 'VII';
+const TOTAL = 'VIII';
+
+/* the illustrations: one poster for the page, one for the rhythm,
+   and three practices told as a sequence */
+const IMG = '/images/case-studies/leadership';
+const PRACTICES: { src: string; alt: string; principle: string }[] = [
+  { src: `${IMG}/priority.webp`, alt: 'Making a priority actionable. Frame: bring the problem and goals into view. Choose: discuss the trade-off and agree the focus. Own: give the work an owner and a next step. Clarity, commitment, action.', principle: 'One owner for every objective' },
+  { src: `${IMG}/critique.webp`, alt: 'Turning critique into a decision. Show the reasoning, challenge the work, record the decision. The outcome is a design decision the team can act on.', principle: 'A rhythm people can rely on' },
+  { src: `${IMG}/coaching.webp`, alt: 'Coaching through the work. Listen: find the challenge behind the design. Practise: create an opportunity to apply the focus. Reflect: discuss the reasoning and the next step.', principle: 'Grow people on a clear bar' },
+];
+
+const Poster = ({ src, alt }: { src: string; alt: string }) => (
+  <img src={src} alt={alt} loading="lazy" decoding="async" className="w-full h-auto rounded-[20px] md:rounded-[28px] border" style={{ borderColor: LINE }} />
+);
 
 function Section({ i, tone, title, lead, children }: { i: number; tone?: 'teal'; title: string; lead: string; children: ReactNode }) {
   const c = CHAPTERS[i];
@@ -267,6 +281,9 @@ export function LeadershipCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
           >
             <p>Five principles and a weekly rhythm I’ve used to run design teams, from a B2B marketplace to a games studio.</p>
           </CaseIntro>
+          <motion.div {...reveal} className="mb-12">
+            <Poster src={`${IMG}/cover.webp`} alt="Design leadership. Building the team behind the product. People, products, practice." />
+          </motion.div>
           <motion.dl {...reveal} className="grid grid-cols-3 border-t border-b" style={{ borderColor: LINE }}>
             {SCALE.map(([v, k], i) => (
               <div key={k} className={`py-8 ${i ? 'border-l pl-5 md:pl-8' : ''}`} style={{ borderColor: LINE }}>
@@ -283,18 +300,37 @@ export function LeadershipCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
         </Section>
 
         <Section i={2} title="A rhythm from a day to a quarter." lead="Each ritual has one job. Read it top to bottom; the quarter sets what the days work on.">
-          <Rhythm />
+          <div className="grid gap-6">
+            <Poster src={`${IMG}/rhythm.webp`} alt="A rhythm for better decisions. Shared priorities. Open critique. Learning carried forward. Align, review, learn." />
+            <Rhythm />
+          </div>
         </Section>
 
-        <Section i={3} tone="teal" title="Designers in streams, one team behind them." lead="Designers work day to day with a stream and its PM, and come back to one team for the system, research and standard.">
+        <Section i={3} tone="teal" title="Three moments where it shows." lead="How a priority, a critique and a coaching conversation run on my teams.">
+          <ol className="grid gap-12 md:gap-16">
+            {PRACTICES.map((pr, k) => (
+              <li key={pr.src}>
+                <Poster src={pr.src} alt={pr.alt} />
+                <p className="flex items-baseline gap-3 mt-4 text-white/55 text-sm">
+                  <span className="tabular-nums font-semibold" style={{ color: ACCENT }}>
+                    {String(k + 1).padStart(2, '0')}
+                  </span>
+                  Principle: <span className="text-white/80">{pr.principle}</span>
+                </p>
+              </li>
+            ))}
+          </ol>
+        </Section>
+
+        <Section i={4} title="Designers in streams, one team behind them." lead="Designers work day to day with a stream and its PM, and come back to one team for the system, research and standard.">
           <Shape />
         </Section>
 
-        <Section i={4} title="Every objective has one owner." lead="Objectives are short, measurable and owned by one person. This is the format, with one of mine as the example.">
+        <Section i={5} tone="teal" title="Every objective has one owner." lead="Objectives are short, measurable and owned by one person. This is the format, with one of mine as the example.">
           <OkrFormat />
         </Section>
 
-        <Section i={5} tone="teal" title="Hire on one bar, grow on the same one." lead="Every finalist gets the same open brief and is scored on the same four things: storytelling, rationale, quality and prioritisation. Bi-weekly 1:1s turn the same bar into a growth plan.">
+        <Section i={6} title="Hire on one bar, grow on the same one." lead="Every finalist gets the same open brief and is scored on the same four things: storytelling, rationale, quality and prioritisation. Bi-weekly 1:1s turn the same bar into a growth plan.">
           <ol className="grid grid-cols-1 sm:grid-cols-5 border-t" style={{ borderColor: LINE }}>
             {HIRING.map((p, i) => (
               <li key={p} className="pt-5 pb-2 sm:pr-4 grid grid-cols-[32px_minmax(0,1fr)] sm:block gap-2">
@@ -307,7 +343,7 @@ export function LeadershipCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
           </ol>
         </Section>
 
-        <Section i={6} title="Where it worked." lead="The same playbook, two very different teams.">
+        <Section i={7} tone="teal" title="Where it worked." lead="The same playbook, two very different teams.">
           <div className="grid md:grid-cols-2 gap-3 mb-12">
             {PROOF.map((t) => (
               <Panel key={t.where} className="!p-6 md:!p-8">

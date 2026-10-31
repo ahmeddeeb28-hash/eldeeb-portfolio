@@ -91,7 +91,7 @@ const COPY: Record<string, { name: string; line: string; tint: string; beats: st
     name: 'Design leadership',
     line: 'How I lead design teams: one owner per objective, a steady rhythm, one source of truth.',
     tint: '#0F4C4A',
-    beats: ['Every day: stand-up and PM alignment', 'Every week: review, crit, production call', 'Every month: replays and a retro', 'Every quarter: objectives, one owner each'],
+    beats: ['Building the team behind the product', 'Making a priority actionable', 'Turning critique into a decision', 'Coaching through the work'],
   },
   'sary-repeat-customers': {
     name: 'Sary Buy Again',
@@ -240,60 +240,48 @@ function FreshStage({ p }: { p: MotionValue<number> }) {
   );
 }
 
-/* the leadership rhythm: five cadences, each with its rituals,
-   lighting up from a day to a quarter as the card's story plays;
-   the quarter loops back to the day */
-const RHYTHM: [string, string[]][] = [
-  ['Day', ['Stand-up', 'Designer ↔ PM']],
-  ['Week', ['Design review', 'Crit', 'Production call', 'Design QA']],
-  ['Two weeks', ['1:1s']],
-  ['Month', ['Session replays', 'Retro']],
-  ['Quarter', ['OKR review']],
+/* the leadership story as a deck of illustrated cutouts: the cover,
+   then the three practices. Each one lands on top of the last as
+   the card's story plays; the ones before stay stacked behind. */
+const LEAD_IMG = '/images/case-studies/leadership';
+const DECK = [
+  { src: `${LEAD_IMG}/cover.webp`, alt: 'Design leadership: building the team behind the product' },
+  { src: `${LEAD_IMG}/priority.webp`, alt: 'Making a priority actionable: frame, choose, own' },
+  { src: `${LEAD_IMG}/critique.webp`, alt: 'Turning critique into a decision: show the reasoning, challenge the work, record the decision' },
+  { src: `${LEAD_IMG}/coaching.webp`, alt: 'Coaching through the work: listen, practise, reflect' },
 ];
 function TeamStage({ p }: { p: MotionValue<number> }) {
   const v = useStep(p);
-  const lit = Math.max(1, Math.floor(clamp01((v - 0.05) / 0.7) * RHYTHM.length + 0.0001));
-  const now = Math.min(lit, RHYTHM.length) - 1;
-  const loop = v >= 0.8;
+  const cur = Math.min(DECK.length - 1, Math.floor(clamp01((v - 0.04) / 0.8) * DECK.length));
   return (
-    <div className="absolute inset-0 flex items-center justify-center px-[5%] text-white">
-      <div className="w-full max-w-[640px]">
-        <ol className="grid gap-1.5 md:gap-2.5">
-          {RHYTHM.map(([k, items], i) => {
-            const cur = i === now;
-            const on = i <= now;
-            return (
-              <li
-                key={k}
-                className="grid grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[auto_minmax(0,1fr)] items-center gap-3 md:gap-5 rounded-xl md:rounded-2xl px-3.5 md:px-5 py-2 md:py-3.5 transition-all duration-300"
-                style={{
-                  background: cur ? '#2DD4BF' : on ? 'rgba(45,212,191,0.12)' : 'rgba(255,255,255,0.03)',
-                  color: cur ? '#06201E' : '#FFFFFF',
-                  opacity: on ? 1 : 0.4,
-                  transform: cur ? 'scale(1.02)' : 'none',
-                  boxShadow: cur ? '0 18px 40px -18px rgba(45,212,191,0.7)' : 'none',
-                }}
-              >
-                <span className="text-lg md:text-xl xl:text-2xl font-extrabold tracking-[-0.03em] leading-none whitespace-nowrap md:w-[9.5em]">Every {k.toLowerCase()}</span>
-                <span className="md:hidden text-xs font-semibold tabular-nums opacity-70">{items.length}</span>
-                <span className="hidden md:flex flex-wrap gap-1.5">
-                  {items.map((it) => (
-                    <span
-                      key={it}
-                      className="rounded-lg px-2.5 py-1 text-sm font-semibold whitespace-nowrap"
-                      style={{ background: cur ? 'rgba(6,32,30,0.12)' : 'rgba(255,255,255,0.08)' }}
-                    >
-                      {it}
-                    </span>
-                  ))}
-                </span>
-              </li>
-            );
-          })}
-        </ol>
-        <p className="mt-3 md:mt-4 text-xs md:text-base font-semibold text-[#2DD4BF] transition-opacity duration-300" style={{ opacity: loop ? 1 : 0 }}>
-          ↺ The quarter sets what the days work on
-        </p>
+    <div className="absolute inset-0 grid place-items-center px-[5%]">
+      <div className="relative w-full max-w-[680px] aspect-[3/2]">
+        {DECK.map((d, i) => {
+          const past = i < cur;
+          const on = i === cur;
+          const depth = cur - i;
+          return (
+            <img
+              key={d.src}
+              src={d.src}
+              alt={on ? d.alt : ''}
+              aria-hidden={!on}
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 w-full h-full object-cover rounded-xl md:rounded-2xl transition-all duration-500 ease-out"
+              style={{
+                opacity: on ? 1 : past ? Math.max(0, 0.55 - depth * 0.18) : 0,
+                transform: on
+                  ? 'translateY(0) rotate(0deg) scale(1)'
+                  : past
+                    ? `translateY(${-depth * 4}%) rotate(${(i % 2 ? 1 : -1) * (2 + depth)}deg) scale(${1 - depth * 0.05})`
+                    : 'translateY(8%) rotate(0deg) scale(0.96)',
+                zIndex: i,
+                boxShadow: on ? '0 40px 70px -30px rgba(0,0,0,0.85)' : 'none',
+              }}
+            />
+          );
+        })}
       </div>
     </div>
   );
