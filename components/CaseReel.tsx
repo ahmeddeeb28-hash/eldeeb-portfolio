@@ -53,10 +53,10 @@ const STATS: Record<string, Stat[]> = {
 /* My part in each case, as each case study states it. A line recruiters
    look for first: who did what. */
 const ROLE: Record<string, string> = {
-  'sary-repeat-customers': 'Lead Product Designer at Sary, owned the Buy Again hub',
+  'sary-repeat-customers': 'Senior Product Designer at Sary, designed the Buy Again hub',
   'sary-usability-report': 'Senior Product Designer, Experience Design: wrote the quarterly report',
-  'sampo-ai-pricing': 'Design consultant and design team lead: aligned founders, product and engineering, built and tested the prototype',
-  'fresh-order-placed': 'Lead Product Designer, the order placed moment end to end',
+  'sampo-ai-pricing': 'Product Design Consultant (Contract): aligned founders, product and engineering, built and tested the prototype',
+  'fresh-order-placed': 'Freelance product designer: the order placed moment end to end',
 };
 
 const COPY: Record<string, { name: string; line: string; tint: string; beats: string[] }> = {
@@ -159,8 +159,8 @@ function ReportStage({ p }: { p: MotionValue<number> }) {
           const t = clamp01((v - 0.08 - i * 0.12) / 0.3);
           const final = 34 + 66 * Math.sqrt(f.pct / 100);
           return (
-            <div key={f.k} className="h-9 md:h-11 rounded-xl grid place-items-center text-white text-[11px] md:text-xs font-semibold transition-[width] duration-200" style={{ width: `${100 - (100 - final) * t}%`, background: ['#2DD4BF', '#38BDF8', '#3B82F6', '#1E3A8A'][i] }}>
-              <span className="truncate px-2">
+            <div key={f.k} className="min-w-fit h-9 md:h-11 rounded-xl grid place-items-center text-white text-[11px] md:text-xs font-semibold transition-[width] duration-200" style={{ width: `${100 - (100 - final) * t}%`, background: ['#2DD4BF', '#38BDF8', '#3B82F6', '#1E3A8A'][i] }}>
+              <span className="whitespace-nowrap px-3">
                 {f.k} · {f.pct}%
               </span>
             </div>
@@ -171,7 +171,7 @@ function ReportStage({ p }: { p: MotionValue<number> }) {
           <span className="text-[#5B6478] text-xs">shoppers {v > 0.62 ? 'reached Discover' : 'still in'}</span>
         </p>
       </div>
-      <div className="relative h-[86%] aspect-[318/636] rounded-[28px] overflow-hidden bg-black border-[5px] border-[#1b1d22] shadow-[0_30px_60px_-30px_rgba(15,27,61,0.55)] hidden sm:block" style={{ opacity: 0.25 + 0.75 * heat, transform: `translateY(${(1 - heat) * 16}px)` }}>
+      <div className="relative h-[86%] aspect-[318/636] rounded-[28px] overflow-hidden bg-black border-[5px] border-[#1b1d22] shadow-[0_30px_60px_-30px_rgba(15,27,61,0.55)] hidden sm:block lg:hidden xl:block" style={{ opacity: 0.25 + 0.75 * heat, transform: `translateY(${(1 - heat) * 16}px)` }}>
         <img src="/images/case-studies/sary-report/heat-2.webp" alt="" aria-hidden className="w-full h-full object-cover" />
         <span className="absolute left-2 bottom-2 rounded-full bg-black/65 text-white text-[10px] font-semibold px-2 py-0.5">Discover heatmap</span>
       </div>
@@ -386,8 +386,8 @@ function Stats({ p, stats, th }: { p: MotionValue<number>; stats: Stat[]; th: Th
   const [lead, ...rest] = stats;
   return (
     <div className="grid grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,1fr)] gap-2.5">
-      <div className="rounded-2xl p-4 md:p-5 shadow-[0_20px_40px_-22px_rgba(0,0,0,0.55)]" style={{ background: th.lead.bg, border: `1px solid ${th.lead.border}` }}>
-        <p className="font-extrabold tabular-nums leading-none tracking-[-0.055em] text-4xl md:text-[clamp(44px,4.4vw,72px)]" style={{ color: th.lead.ink }}>
+      <div className="@container min-w-0 rounded-2xl p-4 md:p-5 shadow-[0_20px_40px_-22px_rgba(0,0,0,0.55)]" style={{ background: th.lead.bg, border: `1px solid ${th.lead.border}` }}>
+        <p className="font-extrabold tabular-nums leading-none tracking-[-0.055em] whitespace-nowrap text-[clamp(26px,28cqi,72px)]" style={{ color: th.lead.ink }}>
           {show(lead)}
         </p>
         <p className="text-xs md:text-sm mt-2.5 leading-snug" style={{ color: th.lead.sub }}>
@@ -396,8 +396,8 @@ function Stats({ p, stats, th }: { p: MotionValue<number>; stats: Stat[]; th: Th
         </p>
       </div>
       {rest.map((s2) => (
-        <div key={s2.k} className="rounded-2xl p-4 md:p-5" style={{ background: th.tile.bg, border: `1px solid ${th.tile.border}` }}>
-          <p className="font-bold tabular-nums leading-none tracking-[-0.045em] text-3xl md:text-[clamp(30px,2.8vw,46px)]" style={{ color: th.tile.ink }}>
+        <div key={s2.k} className="@container min-w-0 rounded-2xl p-4 md:p-5" style={{ background: th.tile.bg, border: `1px solid ${th.tile.border}` }}>
+          <p className="font-bold tabular-nums leading-none tracking-[-0.045em] whitespace-nowrap text-[clamp(20px,24cqi,46px)]" style={{ color: th.tile.ink }}>
             {show(s2)}
           </p>
           <p className="text-xs md:text-sm mt-2.5 leading-snug" style={{ color: th.tile.sub }}>
@@ -476,7 +476,7 @@ function Card({
     >
       <motion.div
         onClick={onOpen}
-        className={`relative h-full w-full overflow-hidden rounded-[32px] grid grid-rows-[auto_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1.2fr)] ${onOpen ? 'cursor-pointer' : ''}`}
+        className={`relative h-full w-full overflow-hidden rounded-[32px] grid grid-rows-[auto_minmax(0,1fr)] lg:grid-rows-1 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1.2fr)] ${onOpen ? 'cursor-pointer' : ''}`}
         style={{
           x: reduced ? 0 : x,
           rotate: reduced ? 0 : rot,
@@ -515,12 +515,12 @@ function Card({
             )}
           </div>
           {STATS[project.id] && (
-            <div className="hidden sm:block">
+            <div className="hidden lg:block">
               <Stats p={story} stats={STATS[project.id]} th={th} />
             </div>
           )}
           <div className="grid gap-5">
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <Beat p={story} beats={copy.beats} th={th} />
             </div>
             {onOpen && (

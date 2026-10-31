@@ -339,7 +339,7 @@ export function PremiumHero() {
             <li aria-hidden className="text-white/25">·</li>
             <li>Egypt</li>
             <li aria-hidden className="text-white/25">·</li>
-            <li>AI products, design systems, design leadership</li>
+            <li>AI product builder · design systems · design leadership</li>
           </motion.ul>
 
           {/* CTA row */}
@@ -507,7 +507,7 @@ export function PremiumHero() {
                   color: 'rgba(255,255,255,0.5)',
                 }}
               >
-                Product Design Lead
+                Lead Product Designer
               </div>
             </div>
           </div>

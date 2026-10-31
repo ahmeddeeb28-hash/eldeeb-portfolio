@@ -304,8 +304,8 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
             <CaseIntro
               meta={[
                 ['Company', 'Sampo AI'],
-                ['Role', 'Consultation & Design team management'],
-                ['Year', '2024 – 2025'],
+                ['Role', 'Product Design Consultant (Contract)'],
+                ['Year', 'Nov 2024 – Dec 2025'],
               ]}
               title="AI pricing merchants can trust, test and undo."
             >

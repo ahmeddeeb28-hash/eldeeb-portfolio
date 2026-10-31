@@ -168,7 +168,7 @@ const allProjects = [
     image: CASE_STUDY_IMAGES.freshOrderPlaced,
     stage: 'fresh' as const,
     year: 'Now',
-    category: 'Food Delivery · fresh',
+    category: 'Food Delivery · fresh · Freelance',
     title: 'fresh: The Five Seconds After Pay',
     summary:
       'I replaced the spinner after Pay with a 5 second window to fix the address or items, then a direct handoff to tracking.',

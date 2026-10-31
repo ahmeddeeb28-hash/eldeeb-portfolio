@@ -246,7 +246,7 @@ function FirstLeadHighlight() {
           className="font-mono font-black uppercase shrink-0 text-white/40"
           style={{ fontSize: 9.5, letterSpacing: '0.22em' }}
         >
-          2024
+          2025
         </span>
       </div>
 
@@ -352,7 +352,7 @@ function StorySection() {
               </span>
               <div className="flex flex-col gap-5">
                 <Meta label="Role" value="Lead Product Designer" />
-                <Meta label="Based" value="Remote / MENA" />
+                <Meta label="Based" value="Egypt · open to remote & relocation" />
                 <Meta label="Focus" value="Systems & Growth" />
                 <Meta label="Years" value="10+" />
               </div>
@@ -392,17 +392,14 @@ type Role = {
    read for velocity and lift. Every role carries both, in that order, and
    every claim traces back to the CV rather than to adjectives. */
 const CURRENT_ROLE: Role = {
-  role: 'Lead Game UI/UX Designer',
+  role: 'Lead Game Product Designer',
   company: 'Lobah Gaming',
   domain: 'Gaming',
-  period: '2024 to Present',
-  location: 'Poland & Saudi Arabia',
-  stamps: [
-    { city: 'Warsaw', country: 'PL', flag: 'PL' },
-    { city: 'Riyadh', country: 'SA', flag: 'SA' },
-  ],
+  period: 'Jan 2025 – Present',
+  location: 'Poland (Remote)',
+  stamps: [{ city: 'Warsaw', country: 'PL', flag: 'PL' }],
   lines: [
-    'Directing design across three titles (Samlah, IceBreaker, Jackaroo) on one shared game design system.',
+    'Directing design across three titles (Samla, IceBreaker, Jackaroo) on one shared game design system.',
     'Rebuilt onboarding and progression, cutting time-to-play by 40% and reducing early-session drop-off.',
     'Run UX review, game QA, and roadmap alignment across product, engineering, and art.',
   ],
@@ -411,15 +408,12 @@ const CURRENT_ROLE: Role = {
 
 const PAST_ROLES: Role[] = [
   {
-    role: 'Principal Product Designer',
-    company: 'SAMPO · AI Pricing Tool',
+    role: 'Product Design Consultant (Contract)',
+    company: 'Sampo AI',
     domain: 'AI · SaaS',
-    period: '2024 to 2025',
-    location: 'Dubai & Finland',
-    stamps: [
-      { city: 'Dubai',    country: 'AE', flag: 'AE' },
-      { city: 'Helsinki', country: 'FI', flag: 'FI' },
-    ],
+    period: 'Nov 2024 – Dec 2025',
+    location: 'Finland (Remote)',
+    stamps: [{ city: 'Helsinki', country: 'FI', flag: 'FI' }],
     lines: [
       'Owned end-to-end design for an early-stage AI pricing engine: vision, structure, and launch UX.',
       'Shipped the analysis dashboard and Alliance Perks UI: +40% pilot usage, +34% partner engagement, +28% sign-up intent.',
@@ -430,7 +424,7 @@ const PAST_ROLES: Role[] = [
     role: 'Product Design Lead',
     company: 'Hakbah',
     domain: 'Fintech',
-    period: '2024',
+    period: 'Oct 2023 – Dec 2024',
     location: 'Riyadh, Saudi Arabia',
     stamps: [{ city: 'Riyadh', country: 'SA', flag: 'SA' }],
     lines: [
@@ -440,14 +434,14 @@ const PAST_ROLES: Role[] = [
     ],
   },
   {
-    role: 'Design Lead',
+    role: 'Product Design Lead',
     company: 'Sary',
     domain: 'B2B E-commerce',
-    period: '2021 to 2024',
-    location: 'Riyadh, Saudi Arabia',
+    period: 'Sep 2021 – Sep 2023',
+    location: 'Riyadh, Saudi Arabia & Egypt',
     stamps: [{ city: 'Riyadh', country: 'SA', flag: 'SA' }],
     lines: [
-      'Promoted from Senior to Lead; managed 8 designers across 3 squads and raised design velocity 40%.',
+      'Senior Product Designer (Sep 2021 – Dec 2022), then Product Design Lead (Jan 2023 – Sep 2023): managed 8 designers across 3 product squads and raised design velocity 40%.',
       'Rolled out a tokenized design system to 25+ engineers, cutting handoff time 30%.',
       'Redesigned driver delivery and B2B checkout: +36% order-closure accuracy, 20% fewer delivery failures.',
     ],
@@ -456,7 +450,7 @@ const PAST_ROLES: Role[] = [
     role: 'Senior Product Designer',
     company: 'Zyda',
     domain: 'SaaS · F&B Commerce',
-    period: '2020 to 2021',
+    period: 'Jul 2020 – Aug 2021',
     location: 'Kuwait City, Kuwait',
     stamps: [{ city: 'Kuwait', country: 'KW', flag: 'KW' }],
     lines: [
@@ -469,7 +463,7 @@ const PAST_ROLES: Role[] = [
     role: 'Senior Product Designer',
     company: 'AqarMap',
     domain: 'Real Estate',
-    period: '2019 to 2021',
+    period: 'May 2019 – Feb 2020',
     location: 'Cairo, Egypt',
     stamps: [{ city: 'Cairo', country: 'EG', flag: 'EG' }],
     lines: [
@@ -1155,9 +1149,9 @@ const TIMELINE = [
   { year: '2015', role: 'Engineering beginnings', note: 'Built my first interface.' },
   { year: '2017', role: 'Product Designer', note: 'Turned curiosity into craft.' },
   { year: '2019', role: 'Senior Product Designer', note: 'Started owning systems, not only screens.' },
-  { year: '2021', role: 'Design Lead · B2B', note: 'Led mobile and web products at scale.' },
-  { year: '2024', role: 'International Design Leadership', note: 'Led teams across gaming, fintech, and AI.' },
-  { year: 'Now', role: 'Lead Game UI/UX', note: 'Exploring other parts of the world evolution.' },
+  { year: '2021', role: 'Senior Product Designer · Sary', note: 'Led mobile and web products at scale.' },
+  { year: '2023', role: 'Product Design Lead · Sary, Hakbah', note: 'Led 8 designers across 3 squads, then fintech.' },
+  { year: 'Now', role: 'Lead Game Product Designer · Lobah', note: 'Three titles: Samla, IceBreaker, Jackaroo.' },
 ];
 
 /* One horizontal milestone: year + role + note, stacked either above or
