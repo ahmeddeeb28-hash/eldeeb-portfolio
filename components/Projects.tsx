@@ -70,6 +70,19 @@ interface ProjectsProps {
 */
 const allProjects = [
   {
+    id: 'sary-design-leadership',
+    image: CASE_STUDY_IMAGES.saryGrocery,
+    year: '2023',
+    category: 'Design Leadership · Sary',
+    title: 'Sary: Building the Design Team',
+    summary:
+      'Eight designers across three squads and five countries. Quarterly OKRs with owners, a weekly rhythm, one design system and a fair hiring bar.',
+    accentColor: 'rgba(45,212,191,0.95)',
+    imageGlow:
+      'radial-gradient(ellipse 65% 55% at 30% 30%, rgba(45,212,191,0.09) 0%, transparent 70%)',
+    hasStudy: true,
+  },
+  {
     id: 'shorefield-holidays',
     image: CASE_STUDY_IMAGES.saasDashboard,
     year: '2020',

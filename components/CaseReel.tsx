@@ -28,6 +28,11 @@ type Project = { id: string; title: string; category?: string; hasStudy?: boolea
 /* real figures from each case study; `lead` is drawn larger */
 type Stat = { v: number; pre?: string; suf?: string; dp?: number; k: string; note?: string };
 const STATS: Record<string, Stat[]> = {
+  'sary-design-leadership': [
+    { v: 40, pre: '+', suf: '%', k: 'Design velocity', note: 'cycle time' },
+    { v: 30, suf: '%', k: 'Faster handoff' },
+    { v: 25, suf: '+', k: 'Engineers on the system' },
+  ],
   'sary-repeat-customers': [
     { v: 28, pre: '+', suf: '%', k: 'Repeat purchases' },
     { v: 27, pre: '+', suf: '%', k: 'Average order value' },
@@ -58,6 +63,13 @@ const STATS: Record<string, Stat[]> = {
    recommendation that speaks to this work. */
 type RoleFacts = { role: string; team?: string; owned?: string; duration?: string; proof?: string };
 const ROLE: Record<string, RoleFacts> = {
+  'sary-design-leadership': {
+    role: 'Product Design Lead',
+    team: '8 designers, 3 squads, 5 countries',
+    owned: 'OKRs, rituals, the design system and hiring',
+    duration: 'Jan – Sep 2023',
+    proof: 'Mohammed Aldossary, Sary’s co-founder & CEO',
+  },
   'sary-repeat-customers': {
     role: 'Product Design Lead',
     owned: 'The Buy Again hub, end to end',
@@ -81,6 +93,12 @@ const ROLE: Record<string, RoleFacts> = {
 };
 
 const COPY: Record<string, { name: string; line: string; tint: string; beats: string[] }> = {
+  'sary-design-leadership': {
+    name: 'Sary design leadership',
+    line: 'Eight designers across three squads, set up to ship: owners, rhythm, one source of truth.',
+    tint: '#0F4C4A',
+    beats: ['One lead, eight designers', 'Spread across Demand, Supply and Logistics', 'Five design tools down to one', 'Phase 1 of the system shipped'],
+  },
   'sary-repeat-customers': {
     name: 'Sary Buy Again',
     line: '39 taps down to 3. Repeat purchases up 28%, order value up 27%.',
@@ -228,7 +246,73 @@ function FreshStage({ p }: { p: MotionValue<number> }) {
   );
 }
 
+/* the team: one lead, eight designers fanning out to three squads,
+   five tools folding into one, then the quarter's results */
+const SQUAD_NAMES = ['Demand', 'Supply', 'Logistics'];
+const TOOLS = ['t1', 't2', 't3', 't4', 'Figma']; // only Figma is named; the other four aren't listed in the source
+function TeamStage({ p }: { p: MotionValue<number> }) {
+  const v = useStep(p);
+  const fan = clamp01((v - 0.12) / 0.3);
+  const fold = clamp01((v - 0.5) / 0.2);
+  const done = v >= 0.78;
+  // dots per group only draw the fan (3, 3, 2); not a confirmed headcount split
+  const groups = [3, 3, 2];
+  return (
+    <div className="absolute inset-0 overflow-hidden flex flex-col items-center justify-center gap-3 md:gap-6 px-[4%] text-white">
+      <span className="rounded-full px-3.5 py-1 md:px-4 md:py-1.5 text-xs md:text-sm font-bold text-[#06201E] bg-[#2DD4BF]">Design lead</span>
+      <svg aria-hidden viewBox="0 0 300 24" className="w-[min(78%,360px)] h-4 md:h-6 -my-1" style={{ opacity: fan }}>
+        <path d="M150 0 V10 M50 24 V10 H250 V24 M150 10 V24" fill="none" stroke="#2DD4BF" strokeOpacity="0.5" strokeWidth="2" />
+      </svg>
+      <div className="flex items-start justify-center" style={{ gap: `${6 + fan * 34}px` }}>
+        {groups.map((n, g) => (
+          <div key={g} className="flex flex-col items-center gap-2">
+            <div className="flex gap-1.5">
+              {Array.from({ length: n }, (_, i) => (
+                <span key={i} className="w-5 h-5 md:w-7 md:h-7 rounded-full border-2 border-[#2DD4BF] bg-[#0B3433]" />
+              ))}
+            </div>
+            <span className="text-[11px] md:text-sm font-semibold whitespace-nowrap text-[#CFF5EF]" style={{ opacity: fan }}>
+              {SQUAD_NAMES[g]}
+            </span>
+          </div>
+        ))}
+      </div>
+      <div className="hidden sm:flex items-center justify-center gap-2 min-h-[52px] mt-1 md:mt-3">
+        {done ? (
+          <div className="grid grid-cols-3 gap-2 text-center">
+            {[['Phase 1', 'System shipped'], ['8 / 3', 'Dashboards'], ['68', 'First SUS']].map(([a, b2]) => (
+              <div key={b2} className="rounded-xl px-2.5 py-2 md:px-3 bg-white/[0.06] border border-white/10">
+                <p className="text-base md:text-2xl font-extrabold tracking-tight leading-none whitespace-nowrap">{a}</p>
+                <p className="text-[10px] md:text-[11px] text-white/60 mt-1 whitespace-nowrap">{b2}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <>
+            {TOOLS.map((t) => {
+              const keep = t === 'Figma';
+              const o = keep ? 1 : 1 - fold;
+              return (
+                <span
+                  key={t}
+                  aria-hidden
+                  className="rounded-lg h-7 md:h-8 grid place-items-center text-xs font-semibold"
+                  style={{ width: keep ? 60 : 26, opacity: o, transform: `scale(${keep ? 1 + fold * 0.15 : 1 - fold * 0.4})`, background: keep ? '#2DD4BF' : 'rgba(255,255,255,0.1)', color: '#06201E', display: o <= 0.02 ? 'none' : undefined }}
+                >
+                  {keep ? 'Figma' : ''}
+                </span>
+              );
+            })}
+            <span className="text-xs md:text-sm text-white/70 ml-1.5 tabular-nums whitespace-nowrap">{fold < 1 ? '5 design tools' : '1 tool'}</span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 const STAGE: Record<string, (props: { p: MotionValue<number> }) => ReactNode> = {
+  'sary-design-leadership': TeamStage,
   'sary-repeat-customers': SaryStage,
   'sary-usability-report': ReportStage,
   'sampo-ai-pricing': SampoStage,
@@ -275,6 +359,11 @@ type Engrave = { ink: string; cut: string; filter: string };
    colour where the lockup sits), so the logo and the "Q4 ’22 report"
    text stay readable; the pressed-in look comes from the edges. */
 const ENGRAVE: Record<string, Engrave> = {
+  'sary-design-leadership': {
+    ink: '#9FD9CF', // on the deep teal #0F4C4A
+    cut: '#0F4C4A',
+    filter: 'drop-shadow(0 -1px 0 rgba(2,20,18,0.8)) drop-shadow(0 1px 0 rgba(207,245,239,0.16))',
+  },
   'sary-repeat-customers': {
     ink: '#C0C7DF', // 6.4:1 on #1D368D
     cut: '#1D368D',
@@ -299,6 +388,15 @@ const ENGRAVE: Record<string, Engrave> = {
 
 /* the lockup at the top of each card */
 const LOCKUP: Record<string, (e: Engrave) => ReactNode> = {
+  'sary-design-leadership': (e) => (
+    <span className="inline-flex items-center gap-2.5">
+      <SaryWord color={e.ink} h={38} />
+      <span className="h-5 w-[2px] rounded-full" style={{ background: e.ink }} />
+      <span className="text-[15px] font-bold" style={{ color: e.ink }}>
+        Design team
+      </span>
+    </span>
+  ),
   'sary-repeat-customers': (e) => <SaryWord color={e.ink} h={40} />,
   'sary-usability-report': (e) => (
     <span className="inline-flex items-center gap-2.5">
@@ -339,6 +437,18 @@ type Theme = {
 };
 
 const THEMES: Record<string, Theme> = {
+  'sary-design-leadership': {
+    bg: 'radial-gradient(ellipse 80% 90% at 85% 10%, #17706B 0%, transparent 62%), linear-gradient(160deg, #0F4C4A 0%, #062221 72%)',
+    border: 'rgba(45,212,191,0.22)',
+    kicker: 'rgba(207,245,239,0.7)',
+    ink: '#FFFFFF',
+    sub: 'rgba(225,248,244,0.75)',
+    lead: { bg: '#2DD4BF', ink: '#06201E', sub: 'rgba(6,32,30,0.72)', border: 'transparent' },
+    tile: { bg: 'rgba(45,212,191,0.1)', ink: '#FFFFFF', sub: 'rgba(207,245,239,0.7)', border: 'rgba(45,212,191,0.22)' },
+    btn: { bg: '#2DD4BF', ink: '#06201E' },
+    beatOn: '#2DD4BF',
+    beatOff: 'rgba(45,212,191,0.2)',
+  },
   'sary-repeat-customers': {
     bg: 'radial-gradient(ellipse 80% 90% at 85% 10%, #2B4BC0 0%, transparent 62%), linear-gradient(160deg, #1D368D 0%, #0E1A47 70%)',
     border: 'rgba(255,255,255,0.16)',

@@ -42,6 +42,13 @@
       "image": "/og/fresh-order-placed.jpg",
       "imageAlt": "fresh order placed case study: the placed screen, straight on to tracking",
       "type": "article"
+    },
+    "/work/sary-design-leadership": {
+      "title": "Sary design leadership: eight designers, three squads · Ahmad Eldeeb",
+      "description": "How I led Sary's design team of 8 across three squads and five countries: quarterly OKRs with owners, rituals, one design system and a hiring process built from scratch.",
+      "image": "/og/sary-design-leadership.jpg",
+      "imageAlt": "Sary design leadership case study: one lead, eight designers, three squads",
+      "type": "article"
     }
   }
 }
