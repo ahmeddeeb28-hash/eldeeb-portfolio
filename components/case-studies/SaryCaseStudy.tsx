@@ -369,8 +369,8 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
             <CaseIntro
               meta={[
                 ['Company', 'Sary'],
-                ['Role', 'Senior Product Designer'],
-                ['Year', '2022'],
+                ['Role', 'Product Design Lead'],
+                ['Year', '2023'],
               ]}
               title="Restock in 3 taps, not 39."
             >

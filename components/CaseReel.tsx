@@ -53,7 +53,7 @@ const STATS: Record<string, Stat[]> = {
 /* My part in each case, as each case study states it. A line recruiters
    look for first: who did what. */
 const ROLE: Record<string, string> = {
-  'sary-repeat-customers': 'Senior Product Designer at Sary, designed the Buy Again hub',
+  'sary-repeat-customers': 'Product Design Lead at Sary, led the Buy Again hub',
   'sary-usability-report': 'Senior Product Designer, Experience Design: wrote the quarterly report',
   'sampo-ai-pricing': 'Product Design Consultant (Contract): aligned founders, product and engineering, built and tested the prototype',
   'fresh-order-placed': 'Freelance product designer: the order placed moment end to end',

@@ -85,7 +85,7 @@ const allProjects = [
   {
     id: 'sary-repeat-customers',
     image: CASE_STUDY_IMAGES.saryGrocery,
-    year: '2022',
+    year: '2023',
     category: 'Grocery Marketplace · Sary era',
     title: 'Sary: Restock in 3 Taps, Not 39',
     summary:
