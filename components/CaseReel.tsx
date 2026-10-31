@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useInView, useMotionValueEvent, useReducedMotion, useScroll, useTransform, type MotionValue } from 'motion/react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { ArrowUpRight, Leaf } from 'lucide-react';
+import { ArrowUpRight, Leaf, Quote } from 'lucide-react';
 import { FUNNEL } from './case-studies/report/ReportData';
 import { SaryPhone } from './case-studies/sary/SaryPhone';
 import { FreshPhone, type PhoneState } from './case-studies/fresh/FreshPhone';
@@ -39,9 +39,9 @@ const STATS: Record<string, Stat[]> = {
     { v: 63.1, suf: '%', dp: 1, k: 'Used a section slider' },
   ],
   'sampo-ai-pricing': [
-    { v: 17, pre: '+', suf: '%', k: 'Winning mode, revenue', note: 'sample test' },
-    { v: 3, k: 'Modes tested before live' },
-    { v: 1, k: 'Click to undo' },
+    { v: 40, pre: '+', suf: '%', k: 'Dashboard usage', note: 'pilot' },
+    { v: 22, pre: '−', suf: '%', k: 'Setup friction' },
+    { v: 28, pre: '+', suf: '%', k: 'Sign-up intent' },
   ],
   'fresh-order-placed': [
     { v: 5, suf: 's', k: 'To fix the order after Pay' },
@@ -52,11 +52,32 @@ const STATS: Record<string, Stat[]> = {
 
 /* My part in each case, as each case study states it. A line recruiters
    look for first: who did what. */
-const ROLE: Record<string, string> = {
-  'sary-repeat-customers': 'Product Design Lead at Sary, led the Buy Again hub',
-  'sary-usability-report': 'Senior Product Designer, Experience Design: wrote the quarterly report',
-  'sampo-ai-pricing': 'Product Design Consultant (Contract): aligned founders, product and engineering, built and tested the prototype',
-  'fresh-order-placed': 'Freelance product designer: the order placed moment end to end',
+/* Who did what, the line reviewers look for first: role, team, what I
+   owned and how long, in one format on every card. Fields not yet
+   confirmed are left out rather than guessed. `proof` points to the
+   recommendation that speaks to this work. */
+type RoleFacts = { role: string; team?: string; owned?: string; duration?: string; proof?: string };
+const ROLE: Record<string, RoleFacts> = {
+  'sary-repeat-customers': {
+    role: 'Product Design Lead',
+    owned: 'The Buy Again hub, end to end',
+    proof: 'Mohammed Aldossary, Sary’s co-founder & CEO',
+  },
+  'sary-usability-report': {
+    role: 'Senior Product Designer',
+    owned: 'The quarterly usability report and its rituals',
+    proof: 'Asad Ali Shah, Director of Growth',
+  },
+  'sampo-ai-pricing': {
+    role: 'Freelance, then Product Design Consultant (Contract)',
+    team: 'Founders, engineering and growth',
+    owned: 'Pricing analysis, dashboards, onboarding',
+    duration: '14 months',
+  },
+  'fresh-order-placed': {
+    role: 'Product Designer (Freelance)',
+    owned: 'The order placed moment, end to end',
+  },
 };
 
 const COPY: Record<string, { name: string; line: string; tint: string; beats: string[] }> = {
@@ -409,6 +430,48 @@ function Stats({ p, stats, th }: { p: MotionValue<number>; stats: Stat[]; th: Th
   );
 }
 
+function RoleStrip({ facts, th }: { facts: RoleFacts; th: Theme }) {
+  const items: [string, string | undefined][] = [
+    ['My role', facts.role],
+    ['Team', facts.team],
+    ['I owned', facts.owned],
+    ['Duration', facts.duration],
+  ];
+  return (
+    <div className="mt-4 md:mt-5 max-w-xl">
+      <dl className="flex flex-wrap gap-x-5 gap-y-2.5 rounded-2xl px-4 py-3" style={{ background: th.tile.bg, border: `1px solid ${th.tile.border}` }}>
+        {items
+          .filter(([, v]) => v)
+          .map(([k, v]) => (
+            <div key={k} className="min-w-0">
+              <dt className="text-[11px] md:text-xs" style={{ color: th.tile.sub }}>
+                {k}
+              </dt>
+              <dd className="text-[13px] md:text-sm font-semibold leading-snug" style={{ color: th.tile.ink }}>
+                {v}
+              </dd>
+            </div>
+          ))}
+      </dl>
+      {facts.proof && (
+        <a
+          href="#recommendations"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('recommendations')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
+          className="inline-flex items-center gap-1.5 mt-2.5 text-[13px] font-medium underline-offset-4 hover:underline"
+          style={{ color: th.ink }}
+        >
+          <Quote className="w-3.5 h-3.5" aria-hidden />
+          Recommended by {facts.proof}
+        </a>
+      )}
+    </div>
+  );
+}
+
 /* ── one card ──────────────────────────────────────────────────────── */
 
 const STICK = 88; // under the floating nav
@@ -505,14 +568,7 @@ function Card({
             </div>
             <h3 className="font-extrabold tracking-[-0.055em] leading-[0.92]" style={{ fontSize: 'clamp(38px, 5.2vw, 92px)', color: th.ink }}>{copy.name}</h3>
             <p className="text-base md:text-xl leading-snug mt-4 md:mt-5 max-w-xl tracking-[-0.01em]" style={{ color: th.sub }}>{copy.line}</p>
-            {ROLE[project.id] && (
-              <p className="text-sm md:text-[15px] leading-snug mt-3 max-w-xl" style={{ color: th.kicker }}>
-                <span className="font-semibold" style={{ color: th.ink }}>
-                  My role:
-                </span>{' '}
-                {ROLE[project.id]}
-              </p>
-            )}
+            {ROLE[project.id] && <RoleStrip facts={ROLE[project.id]} th={th} />}
           </div>
           {STATS[project.id] && (
             <div className="hidden lg:block">

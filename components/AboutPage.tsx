@@ -415,7 +415,7 @@ const PAST_ROLES: Role[] = [
     location: 'Finland (Remote)',
     stamps: [{ city: 'Helsinki', country: 'FI', flag: 'FI' }],
     lines: [
-      'Owned end-to-end design for an early-stage AI pricing engine: vision, structure, and launch UX.',
+      'Started as a freelance project and became a 14-month contract: owned end-to-end design for an early-stage AI pricing engine, from vision and structure to launch UX.',
       'Shipped the analysis dashboard and Alliance Perks UI: +40% pilot usage, +34% partner engagement, +28% sign-up intent.',
       'Cut onboarding friction 22% and worked directly with founders on GTM and roadmap.',
     ],
