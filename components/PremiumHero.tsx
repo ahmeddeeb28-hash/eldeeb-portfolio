@@ -322,25 +322,29 @@ export function PremiumHero() {
             AI and gaming, with teams in Europe and the Gulf.
           </motion.p>
           {/* the facts a recruiter scans for first, matching the CV */}
-          <motion.ul
+          <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.4 }}
-            aria-label="At a glance"
-            className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm md:text-[15px] text-white/75 mb-10 -mt-4"
+            className="flex flex-col items-start gap-4 mb-10 -mt-3"
           >
-            <li className="inline-flex items-center gap-2">
+            <p className="inline-flex items-center gap-2.5 sm:gap-3 rounded-full border border-white/[0.12] bg-white/[0.04] pl-3 pr-3.5 sm:pl-3.5 sm:pr-4 py-2 text-[13px] sm:text-sm md:text-[15px] whitespace-nowrap">
               <span className="relative flex w-2 h-2" aria-hidden>
                 <span className="absolute inset-0 rounded-full bg-[#34D399] opacity-60 motion-safe:animate-ping" />
                 <span className="relative w-2 h-2 rounded-full bg-[#34D399]" />
               </span>
-              Open to remote and relocation
-            </li>
-            <li aria-hidden className="text-white/25">·</li>
-            <li>Egypt</li>
-            <li aria-hidden className="text-white/25">·</li>
-            <li>AI product builder · design systems · design leadership</li>
-          </motion.ul>
+              <span className="text-white/90">Open to remote &amp; relocation</span>
+              <span aria-hidden className="h-3.5 w-px bg-white/20" />
+              <span className="text-white/55">Based in Egypt</span>
+            </p>
+            <ul aria-label="Focus" className="flex flex-wrap items-center gap-x-4 sm:gap-x-0 gap-y-2 text-[13px] sm:text-sm md:text-[15px] text-white/60">
+              {['AI product builder', 'Design systems', 'Design leadership'].map((f, i) => (
+                <li key={f} className={i ? 'sm:pl-4 sm:ml-4 sm:border-l border-white/15 leading-none' : 'leading-none'}>
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </motion.div>
 
           {/* CTA row */}
           <motion.div

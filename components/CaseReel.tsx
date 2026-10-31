@@ -516,53 +516,42 @@ function Stats({ p, stats, th }: { p: MotionValue<number>; stats: Stat[]; th: Th
   };
   const [lead, ...rest] = stats;
   return (
-    <div className="grid grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,1fr)] gap-2.5">
-      <div className="@container min-w-0 rounded-2xl p-4 md:p-5 shadow-[0_20px_40px_-22px_rgba(0,0,0,0.55)]" style={{ background: th.lead.bg, border: `1px solid ${th.lead.border}` }}>
-        <p className="font-extrabold tabular-nums leading-none tracking-[-0.055em] whitespace-nowrap text-[clamp(26px,28cqi,72px)]" style={{ color: th.lead.ink }}>
+    <div className="flex items-end gap-8 xl:gap-12">
+      <div className="min-w-0">
+        <p className="font-extrabold tabular-nums leading-[0.85] tracking-[-0.06em] whitespace-nowrap text-[clamp(56px,6vw,104px)]" style={{ color: th.beatOn }}>
           {show(lead)}
         </p>
-        <p className="text-xs md:text-sm mt-2.5 leading-snug" style={{ color: th.lead.sub }}>
+        <p className="text-sm md:text-base mt-3 leading-snug" style={{ color: th.sub }}>
           {lead.k}
           {lead.note && <span className="opacity-70"> · {lead.note}</span>}
         </p>
       </div>
-      {rest.map((s2) => (
-        <div key={s2.k} className="@container min-w-0 rounded-2xl p-4 md:p-5" style={{ background: th.tile.bg, border: `1px solid ${th.tile.border}` }}>
-          <p className="font-bold tabular-nums leading-none tracking-[-0.045em] whitespace-nowrap text-[clamp(20px,24cqi,46px)]" style={{ color: th.tile.ink }}>
-            {show(s2)}
-          </p>
-          <p className="text-xs md:text-sm mt-2.5 leading-snug" style={{ color: th.tile.sub }}>
-            {s2.k}
-          </p>
-        </div>
-      ))}
+      <dl className="grid gap-3 pb-1 pl-6 xl:pl-8" style={{ borderLeft: `1px solid ${th.tile.border}` }}>
+        {rest.map((s2) => (
+          <div key={s2.k} className="flex items-baseline gap-2.5 whitespace-nowrap">
+            <dt className="sr-only">{s2.k}</dt>
+            <dd className="text-xl xl:text-2xl font-bold tabular-nums tracking-[-0.04em]" style={{ color: th.ink }}>
+              {show(s2)}
+            </dd>
+            <span aria-hidden className="text-sm" style={{ color: th.sub }}>
+              {s2.k}
+            </span>
+          </div>
+        ))}
+      </dl>
     </div>
   );
 }
 
-function RoleStrip({ facts, th }: { facts: RoleFacts; th: Theme }) {
-  const items: [string, string | undefined][] = [
-    ['My role', facts.role],
-    ['Team', facts.team],
-    ['I owned', facts.owned],
-    ['Duration', facts.duration],
-  ];
+/* who did what, in one quiet line next to the button: the role first,
+   then what I owned; the recommendation as a small link under it */
+function RoleLine({ facts, th }: { facts: RoleFacts; th: Theme }) {
   return (
-    <div className="mt-4 md:mt-5 max-w-xl">
-      <dl className="flex flex-wrap gap-x-5 gap-y-2.5 rounded-2xl px-4 py-3" style={{ background: th.tile.bg, border: `1px solid ${th.tile.border}` }}>
-        {items
-          .filter(([, v]) => v)
-          .map(([k, v]) => (
-            <div key={k} className="min-w-0">
-              <dt className="text-[11px] md:text-xs" style={{ color: th.tile.sub }}>
-                {k}
-              </dt>
-              <dd className="text-[13px] md:text-sm font-semibold leading-snug" style={{ color: th.tile.ink }}>
-                {v}
-              </dd>
-            </div>
-          ))}
-      </dl>
+    <div className="min-w-0 text-[13px] md:text-sm leading-snug">
+      <p style={{ color: th.ink }}>
+        <span className="font-semibold">{facts.role}</span>
+        {facts.owned && <span style={{ color: th.sub }}> · {facts.owned}</span>}
+      </p>
       {facts.proof && (
         <a
           href="#recommendations"
@@ -571,10 +560,10 @@ function RoleStrip({ facts, th }: { facts: RoleFacts; th: Theme }) {
             e.stopPropagation();
             document.getElementById('recommendations')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }}
-          className="inline-flex items-center gap-1.5 mt-2.5 text-[13px] font-medium underline-offset-4 hover:underline"
-          style={{ color: th.ink }}
+          className="inline-flex items-center gap-1.5 mt-1 underline-offset-4 hover:underline"
+          style={{ color: th.sub }}
         >
-          <Quote className="w-3.5 h-3.5" aria-hidden />
+          <Quote className="w-3 h-3" aria-hidden />
           Recommended by {facts.proof}
         </a>
       )}
@@ -591,13 +580,13 @@ function Beat({ p, beats, th }: { p: MotionValue<number>; beats: string[]; th: T
   const v = useStep(p);
   const i = Math.min(beats.length - 1, Math.floor(clamp01(v) * beats.length * 0.999));
   return (
-    <div className="min-h-[3.2em]">
+    <div className="min-h-[2.6em] max-w-xl">
       <AnimatePresence mode="wait" initial={false}>
-        <motion.p key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="text-base md:text-xl font-semibold leading-snug tracking-[-0.015em]" style={{ color: th.ink }}>
+        <motion.p key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="text-sm md:text-base font-medium leading-snug" style={{ color: th.sub }}>
           {beats[i]}
         </motion.p>
       </AnimatePresence>
-      <div className="flex gap-1.5 mt-3">
+      <div className="flex gap-1.5 mt-2.5">
         {beats.map((b, k) => (
           <span key={b} className="h-1 flex-1 rounded-full transition-colors duration-300" style={{ background: k <= i ? th.beatOn : th.beatOff }} />
         ))}
@@ -670,15 +659,9 @@ function Card({
                   {LOCKUP[project.id](ENGRAVE[project.id])}
                 </span>
               )}
-              {project.category && (
-                <span className="text-sm md:text-base" style={{ color: th.kicker }}>
-                  {project.category}
-                </span>
-              )}
             </div>
             <h3 className="font-extrabold tracking-[-0.055em] leading-[0.92]" style={{ fontSize: 'clamp(38px, 5.2vw, 92px)', color: th.ink }}>{copy.name}</h3>
             <p className="text-base md:text-xl leading-snug mt-4 md:mt-5 max-w-xl tracking-[-0.01em]" style={{ color: th.sub }}>{copy.line}</p>
-            {ROLE[project.id] && <RoleStrip facts={ROLE[project.id]} th={th} />}
           </div>
           {STATS[project.id] && (
             <div className="hidden lg:block">
@@ -689,20 +672,23 @@ function Card({
             <div className="hidden lg:block">
               <Beat p={story} beats={copy.beats} th={th} />
             </div>
-            {onOpen && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onOpen();
-                }}
-                className="group w-fit inline-flex items-center gap-2 rounded-full text-[15px] font-semibold pl-6 pr-5 py-3 transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-                style={{ background: th.btn.bg, color: th.btn.ink, outlineColor: th.btn.bg }}
-              >
-                View case
-                <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </button>
-            )}
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+              {onOpen && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpen();
+                  }}
+                  className="group flex-none w-fit inline-flex items-center gap-2 rounded-full text-[15px] font-semibold pl-6 pr-5 py-3 transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                  style={{ background: th.btn.bg, color: th.btn.ink, outlineColor: th.btn.bg }}
+                >
+                  View case
+                  <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </button>
+              )}
+              {ROLE[project.id] && <RoleLine facts={ROLE[project.id]} th={th} />}
+            </div>
           </div>
         </div>
         {/* the app */}
