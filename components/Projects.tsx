@@ -72,11 +72,11 @@ const allProjects = [
   {
     id: 'sary-design-leadership',
     image: CASE_STUDY_IMAGES.saryGrocery,
-    year: '2021–23',
-    category: 'Design Leadership · Sary, Lobah',
-    title: 'Design Leadership: Three Streams, One Team',
+    year: '2021–now',
+    category: 'Design Leadership',
+    title: 'How I Lead Design Teams',
     summary:
-      'One design team of eight across Demand, Supply and Logistics at Sary, and the game design team I lead at Lobah now.',
+      'My leadership playbook: five principles, a rhythm from a day to a quarter, one owner per objective, and one bar for hiring. Proven at Sary and Lobah.',
     accentColor: 'rgba(45,212,191,0.95)',
     imageGlow:
       'radial-gradient(ellipse 65% 55% at 30% 30%, rgba(45,212,191,0.09) 0%, transparent 70%)',

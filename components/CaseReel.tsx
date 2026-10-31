@@ -29,9 +29,9 @@ type Project = { id: string; title: string; category?: string; hasStudy?: boolea
 type Stat = { v: number; pre?: string; suf?: string; dp?: number; k: string; note?: string };
 const STATS: Record<string, Stat[]> = {
   'sary-design-leadership': [
-    { v: 8, k: 'Designers in one team' },
-    { v: 3, k: 'Streams, 5 products' },
-    { v: 40, pre: '+', suf: '%', k: 'Design velocity' },
+    { v: 12, suf: '+', k: 'Designers led' },
+    { v: 2, k: 'Teams: Sary, Lobah' },
+    { v: 5, k: 'Cadences, day to quarter' },
   ],
   'sary-repeat-customers': [
     { v: 28, pre: '+', suf: '%', k: 'Repeat purchases' },
@@ -60,10 +60,8 @@ const STATS: Record<string, Stat[]> = {
 type RoleFacts = { role: string; team?: string; owned?: string; duration?: string; proof?: string };
 const ROLE: Record<string, RoleFacts> = {
   'sary-design-leadership': {
-    role: 'Senior Product Designer → Product Design Lead',
-    team: '8 designers, 3 streams, 5 countries',
-    owned: 'OKRs, rituals, the design system and hiring',
-    duration: 'Sep 2021 – Sep 2023',
+    role: 'Design lead at Sary and Lobah',
+    owned: 'Principles, rituals, objectives and hiring',
     proof: 'Mohammed Aldossary, Sary’s co-founder & CEO',
   },
   'sary-repeat-customers': {
@@ -91,9 +89,9 @@ const ROLE: Record<string, RoleFacts> = {
 const COPY: Record<string, { name: string; line: string; tint: string; beats: string[] }> = {
   'sary-design-leadership': {
     name: 'Design leadership',
-    line: 'One design team across Demand, Supply and Logistics: retailers, suppliers and drivers.',
+    line: 'How I lead design teams: one owner per objective, a steady rhythm, one source of truth.',
     tint: '#0F4C4A',
-    beats: ['One lead, one team of eight', 'Three streams, each with its own users', 'Five products on one design system', 'Held together by rituals, OKRs and hiring'],
+    beats: ['Every day: stand-up and PM alignment', 'Every week: review, crit, production call', 'Every month: replays and a retro', 'Every quarter: objectives, one owner each'],
   },
   'sary-repeat-customers': {
     name: 'Sary Buy Again',
@@ -242,56 +240,45 @@ function FreshStage({ p }: { p: MotionValue<number> }) {
   );
 }
 
-/* the team as its architecture: the lead, one design team, and the
-   three streams it served with their users and products. Builds up
-   with the card's story; the shared layer lights last. */
-const ARCH: { name: string; users: string; products: string[] }[] = [
-  { name: 'Demand', users: 'Retailers', products: ['Flagship app', 'POS'] },
-  { name: 'Supply', users: 'Suppliers', products: ['Ark'] },
-  { name: 'Logistics', users: 'Drivers', products: ['Launchpad', 'Lighthouse'] },
+/* the leadership rhythm: five cadences, each with its rituals,
+   lighting up from a day to a quarter as the card's story plays;
+   the quarter loops back to the day */
+const RHYTHM: [string, string[]][] = [
+  ['Day', ['Stand-up', 'Designer ↔ PM']],
+  ['Week', ['Design review', 'Crit', 'Production call', 'Design QA']],
+  ['Two weeks', ['1:1s']],
+  ['Month', ['Session replays', 'Retro']],
+  ['Quarter', ['OKR review']],
 ];
 function TeamStage({ p }: { p: MotionValue<number> }) {
   const v = useStep(p);
-  const show = (at: number) => ({ opacity: clamp01((v - at) / 0.12), transform: `translateY(${(1 - clamp01((v - at) / 0.12)) * 8}px)` });
-  const shared = v >= 0.72;
-  const line = 'rgba(45,212,191,0.45)';
+  const lit = Math.floor(clamp01((v - 0.05) / 0.7) * RHYTHM.length + 0.0001);
+  const loop = v >= 0.8;
   return (
-    <div className="absolute inset-0 flex items-center justify-center px-[5%] text-white">
-      <div className="w-full max-w-[560px] flex flex-col items-center">
-        <span className="rounded-xl px-3.5 py-1.5 text-xs md:text-sm font-bold text-[#06201E] bg-[#2DD4BF]">Product Design Lead</span>
-        <span aria-hidden className="w-px h-4 md:h-5" style={{ background: line }} />
-        <div className="w-full rounded-xl md:rounded-2xl border px-3 py-2 md:py-2.5 text-center" style={{ ...show(0.08), borderColor: line, background: 'rgba(45,212,191,0.08)' }}>
-          <p className="text-[11px] md:text-sm font-bold">One design team · 8 designers · 5 countries</p>
-        </div>
-        {/* stems: a bar across, one down to each stream */}
-        <div aria-hidden className="relative w-full h-4 md:h-6" style={show(0.2)}>
-          <span className="absolute left-1/2 top-0 w-px h-1/2" style={{ background: line }} />
-          <span className="absolute left-[16.66%] right-[16.66%] top-1/2 h-px" style={{ background: line }} />
-          {[16.66, 50, 83.33].map((x) => (
-            <span key={x} className="absolute top-1/2 w-px h-1/2" style={{ left: `${x}%`, background: line }} />
-          ))}
-        </div>
-        <div className="grid grid-cols-3 gap-1.5 md:gap-2.5 w-full">
-          {ARCH.map((s, i) => (
-            <div key={s.name} className="rounded-xl md:rounded-2xl border p-2 md:p-3.5 min-w-0" style={{ ...show(0.24 + i * 0.1), borderColor: 'rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)' }}>
-              <p className="text-xs md:text-base font-bold truncate">{s.name}</p>
-              <p className="text-[10px] md:text-xs text-[#CFF5EF]/70 truncate">{s.users}</p>
-              <div className="hidden sm:grid gap-1 mt-2 md:mt-3">
-                {s.products.map((pr) => (
-                  <span key={pr} className="rounded-md px-1.5 md:px-2 py-1 text-[10px] md:text-xs font-medium truncate" style={{ background: 'rgba(45,212,191,0.14)', color: '#E6FBF7' }}>
-                    {pr}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-        {/* what every stream shares */}
-        <div className="hidden sm:flex w-full mt-2.5 md:mt-3 rounded-xl border px-3 py-2 text-[10px] md:text-xs justify-center gap-x-3 gap-y-1 flex-wrap transition-colors duration-300" style={{ ...show(0.6), borderColor: shared ? line : 'rgba(255,255,255,0.1)', color: shared ? '#E6FBF7' : 'rgba(255,255,255,0.55)' }}>
-          {['Design system', 'Research ops', 'Rituals', 'OKRs', 'Hiring'].map((x) => (
-            <span key={x} className="whitespace-nowrap">{x}</span>
-          ))}
-        </div>
+    <div className="absolute inset-0 flex items-center justify-center px-[6%] text-white">
+      <div className="w-full max-w-[520px]">
+        <ol className="relative">
+          <span aria-hidden className="absolute left-[6px] top-2 bottom-2 w-px bg-[#2DD4BF]/40" />
+          {RHYTHM.map(([k, items], i) => {
+            const on = i < lit;
+            return (
+              <li key={k} className="relative grid grid-cols-[minmax(0,92px)_minmax(0,1fr)] sm:grid-cols-[minmax(0,110px)_minmax(0,1fr)] gap-3 pl-6 py-1.5 md:py-2.5 transition-opacity duration-300" style={{ opacity: on ? 1 : 0.28 }}>
+                <span aria-hidden className="absolute left-0 top-2.5 md:top-3.5 w-[13px] h-[13px] rounded-full border-2 border-[#2DD4BF] transition-colors" style={{ background: on ? '#2DD4BF' : '#0B2A29' }} />
+                <span className="text-xs md:text-sm font-bold text-[#2DD4BF] pt-0.5">Every {k.toLowerCase()}</span>
+                <span className="flex flex-wrap gap-1 md:gap-1.5">
+                  {items.map((it) => (
+                    <span key={it} className="rounded-md px-1.5 md:px-2 py-0.5 md:py-1 text-[10px] md:text-xs font-medium whitespace-nowrap bg-white/[0.08]">
+                      {it}
+                    </span>
+                  ))}
+                </span>
+              </li>
+            );
+          })}
+        </ol>
+        <p className="mt-2 md:mt-3 pl-6 text-[11px] md:text-sm text-[#CFF5EF] transition-opacity duration-300" style={{ opacity: loop ? 0.85 : 0 }}>
+          ↺ The quarter sets what the days work on
+        </p>
       </div>
     </div>
   );
@@ -375,12 +362,8 @@ const ENGRAVE: Record<string, Engrave> = {
 /* the lockup at the top of each card */
 const LOCKUP: Record<string, (e: Engrave) => ReactNode> = {
   'sary-design-leadership': (e) => (
-    <span className="inline-flex items-center gap-2.5">
-      <SaryWord color={e.ink} h={38} />
-      <span className="h-5 w-[2px] rounded-full" style={{ background: e.ink }} />
-      <span className="text-[15px] font-bold" style={{ color: e.ink }}>
-        Design team
-      </span>
+    <span className="text-[15px] md:text-base font-bold" style={{ color: e.ink }}>
+      Leadership playbook
     </span>
   ),
   'sary-repeat-customers': (e) => <SaryWord color={e.ink} h={40} />,
