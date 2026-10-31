@@ -17,6 +17,7 @@ import { AnimatePresence } from 'motion/react';
 import { useRef, useState, useEffect, lazy, Suspense } from 'react';
 import { scrollToSection, scrollToTop } from './lib/scrollToSection';
 import { track, trackPage } from './lib/analytics';
+import { applyMeta } from './lib/seo';
 import { ConsentBanner } from './components/ConsentBanner';
 
 /* The Director's Cut is the heaviest view on the site and only opens
@@ -80,9 +81,11 @@ export default function App() {
     }
   }, []);
 
-  /* One GA4 page view per route, the first one included. Vercel
-     Analytics follows pushState on its own. */
+  /* Per route: the title and share tags, then one GA4 page view (the
+     first one included). Vercel Analytics follows pushState on its own. */
   useEffect(() => {
+    // the tab title and share tags follow the route; the page view uses them
+    applyMeta(routeToPath(route));
     trackPage(routeToPath(route), document.title);
   }, [route.view, activeProjectId]);
 
