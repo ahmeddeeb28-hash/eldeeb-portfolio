@@ -1,6 +1,5 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useState } from 'react';
-import { ArrowRight } from 'lucide-react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
 import { CaseIntro, LeadStats, Takeaway } from './_shared/CaseLayout';
@@ -292,144 +291,49 @@ const CADENCES: { k: string; items: Ritual[] }[] = [
         name: 'OKR review',
         meta: 'Objectives, each with one owner',
         input: 'Dashboards, SUS scores, replays',
-        output: 'Next quarter’s objectives, back into the daily stand-up',
+        output: 'Next quarter’s objectives, each with one owner',
       },
     ],
   },
 ];
 
+/* a ladder: one step per cadence on a single line, each ritual with
+   what it produces; the quarter loops back to the day */
 function Rhythm() {
-  const [c, setC] = useState(1);
-  const [r, setR] = useState(0);
-  const reduced = useReducedMotion();
-  const cad = CADENCES[c];
-  const rit = cad.items[Math.min(r, cad.items.length - 1)];
-  const pick = (i: number) => {
-    setC(i);
-    setR(0);
-  };
   return (
-    <div className="rounded-[28px] border overflow-hidden" style={{ background: PANEL, borderColor: LINE }}>
-      {/* the map of every ritual, by cadence; the chosen zoom and everything inside it light up */}
-      <div className="p-5 md:p-10 pb-6">
-        {/* phones: the rituals at the chosen cadence, full names */}
-        <div className="md:hidden flex flex-wrap gap-1.5 min-h-[76px] content-start">
-          {cad.items.map((it, j) => {
-            const on = j === Math.min(r, cad.items.length - 1);
-            return (
-              <button
-                key={it.name}
-                type="button"
-                onClick={() => setR(j)}
-                className="rounded-lg px-3 py-2 text-sm font-semibold"
-                style={{ background: on ? ACCENT : `${ACCENT}1F`, color: on ? '#06201E' : '#E6FBF7' }}
-              >
-                {it.name}
-              </button>
-            );
-          })}
-        </div>
-        <div className="hidden md:grid grid-cols-5 gap-3">
-          {CADENCES.map((x, i) => (
-            <div key={x.k} className="min-w-0">
-              <div className="grid gap-1.5">
-                {x.items.map((it, j) => {
-                  const on = i === c && j === Math.min(r, x.items.length - 1);
-                  const lit = i <= c;
-                  return (
-                    <button
-                      key={it.name}
-                      type="button"
-                      onClick={() => {
-                        setC(i);
-                        setR(j);
-                      }}
-                      className="rounded-xl px-3 py-2 text-left text-sm font-semibold leading-tight transition-all truncate"
-                      style={{
-                        background: on ? ACCENT : lit ? `${ACCENT}1F` : 'rgba(255,255,255,0.03)',
-                        color: on ? '#06201E' : lit ? '#E6FBF7' : 'rgba(255,255,255,0.35)',
-                        outline: on ? 'none' : undefined,
-                      }}
-                      title={it.name}
-                    >
-                      {it.name}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-        {/* the slider: a day out to a quarter */}
-        <div className="mt-6">
-          <input
-            type="range"
-            min={0}
-            max={CADENCES.length - 1}
-            step={1}
-            value={c}
-            onChange={(e) => pick(Number(e.target.value))}
-            aria-label="Cadence, from a day to a quarter"
-            aria-valuetext={cad.k}
-            className="w-full accent-[#2DD4BF] cursor-pointer"
-          />
-          <div className="grid grid-cols-5 mt-1">
-            {CADENCES.map((x, i) => (
-              <button
-                key={x.k}
-                type="button"
-                onClick={() => pick(i)}
-                className="text-[11px] md:text-sm font-medium transition-colors"
-                style={{ color: i === c ? ACCENT : 'rgba(255,255,255,0.45)' }}
-              >
-                {x.k}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-      {/* the chosen ritual: what goes in, what comes out */}
-      <div className="border-t p-5 md:p-10" style={{ borderColor: LINE, background: 'rgba(255,255,255,0.015)' }}>
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={rit.name}
-            initial={reduced ? false : { opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduced ? undefined : { opacity: 0, y: -8 }}
-            transition={{ duration: 0.22 }}
-            className="grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1.1fr)_auto_minmax(0,1fr)] gap-3 md:gap-4 items-stretch"
+    <div className="rounded-[28px] border p-5 md:p-10" style={{ background: PANEL, borderColor: LINE }}>
+      <ol className="relative">
+        {/* the line every step hangs on */}
+        <span aria-hidden className="absolute left-[7px] top-2 bottom-2 w-px" style={{ background: `${ACCENT}55` }} />
+        {CADENCES.map((c, i) => (
+          <motion.li
+            key={c.k}
+            {...reveal}
+            transition={{ ...reveal.transition, delay: i * 0.06 }}
+            className="relative grid md:grid-cols-[150px_minmax(0,1fr)] gap-x-6 gap-y-3 pl-8 pb-8 last:pb-0"
           >
-            <Flow label="Goes in" text={rit.input} />
-            <Arrow />
-            <div className="rounded-2xl p-5 text-[#06201E]" style={{ background: ACCENT }}>
-              <p className="text-xs font-semibold opacity-70">Every {cad.k.toLowerCase()}</p>
-              <p className="text-xl font-bold leading-tight mt-1">{rit.name}</p>
-              <p className="text-sm mt-1.5 opacity-80">{rit.meta}</p>
+            <span aria-hidden className="absolute left-0 top-1 w-[15px] h-[15px] rounded-full border-2" style={{ borderColor: ACCENT, background: i === CADENCES.length - 1 ? ACCENT : PANEL }} />
+            <p className="text-lg font-bold leading-none pt-0.5" style={{ color: ACCENT }}>
+              Every {c.k.toLowerCase()}
+            </p>
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
+              {c.items.map((it) => (
+                <div key={it.name}>
+                  <p className="text-white font-semibold">{it.name}</p>
+                  <p className="text-white/55 text-sm leading-snug mt-0.5">{it.output}</p>
+                </div>
+              ))}
             </div>
-            <Arrow />
-            <Flow label="Comes out" text={rit.output} />
-          </motion.div>
-        </AnimatePresence>
-        <p className="text-white/40 text-xs mt-5">
-          Drag the slider or pick a ritual. Each output feeds the next ritual, and the quarterly review sets what the
-          stand-ups work on.
-        </p>
-      </div>
+          </motion.li>
+        ))}
+      </ol>
+      <p className="mt-8 pt-5 border-t text-white/70 text-sm flex items-start gap-2.5" style={{ borderColor: LINE }}>
+        <span aria-hidden style={{ color: ACCENT }}>↺</span>
+        The quarter’s objectives set what the daily stand-up works on, and the loop starts again.
+      </p>
     </div>
   );
 }
-
-const Flow = ({ label, text }: { label: string; text: string }) => (
-  <div className="rounded-2xl border p-5" style={{ borderColor: LINE }}>
-    <p className="text-white/45 text-xs font-medium">{label}</p>
-    <p className="text-white font-semibold leading-snug mt-1.5">{text}</p>
-  </div>
-);
-const Arrow = () => (
-  <span aria-hidden className="grid place-items-center text-white/30">
-    <ArrowRight className="w-5 h-5 rotate-90 md:rotate-0" />
-  </span>
-);
 
 /* ── 04 OKRs: baseline to target ───────────────────── */
 
@@ -662,7 +566,7 @@ export function LeadershipCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
             One rhythm, from a day to a quarter.
           </motion.h2>
           <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-10">
-            A team spread over five countries needs rituals that hand off to each other. What one produces, the next one uses.
+            Five cadences, each with a clear output. Read it top to bottom: a day, a week, two weeks, a month, a quarter.
           </motion.p>
           <motion.div {...reveal}>
             <Rhythm />
