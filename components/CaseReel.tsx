@@ -39,9 +39,7 @@ const STATS: Record<string, Stat[]> = {
     { v: 42, pre: '+', suf: '%', k: 'Use of suggestions' },
   ],
   'sary-usability-report': [
-    { v: 9.63, suf: '%', dp: 2, k: 'Reached Discover' },
-    { v: 34860, k: 'Opened the catalogue' },
-    { v: 63.1, suf: '%', dp: 1, k: 'Used a section slider' },
+    { v: 9.63, suf: '%', dp: 2, k: 'Of shoppers reached Discover' },
   ],
   'sampo-ai-pricing': [
     { v: 40, pre: '+', suf: '%', k: 'Dashboard usage', note: 'pilot' },
@@ -49,9 +47,7 @@ const STATS: Record<string, Stat[]> = {
     { v: 28, pre: '+', suf: '%', k: 'Sign-up intent' },
   ],
   'fresh-order-placed': [
-    { v: 5, suf: 's', k: 'To fix the order after Pay' },
-    { v: 9, k: 'Designed states' },
-    { v: 1, k: 'Clock for ring and cancel' },
+    { v: 5, suf: 's', k: 'To fix the address or items after Pay' },
   ],
 };
 
@@ -107,7 +103,7 @@ const COPY: Record<string, { name: string; line: string; tint: string; beats: st
   },
   'sary-usability-report': {
     name: 'Sary usability report',
-    line: 'Only 9.63% of shoppers reached Discover. My quarterly report on why.',
+    line: 'My quarterly report on where shoppers dropped off, and why.',
     tint: '#1E3A8A',
     beats: ['34,860 shoppers opened the catalogue', 'Every step lost more of them', 'Only 3,357 reached Discover, and the heatmap shows why'],
   },
@@ -526,7 +522,7 @@ function Stats({ p, stats, th }: { p: MotionValue<number>; stats: Stat[]; th: Th
           {lead.note && <span className="opacity-70"> · {lead.note}</span>}
         </p>
       </div>
-      <dl className="grid gap-3 pb-1 pl-6 xl:pl-8" style={{ borderLeft: `1px solid ${th.tile.border}` }}>
+      {rest.length > 0 && <dl className="grid gap-3 pb-1 pl-6 xl:pl-8" style={{ borderLeft: `1px solid ${th.tile.border}` }}>
         {rest.map((s2) => (
           <div key={s2.k} className="flex items-baseline gap-2.5 whitespace-nowrap">
             <dt className="sr-only">{s2.k}</dt>
@@ -538,7 +534,7 @@ function Stats({ p, stats, th }: { p: MotionValue<number>; stats: Stat[]; th: Th
             </span>
           </div>
         ))}
-      </dl>
+      </dl>}
     </div>
   );
 }
