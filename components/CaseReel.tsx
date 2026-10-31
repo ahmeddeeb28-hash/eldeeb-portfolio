@@ -227,15 +227,53 @@ function SampoStage({ p }: { p: MotionValue<number> }) {
   );
 }
 
+/* three phones, one per action: Pay starts the window, the address is
+   fixed while the clock pauses, then placed. They rise in one after
+   another, float on a slow offset bob, and the phone for the current
+   beat steps forward. */
+const FRESH_CSS = `@keyframes fresh-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.2%)}}
+@media (prefers-reduced-motion: reduce){.fresh-bob{animation:none!important}}`;
 function FreshStage({ p }: { p: MotionValue<number> }) {
   const v = useStep(p);
   const [ref, box] = useBox<HTMLDivElement>();
-  const w = Math.min(box.w * 0.62, (box.h * 0.94 * 440) / 956);
-  const progress = clamp01((v - 0.12) / 0.58);
-  const state: PhoneState = v < 0.72 ? 'placing' : v < 0.8 ? 'burst' : 'placed';
+  const w = Math.min(box.w * 0.29, (box.h * 0.8 * 440) / 956);
+  const focus = v < 0.4 ? 0 : v < 0.7 ? 1 : 2;
+  const pay = clamp01(v / 0.38);
+  const phones: { state: PhoneState; progress: number; label: string }[] = [
+    { state: pay >= 1 ? 'sent' : 'placing', progress: pay, label: 'Pay' },
+    { state: 'edit-address', progress: 0.38, label: 'Fix it' },
+    { state: v >= 0.7 && v < 0.78 ? 'burst' : 'placed', progress: 1, label: 'Placed' },
+  ];
   return (
-    <div ref={ref} className="absolute inset-0 grid place-items-center">
-      {w > 0 && <FreshPhone state={state} progress={progress} width={w} />}
+    <div ref={ref} className="absolute inset-0 flex items-center justify-center gap-[2.5%]">
+      <style>{FRESH_CSS}</style>
+      {w > 0 &&
+        phones.map((ph, i) => {
+          const on = i === focus;
+          // the wave in: each phone rises a beat after the one before
+          const rise = clamp01((v + 0.02 - i * 0.035) / 0.1);
+          return (
+            <div
+              key={i}
+              className="flex flex-col items-center gap-2 transition-[transform,opacity] duration-500 ease-out"
+              style={{
+                transform: `translateY(${(1 - rise) * 40 + (on ? -4 : 3)}%) scale(${on ? 1.06 : 0.92})`,
+                opacity: rise * (on ? 1 : 0.8),
+                zIndex: on ? 2 : 1,
+              }}
+            >
+              <div className="fresh-bob" style={{ animation: `fresh-bob 3.6s ease-in-out ${i * -1.2}s infinite` }}>
+                <FreshPhone state={ph.state} progress={ph.progress} width={w} />
+              </div>
+              <span
+                className="rounded-full px-3 py-1 text-[11px] md:text-xs font-bold transition-colors duration-300"
+                style={{ background: on ? '#0E7A4E' : 'rgba(14,122,78,0.12)', color: on ? '#FFFFFF' : '#2F5E47' }}
+              >
+                {String(i + 1).padStart(2, '0')} · {ph.label}
+              </span>
+            </div>
+          );
+        })}
     </div>
   );
 }
