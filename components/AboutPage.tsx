@@ -400,7 +400,7 @@ const CURRENT_ROLE: Role = {
   stamps: [{ city: 'Warsaw', country: 'PL', flag: 'PL' }],
   lines: [
     'Directing design across three titles (Samla, IceBreaker, Jackaroo) on one shared game design system.',
-    'Rebuilt onboarding and progression, cutting time-to-play by 40% and reducing early-session drop-off.',
+    'Rebuilt onboarding and progression so players get into a game sooner.',
     'Run UX review, game QA, and roadmap alignment across product, engineering, and art.',
   ],
   current: true,
