@@ -253,7 +253,9 @@ const FRESH_CSS = `@keyframes fresh-bob{0%,100%{transform:translateY(0)}50%{tran
 function FreshStage({ p }: { p: MotionValue<number> }) {
   const v = useStep(p);
   const [ref, box] = useBox<HTMLDivElement>();
-  const w = Math.min(box.w * 0.29, (box.h * 0.8 * 440) / 956);
+  // the centre phone at a comfortable size; the two behind it peek out
+  // either side, so the whole group always fits inside the card
+  const w = Math.min(box.w * 0.4, (box.h * 0.74 * 440) / 956);
   const focus = v < 0.4 ? 0 : v < 0.7 ? 1 : 2;
   const pay = clamp01(v / 0.38);
   const phones: { state: PhoneState; progress: number; label: string }[] = [
@@ -262,35 +264,45 @@ function FreshStage({ p }: { p: MotionValue<number> }) {
     { state: v >= 0.7 && v < 0.78 ? 'burst' : 'placed', progress: 1, label: 'Placed' },
   ];
   return (
-    <div ref={ref} className="absolute inset-0 flex items-center justify-center gap-[2.5%]">
+    <div ref={ref} className="absolute inset-0">
       <style>{FRESH_CSS}</style>
       {w > 0 &&
         phones.map((ph, i) => {
-          const on = i === focus;
-          // the wave in: each phone rises a beat after the one before
+          // 0 = centre, 1 = behind on the right, -1 = behind on the left
+          const d = (i - focus + 3) % 3;
+          const role = d === 0 ? 0 : d === 1 ? 1 : -1;
+          const on = role === 0;
           const rise = clamp01((v + 0.02 - i * 0.035) / 0.1);
+          const x = role * w * 0.62;
           return (
             <div
               key={i}
-              className="flex flex-col items-center gap-2 transition-[transform,opacity] duration-500 ease-out"
+              className="absolute left-1/2 top-1/2 transition-[transform,opacity,filter] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
               style={{
-                transform: `translateY(${(1 - rise) * 40 + (on ? -4 : 3)}%) scale(${on ? 1.06 : 0.92})`,
-                opacity: rise * (on ? 1 : 0.8),
-                zIndex: on ? 2 : 1,
+                transform: `translate(calc(-50% + ${x}px), calc(-55% + ${(1 - rise) * 30}%)) scale(${on ? 1 : 0.8})`,
+                opacity: rise * (on ? 1 : 0.55),
+                filter: on ? 'none' : 'saturate(0.8)',
+                zIndex: on ? 3 : 1,
               }}
             >
               <div className="fresh-bob" style={{ animation: `fresh-bob 3.6s ease-in-out ${i * -1.2}s infinite` }}>
                 <FreshPhone state={ph.state} progress={ph.progress} width={w} />
               </div>
-              <span
-                className="rounded-full px-3 py-1 text-[11px] md:text-xs font-bold transition-colors duration-300"
-                style={{ background: on ? '#0E7A4E' : 'rgba(14,122,78,0.12)', color: on ? '#FFFFFF' : '#2F5E47' }}
-              >
-                {String(i + 1).padStart(2, '0')} · {ph.label}
-              </span>
             </div>
           );
         })}
+      {/* one label for the phone in front */}
+      <div className="absolute left-1/2 -translate-x-1/2 bottom-[3%] flex gap-1.5 z-10">
+        {phones.map((ph, i) => (
+          <span
+            key={ph.label}
+            className="rounded-full px-2.5 md:px-3 py-1 text-[10px] md:text-xs font-bold whitespace-nowrap transition-colors duration-300"
+            style={{ background: i === focus ? '#0E7A4E' : 'rgba(14,122,78,0.12)', color: i === focus ? '#FFFFFF' : '#2F5E47' }}
+          >
+            {String(i + 1).padStart(2, '0')} · {ph.label}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
