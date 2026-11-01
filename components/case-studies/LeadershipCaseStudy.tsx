@@ -1,5 +1,6 @@
-import { motion } from 'motion/react';
-import type { ReactNode } from 'react';
+import { motion, useReducedMotion } from 'motion/react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
 import { CaseIntro, Takeaway } from './_shared/CaseLayout';
@@ -21,7 +22,7 @@ const LINE = 'rgba(255,255,255,0.08)';
 
 const CHAPTERS: Chapter[] = [
   { id: 'overview', num: '01', roman: 'I', label: 'Overview', beat: 'How I lead.' },
-  { id: 'principles', num: '02', roman: 'II', label: 'Principles', beat: 'What I hold to.' },
+  { id: 'principles', num: '02', roman: 'II', label: 'My style', beat: 'What I hold to.' },
   { id: 'rituals', num: '03', roman: 'III', label: 'Rituals', beat: 'The rhythm.' },
   { id: 'practice', num: '04', roman: 'IV', label: 'In practice', beat: 'Three moments.' },
   { id: 'shape', num: '05', roman: 'V', label: 'Team shape', beat: 'Streams and one team.' },
@@ -31,18 +32,184 @@ const CHAPTERS: Chapter[] = [
 ];
 const TOTAL = 'VIII';
 
-/* the illustrations: one poster for the page, one for the rhythm,
-   and three practices told as a sequence */
+/* the illustrations open the page as one carousel; the chapters after
+   it tell the same ideas in words */
 const IMG = '/images/case-studies/leadership';
-const PRACTICES: { src: string; alt: string; principle: string }[] = [
-  { src: `${IMG}/priority.webp`, alt: 'Making a priority actionable. Frame: bring the problem and goals into view. Choose: discuss the trade-off and agree the focus. Own: give the work an owner and a next step. Clarity, commitment, action.', principle: 'One owner for every objective' },
-  { src: `${IMG}/critique.webp`, alt: 'Turning critique into a decision. Show the reasoning, challenge the work, record the decision. The outcome is a design decision the team can act on.', principle: 'A rhythm people can rely on' },
-  { src: `${IMG}/coaching.webp`, alt: 'Coaching through the work. Listen: find the challenge behind the design. Practise: create an opportunity to apply the focus. Reflect: discuss the reasoning and the next step.', principle: 'Grow people on a clear bar' },
+const SLIDES: { src: string; title: string; line: string; alt: string }[] = [
+  { src: `${IMG}/cover.webp`, title: 'Design leadership', line: 'Building the team behind the product.', alt: 'Design leadership. Building the team behind the product. People, products, practice.' },
+  { src: `${IMG}/rhythm.webp`, title: 'A rhythm for better decisions', line: 'Shared priorities, open critique, learning carried forward.', alt: 'A rhythm for better decisions. Shared priorities. Open critique. Learning carried forward. Align, review, learn.' },
+  { src: `${IMG}/priority.webp`, title: 'Making a priority actionable', line: 'Frame, choose, own.', alt: 'Making a priority actionable. Frame: bring the problem and goals into view. Choose: discuss the trade-off and agree the focus. Own: give the work an owner and a next step. Clarity, commitment, action.' },
+  { src: `${IMG}/critique.webp`, title: 'Turning critique into a decision', line: 'Show the reasoning, challenge the work, record the decision.', alt: 'Turning critique into a decision. Show the reasoning, challenge the work, record the decision. The outcome is a design decision the team can act on.' },
+  { src: `${IMG}/coaching.webp`, title: 'Coaching through the work', line: 'Listen, practise, reflect.', alt: 'Coaching through the work. Listen: find the challenge behind the design. Practise: create an opportunity to apply the focus. Reflect: discuss the reasoning and the next step.' },
 ];
 
-const Poster = ({ src, alt }: { src: string; alt: string }) => (
-  <img src={src} alt={alt} loading="lazy" decoding="async" className="w-full h-auto rounded-[20px] md:rounded-[28px] border" style={{ borderColor: LINE }} />
-);
+/* centred slides with the neighbours peeking in; arrows, dots, swipe
+   and arrow keys; moves on by itself every 6 seconds until someone
+   touches it, never under reduced motion */
+function Carousel() {
+  const reduced = useReducedMotion();
+  const [i, setI] = useState(0);
+  const [auto, setAuto] = useState(!reduced);
+  const [w, setW] = useState(0);
+  const box = useRef<HTMLDivElement>(null);
+  const start = useRef<number | null>(null);
+  const dragged = useRef(false);
+  const n = SLIDES.length;
+  const go = (k: number) => setI(((k % n) + n) % n);
+  const stop = () => setAuto(false);
+
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([e]) => setW(e.contentRect.width));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  useEffect(() => {
+    if (!auto || reduced) return;
+    const t = window.setTimeout(() => setI((x) => (x + 1) % n), 6000);
+    return () => window.clearTimeout(t);
+  }, [auto, reduced, i, n]);
+
+  const slideW = Math.min(w * (w < 640 ? 0.86 : 0.72), 1040);
+  const gap = w < 640 ? 12 : 24;
+  const x = w / 2 - slideW / 2 - i * (slideW + gap);
+  const s = SLIDES[i];
+
+  return (
+    <div
+      className="[--c-w:calc(100vw-0px)] md:[--c-w:min(1440px,calc(100vw-64px))]"
+      style={{ width: 'var(--c-w)', marginLeft: 'calc(50% - var(--c-w) / 2)' }}
+      onKeyDown={(e) => {
+        if (e.key === 'ArrowRight') { stop(); go(i + 1); }
+        if (e.key === 'ArrowLeft') { stop(); go(i - 1); }
+      }}
+    >
+      <div
+        ref={box}
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="Leadership illustrations"
+        tabIndex={0}
+        className="relative overflow-hidden outline-none select-none touch-pan-y"
+        onPointerDown={(e) => (start.current = e.clientX)}
+        onPointerUp={(e) => {
+          if (start.current === null) return;
+          const d = e.clientX - start.current;
+          start.current = null;
+          dragged.current = Math.abs(d) > 40;
+          if (dragged.current) { stop(); go(i + (d < 0 ? 1 : -1)); }
+        }}
+      >
+        <div
+          className="flex transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          style={{ gap, transform: `translateX(${x}px)` }}
+        >
+          {SLIDES.map((sl, k) => {
+            const on = k === i;
+            return (
+              <button
+                key={sl.src}
+                type="button"
+                onClick={() => {
+                  // the click that ends a swipe is not a pick
+                  if (dragged.current) { dragged.current = false; return; }
+                  stop();
+                  go(k);
+                }}
+                aria-label={on ? sl.title : `Show ${sl.title}`}
+                aria-current={on}
+                className="flex-none transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                style={{ width: slideW || undefined, transform: `scale(${on ? 1 : 0.9})`, opacity: on ? 1 : 0.4 }}
+              >
+                <img src={sl.src} alt={on ? sl.alt : ''} draggable={false} loading={k < 2 ? 'eager' : 'lazy'} decoding="async" className="w-full h-auto rounded-[18px] md:rounded-[28px] shadow-[0_40px_80px_-40px_rgba(0,0,0,0.9)]" />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      {/* caption and controls, lined up under the slide in front */}
+      <div className="mx-auto mt-6 md:mt-8 px-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-4" style={{ maxWidth: slideW ? slideW + 48 : undefined }}>
+        <div className="min-w-0" aria-live="polite">
+          <p className="text-white text-lg md:text-2xl font-semibold tracking-[-0.02em]">
+            <span className="tabular-nums mr-3" style={{ color: ACCENT }}>
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            {s.title}
+          </p>
+          <p className="text-white/55 mt-1">{s.line}</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="flex gap-1.5" aria-hidden>
+            {SLIDES.map((sl, k) => (
+              <span key={sl.src} className="h-1.5 rounded-full transition-all duration-300" style={{ width: k === i ? 22 : 6, background: k === i ? ACCENT : 'rgba(255,255,255,0.25)' }} />
+            ))}
+          </div>
+          <button type="button" onClick={() => { stop(); go(i - 1); }} aria-label="Previous illustration" className="grid place-items-center w-11 h-11 rounded-full border border-white/15 text-white/80 hover:text-white hover:border-white/40 transition-colors">
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+          <button type="button" onClick={() => { stop(); go(i + 1); }} aria-label="Next illustration" className="grid place-items-center w-11 h-11 rounded-full border border-white/15 text-white/80 hover:text-white hover:border-white/40 transition-colors">
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* the three practices, told in words: the steps in order, then what
+   actually happens in the room */
+const PRACTICES: { title: string; steps: string[]; story: string; principle: string }[] = [
+  {
+    title: 'Making a priority actionable',
+    steps: ['Frame', 'Choose', 'Own'],
+    story: 'When a priority lands, I first put the problem and the goals on the table so everyone is looking at the same thing. Then we talk through the trade-off and agree one focus. It isn’t done until the work has an owner and a next step.',
+    principle: 'One owner for every objective',
+  },
+  {
+    title: 'Turning critique into a decision',
+    steps: ['Show the reasoning', 'Challenge the work', 'Record the decision'],
+    story: 'In a crit the designer explains the choice and the open question, not just the screens. We challenge the work against the concern, never personal taste. Then we write the decision down so it carries into the next step.',
+    principle: 'A rhythm people can rely on',
+  },
+  {
+    title: 'Coaching through the work',
+    steps: ['Listen', 'Practise', 'Reflect'],
+    story: 'Coaching happens inside real projects. I listen for the challenge behind the design, set up a chance to practise that skill on the next piece of work, then we reflect on the reasoning together. Growth carries into the next project.',
+    principle: 'Grow people on a clear bar',
+  },
+];
+
+function Practices() {
+  return (
+    <ol className="grid gap-4">
+      {PRACTICES.map((pr, k) => (
+        <li key={pr.title} className="rounded-[24px] border p-6 md:p-10 grid md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-6 md:gap-12" style={{ background: PANEL, borderColor: LINE }}>
+          <div>
+            <p className="text-sm font-semibold tabular-nums mb-3" style={{ color: ACCENT }}>
+              {String(k + 1).padStart(2, '0')}
+            </p>
+            <h3 className="text-white text-2xl md:text-3xl font-semibold tracking-[-0.02em] leading-tight">{pr.title}</h3>
+            <ol className="flex flex-wrap items-center gap-2 mt-5">
+              {pr.steps.map((st, j) => (
+                <li key={st} className="flex items-center gap-2">
+                  <span className="rounded-full px-3 py-1.5 text-sm font-semibold" style={{ background: j === pr.steps.length - 1 ? ACCENT : 'rgba(255,255,255,0.06)', color: j === pr.steps.length - 1 ? '#101216' : '#FFFFFF' }}>
+                    {st}
+                  </span>
+                  {j < pr.steps.length - 1 && <ArrowRight aria-hidden className="w-3.5 h-3.5 text-white/35" />}
+                </li>
+              ))}
+            </ol>
+          </div>
+          <div>
+            <p className="text-white/75 text-lg leading-relaxed">{pr.story}</p>
+            <p className="text-white/40 text-sm mt-4">Principle: {pr.principle}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}
 
 function Section({ i, tone, title, lead, children }: { i: number; tone?: 'teal'; title: string; lead: string; children: ReactNode }) {
   const c = CHAPTERS[i];
@@ -281,8 +448,8 @@ export function LeadershipCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
           >
             <p>Five principles and a weekly rhythm I’ve used to run design teams, from a B2B marketplace to a games studio.</p>
           </CaseIntro>
-          <motion.div {...reveal} className="mb-12">
-            <Poster src={`${IMG}/cover.webp`} alt="Design leadership. Building the team behind the product. People, products, practice." />
+          <motion.div {...reveal} className="mb-16 md:mb-20">
+            <Carousel />
           </motion.div>
           <motion.dl {...reveal} className="grid grid-cols-3 border-t border-b" style={{ borderColor: LINE }}>
             {SCALE.map(([v, k], i) => (
@@ -295,31 +462,16 @@ export function LeadershipCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
           </motion.dl>
         </section>
 
-        <Section i={1} tone="teal" title="Five things I hold to." lead="Everything else in this page comes from these.">
+        <Section i={1} tone="teal" title="Here’s my style." lead="Five things I hold to. Everything else on this page comes from them.">
           <Principles />
         </Section>
 
         <Section i={2} title="A rhythm from a day to a quarter." lead="Each ritual has one job. Read it top to bottom; the quarter sets what the days work on.">
-          <div className="grid gap-6">
-            <Poster src={`${IMG}/rhythm.webp`} alt="A rhythm for better decisions. Shared priorities. Open critique. Learning carried forward. Align, review, learn." />
-            <Rhythm />
-          </div>
+          <Rhythm />
         </Section>
 
-        <Section i={3} tone="teal" title="Three moments where it shows." lead="How a priority, a critique and a coaching conversation run on my teams.">
-          <ol className="grid gap-12 md:gap-16">
-            {PRACTICES.map((pr, k) => (
-              <li key={pr.src}>
-                <Poster src={pr.src} alt={pr.alt} />
-                <p className="flex items-baseline gap-3 mt-4 text-white/55 text-sm">
-                  <span className="tabular-nums font-semibold" style={{ color: ACCENT }}>
-                    {String(k + 1).padStart(2, '0')}
-                  </span>
-                  Principle: <span className="text-white/80">{pr.principle}</span>
-                </p>
-              </li>
-            ))}
-          </ol>
+        <Section i={3} tone="teal" title="Three moments where it shows." lead="How a priority, a critique and a coaching conversation run on my teams, step by step.">
+          <Practices />
         </Section>
 
         <Section i={4} title="Designers in streams, one team behind them." lead="Designers work day to day with a stream and its PM, and come back to one team for the system, research and standard.">
