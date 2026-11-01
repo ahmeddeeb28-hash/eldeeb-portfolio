@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useInView, useMotionValueEvent, useReducedMotion, useScroll, useTransform, type MotionValue } from 'motion/react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { ArrowUpRight, Leaf, Quote } from 'lucide-react';
+import { ArrowUpRight, Leaf } from 'lucide-react';
 import { FUNNEL } from './case-studies/report/ReportData';
 import { SaryPhone } from './case-studies/sary/SaryPhone';
 import { FreshPhone, type PhoneState } from './case-studies/fresh/FreshPhone';
@@ -49,39 +49,6 @@ const STATS: Record<string, Stat[]> = {
   'fresh-order-placed': [
     { v: 5, suf: 's', k: 'To fix the address or items after Pay' },
   ],
-};
-
-/* My part in each case, as each case study states it. A line recruiters
-   look for first: who did what. */
-/* Who did what, the line reviewers look for first: role, team, what I
-   owned and how long, in one format on every card. Fields not yet
-   confirmed are left out rather than guessed. `proof` points to the
-   recommendation that speaks to this work. */
-type RoleFacts = { role: string; team?: string; owned?: string; duration?: string; proof?: string };
-const ROLE: Record<string, RoleFacts> = {
-  'sary-design-leadership': {
-    role: 'Design lead · Sary and Lobah, 2021 – now',
-    owned: 'Ran the rituals, objectives and hiring for teams of 8 and 4+',
-    proof: 'Polina Kosheleva, who reported to me at Lobah',
-  },
-  'sary-repeat-customers': {
-    role: 'Product Design Lead · Sary, 2023',
-    owned: 'Owned the Buy Again hub end to end',
-    proof: 'Mohammed Aldossary, Sary’s co-founder & CEO',
-  },
-  'sary-usability-report': {
-    role: 'Senior Product Designer · Sary, Q4 2022',
-    owned: 'Ran the quarterly usability report and its review',
-    proof: 'Asad Ali Shah, Director of Growth',
-  },
-  'sampo-ai-pricing': {
-    role: 'Product Design Consultant (Contract) · Sampo AI, 2024 – 25',
-    owned: 'Led pricing analysis, dashboards and onboarding over 14 months',
-  },
-  'fresh-order-placed': {
-    role: 'Product Designer (Freelance) · fresh',
-    owned: 'Designed the moment after Pay, end to end',
-  },
 };
 
 const COPY: Record<string, { name: string; line: string; tint: string; beats: string[] }> = {
@@ -581,34 +548,6 @@ function Stats({ p, stats, th }: { p: MotionValue<number>; stats: Stat[]; th: Th
   );
 }
 
-/* who did what, in one quiet line next to the button: the role first,
-   then what I owned; the recommendation as a small link under it */
-function RoleLine({ facts, th }: { facts: RoleFacts; th: Theme }) {
-  return (
-    <div className="min-w-0 text-[13px] md:text-sm leading-snug">
-      <p className="font-semibold" style={{ color: th.ink }}>
-        {facts.role}
-      </p>
-      {facts.owned && <p style={{ color: th.sub }}>{facts.owned}</p>}
-      {facts.proof && (
-        <a
-          href="#recommendations"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            document.getElementById('recommendations')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }}
-          className="inline-flex items-center gap-1.5 mt-1 underline-offset-4 hover:underline"
-          style={{ color: th.sub }}
-        >
-          <Quote className="w-3 h-3" aria-hidden />
-          Recommended by {facts.proof}
-        </a>
-      )}
-    </div>
-  );
-}
-
 /* ── one card ──────────────────────────────────────────────────────── */
 
 const STICK = 88; // under the floating nav
@@ -725,7 +664,6 @@ function Card({
                   <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </button>
               )}
-              {ROLE[project.id] && <RoleLine facts={ROLE[project.id]} th={th} />}
             </div>
           </div>
         </div>
