@@ -60,29 +60,27 @@ const STATS: Record<string, Stat[]> = {
 type RoleFacts = { role: string; team?: string; owned?: string; duration?: string; proof?: string };
 const ROLE: Record<string, RoleFacts> = {
   'sary-design-leadership': {
-    role: 'Design lead at Sary and Lobah',
-    owned: 'Principles, rituals, objectives and hiring',
-    proof: 'Mohammed Aldossary, Sary’s co-founder & CEO',
+    role: 'Design lead · Sary and Lobah, 2021 – now',
+    owned: 'Ran the rituals, objectives and hiring for teams of 8 and 4+',
+    proof: 'Polina Kosheleva, who reported to me at Lobah',
   },
   'sary-repeat-customers': {
-    role: 'Product Design Lead',
-    owned: 'The Buy Again hub, end to end',
+    role: 'Product Design Lead · Sary, 2023',
+    owned: 'Owned the Buy Again hub end to end',
     proof: 'Mohammed Aldossary, Sary’s co-founder & CEO',
   },
   'sary-usability-report': {
-    role: 'Senior Product Designer',
-    owned: 'The quarterly usability report and its rituals',
+    role: 'Senior Product Designer · Sary, Q4 2022',
+    owned: 'Ran the quarterly usability report and its review',
     proof: 'Asad Ali Shah, Director of Growth',
   },
   'sampo-ai-pricing': {
-    role: 'Freelance, then Product Design Consultant (Contract)',
-    team: 'Founders, engineering and growth',
-    owned: 'Pricing analysis, dashboards, onboarding',
-    duration: '14 months',
+    role: 'Product Design Consultant (Contract) · Sampo AI, 2024 – 25',
+    owned: 'Led pricing analysis, dashboards and onboarding over 14 months',
   },
   'fresh-order-placed': {
-    role: 'Product Designer (Freelance)',
-    owned: 'The order placed moment, end to end',
+    role: 'Product Designer (Freelance) · fresh',
+    owned: 'Designed the moment after Pay, end to end',
   },
 };
 
@@ -588,10 +586,10 @@ function Stats({ p, stats, th }: { p: MotionValue<number>; stats: Stat[]; th: Th
 function RoleLine({ facts, th }: { facts: RoleFacts; th: Theme }) {
   return (
     <div className="min-w-0 text-[13px] md:text-sm leading-snug">
-      <p style={{ color: th.ink }}>
-        <span className="font-semibold">{facts.role}</span>
-        {facts.owned && <span style={{ color: th.sub }}> · {facts.owned}</span>}
+      <p className="font-semibold" style={{ color: th.ink }}>
+        {facts.role}
       </p>
+      {facts.owned && <p style={{ color: th.sub }}>{facts.owned}</p>}
       {facts.proof && (
         <a
           href="#recommendations"
@@ -712,7 +710,7 @@ function Card({
             <div className="hidden lg:block">
               <Beat p={story} beats={copy.beats} th={th} />
             </div>
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+            <div className="grid justify-items-start gap-3">
               {onOpen && (
                 <button
                   type="button"
