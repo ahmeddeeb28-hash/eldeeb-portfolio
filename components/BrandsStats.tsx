@@ -36,7 +36,7 @@ const brandLogos: { name: string; src: string }[] = [
  *
  *   +22% WAU        Hakbah   AboutPage.tsx:431
  *   +27% AOV        Sary     lib/sanity/fallbackCaseStudies.ts:32
- *   40% faster TTP  Lobah    AboutPage.tsx:400
+ *   +40% usage      Sampo AI pilot, Sampo case study (dashboard usage)
  *
  * Each card carries its brand mark so the figure is attached to a company
  * instead of the company name being buried in the description sentence.
@@ -72,13 +72,15 @@ const stats = [
     accent: "#BA7CFF",
   },
   {
-    number: "40%",
-    label: "Faster Time to Play",
-    brand: "Lobah",
-    sector: "Gaming",
+    // Lobah's onboarding work wasn't measured, so its card is gone;
+    // this is Sampo's measured pilot result
+    number: "+40%",
+    label: "Dashboard Usage",
+    brand: "Sampo AI",
+    sector: "AI · SaaS",
     logo: null,
     description:
-      "Rebuilt onboarding and progression across three titles, cutting the wait between opening the app and the first match.",
+      "Explaining every pricing strategy and testing it before it went live got merchants using the dashboard more in the pilot.",
     accent: "#FFB454",
   },
 ];
