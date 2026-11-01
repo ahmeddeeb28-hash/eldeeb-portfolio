@@ -1,34 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="AE — Ahmad Eldeeb">
-  <defs>
-    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#F0D9A8"/>
-      <stop offset="0.55" stop-color="#DCBE8C"/>
-      <stop offset="1" stop-color="#A98757"/>
-    </linearGradient>
-    <radialGradient id="glow" cx="0.35" cy="0.25" r="0.9">
-      <stop offset="0" stop-color="#4AF2E5" stop-opacity="0.10"/>
-      <stop offset="1" stop-color="#4AF2E5" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
-
-  <!-- Base -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="AE, Ahmad Eldeeb">
+  <!-- AE monogram drawn as shapes, so it stays crisp at 16px and needs
+       no web font (browsers don't load fonts inside favicons) -->
   <rect width="64" height="64" rx="14" fill="#0A0A0A"/>
-  <rect width="64" height="64" rx="14" fill="url(#glow)"/>
-
-  <!-- Hairline gold frame -->
-  <rect x="1" y="1" width="62" height="62" rx="13" fill="none"
-        stroke="#DCBE8C" stroke-opacity="0.35" stroke-width="1"/>
-
-  <!-- Monogram AE. — italic serif, gold gradient -->
-  <text x="32" y="43"
-        text-anchor="middle"
-        font-family="'Fraunces','Playfair Display', Georgia, 'Times New Roman', serif"
-        font-style="italic"
-        font-weight="700"
-        font-size="30"
-        letter-spacing="-1"
-        fill="url(#gold)">AE</text>
-
-  <!-- Teal signature dot -->
-  <circle cx="46" cy="46" r="2.2" fill="#4AF2E5"/>
+  <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="13.25" fill="none" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="1.5"/>
+  <g fill="#F2F0EA">
+    <path fill-rule="evenodd" d="M7 48 L18 16 H25.5 L36.5 48 H29.6 L27.6 42 H15.9 L13.9 48 Z M17.8 36.2 H25.7 L21.75 24.4 Z"/>
+    <path d="M39 16 H56 V22.2 H45.6 V28.9 H54.2 V35.1 H45.6 V41.8 H56 V48 H39 Z"/>
+  </g>
 </svg>
