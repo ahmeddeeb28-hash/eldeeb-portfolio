@@ -29,9 +29,9 @@ type Project = { id: string; title: string; category?: string; hasStudy?: boolea
 type Stat = { v: number; pre?: string; suf?: string; dp?: number; k: string; note?: string };
 const STATS: Record<string, Stat[]> = {
   'sary-design-leadership': [
+    { v: 40, pre: '+', suf: '%', k: 'Design velocity', note: 'brief to dev-ready' },
     { v: 12, suf: '+', k: 'Designers led' },
-    { v: 2, k: 'Teams: Sary, Lobah' },
-    { v: 5, k: 'Cadences, day to quarter' },
+    { v: 30, suf: '%', k: 'Faster handoff' },
   ],
   'sary-repeat-customers': [
     { v: 28, pre: '+', suf: '%', k: 'Repeat purchases' },
@@ -88,32 +88,32 @@ const ROLE: Record<string, RoleFacts> = {
 
 const COPY: Record<string, { name: string; line: string; tint: string; beats: string[] }> = {
   'sary-design-leadership': {
-    name: 'Design leadership',
-    line: 'How I lead design teams: one owner per objective, a steady rhythm, one source of truth.',
+    name: 'How I lead design teams',
+    line: 'One owner per objective, a steady rhythm, one source of truth. Proven at Sary and Lobah.',
     tint: '#0343F8',
     beats: ['Building the team behind the product', 'Making a priority actionable', 'Turning critique into a decision', 'Coaching through the work'],
   },
   'sary-repeat-customers': {
-    name: 'Sary Buy Again',
-    line: '39 taps down to 3. Repeat purchases up 28%, order value up 27%.',
+    name: 'Restock in 3 taps, not 39',
+    line: 'A Buy Again hub for grocery stores. Repeat purchases up 28%, order value up 27%.',
     tint: '#1D368D',
     beats: ['A store owner opens Sary to restock', 'The Buy Again hub has the usual basket ready', 'Add all: 18 items in the cart in one tap'],
   },
   'sary-usability-report': {
-    name: 'Sary usability report',
-    line: 'My quarterly report on where shoppers dropped off, and why.',
+    name: 'Where shoppers dropped off, and why',
+    line: 'My quarterly usability report: the catalogue funnel and the heatmaps behind it.',
     tint: '#1E3A8A',
     beats: ['34,860 shoppers opened the catalogue', 'Every step lost more of them', 'Only 3,357 reached Discover, and the heatmap shows why'],
   },
   'sampo-ai-pricing': {
-    name: 'Sampo AI pricing',
-    line: 'An AI that sets prices, made trustworthy: explained, previewed, reversible.',
+    name: 'AI pricing merchants can trust',
+    line: 'An AI that sets store prices, with every strategy explained, previewed and reversible.',
     tint: '#4338CA',
     beats: ['Careful: small, safe nudges', 'High Impact: more reach, less profit', 'Balanced: best profit for moderate risk', 'Tested before anything goes live'],
   },
   'fresh-order-placed': {
-    name: 'fresh order placed',
-    line: 'The spinner after Pay became five seconds to fix the order, then tracking.',
+    name: 'Five seconds to fix an order',
+    line: 'The spinner after Pay became a window to change the address or items, then tracking.',
     tint: '#0E7A4E',
     beats: ['Pay, and a five second window opens', 'Fix the address or the items while it runs', 'Placed, and straight on to tracking'],
   },
@@ -700,7 +700,7 @@ function Card({
                 </span>
               )}
             </div>
-            <h3 className="font-extrabold tracking-[-0.055em] leading-[0.92]" style={{ fontSize: 'clamp(38px, 5.2vw, 92px)', color: th.ink }}>{copy.name}</h3>
+            <h3 className="font-extrabold tracking-[-0.05em] leading-[0.95] max-w-[12ch]" style={{ fontSize: 'clamp(36px, 4.4vw, 80px)', color: th.ink }}>{copy.name}</h3>
             <p className="text-base md:text-xl leading-snug mt-4 md:mt-5 max-w-xl tracking-[-0.01em]" style={{ color: th.sub }}>{copy.line}</p>
           </div>
           {STATS[project.id] && (
