@@ -1,10 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="AE, Ahmad Eldeeb">
-  <!-- AE monogram drawn as shapes, so it stays crisp at 16px and needs
-       no web font (browsers don't load fonts inside favicons) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="d., deeb.design">
+  <!-- "d." for deeb.design, drawn as shapes so it stays crisp at 16px
+       and needs no web font (browsers don't load fonts inside favicons) -->
   <rect width="64" height="64" rx="14" fill="#0A0A0A"/>
   <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="13.25" fill="none" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="1.5"/>
-  <g fill="#F2F0EA">
-    <path fill-rule="evenodd" d="M7 48 L18 16 H25.5 L36.5 48 H29.6 L27.6 42 H15.9 L13.9 48 Z M17.8 36.2 H25.7 L21.75 24.4 Z"/>
-    <path d="M39 16 H56 V22.2 H45.6 V28.9 H54.2 V35.1 H45.6 V41.8 H56 V48 H39 Z"/>
-  </g>
+  <path fill="#F2F0EA" fill-rule="evenodd" d="M25 23 A14 14 0 1 0 25 51 A14 14 0 1 0 25 23 Z M25 30.5 A6.5 6.5 0 1 1 25 43.5 A6.5 6.5 0 1 1 25 30.5 Z"/>
+  <rect x="32" y="12" width="7.5" height="39" fill="#F2F0EA"/>
+  <circle cx="49" cy="46.5" r="4.5" fill="#DCBE8C"/>
 </svg>
