@@ -1,0 +1,541 @@
+import { motion, useReducedMotion } from 'motion/react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { CaseShell } from './_shared/CaseShell';
+import { ChapterTitle } from './_shared/ChapterTitle';
+import { CaseIntro, Takeaway } from './_shared/CaseLayout';
+import { reveal } from './_shared/CaseBits';
+import type { Chapter, CaseStudyComponentProps } from './_shared/types';
+
+/* ── How I lead design teams ─────────────────────────
+   A leadership playbook, not a company story: the principles,
+   the rituals, the team shape, how objectives are set, and how
+   people are hired and grown. Sary and Lobah appear only as the
+   places it was proven. Each chapter is a heading, one sentence
+   and one visual. Sources: the CV, Sary's design plan and review
+   in Notion, and LinkedIn recommendations. */
+
+const ACCENT = '#D4F03A'; // the lime from the illustrations
+const DEEP = '#0343F8'; // their royal blue
+const PANEL = '#0F1413';
+const LINE = 'rgba(255,255,255,0.08)';
+
+const CHAPTERS: Chapter[] = [
+  { id: 'overview', num: '01', roman: 'I', label: 'Overview', beat: 'How I lead.' },
+  { id: 'principles', num: '02', roman: 'II', label: 'My style', beat: 'What I hold to.' },
+  { id: 'rituals', num: '03', roman: 'III', label: 'Rituals', beat: 'The rhythm.' },
+  { id: 'practice', num: '04', roman: 'IV', label: 'In practice', beat: 'Three moments.' },
+  { id: 'shape', num: '05', roman: 'V', label: 'Team shape', beat: 'Streams and one team.' },
+  { id: 'objectives', num: '06', roman: 'VI', label: 'Objectives', beat: 'One owner each.' },
+  { id: 'people', num: '07', roman: 'VII', label: 'People', beat: 'Hire and grow.' },
+  { id: 'proof', num: '08', roman: 'VIII', label: 'Proof', beat: 'Where it worked.' },
+];
+const TOTAL = 'VIII';
+
+/* the illustrations open the page as one carousel; the chapters after
+   it tell the same ideas in words */
+const IMG = '/images/case-studies/leadership';
+const SLIDES: { src: string; title: string; line: string; alt: string }[] = [
+  { src: `${IMG}/cover.webp`, title: 'Design leadership', line: 'Building the team behind the product.', alt: 'Design leadership. Building the team behind the product. People, products, practice.' },
+  { src: `${IMG}/rhythm.webp`, title: 'A rhythm for better decisions', line: 'Shared priorities, open critique, learning carried forward.', alt: 'A rhythm for better decisions. Shared priorities. Open critique. Learning carried forward. Align, review, learn.' },
+  { src: `${IMG}/priority.webp`, title: 'Making a priority actionable', line: 'Frame, choose, own.', alt: 'Making a priority actionable. Frame: bring the problem and goals into view. Choose: discuss the trade-off and agree the focus. Own: give the work an owner and a next step. Clarity, commitment, action.' },
+  { src: `${IMG}/critique.webp`, title: 'Turning critique into a decision', line: 'Show the reasoning, challenge the work, record the decision.', alt: 'Turning critique into a decision. Show the reasoning, challenge the work, record the decision. The outcome is a design decision the team can act on.' },
+  { src: `${IMG}/coaching.webp`, title: 'Coaching through the work', line: 'Listen, practise, reflect.', alt: 'Coaching through the work. Listen: find the challenge behind the design. Practise: create an opportunity to apply the focus. Reflect: discuss the reasoning and the next step.' },
+];
+
+/* centred slides with the neighbours peeking in; arrows, dots, swipe
+   and arrow keys; moves on by itself every 6 seconds until someone
+   touches it, never under reduced motion */
+function Carousel() {
+  const reduced = useReducedMotion();
+  const [i, setI] = useState(0);
+  const [auto, setAuto] = useState(!reduced);
+  const [w, setW] = useState(0);
+  const box = useRef<HTMLDivElement>(null);
+  const start = useRef<number | null>(null);
+  const dragged = useRef(false);
+  const n = SLIDES.length;
+  const go = (k: number) => setI(((k % n) + n) % n);
+  const stop = () => setAuto(false);
+
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([e]) => setW(e.contentRect.width));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  useEffect(() => {
+    if (!auto || reduced) return;
+    const t = window.setTimeout(() => setI((x) => (x + 1) % n), 6000);
+    return () => window.clearTimeout(t);
+  }, [auto, reduced, i, n]);
+
+  const slideW = Math.min(w * (w < 640 ? 0.86 : 0.72), 1040);
+  const gap = w < 640 ? 12 : 24;
+  const x = w / 2 - slideW / 2 - i * (slideW + gap);
+  const s = SLIDES[i];
+
+  return (
+    <div
+      className="[--c-w:calc(100vw-0px)] md:[--c-w:min(1440px,calc(100vw-64px))]"
+      style={{ width: 'var(--c-w)', marginLeft: 'calc(50% - var(--c-w) / 2)' }}
+      onKeyDown={(e) => {
+        if (e.key === 'ArrowRight') { stop(); go(i + 1); }
+        if (e.key === 'ArrowLeft') { stop(); go(i - 1); }
+      }}
+    >
+      <div
+        ref={box}
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="Leadership illustrations"
+        tabIndex={0}
+        className="relative overflow-hidden outline-none select-none touch-pan-y"
+        onPointerDown={(e) => (start.current = e.clientX)}
+        onPointerUp={(e) => {
+          if (start.current === null) return;
+          const d = e.clientX - start.current;
+          start.current = null;
+          dragged.current = Math.abs(d) > 40;
+          if (dragged.current) { stop(); go(i + (d < 0 ? 1 : -1)); }
+        }}
+      >
+        <div
+          className="flex transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          style={{ gap, transform: `translateX(${x}px)` }}
+        >
+          {SLIDES.map((sl, k) => {
+            const on = k === i;
+            return (
+              <button
+                key={sl.src}
+                type="button"
+                onClick={() => {
+                  // the click that ends a swipe is not a pick
+                  if (dragged.current) { dragged.current = false; return; }
+                  stop();
+                  go(k);
+                }}
+                aria-label={on ? sl.title : `Show ${sl.title}`}
+                aria-current={on}
+                className="flex-none transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                style={{ width: slideW || undefined, transform: `scale(${on ? 1 : 0.9})`, opacity: on ? 1 : 0.4 }}
+              >
+                <img src={sl.src} alt={on ? sl.alt : ''} draggable={false} loading={k < 2 ? 'eager' : 'lazy'} decoding="async" className="w-full h-auto rounded-[18px] md:rounded-[28px] shadow-[0_40px_80px_-40px_rgba(0,0,0,0.9)]" />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      {/* caption and controls, lined up under the slide in front */}
+      <div className="mx-auto mt-6 md:mt-8 px-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-4" style={{ maxWidth: slideW ? slideW + 48 : undefined }}>
+        <div className="min-w-0" aria-live="polite">
+          <p className="text-white text-lg md:text-2xl font-semibold tracking-[-0.02em]">
+            <span className="tabular-nums mr-3" style={{ color: ACCENT }}>
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            {s.title}
+          </p>
+          <p className="text-white/55 mt-1">{s.line}</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="flex gap-1.5" aria-hidden>
+            {SLIDES.map((sl, k) => (
+              <span key={sl.src} className="h-1.5 rounded-full transition-all duration-300" style={{ width: k === i ? 22 : 6, background: k === i ? ACCENT : 'rgba(255,255,255,0.25)' }} />
+            ))}
+          </div>
+          <button type="button" onClick={() => { stop(); go(i - 1); }} aria-label="Previous illustration" className="grid place-items-center w-11 h-11 rounded-full border border-white/15 text-white/80 hover:text-white hover:border-white/40 transition-colors">
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+          <button type="button" onClick={() => { stop(); go(i + 1); }} aria-label="Next illustration" className="grid place-items-center w-11 h-11 rounded-full border border-white/15 text-white/80 hover:text-white hover:border-white/40 transition-colors">
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* the three practices, told in words: the steps in order, then what
+   actually happens in the room */
+const PRACTICES: { title: string; steps: string[]; story: string; principle: string }[] = [
+  {
+    title: 'Making a priority actionable',
+    steps: ['Frame', 'Choose', 'Own'],
+    story: 'When a priority lands, I first put the problem and the goals on the table so everyone is looking at the same thing. Then we talk through the trade-off and agree one focus. It isn’t done until the work has an owner and a next step.',
+    principle: 'One owner for every objective',
+  },
+  {
+    title: 'Turning critique into a decision',
+    steps: ['Show the reasoning', 'Challenge the work', 'Record the decision'],
+    story: 'In a crit the designer explains the choice and the open question, not just the screens. We challenge the work against the concern, never personal taste. Then we write the decision down so it carries into the next step.',
+    principle: 'A rhythm people can rely on',
+  },
+  {
+    title: 'Coaching through the work',
+    steps: ['Listen', 'Practise', 'Reflect'],
+    story: 'Coaching happens inside real projects. I listen for the challenge behind the design, set up a chance to practise that skill on the next piece of work, then we reflect on the reasoning together. Growth carries into the next project.',
+    principle: 'Grow people on a clear bar',
+  },
+];
+
+function Practices() {
+  return (
+    <ol className="grid gap-4">
+      {PRACTICES.map((pr, k) => (
+        <li key={pr.title} className="rounded-[24px] border p-6 md:p-10 grid md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-6 md:gap-12" style={{ background: PANEL, borderColor: LINE }}>
+          <div>
+            <p className="text-sm font-semibold tabular-nums mb-3" style={{ color: ACCENT }}>
+              {String(k + 1).padStart(2, '0')}
+            </p>
+            <h3 className="text-white text-2xl md:text-3xl font-semibold tracking-[-0.02em] leading-tight">{pr.title}</h3>
+            <ol className="flex flex-wrap items-center gap-2 mt-5">
+              {pr.steps.map((st, j) => (
+                <li key={st} className="flex items-center gap-2">
+                  <span className="rounded-full px-3 py-1.5 text-sm font-semibold" style={{ background: j === pr.steps.length - 1 ? ACCENT : 'rgba(255,255,255,0.06)', color: j === pr.steps.length - 1 ? '#101216' : '#FFFFFF' }}>
+                    {st}
+                  </span>
+                  {j < pr.steps.length - 1 && <ArrowRight aria-hidden className="w-3.5 h-3.5 text-white/35" />}
+                </li>
+              ))}
+            </ol>
+          </div>
+          <div>
+            <p className="text-white/75 text-lg leading-relaxed">{pr.story}</p>
+            <p className="text-white/40 text-sm mt-4">Principle: {pr.principle}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function Section({ i, tone, title, lead, children }: { i: number; tone?: 'teal'; title: string; lead: string; children: ReactNode }) {
+  const c = CHAPTERS[i];
+  return (
+    <>
+      <ChapterTitle chapter={c} total={TOTAL} tone={tone} />
+      <section id={c.id} className="mb-28 md:mb-36 scroll-mt-24">
+        <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] leading-[1.05] max-w-3xl">
+          {title}
+        </motion.h2>
+        <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mt-4 mb-10 md:mb-12">
+          {lead}
+        </motion.p>
+        <motion.div {...reveal}>{children}</motion.div>
+      </section>
+    </>
+  );
+}
+
+const Panel = ({ children, className = '' }: { children: ReactNode; className?: string }) => (
+  <div className={`rounded-[28px] border p-5 md:p-10 ${className}`} style={{ background: PANEL, borderColor: LINE }}>
+    {children}
+  </div>
+);
+
+/* ── 01 ───────────────────────────────────────────── */
+
+const SCALE: [string, string][] = [
+  ['10+', 'years in product design'],
+  ['12+', 'designers led'],
+  ['2', 'teams: Sary and Lobah'],
+];
+
+/* ── 02 principles ─────────────────────────────────── */
+
+const PRINCIPLES: [string, string][] = [
+  ['One owner for every objective', 'Shared goals drift. A name next to each one keeps it moving.'],
+  ['A rhythm people can rely on', 'Small, regular rituals beat big meetings. Everyone knows when work gets seen.'],
+  ['One source of truth', 'One design system and one tool for design and engineering, so nothing is redrawn twice.'],
+  ['Measure design, don’t assume it', 'Dashboards, session replays and usability scores decide what we fix next.'],
+  ['Grow people on a clear bar', 'The same bar for hiring, feedback and promotion, written down.'],
+];
+
+function Principles() {
+  return (
+    <ol className="border-t" style={{ borderColor: LINE }}>
+      {PRINCIPLES.map(([t, d], i) => (
+        <li key={t} className="grid grid-cols-[44px_minmax(0,1fr)] md:grid-cols-[64px_minmax(0,1fr)_minmax(0,1.1fr)] gap-x-4 gap-y-1 py-6 border-b" style={{ borderColor: LINE }}>
+          <span className="text-sm font-semibold tabular-nums pt-1" style={{ color: ACCENT }}>
+            {String(i + 1).padStart(2, '0')}
+          </span>
+          <p className="text-white text-xl md:text-2xl font-semibold tracking-[-0.02em] leading-snug">{t}</p>
+          <p className="text-white/55 leading-relaxed col-start-2 md:col-start-auto">{d}</p>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+/* ── 03 rituals ──────────────────────────────────── */
+
+type Ritual = { name: string; meta: string; input: string; output: string };
+const CADENCES: { k: string; items: Ritual[] }[] = [
+  {
+    k: 'Day',
+    items: [
+      { name: 'Stand-up', meta: '15 min, whole team', input: 'Yesterday’s progress in Figma', output: 'Blockers raised the same day' },
+      { name: 'Designer ↔ PM', meta: 'Each designer with their squad PM', input: 'Squad priorities', output: 'Scope agreed before design starts' },
+    ],
+  },
+  {
+    k: 'Week',
+    items: [
+      { name: 'Design review', meta: 'Team sync on work in progress', input: 'Work from every stream', output: 'One standard across streams' },
+      { name: 'Design crit', meta: 'Open critique across squads', input: 'Flows ready for feedback', output: 'Stronger rationale before handoff' },
+      { name: 'Production call', meta: 'With PMs and product leadership', input: 'What each squad is shipping', output: 'Priorities and trade-offs agreed' },
+      { name: 'Design QA', meta: 'With engineering, on Jira', input: 'Built screens', output: 'Usability fixes before release' },
+    ],
+  },
+  {
+    k: 'Two weeks',
+    items: [{ name: '1:1s', meta: 'With every designer', input: 'Growth, feedback, frustrations', output: 'A growth plan per person' }],
+  },
+  {
+    k: 'Month',
+    items: [
+      { name: 'Session replays', meta: 'Watching real sessions together', input: 'Real sessions on core flows', output: 'UX issues added to the backlog' },
+      { name: 'Retro', meta: 'Adjusted to project scale', input: 'What worked and what didn’t', output: 'Process changes for next month' },
+    ],
+  },
+  {
+    k: 'Quarter',
+    items: [
+      {
+        name: 'OKR review',
+        meta: 'Objectives, each with one owner',
+        input: 'Dashboards, SUS scores, replays',
+        output: 'Next quarter’s objectives, each with one owner',
+      },
+    ],
+  },
+];
+
+function Rhythm() {
+  return (
+    <Panel>
+      <ol className="relative">
+        <span aria-hidden className="absolute left-[7px] top-2 bottom-2 w-px" style={{ background: `${ACCENT}55` }} />
+        {CADENCES.map((c, i) => (
+          <li key={c.k} className="relative grid md:grid-cols-[160px_minmax(0,1fr)] gap-x-6 gap-y-3 pl-8 pb-8 last:pb-0">
+            <span aria-hidden className="absolute left-0 top-1 w-[15px] h-[15px] rounded-full border-2" style={{ borderColor: ACCENT, background: i === CADENCES.length - 1 ? ACCENT : PANEL }} />
+            <p className="text-lg font-bold leading-none pt-0.5" style={{ color: ACCENT }}>
+              Every {c.k.toLowerCase()}
+            </p>
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
+              {c.items.map((it) => (
+                <div key={it.name}>
+                  <p className="text-white font-semibold">{it.name}</p>
+                  <p className="text-white/50 text-sm leading-snug mt-0.5">{it.output}</p>
+                </div>
+              ))}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </Panel>
+  );
+}
+
+/* ── 04 team shape ───────────────────────────────── */
+
+function Shape() {
+  const line = `${ACCENT}66`;
+  return (
+    <Panel>
+      <div className="flex flex-col items-center">
+        <span className="rounded-xl px-4 py-2 text-sm font-bold text-[#101216]" style={{ background: ACCENT }}>
+          Design lead
+        </span>
+        <span aria-hidden className="w-px h-5" style={{ background: line }} />
+        <div className="w-full rounded-2xl border px-4 py-3 text-center" style={{ borderColor: `${ACCENT}55`, background: `${ACCENT}0D` }}>
+          <p className="text-white font-semibold">One design team</p>
+          <p className="text-white/50 text-sm mt-0.5">System · research · standard · growth</p>
+        </div>
+        <div aria-hidden className="relative w-full h-6">
+          <span className="absolute left-1/2 top-0 w-px h-1/2" style={{ background: line }} />
+          <span className="absolute left-[16.66%] right-[16.66%] top-1/2 h-px" style={{ background: line }} />
+          {[16.66, 50, 83.33].map((x) => (
+            <span key={x} className="absolute top-1/2 w-px h-1/2" style={{ left: `${x}%`, background: line }} />
+          ))}
+        </div>
+        <div className="grid grid-cols-3 gap-2 md:gap-3 w-full">
+          {['Stream A', 'Stream B', 'Stream C'].map((s) => (
+            <div key={s} className="rounded-2xl border p-3 md:p-5 text-center" style={{ borderColor: LINE }}>
+              <p className="text-white font-semibold text-sm md:text-base">{s}</p>
+              <p className="text-white/50 text-xs md:text-sm mt-1">Designers + PM</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      <p className="text-white/45 text-sm mt-8 pt-5 border-t" style={{ borderColor: LINE }}>
+        At Sary the streams were Demand, Supply and Logistics: retailers, suppliers and drivers.
+      </p>
+    </Panel>
+  );
+}
+
+/* ── 05 objectives: the format ───────────────────── */
+
+const OKR_PARTS: [string, string][] = [
+  ['Objective', 'Measure design impact'],
+  ['Owner', 'One named person'],
+  ['Key results', '0 → 3 dashboards · 0 → 3 SUS surveys'],
+  ['Check-in', 'Monthly update to the team'],
+  ['Review', 'Quarterly, with product leadership'],
+];
+
+function OkrFormat() {
+  return (
+    <Panel className="!p-0 overflow-hidden">
+      {OKR_PARTS.map(([k, v]) => (
+        <div key={k} className="grid grid-cols-[110px_minmax(0,1fr)] md:grid-cols-[200px_minmax(0,1fr)] gap-4 px-5 md:px-10 py-4 md:py-5 border-b last:border-0" style={{ borderColor: LINE }}>
+          <span className="text-white/45 text-sm pt-0.5">{k}</span>
+          <span className="text-white md:text-lg font-semibold">{v}</span>
+        </div>
+      ))}
+      <p className="px-5 md:px-10 py-4 text-sm" style={{ background: `${ACCENT}12`, color: ACCENT }}>
+        Result at Sary: 8 dashboards against a target of 3, and a first SUS score of 68.
+      </p>
+    </Panel>
+  );
+}
+
+/* ── 06 people ───────────────────────────────────── */
+
+const HIRING = ['Intro chat', 'Portfolio interview', 'Take-home, 6 days', 'Presentation', 'Decision in 2–4 weeks'];
+
+/* ── 07 proof ────────────────────────────────────── */
+
+const PROOF: { where: string; when: string; role: string; points: [string, string][] }[] = [
+  {
+    where: 'Sary',
+    when: '2021 – 2023',
+    role: 'Senior Product Designer → Product Design Lead',
+    points: [
+      ['8', 'designers across 3 streams'],
+      ['+40%', 'design velocity'],
+      ['25+', 'engineers on one system'],
+    ],
+  },
+  {
+    where: 'Lobah',
+    when: '2025 – now',
+    role: 'Lead Game Product Designer',
+    points: [
+      ['4+', 'game UI and UX designers'],
+      ['4', 'products, PC and mobile'],
+    ],
+  },
+];
+
+export function LeadershipCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
+  return (
+    <CaseShell chapters={CHAPTERS} metaLine="Design leadership" onBack={onBack} onNext={onNext} resetKey="sary-design-leadership" pillId="lead-tab-pill">
+      <div className="max-w-5xl mx-auto px-6 pt-16 pb-24">
+        {/* ── 01 OVERVIEW ── */}
+        <ChapterTitle chapter={CHAPTERS[0]} total={TOTAL} />
+        <section id="overview" className="mb-28 md:mb-36 scroll-mt-24">
+          <CaseIntro
+            meta={[
+              ['Focus', 'Design leadership'],
+              ['Teams', 'Sary, Lobah'],
+              ['Years', '2021 – now'],
+            ]}
+            title="How I lead design teams."
+          >
+            <p>Five principles and a weekly rhythm I’ve used to run design teams, from a B2B marketplace to a games studio.</p>
+          </CaseIntro>
+          <motion.div {...reveal} className="mb-16 md:mb-20">
+            <Carousel />
+          </motion.div>
+          <motion.dl {...reveal} className="grid grid-cols-3 border-t border-b" style={{ borderColor: LINE }}>
+            {SCALE.map(([v, k], i) => (
+              <div key={k} className={`py-8 ${i ? 'border-l pl-5 md:pl-8' : ''}`} style={{ borderColor: LINE }}>
+                <dt className="sr-only">{k}</dt>
+                <dd className="text-white text-5xl md:text-7xl font-extrabold tracking-[-0.06em] leading-none tabular-nums">{v}</dd>
+                <p className="text-white/50 text-sm md:text-base mt-3">{k}</p>
+              </div>
+            ))}
+          </motion.dl>
+        </section>
+
+        <Section i={1} tone="teal" title="Here’s my style." lead="Five things I hold to. Everything else on this page comes from them.">
+          <Principles />
+        </Section>
+
+        <Section i={2} title="A rhythm from a day to a quarter." lead="Each ritual has one job. Read it top to bottom; the quarter sets what the days work on.">
+          <Rhythm />
+        </Section>
+
+        <Section i={3} tone="teal" title="Three moments where it shows." lead="How a priority, a critique and a coaching conversation run on my teams, step by step.">
+          <Practices />
+        </Section>
+
+        <Section i={4} title="Designers in streams, one team behind them." lead="Designers work day to day with a stream and its PM, and come back to one team for the system, research and standard.">
+          <Shape />
+        </Section>
+
+        <Section i={5} tone="teal" title="Every objective has one owner." lead="Objectives are short, measurable and owned by one person. This is the format, with one of mine as the example.">
+          <OkrFormat />
+        </Section>
+
+        <Section i={6} title="Hire on one bar, grow on the same one." lead="Every finalist gets the same open brief and is scored on the same four things: storytelling, rationale, quality and prioritisation. Bi-weekly 1:1s turn the same bar into a growth plan.">
+          <ol className="grid grid-cols-1 sm:grid-cols-5 border-t" style={{ borderColor: LINE }}>
+            {HIRING.map((p, i) => (
+              <li key={p} className="pt-5 pb-2 sm:pr-4 grid grid-cols-[32px_minmax(0,1fr)] sm:block gap-2">
+                <span className="text-sm font-semibold tabular-nums" style={{ color: ACCENT }}>
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span className="text-white font-semibold sm:block sm:mt-2">{p}</span>
+              </li>
+            ))}
+          </ol>
+        </Section>
+
+        <Section i={7} tone="teal" title="Where it worked." lead="The same playbook, two very different teams.">
+          <div className="grid md:grid-cols-2 gap-3 mb-12">
+            {PROOF.map((t) => (
+              <Panel key={t.where} className="!p-6 md:!p-8">
+                <div className="flex items-baseline justify-between gap-4">
+                  <p className="text-white text-2xl font-bold">{t.where}</p>
+                  <p className="text-white/45 text-sm tabular-nums">{t.when}</p>
+                </div>
+                <p className="text-sm mt-1 mb-6" style={{ color: ACCENT }}>
+                  {t.role}
+                </p>
+                <dl className="grid gap-3">
+                  {t.points.map(([v, k]) => (
+                    <div key={k} className="flex items-baseline gap-4">
+                      <dt className="sr-only">{k}</dt>
+                      <dd className="text-white text-3xl font-extrabold tracking-[-0.04em] tabular-nums min-w-[3.2ch]">{v}</dd>
+                      <span className="text-white/55">{k}</span>
+                    </div>
+                  ))}
+                </dl>
+              </Panel>
+            ))}
+          </div>
+          <figure className="border-l-2 pl-6 max-w-3xl" style={{ borderColor: ACCENT }}>
+            <blockquote className="text-white text-xl md:text-2xl leading-snug">
+              “He has a great talent for organizing work, skillfully delegating tasks based on his team members’ individual
+              strengths, while also fostering their professional growth, acting as a true mentor in the process.”
+            </blockquote>
+            <figcaption className="text-white/45 text-sm mt-4">Polina Kosheleva, Senior Game UI Artist, reported to Ahmad at Lobah</figcaption>
+          </figure>
+        </Section>
+
+        <Takeaway
+          accent={ACCENT}
+          deep={DEEP}
+          note="“He has fostered a culture of innovation within our design team, enhancing collaboration and elevating our deliverables.” — Mohammed Aldossary, Co-founder & CEO, Sary"
+        >
+          A team doesn’t need more pressure. It needs an owner for every objective, a rhythm people can rely on, and one source
+          of truth.
+        </Takeaway>
+      </div>
+    </CaseShell>
+  );
+}

@@ -28,50 +28,57 @@ type Project = { id: string; title: string; category?: string; hasStudy?: boolea
 /* real figures from each case study; `lead` is drawn larger */
 type Stat = { v: number; pre?: string; suf?: string; dp?: number; k: string; note?: string };
 const STATS: Record<string, Stat[]> = {
+  'sary-design-leadership': [
+    { v: 40, pre: '+', suf: '%', k: 'Design velocity', note: 'brief to dev-ready' },
+    { v: 12, suf: '+', k: 'Designers led' },
+    { v: 30, suf: '%', k: 'Faster handoff' },
+  ],
   'sary-repeat-customers': [
     { v: 28, pre: '+', suf: '%', k: 'Repeat purchases' },
     { v: 27, pre: '+', suf: '%', k: 'Average order value' },
     { v: 42, pre: '+', suf: '%', k: 'Use of suggestions' },
   ],
   'sary-usability-report': [
-    { v: 9.63, suf: '%', dp: 2, k: 'Reached Discover' },
-    { v: 34860, k: 'Opened the catalogue' },
-    { v: 63.1, suf: '%', dp: 1, k: 'Used a section slider' },
+    { v: 9.63, suf: '%', dp: 2, k: 'Of shoppers reached Discover' },
   ],
   'sampo-ai-pricing': [
-    { v: 17, pre: '+', suf: '%', k: 'Winning mode, revenue', note: 'sample test' },
-    { v: 3, k: 'Modes tested before live' },
-    { v: 1, k: 'Click to undo' },
+    { v: 40, pre: '+', suf: '%', k: 'Dashboard usage', note: 'pilot' },
+    { v: 22, pre: '−', suf: '%', k: 'Setup friction' },
+    { v: 28, pre: '+', suf: '%', k: 'Sign-up intent' },
   ],
   'fresh-order-placed': [
-    { v: 5, suf: 's', k: 'To fix the order after Pay' },
-    { v: 9, k: 'Designed states' },
-    { v: 1, k: 'Clock for ring and cancel' },
+    { v: 5, suf: 's', k: 'To fix the address or items after Pay' },
   ],
 };
 
 const COPY: Record<string, { name: string; line: string; tint: string; beats: string[] }> = {
+  'sary-design-leadership': {
+    name: 'How I lead design teams',
+    line: 'One owner per objective, a steady rhythm, one source of truth. Proven at Sary and Lobah.',
+    tint: '#0343F8',
+    beats: ['Building the team behind the product', 'Making a priority actionable', 'Turning critique into a decision', 'Coaching through the work'],
+  },
   'sary-repeat-customers': {
-    name: 'Sary Buy Again',
-    line: '39 taps down to 3. Repeat purchases up 28%, order value up 27%.',
+    name: 'Restock in 3 taps, not 39',
+    line: 'A Buy Again hub for grocery stores. Repeat purchases up 28%, order value up 27%.',
     tint: '#1D368D',
     beats: ['A store owner opens Sary to restock', 'The Buy Again hub has the usual basket ready', 'Add all: 18 items in the cart in one tap'],
   },
   'sary-usability-report': {
-    name: 'Sary usability report',
-    line: 'Only 9.63% of shoppers reached Discover. My quarterly report on why.',
+    name: 'Where shoppers dropped off, and why',
+    line: 'My quarterly usability report: the catalogue funnel and the heatmaps behind it.',
     tint: '#1E3A8A',
     beats: ['34,860 shoppers opened the catalogue', 'Every step lost more of them', 'Only 3,357 reached Discover, and the heatmap shows why'],
   },
   'sampo-ai-pricing': {
-    name: 'Sampo AI pricing',
-    line: 'An AI that sets prices, made trustworthy: explained, previewed, reversible.',
+    name: 'AI pricing merchants can trust',
+    line: 'An AI that sets store prices, with every strategy explained, previewed and reversible.',
     tint: '#4338CA',
     beats: ['Careful: small, safe nudges', 'High Impact: more reach, less profit', 'Balanced: best profit for moderate risk', 'Tested before anything goes live'],
   },
   'fresh-order-placed': {
-    name: 'fresh order placed',
-    line: 'The spinner after Pay became five seconds to fix the order, then tracking.',
+    name: 'Five seconds to fix an order',
+    line: 'The spinner after Pay became a window to change the address or items, then tracking.',
     tint: '#0E7A4E',
     beats: ['Pay, and a five second window opens', 'Fix the address or the items while it runs', 'Placed, and straight on to tracking'],
   },
@@ -150,8 +157,8 @@ function ReportStage({ p }: { p: MotionValue<number> }) {
           const t = clamp01((v - 0.08 - i * 0.12) / 0.3);
           const final = 34 + 66 * Math.sqrt(f.pct / 100);
           return (
-            <div key={f.k} className="h-9 md:h-11 rounded-xl grid place-items-center text-white text-[11px] md:text-xs font-semibold transition-[width] duration-200" style={{ width: `${100 - (100 - final) * t}%`, background: ['#2DD4BF', '#38BDF8', '#3B82F6', '#1E3A8A'][i] }}>
-              <span className="truncate px-2">
+            <div key={f.k} className="min-w-fit h-9 md:h-11 rounded-xl grid place-items-center text-white text-[11px] md:text-xs font-semibold transition-[width] duration-200" style={{ width: `${100 - (100 - final) * t}%`, background: ['#2DD4BF', '#38BDF8', '#3B82F6', '#1E3A8A'][i] }}>
+              <span className="whitespace-nowrap px-3">
                 {f.k} · {f.pct}%
               </span>
             </div>
@@ -162,9 +169,26 @@ function ReportStage({ p }: { p: MotionValue<number> }) {
           <span className="text-[#5B6478] text-xs">shoppers {v > 0.62 ? 'reached Discover' : 'still in'}</span>
         </p>
       </div>
-      <div className="relative h-[86%] aspect-[318/636] rounded-[28px] overflow-hidden bg-black border-[5px] border-[#1b1d22] shadow-[0_30px_60px_-30px_rgba(15,27,61,0.55)] hidden sm:block" style={{ opacity: 0.25 + 0.75 * heat, transform: `translateY(${(1 - heat) * 16}px)` }}>
-        <img src="/images/case-studies/sary-report/heat-2.webp" alt="" aria-hidden className="w-full h-full object-cover" />
-        <span className="absolute left-2 bottom-2 rounded-full bg-black/65 text-white text-[10px] font-semibold px-2 py-0.5">Discover heatmap</span>
+      {/* one clean frame around the real screen: the heatmap screenshot is
+          cropped to its content, the bezel, island and status bar are drawn */}
+      <div
+        className="@container relative h-[86%] aspect-[0.49] hidden sm:block lg:hidden xl:block"
+        style={{ opacity: 0.25 + 0.75 * heat, transform: `translateY(${(1 - heat) * 16}px)` }}
+      >
+       <div className="relative h-full w-full rounded-[13cqi] bg-[#0B0C0F] p-[3.2cqi] shadow-[0_40px_70px_-30px_rgba(15,27,61,0.6),0_0_0_1px_rgba(15,27,61,0.18)]">
+        <div className="relative h-full w-full rounded-[10cqi] overflow-hidden bg-white flex flex-col">
+          <div className="relative flex-none h-[11cqi] flex items-center justify-between px-[8cqi] text-[#0F1B3D] text-[4.6cqi] font-semibold">
+            <span>9:41</span>
+            <span aria-hidden className="absolute left-1/2 top-[2.4cqi] -translate-x-1/2 h-[7.5cqi] w-[30cqi] rounded-full bg-[#0B0C0F]" />
+            <span aria-hidden className="flex items-center gap-[1.4cqi]">
+              <span className="w-[5cqi] h-[2.6cqi] rounded-[0.8cqi] border border-[#0F1B3D]/70" />
+            </span>
+          </div>
+          <img src="/images/case-studies/sary-report/heat-2-screen.webp" alt="" aria-hidden className="flex-1 min-h-0 w-full object-cover object-top" />
+          <span aria-hidden className="absolute bottom-[2.2cqi] left-1/2 -translate-x-1/2 h-[1.3cqi] w-[34cqi] rounded-full bg-[#0F1B3D]/80" />
+        </div>
+        <span className="absolute left-[7cqi] bottom-[9cqi] rounded-full bg-[#0F1B3D]/80 backdrop-blur text-white text-[4.4cqi] font-semibold px-[3.5cqi] py-[1.2cqi]">Discover heatmap</span>
+       </div>
       </div>
     </div>
   );
@@ -185,20 +209,118 @@ function SampoStage({ p }: { p: MotionValue<number> }) {
   );
 }
 
+/* three phones, one per action: Pay starts the window, the address is
+   fixed while the clock pauses, then placed. They rise in one after
+   another, float on a slow offset bob, and the phone for the current
+   beat steps forward. */
+const FRESH_CSS = `@keyframes fresh-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.2%)}}
+@media (prefers-reduced-motion: reduce){.fresh-bob{animation:none!important}}`;
 function FreshStage({ p }: { p: MotionValue<number> }) {
   const v = useStep(p);
   const [ref, box] = useBox<HTMLDivElement>();
-  const w = Math.min(box.w * 0.62, (box.h * 0.94 * 440) / 956);
-  const progress = clamp01((v - 0.12) / 0.58);
-  const state: PhoneState = v < 0.72 ? 'placing' : v < 0.8 ? 'burst' : 'placed';
+  // the centre phone at a comfortable size; the two behind it peek out
+  // either side, so the whole group always fits inside the card
+  const w = Math.min(box.w * 0.4, (box.h * 0.74 * 440) / 956);
+  const focus = v < 0.4 ? 0 : v < 0.7 ? 1 : 2;
+  const pay = clamp01(v / 0.38);
+  const phones: { state: PhoneState; progress: number; label: string }[] = [
+    { state: pay >= 1 ? 'sent' : 'placing', progress: pay, label: 'Pay' },
+    { state: 'edit-address', progress: 0.38, label: 'Fix it' },
+    { state: v >= 0.7 && v < 0.78 ? 'burst' : 'placed', progress: 1, label: 'Placed' },
+  ];
   return (
-    <div ref={ref} className="absolute inset-0 grid place-items-center">
-      {w > 0 && <FreshPhone state={state} progress={progress} width={w} />}
+    <div ref={ref} className="absolute inset-0">
+      <style>{FRESH_CSS}</style>
+      {w > 0 &&
+        phones.map((ph, i) => {
+          // 0 = centre, 1 = behind on the right, -1 = behind on the left
+          const d = (i - focus + 3) % 3;
+          const role = d === 0 ? 0 : d === 1 ? 1 : -1;
+          const on = role === 0;
+          const rise = clamp01((v + 0.02 - i * 0.035) / 0.1);
+          const x = role * w * 0.62;
+          return (
+            <div
+              key={i}
+              className="absolute left-1/2 top-1/2 transition-[transform,opacity,filter] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              style={{
+                transform: `translate(calc(-50% + ${x}px), calc(-55% + ${(1 - rise) * 30}%)) scale(${on ? 1 : 0.8})`,
+                opacity: rise * (on ? 1 : 0.55),
+                filter: on ? 'none' : 'saturate(0.8)',
+                zIndex: on ? 3 : 1,
+              }}
+            >
+              <div className="fresh-bob" style={{ animation: `fresh-bob 3.6s ease-in-out ${i * -1.2}s infinite` }}>
+                <FreshPhone state={ph.state} progress={ph.progress} width={w} />
+              </div>
+            </div>
+          );
+        })}
+      {/* one label for the phone in front */}
+      <div className="absolute left-1/2 -translate-x-1/2 bottom-[3%] flex gap-1.5 z-10">
+        {phones.map((ph, i) => (
+          <span
+            key={ph.label}
+            className="rounded-full px-2.5 md:px-3 py-1 text-[10px] md:text-xs font-bold whitespace-nowrap transition-colors duration-300"
+            style={{ background: i === focus ? '#0E7A4E' : 'rgba(14,122,78,0.12)', color: i === focus ? '#FFFFFF' : '#2F5E47' }}
+          >
+            {String(i + 1).padStart(2, '0')} · {ph.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* the leadership story as a deck of illustrated cutouts: the cover,
+   then the three practices. Each one lands on top of the last as
+   the card's story plays; the ones before stay stacked behind. */
+const LEAD_IMG = '/images/case-studies/leadership';
+const DECK = [
+  { src: `${LEAD_IMG}/cover.webp`, alt: 'Design leadership: building the team behind the product' },
+  { src: `${LEAD_IMG}/priority.webp`, alt: 'Making a priority actionable: frame, choose, own' },
+  { src: `${LEAD_IMG}/critique.webp`, alt: 'Turning critique into a decision: show the reasoning, challenge the work, record the decision' },
+  { src: `${LEAD_IMG}/coaching.webp`, alt: 'Coaching through the work: listen, practise, reflect' },
+];
+function TeamStage({ p }: { p: MotionValue<number> }) {
+  const v = useStep(p);
+  const cur = Math.min(DECK.length - 1, Math.floor(clamp01((v - 0.04) / 0.8) * DECK.length));
+  return (
+    <div className="absolute inset-0 grid place-items-center px-[5%]">
+      <div className="relative w-full max-w-[680px] aspect-[3/2]">
+        {DECK.map((d, i) => {
+          const past = i < cur;
+          const on = i === cur;
+          const depth = cur - i;
+          return (
+            <img
+              key={d.src}
+              src={d.src}
+              alt={on ? d.alt : ''}
+              aria-hidden={!on}
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 w-full h-full object-cover rounded-xl md:rounded-2xl transition-all duration-500 ease-out"
+              style={{
+                opacity: on ? 1 : past ? Math.max(0, 0.55 - depth * 0.18) : 0,
+                transform: on
+                  ? 'translateY(0) rotate(0deg) scale(1)'
+                  : past
+                    ? `translateY(${-depth * 4}%) rotate(${(i % 2 ? 1 : -1) * (2 + depth)}deg) scale(${1 - depth * 0.05})`
+                    : 'translateY(8%) rotate(0deg) scale(0.96)',
+                zIndex: i,
+                boxShadow: on ? '0 40px 70px -30px rgba(0,0,0,0.85)' : 'none',
+              }}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }
 
 const STAGE: Record<string, (props: { p: MotionValue<number> }) => ReactNode> = {
+  'sary-design-leadership': TeamStage,
   'sary-repeat-customers': SaryStage,
   'sary-usability-report': ReportStage,
   'sampo-ai-pricing': SampoStage,
@@ -245,6 +367,11 @@ type Engrave = { ink: string; cut: string; filter: string };
    colour where the lockup sits), so the logo and the "Q4 ’22 report"
    text stay readable; the pressed-in look comes from the edges. */
 const ENGRAVE: Record<string, Engrave> = {
+  'sary-design-leadership': {
+    ink: '#0343F8', // 6.9:1 on #F2F3EE
+    cut: '#F2F3EE',
+    filter: 'drop-shadow(0 1px 0 rgba(255,255,255,1)) drop-shadow(0 -1px 0 rgba(1,20,80,0.3))',
+  },
   'sary-repeat-customers': {
     ink: '#C0C7DF', // 6.4:1 on #1D368D
     cut: '#1D368D',
@@ -269,6 +396,11 @@ const ENGRAVE: Record<string, Engrave> = {
 
 /* the lockup at the top of each card */
 const LOCKUP: Record<string, (e: Engrave) => ReactNode> = {
+  'sary-design-leadership': (e) => (
+    <span className="text-[15px] md:text-base font-bold" style={{ color: e.ink }}>
+      Leadership playbook
+    </span>
+  ),
   'sary-repeat-customers': (e) => <SaryWord color={e.ink} h={40} />,
   'sary-usability-report': (e) => (
     <span className="inline-flex items-center gap-2.5">
@@ -309,6 +441,19 @@ type Theme = {
 };
 
 const THEMES: Record<string, Theme> = {
+  'sary-design-leadership': {
+    // the illustrations' own paper, ink and royal blue
+    bg: 'radial-gradient(ellipse 70% 80% at 88% 12%, rgba(3,67,248,0.10) 0%, transparent 60%), linear-gradient(160deg, #F2F3EE 0%, #E9E9E2 100%)',
+    border: 'rgba(16,18,22,0.12)',
+    kicker: '#55565E',
+    ink: '#101216',
+    sub: '#3F4048',
+    lead: { bg: '#0343F8', ink: '#FFFFFF', sub: 'rgba(255,255,255,0.8)', border: 'transparent' },
+    tile: { bg: '#FFFFFF', ink: '#101216', sub: '#55565E', border: 'rgba(16,18,22,0.14)' },
+    btn: { bg: '#101216', ink: '#F2F3EE' },
+    beatOn: '#0343F8',
+    beatOff: 'rgba(16,18,22,0.14)',
+  },
   'sary-repeat-customers': {
     bg: 'radial-gradient(ellipse 80% 90% at 85% 10%, #2B4BC0 0%, transparent 62%), linear-gradient(160deg, #1D368D 0%, #0E1A47 70%)',
     border: 'rgba(255,255,255,0.16)',
@@ -376,26 +521,29 @@ function Stats({ p, stats, th }: { p: MotionValue<number>; stats: Stat[]; th: Th
   };
   const [lead, ...rest] = stats;
   return (
-    <div className="grid grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,1fr)] gap-2.5">
-      <div className="rounded-2xl p-4 md:p-5 shadow-[0_20px_40px_-22px_rgba(0,0,0,0.55)]" style={{ background: th.lead.bg, border: `1px solid ${th.lead.border}` }}>
-        <p className="font-extrabold tabular-nums leading-none tracking-[-0.055em] text-4xl md:text-[clamp(44px,4.4vw,72px)]" style={{ color: th.lead.ink }}>
+    <div className="flex items-end gap-8 xl:gap-12">
+      <div className="min-w-0">
+        <p className="font-extrabold tabular-nums leading-[0.85] tracking-[-0.06em] whitespace-nowrap text-[clamp(56px,6vw,104px)]" style={{ color: th.beatOn }}>
           {show(lead)}
         </p>
-        <p className="text-xs md:text-sm mt-2.5 leading-snug" style={{ color: th.lead.sub }}>
+        <p className="text-sm md:text-base mt-3 leading-snug" style={{ color: th.sub }}>
           {lead.k}
           {lead.note && <span className="opacity-70"> · {lead.note}</span>}
         </p>
       </div>
-      {rest.map((s2) => (
-        <div key={s2.k} className="rounded-2xl p-4 md:p-5" style={{ background: th.tile.bg, border: `1px solid ${th.tile.border}` }}>
-          <p className="font-bold tabular-nums leading-none tracking-[-0.045em] text-3xl md:text-[clamp(30px,2.8vw,46px)]" style={{ color: th.tile.ink }}>
-            {show(s2)}
-          </p>
-          <p className="text-xs md:text-sm mt-2.5 leading-snug" style={{ color: th.tile.sub }}>
-            {s2.k}
-          </p>
-        </div>
-      ))}
+      {rest.length > 0 && <dl className="grid gap-3 pb-1 pl-6 xl:pl-8" style={{ borderLeft: `1px solid ${th.tile.border}` }}>
+        {rest.map((s2) => (
+          <div key={s2.k} className="flex items-baseline gap-2.5 whitespace-nowrap">
+            <dt className="sr-only">{s2.k}</dt>
+            <dd className="text-xl xl:text-2xl font-bold tabular-nums tracking-[-0.04em]" style={{ color: th.ink }}>
+              {show(s2)}
+            </dd>
+            <span aria-hidden className="text-sm" style={{ color: th.sub }}>
+              {s2.k}
+            </span>
+          </div>
+        ))}
+      </dl>}
     </div>
   );
 }
@@ -409,13 +557,13 @@ function Beat({ p, beats, th }: { p: MotionValue<number>; beats: string[]; th: T
   const v = useStep(p);
   const i = Math.min(beats.length - 1, Math.floor(clamp01(v) * beats.length * 0.999));
   return (
-    <div className="min-h-[3.2em]">
+    <div className="min-h-[2.6em] max-w-xl">
       <AnimatePresence mode="wait" initial={false}>
-        <motion.p key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="text-base md:text-xl font-semibold leading-snug tracking-[-0.015em]" style={{ color: th.ink }}>
+        <motion.p key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="text-sm md:text-base font-medium leading-snug" style={{ color: th.sub }}>
           {beats[i]}
         </motion.p>
       </AnimatePresence>
-      <div className="flex gap-1.5 mt-3">
+      <div className="flex gap-1.5 mt-2.5">
         {beats.map((b, k) => (
           <span key={b} className="h-1 flex-1 rounded-full transition-colors duration-300" style={{ background: k <= i ? th.beatOn : th.beatOff }} />
         ))}
@@ -467,7 +615,7 @@ function Card({
     >
       <motion.div
         onClick={onOpen}
-        className={`relative h-full w-full overflow-hidden rounded-[32px] grid grid-rows-[auto_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1.2fr)] ${onOpen ? 'cursor-pointer' : ''}`}
+        className={`relative h-full w-full overflow-hidden rounded-[32px] grid grid-rows-[auto_minmax(0,1fr)] lg:grid-rows-1 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1.2fr)] ${onOpen ? 'cursor-pointer' : ''}`}
         style={{
           x: reduced ? 0 : x,
           rotate: reduced ? 0 : rot,
@@ -488,38 +636,35 @@ function Card({
                   {LOCKUP[project.id](ENGRAVE[project.id])}
                 </span>
               )}
-              {project.category && (
-                <span className="text-sm md:text-base" style={{ color: th.kicker }}>
-                  {project.category}
-                </span>
-              )}
             </div>
-            <h3 className="font-extrabold tracking-[-0.055em] leading-[0.92]" style={{ fontSize: 'clamp(38px, 5.2vw, 92px)', color: th.ink }}>{copy.name}</h3>
+            <h3 className="font-extrabold tracking-[-0.05em] leading-[0.95] max-w-[12ch]" style={{ fontSize: 'clamp(36px, 4.4vw, 80px)', color: th.ink }}>{copy.name}</h3>
             <p className="text-base md:text-xl leading-snug mt-4 md:mt-5 max-w-xl tracking-[-0.01em]" style={{ color: th.sub }}>{copy.line}</p>
           </div>
           {STATS[project.id] && (
-            <div className="hidden sm:block">
+            <div className="hidden lg:block">
               <Stats p={story} stats={STATS[project.id]} th={th} />
             </div>
           )}
           <div className="grid gap-5">
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <Beat p={story} beats={copy.beats} th={th} />
             </div>
-            {onOpen && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onOpen();
-                }}
-                className="group w-fit inline-flex items-center gap-2 rounded-full text-[15px] font-semibold pl-6 pr-5 py-3 transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-                style={{ background: th.btn.bg, color: th.btn.ink, outlineColor: th.btn.bg }}
-              >
-                View case
-                <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </button>
-            )}
+            <div className="grid justify-items-start gap-3">
+              {onOpen && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpen();
+                  }}
+                  className="group flex-none w-fit inline-flex items-center gap-2 rounded-full text-[15px] font-semibold pl-6 pr-5 py-3 transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                  style={{ background: th.btn.bg, color: th.btn.ink, outlineColor: th.btn.bg }}
+                >
+                  View case
+                  <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
         {/* the app */}

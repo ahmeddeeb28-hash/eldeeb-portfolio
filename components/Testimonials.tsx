@@ -1,209 +1,167 @@
-import { motion } from 'motion/react';
-import { SectionHeader } from './SectionHeader';
+import { motion, useReducedMotion } from 'motion/react';
+import { useRef } from 'react';
+import { ArrowLeft, ArrowRight, Linkedin } from 'lucide-react';
 
-/* ────────────────────────────────────────────────────────────────────────
- * TESTIMONIAL AVATARS
- * Drop files in `public/images/testimonials/` — see README there.
- * 1:1 square, ~400×400 px recommended.
- * ──────────────────────────────────────────────────────────────────────── */
-const TESTIMONIAL_AVATARS = {
-  // Testimonial 1 — Jameson Thorne, Head of Product
-  jamesonThorne:
-    'https://images.unsplash.com/photo-1589668944320-409833e5ba10?auto=format&fit=crop&q=80&w=200',
-  // Testimonial 2 — Elena Rodriguez, Engineering Manager
-  elenaRodriguez:
-    'https://images.unsplash.com/photo-1704627363842-a169b9743309?auto=format&fit=crop&q=80&w=200',
-  // Testimonial 3 — Marcus Chen
-  marcusChen:
-    'https://images.unsplash.com/photo-1661983228690-048b2434c4fb?auto=format&fit=crop&q=80&w=200',
-} as const;
+/* ── Recommendations ─────────────────────────────────
+   What people say about working with me, word for word from their
+   recommendations and LinkedIn: the CEO at Sary, a design director,
+   a growth director, a designer I worked beside, and three designers
+   who reported to me. Long LinkedIn texts end at the last full
+   sentence shown there; the full versions live on LinkedIn.
+
+   A row of cards that scrolls sideways (drag, trackpad, or the
+   arrows), snapping to each card. Leadership voices come first. */
+
+const LINKEDIN_URL = 'https://www.linkedin.com/in/el-deeb-39032b131/details/recommendations/';
+
+type Quote = { text: string; name: string; role: string; relation: string; tint: string; photo: string };
+
+const QUOTES: Quote[] = [
+  {
+    text: 'His ability to distill complex data into actionable insights has been invaluable for our strategic decision-making. He has fostered a culture of innovation within our design team, enhancing collaboration and elevating our deliverables.',
+    name: 'Mohammed Aldossary',
+    photo: '/images/people/aldossary.webp',
+    role: 'Co-founder & CEO at Sary · Ex Careem',
+    relation: 'Worked together at Sary',
+    tint: '#2DD4BF',
+  },
+  {
+    text: 'Ahmed has the capacity to come up with creative solutions to complex problems and takes sound decisions based on his communication with PMs and his understanding of his team members’ needs, and has a positive attitude towards trying new things and is always willing to explore new challenges.',
+    name: 'Yasser Nazmy',
+    photo: '/images/people/nazmy.webp',
+    role: 'Design Director at HungerStation, Delivery Hero',
+    relation: 'Worked together',
+    tint: '#F5C451',
+  },
+  {
+    text: 'Ahmad is an excellent lead, working with him was both comfortable and interesting! He is always attentive to detail, passionate about his work, and fully committed to everything he does! He has a great talent for organizing work, skillfully delegating tasks based on his team members’ individual strengths, while also fostering their professional growth, acting as a true mentor in the process.',
+    name: 'Polina Kosheleva',
+    photo: '/images/people/polina.webp',
+    role: 'Senior Game UI Artist · UX Designer',
+    relation: 'Reported to Ahmad directly',
+    tint: '#8B85FF',
+  },
+  {
+    text: 'Ahmed is an exceptional leader, and I feel incredibly fortunate to have been part of his team. Under his leadership, everything was well-organized, transparent, and clearly communicated. He created an environment where everyone felt supported, heard, and appreciated.',
+    name: 'Sandra Mistal',
+    photo: '/images/people/sandra.webp',
+    role: 'UI Designer · 2D Artist, games',
+    relation: 'Reported to Ahmad directly',
+    tint: '#F472B6',
+  },
+  {
+    text: 'Ahmad’s adept management of report rituals, coupled with his exceptional efforts in customizing reports to reflect product performance, showcases his skill in integrating new cultural dynamics between design and product growth.',
+    name: 'Asad Ali Shah',
+    photo: '/images/people/asad.webp',
+    role: 'Director of Growth · Advisor, business development',
+    relation: 'Worked together',
+    tint: '#A78BFA',
+  },
+  {
+    text: 'I have had the pleasure to work under Ahmed’s management for many months, and his attention to detail, positive attitude and knowledge of UX and UI design both in the game industry and outside of it cannot be highlighted enough. Ahmed is a serious designer and a great manager, he would be a great addition to any team.',
+    name: 'Axel Xiberras',
+    photo: '/images/people/axel.webp',
+    role: 'UX UI Designer',
+    relation: 'Reported to Ahmad directly',
+    tint: '#60A5FA',
+  },
+  {
+    text: 'Ahmed is one of those designers who gets to the heart of a problem and solves it elegantly and effectively. He didn’t just present findings; he defined what success looked like and showed exactly how our work would move the needle.',
+    name: 'Mohamed Kamal',
+    photo: '/images/people/kamal.webp',
+    role: 'Senior Product Designer at HungerStation · ex-Sary',
+    relation: 'Worked on the same team',
+    tint: '#34D399',
+  },
+];
 
 export function Testimonials() {
+  const row = useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
+  const nudge = (dir: 1 | -1) => {
+    const el = row.current;
+    if (!el) return;
+    const card = el.querySelector<HTMLElement>('[data-card]');
+    el.scrollBy({ left: dir * ((card?.offsetWidth ?? 480) + 16), behavior: reduced ? 'auto' : 'smooth' });
+  };
+
   return (
-    <section className="bg-[#0A0A0A] py-[88px] overflow-hidden border-t border-white/[0.03]">
-      <div className="container mx-auto px-10 max-w-[1560px] min-h-[80vh] flex flex-col justify-center py-24">
-
-        <SectionHeader
-          eyebrow="Verbatim"
-          title="Client success"
-          flourish="perspective."
-          subtitle="What teams say after shipping work together."
-        />
-
-        {/* 3-Column Editorial Grid - Fixed 32px Spacing */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Testimonial 1 */}
-          <div className="flex flex-col h-full">
-            <div className="relative h-full bg-[#151515]/40 backdrop-blur-2xl p-10 md:p-12 flex flex-col border border-white/10 rounded-[40px] shadow-2xl overflow-hidden group hover:bg-[#151515]/60 transition-all duration-700">
-              <div className="absolute inset-0 bg-gradient-to-br from-white/[0.05] to-transparent pointer-events-none" />
-              
-              <div className="relative z-10 flex items-center gap-3 mb-12">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#4AF2E5]" />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#4AF2E5]/70">
-                  Work is outstanding...!
-                </span>
-              </div>
-
-              <blockquote className="relative z-10 flex flex-col h-full">
-                <div className="border-l-2 pl-8 mb-16 border-white/10">
-                  <motion.p 
-                    className="text-[#E6E6E6] leading-[1.6] italic opacity-80 group-hover:opacity-100 group-hover:text-white transition-all duration-700 cursor-default"
-                    style={{ 
-                      fontFamily: 'Georgia, serif',
-                      fontSize: '21px',
-                    }}
-                    whileHover={{ 
-                      x: 10,
-                      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
-                    }}
-                  >
-                    "Alex has been instrumental to our product vision, always producing innovative and user-centric designs. I strongly recommend them for exceptional creative work."
-                  </motion.p>
-                </div>
-                
-                <footer className="mt-auto pt-10 border-t border-white/[0.05] flex items-center gap-5">
-                  <div className="relative shrink-0">
-                    <div className="w-14 h-14 rounded-full overflow-hidden grayscale bg-[#151515] ring-1 ring-white/10 transition-all duration-500 group-hover:grayscale-0">
-                      <img
-                        src={TESTIMONIAL_AVATARS.jamesonThorne}
-                        alt="Jameson Thorne"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="relative inline-block">
-                      <cite className="not-italic text-white font-black text-base tracking-tight uppercase block">
-                        Jameson Thorne
-                      </cite>
-                    </div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] mt-1 text-[#4AF2E5]">
-                      Head of Product
-                    </span>
-                    <span className="text-white/20 text-[9px] font-bold uppercase tracking-widest mt-1">
-                      Global SaaS
-                    </span>
-                  </div>
-                </footer>
-              </blockquote>
-            </div>
+    <section id="recommendations" aria-labelledby="recommendations-title" className="relative bg-[#0A0A0A] py-24 md:py-32 overflow-hidden">
+      <div className="mx-auto max-w-[1440px] px-4 md:px-6">
+        <div className="flex flex-wrap items-end justify-between gap-6 mb-10 md:mb-14">
+          <div className="max-w-2xl">
+            <h2 id="recommendations-title" className="text-white font-extrabold tracking-[-0.045em] leading-[0.95]" style={{ fontSize: 'clamp(40px, 6vw, 80px)' }}>
+              In their words.
+            </h2>
+            <p className="text-white/60 text-base md:text-xl leading-snug mt-4">
+              From Sary’s CEO, design and growth directors, and the designers who reported to me.
+            </p>
           </div>
-
-          {/* Testimonial 2 */}
-          <div className="flex flex-col h-full">
-            <div className="relative h-full bg-[#151515]/40 backdrop-blur-2xl p-10 md:p-12 flex flex-col border border-white/10 rounded-[40px] shadow-2xl overflow-hidden group hover:bg-[#151515]/60 transition-all duration-700">
-              <div className="absolute inset-0 bg-gradient-to-br from-white/[0.05] to-transparent pointer-events-none" />
-              
-              <div className="relative z-10 flex items-center gap-3 mb-12">
-                <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#4AF2E5]/70">
-                  Absolute pleasure to work with
-                </span>
-              </div>
-
-              <blockquote className="relative z-10 flex flex-col h-full">
-                <div className="border-l-2 pl-8 mb-16 border-[#4AF2E5]/40">
-                  <motion.p 
-                    className="text-[#E6E6E6] leading-[1.6] italic opacity-80 group-hover:opacity-100 group-hover:text-white transition-all duration-700 cursor-default"
-                    style={{ 
-                      fontFamily: 'Georgia, serif',
-                      fontSize: '21px',
-                    }}
-                    whileHover={{ 
-                      x: 10,
-                      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
-                    }}
-                  >
-                    "Alex brings both innovation and a deep understanding of user needs. An essential part of our creative success. I wholeheartedly endorse their work."
-                  </motion.p>
-                </div>
-                
-                <footer className="mt-auto pt-10 border-t border-white/[0.05] flex items-center gap-5">
-                  <div className="relative shrink-0">
-                    <div className="w-14 h-14 rounded-full overflow-hidden grayscale bg-[#151515] ring-1 ring-white/10 transition-all duration-500 group-hover:grayscale-0">
-                      <img
-                        src={TESTIMONIAL_AVATARS.elenaRodriguez}
-                        alt="Elena Rodriguez"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="relative inline-block">
-                      <cite className="not-italic text-white font-black text-base tracking-tight uppercase block">
-                        Elena Rodriguez
-                      </cite>
-                    </div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] mt-1 text-white/30">
-                      Engineering Manager
-                    </span>
-                    <span className="text-white/20 text-[9px] font-bold uppercase tracking-widest mt-1">
-                      Fintech Platform
-                    </span>
-                  </div>
-                </footer>
-              </blockquote>
-            </div>
-          </div>
-
-          {/* Testimonial 3 */}
-          <div className="flex flex-col h-full">
-            <div className="relative h-full bg-[#151515]/40 backdrop-blur-2xl p-10 md:p-12 flex flex-col border border-white/10 rounded-[40px] shadow-2xl overflow-hidden group hover:bg-[#151515]/60 transition-all duration-700">
-              <div className="absolute inset-0 bg-gradient-to-br from-white/[0.05] to-transparent pointer-events-none" />
-              
-              <div className="relative z-10 flex items-center gap-3 mb-12">
-                <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#4AF2E5]/70">
-                  Strategy that actually ships
-                </span>
-              </div>
-
-              <blockquote className="relative z-10 flex flex-col h-full">
-                <div className="border-l-2 pl-8 mb-16 border-white/10">
-                  <motion.p 
-                    className="text-[#E6E6E6] leading-[1.6] italic opacity-80 group-hover:opacity-100 group-hover:text-white transition-all duration-700 cursor-default"
-                    style={{ 
-                      fontFamily: 'Georgia, serif',
-                      fontSize: '21px',
-                    }}
-                    whileHover={{ 
-                      x: 10,
-                      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
-                    }}
-                  >
-                    "The impact wasn't just visual. We saw better prioritization, faster execution, and fewer cycles of rework across the entire engineering team."
-                  </motion.p>
-                </div>
-                
-                <footer className="mt-auto pt-10 border-t border-white/[0.05] flex items-center gap-5">
-                  <div className="relative shrink-0">
-                    <div className="w-14 h-14 rounded-full overflow-hidden grayscale bg-[#151515] ring-1 ring-white/10 transition-all duration-500 group-hover:grayscale-0">
-                      <img
-                        src={TESTIMONIAL_AVATARS.marcusChen}
-                        alt="Marcus Chen"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="relative inline-block">
-                      <cite className="not-italic text-white font-black text-base tracking-tight uppercase block">
-                        Marcus Chen
-                      </cite>
-                      <div className="absolute -bottom-1 left-0 w-full h-[2px] bg-[#4AF2E5]/60" />
-                    </div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] mt-1 text-white/30">
-                      Product Director
-                    </span>
-                    <span className="text-white/20 text-[9px] font-bold uppercase tracking-widest mt-1">
-                      Enterprise Corp
-                    </span>
-                  </div>
-                </footer>
-              </blockquote>
-            </div>
+          <div className="flex items-center gap-2">
+            <a
+              href={LINKEDIN_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 text-white/80 hover:text-white hover:border-white/30 text-sm font-medium px-4 py-2.5 mr-2 transition-colors"
+            >
+              <Linkedin className="w-4 h-4" />
+              All on LinkedIn
+            </a>
+            <button type="button" onClick={() => nudge(-1)} aria-label="Previous recommendation" className="grid place-items-center w-11 h-11 rounded-full border border-white/15 text-white/80 hover:text-white hover:border-white/30 transition-colors">
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+            <button type="button" onClick={() => nudge(1)} aria-label="Next recommendation" className="grid place-items-center w-11 h-11 rounded-full border border-white/15 text-white/80 hover:text-white hover:border-white/30 transition-colors">
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
+      </div>
+
+      <div
+        ref={row}
+        role="list"
+        aria-label="Recommendations"
+        className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        // line the first card up with the heading, and keep snapping on that edge
+        style={{ paddingInline: 'max(16px, calc((100vw - 1440px) / 2 + 24px))', scrollPaddingInline: 'max(16px, calc((100vw - 1440px) / 2 + 24px))' }}
+      >
+        {QUOTES.map((q, i) => (
+          <motion.figure
+            key={q.name}
+            role="listitem"
+            data-card
+            initial={reduced ? false : { opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-10% 0px' }}
+            transition={{ duration: 0.6, delay: Math.min(i, 3) * 0.08, ease: [0.22, 1, 0.36, 1] }}
+            className="snap-start flex-none w-[86vw] sm:w-[440px] md:w-[500px] min-h-[420px] rounded-[28px] bg-[#161618] border border-white/[0.07] p-7 md:p-9 flex flex-col"
+          >
+            <span aria-hidden className="text-5xl leading-none font-extrabold" style={{ color: q.tint }}>
+              “
+            </span>
+            <blockquote className="mt-6 mb-8 flex-1 flex items-center">
+              <p className="text-white text-lg md:text-[21px] leading-[1.45] tracking-[-0.01em]">{q.text}</p>
+            </blockquote>
+            <figcaption className="flex items-center gap-3.5">
+              <img
+                src={q.photo}
+                alt=""
+                aria-hidden
+                loading="lazy"
+                decoding="async"
+                width={48}
+                height={48}
+                className="w-12 h-12 rounded-full object-cover flex-none"
+                style={{ boxShadow: `0 0 0 2px ${q.tint}` }}
+              />
+              <span className="min-w-0">
+                <span className="block text-white font-semibold text-[15px]">{q.name}</span>
+                <span className="block text-white/55 text-[13px] leading-snug">{q.role}</span>
+                <span className="block text-white/40 text-[12px] mt-0.5">{q.relation}</span>
+              </span>
+            </figcaption>
+          </motion.figure>
+        ))}
       </div>
     </section>
   );

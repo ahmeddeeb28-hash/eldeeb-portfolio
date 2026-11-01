@@ -2,7 +2,7 @@
   "site": "https://deeb.design",
   "pages": {
     "/": {
-      "title": "Ahmad Eldeeb — Lead Product Designer · AI & Data Science",
+      "title": "Ahmad Eldeeb — Lead Product Designer · AI Product Builder · Design Systems",
       "description": "Research-driven product design at the intersection of design, artificial intelligence, and human-centered thinking.",
       "image": "/og-image.png",
       "imageAlt": "Ahmad Eldeeb — Lead Product Designer. Driving growth and AI.",
@@ -41,6 +41,13 @@
       "description": "I replaced the spinner after Pay with a 5 second window to fix the address or items, then a direct handoff to tracking.",
       "image": "/og/fresh-order-placed.jpg",
       "imageAlt": "fresh order placed case study: the placed screen, straight on to tracking",
+      "type": "article"
+    },
+    "/work/sary-design-leadership": {
+      "title": "How I lead design teams · Ahmad Eldeeb",
+      "description": "My design leadership playbook: five principles, rituals from a day to a quarter, one owner per objective, and one bar for hiring and growth. Proven at Sary and Lobah.",
+      "image": "/og/sary-design-leadership.jpg",
+      "imageAlt": "Design leadership case study: the rhythm from a day to a quarter",
       "type": "article"
     }
   }

@@ -25,6 +25,7 @@ export const CASE_STUDY_REGISTRY: Record<
   'fresh-order-placed': load(() => import('./FreshOrderPlacedCaseStudy'), 'FreshOrderPlacedCaseStudy'),
   'sampo-ai-pricing': load(() => import('./SampoCaseStudy'), 'SampoCaseStudy'),
   'sary-usability-report': load(() => import('./SaryReportCaseStudy'), 'SaryReportCaseStudy'),
+  'sary-design-leadership': load(() => import('./LeadershipCaseStudy'), 'LeadershipCaseStudy'),
 };
 
 export type CaseStudyId = keyof typeof CASE_STUDY_REGISTRY;

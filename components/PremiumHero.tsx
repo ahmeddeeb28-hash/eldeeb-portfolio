@@ -1,7 +1,6 @@
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useRef, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
-import { SECTION_IDS, scrollToSection } from '../lib/scrollToSection';
 
 interface StickyNoteData {
   id: string;
@@ -310,7 +309,7 @@ export function PremiumHero() {
               marginBottom: '1.6rem',
             }}
           >
-            <span style={{ color: currentView.accent }}>Hello, I’m Ahmad.</span> Product Design Lead.
+            <span style={{ color: currentView.accent }}>Hello, I’m Ahmad.</span> Lead Product Designer.
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 16 }}
@@ -321,6 +320,30 @@ export function PremiumHero() {
             I lead product design teams and still design the hard parts myself. Ten years across e-commerce, SaaS, fintech,
             AI and gaming, with teams in Europe and the Gulf.
           </motion.p>
+          {/* the facts a recruiter scans for first, matching the CV */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.4 }}
+            className="flex flex-col items-start gap-4 mb-10 -mt-3"
+          >
+            <p className="inline-flex items-center gap-2.5 sm:gap-3 rounded-full border border-white/[0.12] bg-white/[0.04] pl-3 pr-3.5 sm:pl-3.5 sm:pr-4 py-2 text-[13px] sm:text-sm md:text-[15px] whitespace-nowrap">
+              <span className="relative flex w-2 h-2" aria-hidden>
+                <span className="absolute inset-0 rounded-full bg-[#34D399] opacity-60 motion-safe:animate-ping" />
+                <span className="relative w-2 h-2 rounded-full bg-[#34D399]" />
+              </span>
+              <span className="text-white/90">Open to remote &amp; relocation</span>
+              <span aria-hidden className="h-3.5 w-px bg-white/20" />
+              <span className="text-white/55">Based in Egypt</span>
+            </p>
+            <ul aria-label="Focus" className="flex flex-wrap items-center gap-x-4 sm:gap-x-0 gap-y-2 text-[13px] sm:text-sm md:text-[15px] text-white/60">
+              {['AI product builder', 'Design systems', 'Design leadership'].map((f, i) => (
+                <li key={f} className={i ? 'sm:pl-4 sm:ml-4 sm:border-l border-white/15 leading-none' : 'leading-none'}>
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </motion.div>
 
           {/* CTA row */}
           <motion.div
@@ -330,8 +353,7 @@ export function PremiumHero() {
             className="flex flex-wrap items-center gap-8"
           >
             <motion.a
-              href={`#${SECTION_IDS.work}`}
-              onClick={(e) => { e.preventDefault(); scrollToSection(SECTION_IDS.work); }}
+              href="mailto:ahmeddeeb28@gmail.com?subject=Hiring%3A%20Lead%20Product%20Designer"
               onMouseMove={handleCtaMove}
               onMouseLeave={() => setCtaOffset({ x: 0, y: 0 })}
               animate={{
@@ -357,7 +379,7 @@ export function PremiumHero() {
                 border: '1px solid rgba(220,190,140,0.6)',
               }}
             >
-              <span className="relative z-10">View Selected Work</span>
+              <span className="relative z-10">Hire me</span>
               <ArrowRight className="relative z-10 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
             </motion.a>
 
@@ -375,7 +397,7 @@ export function PremiumHero() {
               onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.95)')}
               onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')}
             >
-              or say hello
+              Say hello
               <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </a>
           </motion.div>
@@ -487,7 +509,7 @@ export function PremiumHero() {
                   color: 'rgba(255,255,255,0.5)',
                 }}
               >
-                Product Design Lead
+                Lead Product Designer
               </div>
             </div>
           </div>

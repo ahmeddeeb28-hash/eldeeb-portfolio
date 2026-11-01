@@ -70,6 +70,19 @@ interface ProjectsProps {
 */
 const allProjects = [
   {
+    id: 'sary-design-leadership',
+    image: CASE_STUDY_IMAGES.saryGrocery,
+    year: '2021–now',
+    category: 'Design Leadership',
+    title: 'How I Lead Design Teams',
+    summary:
+      'My leadership playbook: five principles, a rhythm from a day to a quarter, one owner per objective, and one bar for hiring. Proven at Sary and Lobah.',
+    accentColor: 'rgba(3,67,248,0.95)',
+    imageGlow:
+      'radial-gradient(ellipse 65% 55% at 30% 30%, rgba(3,67,248,0.09) 0%, transparent 70%)',
+    hasStudy: true,
+  },
+  {
     id: 'shorefield-holidays',
     image: CASE_STUDY_IMAGES.saasDashboard,
     year: '2020',
@@ -85,7 +98,7 @@ const allProjects = [
   {
     id: 'sary-repeat-customers',
     image: CASE_STUDY_IMAGES.saryGrocery,
-    year: '2022',
+    year: '2023',
     category: 'Grocery Marketplace · Sary era',
     title: 'Sary: Restock in 3 Taps, Not 39',
     summary:
@@ -168,7 +181,7 @@ const allProjects = [
     image: CASE_STUDY_IMAGES.freshOrderPlaced,
     stage: 'fresh' as const,
     year: 'Now',
-    category: 'Food Delivery · fresh',
+    category: 'Food Delivery · fresh · Freelance',
     title: 'fresh: The Five Seconds After Pay',
     summary:
       'I replaced the spinner after Pay with a 5 second window to fix the address or items, then a direct handoff to tracking.',
