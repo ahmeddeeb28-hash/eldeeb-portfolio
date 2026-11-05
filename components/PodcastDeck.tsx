@@ -164,8 +164,8 @@ function Knob({ value, onChange }: { value: number; onChange: (v: number) => voi
   );
 }
 
-function RecordPlayer({ ep, playing, progress, onToggle, speed, setSpeed, volume, setVolume }: {
-  ep: Episode; playing: boolean; progress: number; onToggle: () => void; speed: number; setSpeed: (v: number) => void; volume: number; setVolume: (v: number) => void;
+function RecordPlayer({ ep, playing, progress, onToggle, speed, setSpeed, volume, setVolume, swapDir = 1 }: {
+  swapDir?: number; ep: Episode; playing: boolean; progress: number; onToggle: () => void; speed: number; setSpeed: (v: number) => void; volume: number; setVolume: (v: number) => void;
 }) {
   const reduced = useReducedMotion();
   const arm = playing || progress > 0 ? 15 + progress * 18.5 : 0;
@@ -187,7 +187,18 @@ function RecordPlayer({ ep, playing, progress, onToggle, speed, setSpeed, volume
       </svg>
 
       {/* the record */}
-      <div className="absolute rounded-full" style={{ left: '7%', top: '14%', width: '72%', aspectRatio: '1', background: '#151413', boxShadow: '0 6px 14px rgba(0,0,0,.45)' }}>
+      <div className="absolute rounded-full" style={{ left: '7%', top: '14%', width: '72%', aspectRatio: '1', background: 'rgba(0,0,0,.28)', boxShadow: 'inset 0 2px 6px rgba(0,0,0,.35)' }} />
+      <AnimatePresence initial={false} custom={swapDir}>
+      <motion.div key={ep.id} custom={swapDir} className="absolute rounded-full"
+        style={{ left: '7%', top: '14%', width: '72%', aspectRatio: '1', background: '#151413', boxShadow: '0 6px 14px rgba(0,0,0,.45)' }}
+        variants={{
+          enter: (d: number) => (reduced ? { opacity: 0 } : { x: d > 0 ? '70%' : '-70%', y: '-6%', rotate: d > 0 ? 160 : -160, scale: 0.92, opacity: 0 }),
+          center: { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1 },
+          exit: (d: number) => (reduced ? { opacity: 0 } : { x: d > 0 ? '-70%' : '70%', y: '-6%', rotate: d > 0 ? -160 : 160, scale: 0.92, opacity: 0 }),
+        }}
+        initial="enter" animate="center" exit="exit"
+        transition={{ type: 'spring', stiffness: 170, damping: 24, mass: 0.9 }}
+      >
         <button type="button" onClick={onToggle} data-tap aria-label={playing ? 'Pause the episode' : 'Play the episode'}
           className="absolute inset-[2.5%] rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4" style={{ outlineColor: TEAL }}
         >
@@ -208,7 +219,8 @@ function RecordPlayer({ ep, playing, progress, onToggle, speed, setSpeed, volume
             <circle cx="50" cy="50" r="49.3" fill="none" stroke={TEAL} strokeWidth="0.9" strokeLinecap="round" pathLength={1} strokeDasharray={`${progress} 1`} opacity=".9" />
           </svg>
         </button>
-      </div>
+      </motion.div>
+      </AnimatePresence>
 
       {/* S-shaped tone arm, pivot at the top right */}
       <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden>
@@ -393,9 +405,9 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
         className={`cursor-grab active:cursor-grabbing touch-pan-y mx-auto ${variant === 'hero' ? 'max-w-[400px]' : 'max-w-[360px]'}`}
       >
         <AnimatePresence mode="wait" initial={false} custom={dir}>
-          <motion.div key={ep.id + view} {...slide} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
+          <motion.div key={view === 'record' ? 'record' : ep.id + view} {...(view === 'record' ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } } : slide)} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
             {view === 'record'
-              ? <RecordPlayer ep={ep} playing={playing} progress={progress} onToggle={toggle} speed={speed} setSpeed={setSpeed} volume={volume} setVolume={setVolume} />
+              ? <RecordPlayer ep={ep} swapDir={dir} playing={playing} progress={progress} onToggle={toggle} speed={speed} setSpeed={setSpeed} volume={volume} setVolume={setVolume} />
               : <HeadphonesView ep={ep} playing={playing} onToggle={toggle} />}
           </motion.div>
         </AnimatePresence>
@@ -468,18 +480,36 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
       </div>
       {/* 4. browse: every episode as a small cover */}
       <div className="mt-7">
-        <p className="text-xs text-white/40 mb-2.5">All episodes</p>
-        <ol className="grid grid-cols-6 gap-1.5 sm:gap-2.5 max-w-[360px]">
-          {EPISODES.map((e, i) => (
-            <li key={e.id}>
-              <button type="button" onClick={() => go(i)} aria-label={`${SHOWS[e.show].name}, ${e.title}`} aria-current={i === cur} title={e.title}
-                className="block w-full aspect-square rounded-[10px] overflow-hidden transition-all duration-300"
-                style={{ boxShadow: i === cur ? '0 0 0 2px #fff' : '0 0 0 1px rgba(255,255,255,0.12)', opacity: i === cur ? 1 : 0.6, transform: i === cur ? 'translateY(-2px)' : 'none' }}
-              >
-                <img src={e.cover ?? SHOWS[e.show].art} alt="" className="w-full h-full object-cover" loading="lazy" />
-              </button>
-            </li>
-          ))}
+        <p className="text-xs text-white/40 mb-1">All episodes</p>
+        <ol className="grid grid-cols-6 gap-1.5 sm:gap-2.5 max-w-[360px] pt-[8%]">
+          {EPISODES.map((e, i) => {
+            const on = i === cur;
+            return (
+              <li key={e.id} className="relative">
+                {on && (
+                  <motion.span layoutId="pd-sleeve-vinyl" aria-hidden
+                    className="absolute left-[6%] right-[6%] aspect-square rounded-full pointer-events-none"
+                    style={{ top: '-46%', zIndex: 0, background: 'repeating-radial-gradient(circle, #111 0 1.2px, #1f1f1f 1.8px 2.4px)', boxShadow: '0 0 0 1px rgba(255,255,255,.22), 0 2px 6px rgba(0,0,0,.5)' }}
+                    transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 32 }}
+                  >
+                    <span className="absolute inset-[34%] rounded-full" style={{ background: SHOWS[e.show].tone }} />
+                    <motion.span className="absolute inset-0 rounded-full" style={{ background: 'conic-gradient(from 20deg, transparent 0 30deg, rgba(255,255,255,.12) 40deg, transparent 70deg)' }}
+                      animate={reduced || !playing ? { rotate: 0 } : { rotate: 360 }} transition={{ repeat: Infinity, duration: 1.8, ease: 'linear' }} />
+                  </motion.span>
+                )}
+                <motion.button type="button" onClick={() => go(i)} aria-label={`${SHOWS[e.show].name}, ${e.title}`} aria-current={on} title={e.title}
+                  className="relative block w-full aspect-square rounded-[8px] overflow-hidden"
+                  style={{ zIndex: 1, boxShadow: on ? '0 6px 14px -4px rgba(0,0,0,.6), 0 0 0 1.5px rgba(255,255,255,.9)' : '0 0 0 1px rgba(255,255,255,0.12)' }}
+                  animate={{ opacity: on ? 1 : 0.6, y: on ? -2 : 0 }}
+                  whileHover={reduced ? undefined : { y: -3, opacity: 1 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+                >
+                  <img src={e.cover ?? SHOWS[e.show].art} alt="" className="w-full h-full object-cover" loading="lazy" />
+                </motion.button>
+              </li>
+            );
+          })}
         </ol>
       </div>
     </div>
