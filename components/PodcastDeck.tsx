@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, ChevronLeft, ChevronRight, Disc3, Headphones, Pause, Play, RotateCcw, RotateCw } from 'lucide-react';
 
 /* ── Podcasts and talks: a playable deck ──
@@ -24,7 +24,6 @@ type Episode = {
   cover?: string;
   title: string;
   note?: string;
-  topics?: string[];
   role: string;
   date: string;
   length: number; // seconds
@@ -50,7 +49,7 @@ const EPISODES: Episode[] = [
   {
     id: 'ask-designer-s3e2', show: 'ask', label: 'S3 · E2', role: 'Guest',
     title: 'Team leads, and the communication priorities between a team and its company',
-    topics: ['My path into product', 'Asking effective questions', 'Setting priorities', 'Taking initiative with your team'],
+    note: 'My path into product, asking effective questions, setting priorities, and taking initiative with your team.',
     date: '2 Jul 2023', length: 3624,
     audio: 'https://anchor.fm/s/85e3e74/podcast/play/72871596/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2023-6-1%2Fe588654c-869c-fc54-affc-8a157b216003.mp3',
     link: 'https://podcasts.apple.com/us/podcast/id1472945887?i=1000619024450',
@@ -59,7 +58,6 @@ const EPISODES: Episode[] = [
 
 const GOLD = 'rgba(220,190,140,0.85)';
 const TEAL = '#4AF2E5';
-const SPEEDS = [0.75, 1, 1.25, 1.5, 1.75, 2];
 
 const clock = (s: number) => {
   s = Math.max(0, Math.floor(s));
@@ -276,17 +274,6 @@ function HeadphonesView({ ep, playing, onToggle }: { ep: Episode; playing: boole
   );
 }
 
-function Pill({ on, onClick, children }: { on: boolean; onClick: () => void; children: ReactNode }) {
-  return (
-    <button type="button" onClick={onClick} aria-pressed={on}
-      className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap transition-colors"
-      style={{ background: on ? 'rgba(220,190,140,0.16)' : 'transparent', color: on ? '#F3E6CF' : 'rgba(255,255,255,0.5)', border: '1px solid rgba(220,190,140,0.18)' }}
-    >
-      {children}
-    </button>
-  );
-}
-
 export function PodcastDeck() {
   const reduced = useReducedMotion();
   const [cur, setCur] = useState(0);
@@ -343,11 +330,6 @@ export function PodcastDeck() {
     a.currentTime = v;
     setTime(v);
   };
-  const cycleSpeed = () => {
-    const next = SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length];
-    setSpeed(next);
-    if (audio.current) audio.current.playbackRate = next;
-  };
   const go = (i: number) => {
     const n = (i + EPISODES.length) % EPISODES.length;
     if (n === cur) return;
@@ -356,7 +338,6 @@ export function PodcastDeck() {
     setDir(i > cur ? 1 : -1);
     setCur(n); setTime(0); setDur(EPISODES[n].length); setPlaying(false); setLoading(false);
   };
-  const firstOf = (s: keyof typeof SHOWS) => EPISODES.findIndex((e) => e.show === s);
   const progress = dur ? time / dur : 0;
   const backdrop = ep.cover ?? show.art;
   const slide = reduced ? {} : { initial: { x: dir * 60, opacity: 0 }, animate: { x: 0, opacity: 1 }, exit: { x: -dir * 60, opacity: 0 } };
@@ -413,12 +394,20 @@ export function PodcastDeck() {
         <div className="absolute inset-0 opacity-[0.07] mix-blend-overlay" style={{ backgroundImage: "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")" }} />
       </div>
 
-      <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-10 lg:gap-14 p-6 sm:p-10 lg:p-14 items-center">
+      <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-8 lg:gap-14 p-5 sm:p-10 lg:p-14 items-center">
         {/* the instrument: swipe it to change episode */}
         <div className="min-w-0">
-          <div className="flex flex-wrap gap-2 mb-6 justify-center lg:justify-start" role="group" aria-label="Player view">
-            <Pill on={view === 'record'} onClick={() => setView('record')}><Disc3 className="w-4 h-4" /> Record</Pill>
-            <Pill on={view === 'headphones'} onClick={() => setView('headphones')}><Headphones className="w-4 h-4" /> Headphones</Pill>
+          <div className="flex justify-center lg:justify-start mb-5">
+            <div className="inline-flex rounded-full p-1" role="group" aria-label="Player view" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)' }}>
+              {([['record', 'Record', Disc3], ['headphones', 'Headphones', Headphones]] as const).map(([k, l, I]) => (
+                <button key={k} type="button" onClick={() => setView(k)} aria-pressed={view === k}
+                  className="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors"
+                  style={{ background: view === k ? 'rgba(255,255,255,0.14)' : 'transparent', color: view === k ? '#fff' : 'rgba(255,255,255,0.55)' }}
+                >
+                  <I className="w-3.5 h-3.5" /> {l}
+                </button>
+              ))}
+            </div>
           </div>
           <motion.div
             drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.25} dragSnapToOrigin
@@ -428,7 +417,7 @@ export function PodcastDeck() {
               else if (info.offset.x > 60 || info.velocity.x > 400) go(cur - 1);
               setTimeout(() => { dragged.current = false; }, 0);
             }}
-            className="cursor-grab active:cursor-grabbing touch-pan-y"
+            className="cursor-grab active:cursor-grabbing touch-pan-y max-w-[400px] lg:max-w-none mx-auto"
           >
             <AnimatePresence mode="wait" initial={false} custom={dir}>
               <motion.div key={ep.id + view} {...slide} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
@@ -438,48 +427,31 @@ export function PodcastDeck() {
               </motion.div>
             </AnimatePresence>
           </motion.div>
-          <div className="mt-5 flex items-center justify-center gap-4">
-            <button type="button" onClick={() => go(cur - 1)} aria-label="Previous episode" className="grid place-items-center w-10 h-10 rounded-full text-white/70 hover:text-white" style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <span className="text-sm text-white/55 tabular-nums min-w-[9ch] text-center">{cur + 1} / {EPISODES.length}</span>
-            <button type="button" onClick={() => go(cur + 1)} aria-label="Next episode" className="grid place-items-center w-10 h-10 rounded-full text-white/70 hover:text-white" style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-          <p className="mt-2 text-center text-xs text-white/35">Swipe the record to change episode</p>
         </div>
 
         {/* the episode and the controls */}
         <div className="min-w-0">
-          <p className="text-sm font-semibold" style={{ color: GOLD }}>Podcasts and talks</p>
-          <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="Shows">
-            {(Object.keys(SHOWS) as (keyof typeof SHOWS)[]).map((k) => (
-              <Pill key={k} on={ep.show === k} onClick={() => go(firstOf(k))}>
-                {SHOWS[k].name}
-                <span className="text-xs opacity-60 tabular-nums">{EPISODES.filter((e) => e.show === k).length}</span>
-              </Pill>
-            ))}
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-sm font-semibold" style={{ color: GOLD }}>Podcasts and talks</p>
+            <span className="text-sm text-white/45 tabular-nums">{cur + 1} / {EPISODES.length}</span>
           </div>
-          <div className="mt-6 min-h-[230px]" aria-live="polite">
+          <div className="mt-4 lg:min-h-[170px]" aria-live="polite">
             <AnimatePresence mode="wait" initial={false}>
               <motion.div key={ep.id} {...slide} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-                <p className="text-white/50 text-sm">{show.name} · {ep.label} · {ep.role} · {ep.date} · {mins(ep.length)} · In Arabic</p>
-                <h3 className="mt-3 text-white text-2xl sm:text-3xl font-bold leading-tight tracking-[-0.01em]" style={{ textWrap: 'balance' }}>{ep.title}</h3>
-                {ep.note && <p className="mt-3 text-white/65 text-base leading-relaxed">{ep.note}</p>}
-                {ep.topics && (
-                  <ul className="mt-5 flex flex-wrap gap-2">
-                    {ep.topics.map((t) => (
-                      <li key={t} className="rounded-full px-3 py-1 text-[13px] text-white/70" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>{t}</li>
-                    ))}
-                  </ul>
-                )}
+                <p className="text-white/55 text-sm">
+                  {show.name} · {ep.label} · {ep.role} · {mins(ep.length)}
+                  <a href={ep.link} target="_blank" rel="noopener noreferrer" className="inline-flex align-middle ml-2 text-white/55 hover:text-white" aria-label={`Open on ${ep.show === 'blueprint' ? 'Spotify' : 'Apple Podcasts'}`}>
+                    <ArrowUpRight className="w-4 h-4" />
+                  </a>
+                </p>
+                <h3 className="mt-2 text-white text-[22px] sm:text-3xl font-bold leading-tight tracking-[-0.01em]" style={{ textWrap: 'balance' }}>{ep.title}</h3>
+                {ep.note && <p className="mt-3 text-white/65 text-[15px] sm:text-base leading-relaxed">{ep.note}</p>}
               </motion.div>
             </AnimatePresence>
           </div>
 
-          {/* transport */}
-          <div className="mt-6 rounded-[20px] p-5" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          {/* transport: previous episode, back 15, play, forward 30, next episode */}
+          <div className="mt-6 rounded-[20px] p-4 sm:p-5" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.08)' }}>
             <input
               type="range" min={0} max={Math.round(dur)} step={1} value={Math.round(time)}
               onChange={(e) => seek(+e.target.value)}
@@ -489,26 +461,19 @@ export function PodcastDeck() {
             <div className="flex justify-between text-xs text-white/45 tabular-nums mt-1">
               <span>{clock(time)}</span><span>-{clock(dur - time)}</span>
             </div>
-            <div className="mt-4 flex items-center justify-between gap-3">
-              <button type="button" onClick={cycleSpeed} aria-label={`Playback speed ${speed}x`} className="w-12 sm:w-14 rounded-full py-1.5 text-xs font-bold tabular-nums text-white/70 hover:text-white" style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
-                {speed}x
+            <div className="mt-3 flex items-center justify-between">
+              <button type="button" onClick={() => go(cur - 1)} aria-label="Previous episode" className="p-2 text-white/60 hover:text-white"><ChevronLeft className="w-6 h-6" /></button>
+              <button type="button" onClick={() => skip(-15)} aria-label="Back 15 seconds" className="p-2 text-white/70 hover:text-white"><RotateCcw className="w-5 h-5" /></button>
+              <button type="button" onClick={toggle} aria-label={playing ? 'Pause' : 'Play'}
+                className="grid place-items-center w-14 h-14 rounded-full transition-transform hover:scale-105 active:scale-95"
+                style={{ background: TEAL, color: '#04211F', boxShadow: playing ? '0 0 0 6px rgba(74,242,229,0.15)' : 'none' }}
+              >
+                {loading && playing ? <span className="w-5 h-5 rounded-full border-2 border-[#04211F]/30 border-t-[#04211F] animate-spin" /> : playing ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current ml-0.5" />}
               </button>
-              <div className="flex items-center gap-3 sm:gap-4">
-                <button type="button" onClick={() => skip(-15)} aria-label="Back 15 seconds" className="text-white/70 hover:text-white p-2"><RotateCcw className="w-5 h-5" /></button>
-                <button type="button" onClick={toggle} aria-label={playing ? 'Pause' : 'Play'}
-                  className="grid place-items-center w-14 h-14 rounded-full transition-transform hover:scale-105 active:scale-95"
-                  style={{ background: TEAL, color: '#04211F', boxShadow: playing ? '0 0 0 6px rgba(74,242,229,0.15)' : 'none' }}
-                >
-                  {loading && playing ? <span className="w-5 h-5 rounded-full border-2 border-[#04211F]/30 border-t-[#04211F] animate-spin" /> : playing ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current ml-0.5" />}
-                </button>
-                <button type="button" onClick={() => skip(30)} aria-label="Forward 30 seconds" className="text-white/70 hover:text-white p-2"><RotateCw className="w-5 h-5" /></button>
-              </div>
-              <a href={ep.link} target="_blank" rel="noopener noreferrer" aria-label="Open in Apple Podcasts" className="w-12 sm:w-14 grid place-items-center rounded-full py-1.5 text-white/70 hover:text-white" style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
-                <ArrowUpRight className="w-4 h-4" />
-              </a>
+              <button type="button" onClick={() => skip(30)} aria-label="Forward 30 seconds" className="p-2 text-white/70 hover:text-white"><RotateCw className="w-5 h-5" /></button>
+              <button type="button" onClick={() => go(cur + 1)} aria-label="Next episode" className="p-2 text-white/60 hover:text-white"><ChevronRight className="w-6 h-6" /></button>
             </div>
           </div>
-          <p className="mt-5 text-xs text-white/40">Plays here. Titles are translated; the episodes are in Arabic.</p>
         </div>
       </div>
     </motion.div>
