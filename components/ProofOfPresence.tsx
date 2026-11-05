@@ -258,13 +258,13 @@ function QuoteBeat({
 }
 
 /* Where the podcast player sits, while we compare placements:
-   #podcast-a (beside the headline), #podcast-b (after the intro, default),
+   #podcast-a (header then framed card, default), #podcast-b (after the intro),
    #podcast-c (closing the section). */
 function usePlacement(): 'a' | 'b' | 'c' {
   const read = () => {
-    if (typeof window === 'undefined') return 'b';
+    if (typeof window === 'undefined') return 'a';
     const m = (window.location.hash + window.location.search).match(/podcast[-=]([abc])/);
-    return (m ? m[1] : 'b') as 'a' | 'b' | 'c';
+    return (m ? m[1] : 'a') as 'a' | 'b' | 'c';
   };
   const [p, setP] = useState(read);
   useEffect(() => {
