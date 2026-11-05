@@ -358,27 +358,27 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
   };
 
   const glow = (
-    <div className={`absolute -z-10 overflow-hidden pointer-events-none ${variant === 'hero' ? '-inset-[18%]' : 'inset-0'}`} aria-hidden
-      style={{ WebkitMaskImage: 'radial-gradient(closest-side, #000 30%, transparent 100%)', maskImage: 'radial-gradient(closest-side, #000 30%, transparent 100%)' }}
+    <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden
+      style={variant === 'hero' ? undefined : { WebkitMaskImage: 'radial-gradient(closest-side, #000 30%, transparent 100%)', maskImage: 'radial-gradient(closest-side, #000 30%, transparent 100%)' }}
     >
       <AnimatePresence initial={false}>
         <motion.img
           key={backdrop} src={backdrop} alt=""
-          initial={{ opacity: 0 }} animate={{ opacity: 0.55 }} exit={{ opacity: 0 }}
+          initial={{ opacity: 0 }} animate={{ opacity: variant === 'hero' ? 0.9 : 0.55 }} exit={{ opacity: 0 }}
           transition={{ duration: 1.1, ease: 'easeInOut' }}
-          className="absolute left-1/2 top-1/2 w-[120%] h-[120%] max-w-none object-cover"
+          className="absolute left-1/2 top-1/2 w-[140%] h-[140%] max-w-none object-cover"
           style={{
             transform: 'translate(-50%,-50%)', filter: 'blur(30px) saturate(1.3)', willChange: 'transform, opacity',
             animation: reduced ? 'none' : 'pd-drift 22s ease-in-out infinite alternate', animationPlayState: playing ? 'running' : 'paused',
           }}
         />
       </AnimatePresence>
+      {variant === 'hero' && <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 90% 80% at 30% 50%, rgba(10,10,10,0.15) 0%, rgba(10,10,10,0.55) 100%)' }} />}
     </div>
   );
 
   const instrument = (
     <div className="relative min-w-0">
-      {!cardLike && glow}
       <motion.div
         drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.25} dragSnapToOrigin
         onDragStart={() => { dragged.current = true; }}
@@ -397,16 +397,22 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
           </motion.div>
         </AnimatePresence>
       </motion.div>
-      {/* the view switch, demoted to two small icons */}
-      <div className="mt-4 flex justify-center gap-1" role="group" aria-label="Player view">
-        {([['record', 'Record player', Disc3], ['headphones', 'Headphones', Headphones]] as const).map(([k, l, I]) => (
-          <button key={k} type="button" onClick={() => setView(k)} aria-pressed={view === k} aria-label={l} title={l}
-            className="grid place-items-center w-8 h-8 rounded-full transition-colors"
-            style={{ background: view === k ? 'rgba(255,255,255,0.12)' : 'transparent', color: view === k ? '#fff' : 'rgba(255,255,255,0.45)' }}
-          >
-            <I className="w-4 h-4" />
-          </button>
-        ))}
+      {/* the view switch: a small segmented toggle with a sliding thumb */}
+      <div className="mt-4 flex justify-center">
+        <div className="relative inline-grid grid-cols-2 rounded-full p-1" role="radiogroup" aria-label="Player view"
+          style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.12)' }}
+        >
+          <motion.span aria-hidden className="absolute top-1 bottom-1 left-1 rounded-full" style={{ width: 'calc(50% - 4px)', background: 'rgba(255,255,255,0.16)' }}
+            animate={{ x: view === 'record' ? '0%' : '100%' }} transition={{ type: 'spring', stiffness: 500, damping: 36 }} />
+          {([['record', 'Record player', Disc3], ['headphones', 'Headphones', Headphones]] as const).map(([k, l, I]) => (
+            <button key={k} type="button" role="radio" onClick={() => setView(k)} aria-checked={view === k} aria-label={l} title={l}
+              className="relative grid place-items-center w-11 h-8 rounded-full transition-colors"
+              style={{ color: view === k ? '#fff' : 'rgba(255,255,255,0.5)' }}
+            >
+              <I className="w-4 h-4" />
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -488,6 +494,8 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
       .pd-range::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #fff; margin-top: -5px; box-shadow: 0 0 0 4px rgba(74,242,229,.25) }
       .pd-range::-moz-range-thumb { width: 14px; height: 14px; border: 0; border-radius: 50%; background: #fff }
       .pd-range:focus-visible { outline: 2px solid ${TEAL}; outline-offset: 4px; border-radius: 6px }
+      .pd-lead > * { margin-left: auto !important; margin-right: auto !important }
+      .pd-lead > div { justify-content: center }
     `}</style>
   );
 
@@ -497,12 +505,12 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
       <div style={{ isolation: 'isolate' }} onKeyDown={keys}>
         {styles}<audio ref={audio} preload="none" />
         {/* the section's own header, on its own row, so it never reads as the episode's title */}
-        <div className="max-w-3xl">{lead}</div>
+        <div className="pd-lead max-w-3xl mx-auto text-center">{lead}</div>
         {/* the podcast, introduced by its own label below a hairline */}
         <section aria-label="Podcast" className="relative mt-14 lg:mt-16 rounded-[28px] overflow-hidden p-6 sm:p-10 lg:p-12 grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-10 lg:gap-14 items-center"
-          style={{ border: '1px solid rgba(220,190,140,0.18)', background: 'linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))', isolation: 'isolate' }}
+          style={{ border: '1px solid rgba(255,255,255,0.12)', background: '#0B0B0B', isolation: 'isolate' }}
         >
-          <p className="lg:col-span-2 -mb-4 lg:-mb-8 text-xs font-semibold" style={{ color: 'rgba(220,190,140,0.7)' }}>Podcast</p>
+          {glow}
           <div>{instrument}</div>
           <div className="min-w-0">{panel}</div>
         </section>

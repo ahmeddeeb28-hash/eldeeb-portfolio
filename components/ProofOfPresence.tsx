@@ -355,24 +355,6 @@ export function ProofOfPresence() {
 
 
             {/* Short lead-in paragraph */}
-            <motion.p
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              style={{
-                marginTop: 26,
-                maxWidth: '52ch',
-                fontFamily: 'Inter, system-ui, sans-serif',
-                fontSize: 15,
-                lineHeight: 1.65,
-                color: 'rgba(255,255,255,0.62)',
-              }}
-            >
-              Beyond client work, I speak at conferences, run design workshops,
-              and show up for the community: mentoring, panels, and rooms
-              where product decisions actually get made.
-            </motion.p>
     </>
   );
   return (
