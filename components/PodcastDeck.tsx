@@ -406,7 +406,7 @@ export function PodcastDeck() {
       <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-8 lg:gap-14 p-5 sm:p-10 lg:p-14 items-center">
         {/* the instrument: swipe it to change episode */}
         <div className="min-w-0">
-          <div className="flex justify-center lg:justify-start mb-5">
+          <div className="flex justify-center mb-5">
             <div className="inline-flex rounded-full p-1" role="group" aria-label="Player view" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)' }}>
               {([['record', 'Record', Disc3], ['headphones', 'Headphones', Headphones]] as const).map(([k, l, I]) => (
                 <button key={k} type="button" onClick={() => setView(k)} aria-pressed={view === k}
