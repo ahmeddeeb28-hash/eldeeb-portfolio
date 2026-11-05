@@ -164,6 +164,19 @@ const allProjects = [
     hasStudy: true,
   },
   {
+    id: 'vault-split',
+    image: CASE_STUDY_IMAGES.hakbahFintech,
+    year: '2026',
+    category: 'Fintech · Buy now, pay later · Concept',
+    title: 'Vault Split: See Your Real Plan Before You Buy',
+    summary:
+      'Buy now, pay later that shows the real first payment, the reason behind it and three ways forward, on the product page instead of the last step.',
+    accentColor: 'rgba(169,235,96,0.95)',
+    imageGlow:
+      'radial-gradient(ellipse 65% 55% at 30% 30%, rgba(120,200,60,0.10) 0%, transparent 70%)',
+    hasStudy: true,
+  },
+  {
     id: 'jackaroo-game-ui',
     image: CASE_STUDY_IMAGES.jackarooGaming,
     year: '2026',

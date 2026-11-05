@@ -23,6 +23,7 @@ export const CASE_STUDY_REGISTRY: Record<
   'shorefield-holidays': load(() => import('./ShorefieldHolidaysCaseStudy'), 'ShorefieldHolidaysCaseStudy'),
   'global-payments': load(() => import('./GlobalPaymentsCaseStudy'), 'GlobalPaymentsCaseStudy'),
   'fresh-order-placed': load(() => import('./FreshOrderPlacedCaseStudy'), 'FreshOrderPlacedCaseStudy'),
+  'vault-split': load(() => import('./VaultCaseStudy'), 'VaultCaseStudy'),
   'sampo-ai-pricing': load(() => import('./SampoCaseStudy'), 'SampoCaseStudy'),
   'sary-usability-report': load(() => import('./SaryReportCaseStudy'), 'SaryReportCaseStudy'),
   'sary-design-leadership': load(() => import('./LeadershipCaseStudy'), 'LeadershipCaseStudy'),

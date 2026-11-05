@@ -46,6 +46,11 @@ const STATS: Record<string, Stat[]> = {
     { v: 22, pre: '−', suf: '%', k: 'Setup friction' },
     { v: 28, pre: '+', suf: '%', k: 'Sign-up intent' },
   ],
+  'vault-split': [
+    { v: 10, suf: 's', k: 'To see your real plan', note: 'est.' },
+    { v: 5, k: 'Steps to 1 before the real plan' },
+    { v: 3, k: 'Ways forward instead of accept or leave' },
+  ],
   'fresh-order-placed': [
     { v: 5, suf: 's', k: 'To fix the address or items after Pay' },
   ],
@@ -75,6 +80,12 @@ const COPY: Record<string, { name: string; line: string; tint: string; beats: st
     line: 'An AI that sets store prices, with every strategy explained, previewed and reversible.',
     tint: '#4338CA',
     beats: ['Careful: small, safe nudges', 'High Impact: more reach, less profit', 'Balanced: best profit for moderate risk', 'Tested before anything goes live'],
+  },
+  'vault-split': {
+    name: 'See your real plan before you buy',
+    line: 'Buy now, pay later that shows the real first payment, and why, on the product page.',
+    tint: '#16280F',
+    beats: ['Choose how to pay', 'A 10-second check', 'The real plan, with a reason', 'Same plan at checkout'],
   },
   'fresh-order-placed': {
     name: 'Five seconds to fix an order',
@@ -319,11 +330,62 @@ function TeamStage({ p }: { p: MotionValue<number> }) {
   );
 }
 
+/* Vault Split: the three real screens from the Figma file, one in
+   front and two behind, rotating with the card's story */
+const VAULT_SHOTS = [
+  { src: '/images/case-studies/vault/pay-choose.webp', label: 'Product page' },
+  { src: '/images/case-studies/vault/plan-reason.webp', label: 'Real plan' },
+  { src: '/images/case-studies/vault/checkout.webp', label: 'Checkout' },
+];
+function VaultStage({ p }: { p: MotionValue<number> }) {
+  const v = useStep(p);
+  const [ref, box] = useBox<HTMLDivElement>();
+  const w = Math.min(box.w * 0.36, (box.h * 0.76 * 320) / 690);
+  const focus = v < 0.38 ? 0 : v < 0.7 ? 1 : 2;
+  return (
+    <div ref={ref} className="absolute inset-0">
+      {w > 0 &&
+        VAULT_SHOTS.map((sh, i) => {
+          const d = (i - focus + 3) % 3;
+          const role = d === 0 ? 0 : d === 1 ? 1 : -1;
+          const on = role === 0;
+          const rise = clamp01((v + 0.02 - i * 0.035) / 0.1);
+          return (
+            <div
+              key={sh.src}
+              className="absolute left-1/2 top-1/2 transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              style={{
+                width: w,
+                transform: `translate(calc(-50% + ${role * w * 0.66}px), calc(-55% + ${(1 - rise) * 30}%)) scale(${on ? 1 : 0.8})`,
+                opacity: rise * (on ? 1 : 0.5),
+                zIndex: on ? 3 : 1,
+              }}
+            >
+              <img src={sh.src} alt="" draggable={false} className="block w-full h-auto rounded-[20px] shadow-[0_40px_70px_-30px_rgba(0,0,0,0.85)]" />
+            </div>
+          );
+        })}
+      <div className="absolute left-1/2 -translate-x-1/2 bottom-[3%] flex gap-1.5 z-10">
+        {VAULT_SHOTS.map((sh, i) => (
+          <span
+            key={sh.label}
+            className="rounded-full px-2.5 md:px-3 py-1 text-[10px] md:text-xs font-bold whitespace-nowrap transition-colors duration-300"
+            style={{ background: i === focus ? '#A9EB60' : 'rgba(169,235,96,0.14)', color: i === focus ? '#16280F' : '#DDF5C2' }}
+          >
+            {String(i + 1).padStart(2, '0')} · {sh.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 const STAGE: Record<string, (props: { p: MotionValue<number> }) => ReactNode> = {
   'sary-design-leadership': TeamStage,
   'sary-repeat-customers': SaryStage,
   'sary-usability-report': ReportStage,
   'sampo-ai-pricing': SampoStage,
+  'vault-split': VaultStage,
   'fresh-order-placed': FreshStage,
 };
 
@@ -367,6 +429,11 @@ type Engrave = { ink: string; cut: string; filter: string };
    colour where the lockup sits), so the logo and the "Q4 ’22 report"
    text stay readable; the pressed-in look comes from the edges. */
 const ENGRAVE: Record<string, Engrave> = {
+  'vault-split': {
+    ink: '#A9EB60', // 11:1 on #16280F
+    cut: '#16280F',
+    filter: 'drop-shadow(0 -1px 0 rgba(3,10,2,0.8)) drop-shadow(0 1px 0 rgba(220,250,190,0.14))',
+  },
   'sary-design-leadership': {
     ink: '#0343F8', // 6.9:1 on #F2F3EE
     cut: '#F2F3EE',
@@ -419,6 +486,16 @@ const LOCKUP: Record<string, (e: Engrave) => ReactNode> = {
       </b>
     </span>
   ),
+  'vault-split': (e) => (
+    <span className="inline-flex items-center gap-2.5">
+      <svg viewBox="0 0 24 24" width={26} height={26} aria-hidden>
+        <circle cx="12" cy="12" r="8.5" fill="none" stroke={e.ink} strokeWidth="3.2" strokeDasharray="44 10" strokeLinecap="round" transform="rotate(-60 12 12)" />
+      </svg>
+      <span className="text-[17px] font-bold tracking-[-0.01em]" style={{ color: e.ink }}>
+        Vault Split
+      </span>
+    </span>
+  ),
   'fresh-order-placed': (e) => <FreshWord color={e.ink} size={30} />,
 };
 
@@ -441,6 +518,19 @@ type Theme = {
 };
 
 const THEMES: Record<string, Theme> = {
+  'vault-split': {
+    // the product's own forest green and lime
+    bg: 'radial-gradient(ellipse 70% 80% at 85% 15%, #2A4A18 0%, transparent 62%), linear-gradient(160deg, #1A3010 0%, #0B1607 75%)',
+    border: 'rgba(169,235,96,0.22)',
+    kicker: 'rgba(221,245,194,0.7)',
+    ink: '#FFFFFF',
+    sub: 'rgba(230,245,215,0.75)',
+    lead: { bg: '#A9EB60', ink: '#16280F', sub: 'rgba(22,40,15,0.75)', border: 'transparent' },
+    tile: { bg: 'rgba(169,235,96,0.1)', ink: '#FFFFFF', sub: 'rgba(221,245,194,0.7)', border: 'rgba(169,235,96,0.22)' },
+    btn: { bg: '#A9EB60', ink: '#16280F' },
+    beatOn: '#A9EB60',
+    beatOff: 'rgba(169,235,96,0.2)',
+  },
   'sary-design-leadership': {
     // the illustrations' own paper, ink and royal blue
     bg: 'radial-gradient(ellipse 70% 80% at 88% 12%, rgba(3,67,248,0.10) 0%, transparent 60%), linear-gradient(160deg, #F2F3EE 0%, #E9E9E2 100%)',

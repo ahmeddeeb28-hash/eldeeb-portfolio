@@ -6,6 +6,17 @@ import { Meta } from './case-studies/_shared/Meta';
 import type { Chapter } from './case-studies/_shared/types';
 import { ds } from '../styles/designSystem';
 
+/* About page type: one display face for headings, one serif for a few
+   large gold accents, Inter for everything you read. Sentence case
+   throughout; no tracked caps, no small italics. */
+const DISPLAY = '"Inter Tight", Inter, system-ui, sans-serif';
+const SERIF = '"Instrument Serif", Georgia, serif';
+const ABOUT_TYPE_CSS = `
+.about-type .font-mono, .about-type .uppercase { font-family: Inter, system-ui, sans-serif !important; text-transform: none !important; letter-spacing: 0 !important; }
+.about-type .font-mono { font-size: 12.5px !important; font-weight: 600 !important; }
+.about-type h2, .about-type h3, .about-type h4 { font-family: ${DISPLAY}; }
+`;
+
 const LINKEDIN_URL = 'https://www.linkedin.com/in/el-deeb-39032b131/';
 const RESUME_URL = '/cv/Ahmad_Eldeeb_Lead_Product_Designer_CV.pdf';
 
@@ -37,22 +48,15 @@ function SectionHeader({
 }) {
   const centered = align === 'center';
   return (
-    <div className={`flex flex-col gap-4 mb-14 md:mb-20 ${centered ? 'items-center text-center' : ''}`}>
-      <div className={`flex items-center gap-4 ${centered ? 'justify-center' : ''}`}>
-        <span className="text-[#4AF2E5] font-mono text-[11px] font-black tracking-[0.35em]">{roman} / VI</span>
-        <span className="block w-10 h-px" style={{ background: 'rgba(220,190,140,0.4)' }} />
-        <span className="text-white/30 text-[10px] font-black uppercase tracking-[0.3em]">Chapter {num}</span>
-      </div>
+    <div className={`flex flex-col gap-3 mb-12 md:mb-16 ${centered ? 'items-center text-center' : ''}`}>
       <h2
-        className="text-white font-black tracking-tight leading-[0.95]"
-        style={{ fontSize: 'clamp(34px, 5vw, 58px)' }}
+        className="text-white font-extrabold leading-[0.95]"
+        style={{ fontFamily: DISPLAY, fontSize: 'clamp(38px, 5.4vw, 64px)', letterSpacing: '-0.04em' }}
       >
         {label}
+        <span style={{ fontFamily: SERIF, fontWeight: 400, color: 'rgba(220,190,140,1)' }}>.</span>
       </h2>
-      <p
-        className="italic text-white/45 text-base md:text-lg"
-        style={{ fontFamily: ds.font.serif }}
-      >
+      <p className="text-white/50 text-base md:text-lg">
         {beat}
       </p>
     </div>
@@ -145,10 +149,11 @@ function WhatIDoSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px 0px' }}
           transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-          className="text-white text-center uppercase font-semibold leading-[1.02] tracking-[-0.02em] mb-10"
-          style={{ fontSize: 'clamp(2.1rem, 6.2vw, 5.4rem)' }}
+          className="text-white text-center font-extrabold leading-[1.0] mb-10 max-w-5xl mx-auto"
+          style={{ fontFamily: DISPLAY, fontSize: 'clamp(2.4rem, 6vw, 5.2rem)', letterSpacing: '-0.045em' }}
         >
-          I lead teams that turn complex problems into <span style={{ color: ACCENT }}>products people use.</span>
+          I lead teams that turn complex problems into{' '}
+          <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 400, letterSpacing: '-0.01em', color: ACCENT }}>products people use.</span>
         </motion.h2>
         <motion.p
           initial={{ opacity: 0 }}
@@ -262,10 +267,8 @@ function FirstLeadHighlight() {
       <p
         className="mt-2"
         style={{
-          fontFamily: ds.font.serif,
           color: 'rgba(220,190,140,0.92)',
-          fontSize: 'clamp(14px, 1.25vw, 16px)',
-          fontStyle: 'italic',
+          fontSize: 'clamp(15px, 1.25vw, 17px)',
         }}
       >
         HUD, progression, store and live-ops, across cross-platform AAA
@@ -543,7 +546,7 @@ function AchievementLine({ text, size = 'sm' }: { text: string; size?: 'sm' | 'l
       />
       <span
         className="text-white/70"
-        style={{ fontSize: lg ? 14 : 13, lineHeight: 1.6 }}
+        style={{ fontSize: lg ? 16 : 15, lineHeight: 1.65 }}
       >
         {text.split(METRIC).map((part, i) =>
           i % 2 === 1 ? (
@@ -961,10 +964,9 @@ function CurrentRoleRow({ role }: { role: Role }) {
         <p
           className="mb-4"
           style={{
-            fontFamily: ds.font.serif,
             color: 'rgba(220,190,140,0.9)',
-            fontSize: '15px',
-            fontStyle: 'italic',
+            fontSize: '16px',
+            fontWeight: 500,
           }}
         >
           {role.company}
@@ -1061,10 +1063,9 @@ function PreviouslyTimeline({ roles }: { roles: Role[] }) {
               <p
                 className="mb-3"
                 style={{
-                  fontFamily: ds.font.serif,
                   color: 'rgba(220,190,140,0.85)',
-                  fontSize: '13.5px',
-                  fontStyle: 'italic',
+                  fontSize: '15px',
+                  fontWeight: 500,
                 }}
               >
                 {role.company}
@@ -1215,7 +1216,7 @@ function HorizontalMilestone({
         className={isNow ? 'font-black italic leading-none relative' : 'font-black italic leading-none'}
         style={{
           color: accent,
-          fontFamily: 'Fraunces, "Times New Roman", serif',
+          fontFamily: SERIF,
           fontSize: isNow ? 54 : 34,
           letterSpacing: '-0.03em',
           textShadow: isNow ? '0 0 24px rgba(74,242,229,0.35)' : undefined,
@@ -1233,16 +1234,14 @@ function HorizontalMilestone({
         {item.year}
       </motion.span>
       <motion.span
-        className={`mt-3 font-black uppercase leading-tight ${isNow ? 'text-[12px]' : 'text-[10px]'}`}
-        style={{ letterSpacing: isNow ? '0.28em' : '0.22em' }}
+        className={`mt-3 font-bold leading-tight ${isNow ? 'text-[15px]' : 'text-[13.5px]'}`}
         animate={{ color: active || isNow ? '#FFFFFF' : 'rgba(255,255,255,0.9)' }}
         transition={MILESTONE_EASE}
       >
         {item.role}
       </motion.span>
       <motion.span
-        className={`mt-2 italic leading-snug ${isNow ? 'text-[13px]' : 'text-[12px]'}`}
-        style={{ fontFamily: 'Fraunces, "Times New Roman", serif' }}
+        className={`mt-2 leading-snug ${isNow ? 'text-[15px]' : 'text-[14px]'}`}
         animate={{
           color: active
             ? 'rgba(255,255,255,0.9)'
@@ -1461,8 +1460,8 @@ function TimelineSection() {
 
           {/* Closing line */}
           <p
-            className="text-center italic text-white/55 mt-10 text-base"
-            style={{ fontFamily: 'Fraunces, "Times New Roman", serif' }}
+            className="text-center italic mt-10 text-2xl md:text-3xl"
+            style={{ fontFamily: SERIF, color: 'rgba(220,190,140,0.9)' }}
           >
             Same curiosity. Bigger systems. Higher stakes.
           </p>
@@ -1546,10 +1545,10 @@ function TimelineSection() {
                         />
                       </div>
                       <div
-                        className="font-black italic leading-none mb-3"
+                        className="italic leading-none mb-3"
                         style={{
                           color: accent,
-                          fontFamily: 'Fraunces, "Times New Roman", serif',
+                          fontFamily: SERIF,
                           fontSize: isNow ? 52 : 36,
                           letterSpacing: '-0.03em',
                           textShadow: isNow ? '0 0 22px rgba(74,242,229,0.35)' : 'none',
@@ -1558,21 +1557,19 @@ function TimelineSection() {
                         {item.year}
                       </div>
                       <div
-                        className="font-black uppercase mb-3"
+                        className="font-bold mb-3"
                         style={{
                           color: '#FFFFFF',
-                          fontSize: isNow ? 13 : 11,
-                          letterSpacing: isNow ? '0.28em' : '0.22em',
+                          fontSize: isNow ? 16 : 14,
                         }}
                       >
                         {item.role}
                       </div>
                       <div
-                        className="italic leading-relaxed"
+                        className="leading-relaxed"
                         style={{
-                          fontFamily: 'Fraunces, "Times New Roman", serif',
-                          color: isNow ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.55)',
-                          fontSize: isNow ? 15 : 14,
+                          color: isNow ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.6)',
+                          fontSize: isNow ? 16 : 15,
                         }}
                       >
                         {item.note}
@@ -1585,8 +1582,8 @@ function TimelineSection() {
           </div>
 
           <p
-            className="text-center italic text-white/55 mt-6 text-sm"
-            style={{ fontFamily: 'Fraunces, "Times New Roman", serif' }}
+            className="text-center italic mt-8 text-2xl"
+            style={{ fontFamily: SERIF, color: 'rgba(220,190,140,0.9)' }}
           >
             Same curiosity. Bigger systems. Higher stakes.
           </p>
@@ -1697,11 +1694,8 @@ function FilmFrame({ photo, index }: { photo: CollagePhoto; index: number }) {
         >
           <span
             style={{
-              fontFamily: ds.font.serif,
-              fontStyle: 'italic',
-              color: 'rgba(220,190,140,0.55)',
-              fontSize: 11,
-              letterSpacing: '0.04em',
+              color: 'rgba(220,190,140,0.6)',
+              fontSize: 12.5,
             }}
           >
             {photo.alt}
@@ -1756,7 +1750,7 @@ function BeyondWorkSection() {
       <div className="mx-auto" style={{ maxWidth: ds.layout.contentMaxWidth }}>
         <SectionHeader num="05" roman="V" label="Beyond Work" beat="Curiosity follows me everywhere." />
 
-        {/* Emotional statement — Fraunces italic hero line, kept short so
+        {/* Emotional statement — the serif hero line, kept short so
             the collage does the emotional heavy lifting underneath. */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -1768,9 +1762,9 @@ function BeyondWorkSection() {
           <p
             className="italic tracking-tight leading-[1.08] text-white"
             style={{
-              fontFamily: 'Fraunces, "Times New Roman", serif',
-              fontSize: 'clamp(28px, 4vw, 48px)',
-              fontWeight: 300,
+              fontFamily: SERIF,
+              fontSize: 'clamp(34px, 4.6vw, 60px)',
+              fontWeight: 400,
             }}
           >
             I chase new cities
@@ -1925,7 +1919,7 @@ function BeyondWorkSection() {
 
         {/* Passport strip — replaces the plain tag row.
             Each stop is a miniature stamp with a CSS-rendered flag,
-            city name in mono, country code in Fraunces italic. Two
+            city name in mono, country code in gold. Two
             ornamental gold hairline caps flank the row like the ends
             of a passport page. Copenhagen is marked as the "current"
             stamp (the story is being told from there). */}
@@ -1940,7 +1934,7 @@ function BeyondWorkSection() {
    sit correctly on the site's dark palette and read as designed marks
    instead of OS-drawn glyphs. Each stamp is a tiny hand-illustrated
    card: hairline gold frame, subtle offset shadow, mono city name,
-   italic Fraunces country code. */
+   gold country code. */
 
 type Stamp = {
   city: string;
@@ -2043,12 +2037,9 @@ function CountryChip({
         {city}
       </span>
       <span
-        className="italic"
         style={{
-          fontFamily: 'Fraunces, "Times New Roman", serif',
-          color: 'rgba(220,190,140,0.65)',
-          fontSize: isSm ? 10 : 11,
-          letterSpacing: '0.18em',
+          color: 'rgba(220,190,140,0.7)',
+          fontSize: isSm ? 12 : 12.5,
         }}
       >
         · {code}
@@ -2132,12 +2123,10 @@ function PassportStamp({
       </span>
 
       <span
-        className="italic block mt-0.5"
+        className="block mt-0.5"
         style={{
-          fontFamily: 'Fraunces, "Times New Roman", serif',
           color: stamp.current ? 'rgba(74,242,229,0.85)' : 'rgba(220,190,140,0.7)',
-          fontSize: 9,
-          letterSpacing: '0.22em',
+          fontSize: 12,
         }}
       >
         {stamp.country}
@@ -2278,12 +2267,10 @@ function PassportStrip({
           delay: stripStart + STAMPS.length * 0.08 + 0.2,
           ease: [0.22, 1, 0.36, 1],
         }}
-        className="text-center italic mt-8"
+        className="text-center mt-8"
         style={{
-          fontFamily: 'Fraunces, "Times New Roman", serif',
-          color: 'rgba(74,242,229,0.75)',
-          fontSize: 'clamp(13px, 1vw, 15px)',
-          letterSpacing: '0.06em',
+          color: 'rgba(74,242,229,0.8)',
+          fontSize: 'clamp(15px, 1.1vw, 17px)',
         }}
       >
         and wherever next.
@@ -2335,6 +2322,8 @@ export function AboutPage({ onBack, onNavigate }: { onBack: () => void; onNaviga
       pillId="about-tab-pill"
       siteNav={onNavigate ? { onNavigate, current: 'My Story' } : undefined}
     >
+      <style>{ABOUT_TYPE_CSS}</style>
+      <div className="about-type">
       <IntroSection />
       <WhatIDoSection />
       <ExperienceSection />
@@ -2343,6 +2332,7 @@ export function AboutPage({ onBack, onNavigate }: { onBack: () => void; onNaviga
       {false && <StorySection />}
       <BeyondWorkSection />
       <ConnectSection />
+      </div>
     </CaseShell>
   );
 }
