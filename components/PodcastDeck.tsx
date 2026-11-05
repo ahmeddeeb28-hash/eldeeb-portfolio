@@ -8,10 +8,12 @@ import { ArrowUpRight, ChevronLeft, ChevronRight, Disc3, Headphones, Pause, Play
    view (cups glow, a level meter moves). Swipe the record, use the arrows
    or the arrow keys to move between episodes and shows. Audio is each
    episode's own public MP3 from its podcast feed; nothing loads until play.
-   Titles are English translations; the episodes themselves are in Arabic. */
+   Titles are English translations; the episodes themselves are in Arabic.
+   Blueprint episodes come from its Spotify for Creators (Anchor) feed. */
 
 type Show = { name: string; tone: string; ink: string; mark: string; feed: string };
-const SHOWS: Record<'ask' | 'living', Show> = {
+const SHOWS: Record<'blueprint' | 'ask' | 'living', Show> = {
+  blueprint: { name: 'Blueprint', tone: '#1428F5', ink: '#FFE600', mark: '/images/podcasts/blueprint-show.webp', feed: 'https://creators.spotify.com/pod/profile/blueprintcast/' },
   ask: { name: 'Ask Designer', tone: '#F5B800', ink: '#2B1B00', mark: '/images/podcasts/ask-designer-face.webp', feed: 'https://podcasts.apple.com/us/podcast/id1472945887' },
   living: { name: 'Philosophy of Living', tone: '#E9F3E4', ink: '#1F5E2A', mark: '/images/podcasts/philosophy-emblem.webp', feed: 'https://podcasts.apple.com/us/podcast/id1539547101' },
 };
@@ -20,6 +22,7 @@ type Episode = {
   id: string;
   show: keyof typeof SHOWS;
   label: string;
+  cover?: string;
   title: string;
   note?: string;
   topics?: string[];
@@ -33,7 +36,20 @@ type Episode = {
 const SPK = 'https://dts.podtrac.com/redirect.mp3/api.spreaker.com/download/episode/';
 const APL = 'https://podcasts.apple.com/us/podcast/id1539547101?i=';
 
+const BP = (id: string, file: string) => `https://anchor.fm/s/11e702c8/podcast/play/${id}/${encodeURIComponent('https://d3ctxlq1ktw2nl.cloudfront.net/staging/' + file)}`;
+const BPL = 'https://creators.spotify.com/pod/profile/blueprintcast/episodes/';
+
 const EPISODES: Episode[] = [
+  ...([
+    [5, 'Design decisions: from stuck to inspired', 'Why designers get stuck between too many ideas, or can’t decide at all, and ways of thinking that help you make the call.', '5 Jul 2024', 1911, '88869778', '2024-6-5/d86ca67f-8b33-6e4f-207c-121dadadaa46.mp3', '--Design-Decisions-From-Stuck-to-Inspired-e2lmjei', 'show'],
+    [4, 'How to overcome burnout', 'The burnouts we’ve each been through at work, what caused them, and what helped us recover.', '19 Aug 2023', 2093, '74806264', '2023-7-19/343632767-44100-2-5aaf4150f9e3d.mp3', '--How-to-overcome-burnout-e289dho', 'ep4'],
+    [3, 'Figma’s updates and the design process', 'Recorded right after Config: how Figma brought AI in to help designers, and the different design process models and why every project differs.', '10 Aug 2023', 2213, '74459630', '2023-7-10/b9683d5b-55b8-9ebb-91b3-a747e18489d9.mp3', '--e27ur1e', 'ep3'],
+    [2, 'How to start in product design and find the right place', 'The courses and paths into product design, and how your own goals decide where to focus.', '24 Jun 2023', 2057, '72550836', '2023-5-24/5238e671-9eb7-26c2-fce9-64ff19fe80c2.mp3', '--e264ivk', 'ep2'],
+    [1, 'The beginning', 'Why we started Blueprint and the topics and challenges we’ll take on together.', '16 Jun 2023', 601, '72229204', '2023-5-16/335450293-44100-2-deaed5ba4a5fc.m4a', 'ep-e25qosk', 'ep1'],
+  ] as const).map(([n, title, note, date, length, id, file, slug, cover]): Episode => ({
+    id: `blueprint-${n}`, show: 'blueprint', label: `Ep ${n}`, role: 'Co-host', title, note, date, length,
+    cover: `/images/podcasts/blueprint-${cover}.webp`, audio: BP(id, file), link: BPL + slug,
+  })),
   {
     id: 'ask-designer-s3e2', show: 'ask', label: 'S3 · E2', role: 'Guest',
     title: 'Team leads, and the communication priorities between a team and its company',
@@ -68,7 +84,7 @@ const EPISODES: Episode[] = [
 
 const GOLD = 'rgba(220,190,140,0.85)';
 const TEAL = '#4AF2E5';
-const SPEEDS = [1, 1.25, 1.5, 2];
+const SPEEDS = [0.75, 1, 1.25, 1.5, 1.75, 2];
 
 const clock = (s: number) => {
   s = Math.max(0, Math.floor(s));
@@ -81,6 +97,7 @@ const mins = (s: number) => (s < 60 ? '1 min' : `${Math.round(s / 60)} min`);
 
 /* the record label: show colour, its name around the edge, the episode at the foot */
 function RecordLabel({ ep }: { ep: Episode }) {
+  if (ep.cover) return <img src={ep.cover} alt="" className="w-full h-full object-cover" draggable={false} />;
   const s = SHOWS[ep.show];
   const uid = ep.id;
   return (
@@ -104,59 +121,134 @@ function RecordLabel({ ep }: { ep: Episode }) {
   );
 }
 
-/* ── Record player, seen from above ── */
-function RecordPlayer({ ep, playing, progress, onToggle }: { ep: Episode; playing: boolean; progress: number; onToggle: () => void }) {
-  const reduced = useReducedMotion();
-  // parked clear of the record; drops onto the outer groove (23°) and travels to the label (62°)
-  const arm = playing || progress > 0 ? 23 + progress * 39 : 0;
+/* ── Record player: a vintage deck, seen from above ──
+   Ivory body, a recessed well, an S-shaped tone arm, a speed slider and a
+   volume knob. Parked, the needle rests off the record; playing, it drops
+   onto the outer groove (15°) and travels to the inner groove (33.5°).
+   The slider sets the playback speed, the knob the volume. */
+function VSlider({ value, min, max, step, onChange, label, format }: { value: number; min: number; max: number; step: number; onChange: (v: number) => void; label: string; format: (v: number) => string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const set = (clientY: number) => {
+    const r = ref.current!.getBoundingClientRect();
+    const t = 1 - Math.min(1, Math.max(0, (clientY - r.top) / r.height));
+    onChange(Math.round((min + t * (max - min)) / step) * step);
+  };
+  const pct = (value - min) / (max - min);
   return (
-    <div className="relative w-full aspect-square max-w-[460px] mx-auto rounded-[28px]"
-      style={{ background: 'linear-gradient(145deg, #2A2119 0%, #17120D 60%, #0F0C09 100%)', boxShadow: 'inset 0 1px 0 rgba(255,235,200,0.08), 0 40px 80px -40px rgba(0,0,0,0.9)' }}
+    <div
+      ref={ref} role="slider" tabIndex={0} aria-label={label} aria-valuemin={min} aria-valuemax={max} aria-valuenow={value} aria-valuetext={format(value)}
+      className="absolute cursor-ns-resize touch-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 rounded"
+      style={{ left: '88.5%', top: '33%', width: '6%', height: '31%', outlineColor: TEAL }}
+      onPointerDown={(e) => { e.stopPropagation(); (e.target as HTMLElement).setPointerCapture?.(e.pointerId); set(e.clientY); }}
+      onPointerMove={(e) => { if (e.buttons) set(e.clientY); }}
+      onKeyDown={(e) => {
+        if (e.key === 'ArrowUp' || e.key === 'ArrowRight') { e.preventDefault(); e.stopPropagation(); onChange(Math.min(max, +(value + step).toFixed(2))); }
+        if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') { e.preventDefault(); e.stopPropagation(); onChange(Math.max(min, +(value - step).toFixed(2))); }
+      }}
     >
-      <div className="absolute aspect-square rounded-full" style={{ left: '7%', top: '15.6%', width: '68.8%', background: '#0B0B0B', boxShadow: '0 0 0 6px #1C1712, 0 20px 40px -10px rgba(0,0,0,0.8)' }}>
+      <span className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[22%] rounded-full" style={{ background: 'linear-gradient(90deg,#2a2622,#4a443d)', boxShadow: 'inset 0 1px 2px rgba(0,0,0,.6)' }} />
+      {Array.from({ length: 9 }, (_, i) => (
+        <span key={i} className="absolute h-px" style={{ top: `${(i / 8) * 100}%`, left: '108%', width: i % 4 === 0 ? '32%' : '20%', background: 'rgba(60,50,40,.45)' }} />
+      ))}
+      <span className="absolute left-1/2 -translate-x-1/2 w-[120%] h-[11%] rounded-[3px] -translate-y-1/2 transition-[top] duration-150"
+        style={{ top: `${(1 - pct) * 100}%`, background: 'linear-gradient(180deg,#f4f1ec,#bdb6ab)', boxShadow: '0 2px 4px rgba(0,0,0,.35), inset 0 1px 0 #fff' }}
+      >
+        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[28%] h-[28%] rounded-full" style={{ background: '#D2452F' }} />
+      </span>
+    </div>
+  );
+}
+
+function Knob({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const start = useRef<{ y: number; v: number } | null>(null);
+  const angle = -135 + value * 270;
+  return (
+    <div
+      role="slider" tabIndex={0} aria-label="Volume" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(value * 100)}
+      className="absolute rounded-full cursor-ns-resize touch-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+      style={{ left: '79%', top: '79%', width: '12%', height: '12%', outlineColor: TEAL }}
+      onPointerDown={(e) => { e.stopPropagation(); (e.target as HTMLElement).setPointerCapture?.(e.pointerId); start.current = { y: e.clientY, v: value }; }}
+      onPointerMove={(e) => { if (e.buttons && start.current) onChange(Math.min(1, Math.max(0, start.current.v + (start.current.y - e.clientY) / 120))); }}
+      onPointerUp={() => { start.current = null; }}
+      onKeyDown={(e) => {
+        if (e.key === 'ArrowUp' || e.key === 'ArrowRight') { e.preventDefault(); e.stopPropagation(); onChange(Math.min(1, value + 0.1)); }
+        if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') { e.preventDefault(); e.stopPropagation(); onChange(Math.max(0, value - 0.1)); }
+      }}
+    >
+      <span className="absolute inset-0 rounded-full" style={{ background: 'radial-gradient(circle at 35% 30%, #fbfaf7, #c9c3b9 55%, #8f887d)', boxShadow: '0 4px 8px rgba(0,0,0,.35), inset 0 -2px 3px rgba(0,0,0,.2)' }} />
+      <span className="absolute inset-[16%] rounded-full" style={{ background: 'repeating-conic-gradient(from 0deg, #d9d4cb 0deg 4deg, #c6c0b6 4deg 8deg)', transform: `rotate(${angle}deg)`, transition: 'transform .12s' }}>
+        <span className="absolute left-1/2 top-[6%] -translate-x-1/2 w-[9%] h-[30%] rounded-full" style={{ background: '#3a332c' }} />
+      </span>
+    </div>
+  );
+}
+
+function RecordPlayer({ ep, playing, progress, onToggle, speed, setSpeed, volume, setVolume }: {
+  ep: Episode; playing: boolean; progress: number; onToggle: () => void; speed: number; setSpeed: (v: number) => void; volume: number; setVolume: (v: number) => void;
+}) {
+  const reduced = useReducedMotion();
+  const arm = playing || progress > 0 ? 15 + progress * 18.5 : 0;
+  return (
+    <div className="relative w-full aspect-square max-w-[460px] mx-auto rounded-[13%] select-none"
+      style={{ background: 'linear-gradient(160deg, #F4EFE4 0%, #E6DDCB 70%, #DCD1BC 100%)', boxShadow: 'inset 0 2px 0 rgba(255,255,255,.8), inset 0 -3px 0 rgba(120,100,70,.18), 0 50px 90px -40px rgba(0,0,0,.95), 0 0 0 1px rgba(0,0,0,.25)' }}
+    >
+      {/* recessed well, flat on the left and round around the record */}
+      <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden>
+        <path d="M0 9 H43 A41 41 0 0 1 43 91 H0 Z" fill="#CFC5B2" />
+        <path d="M0 9 H43 A41 41 0 0 1 43 91 H0 Z" fill="none" stroke="rgba(90,75,55,.25)" strokeWidth=".5" />
+        {/* maker plate */}
+        <text x="66" y="95" fontFamily="'Fraunces', Georgia, serif" fontStyle="italic" fontSize="3.2" fill="rgba(90,75,55,.55)">Deeb · Model 33</text>
+        <circle cx="94" cy="95" r="1.1" fill={playing ? TEAL : 'rgba(90,75,55,.35)'} style={{ filter: playing ? `drop-shadow(0 0 1.5px ${TEAL})` : 'none' }} />
+        <text x="89.5" y="31" fontFamily="Inter, sans-serif" fontWeight="600" fontSize="2.6" fill="rgba(90,75,55,.6)">Speed</text>
+        <text x="80.5" y="77.5" fontFamily="Inter, sans-serif" fontWeight="600" fontSize="2.6" fill="rgba(90,75,55,.6)">Volume</text>
+      </svg>
+
+      {/* the record */}
+      <div className="absolute rounded-full" style={{ left: '7%', top: '14%', width: '72%', aspectRatio: '1', background: '#151413', boxShadow: '0 6px 14px rgba(0,0,0,.45)' }}>
         <button type="button" onClick={onToggle} data-tap aria-label={playing ? 'Pause the episode' : 'Play the episode'}
-          className="absolute inset-[2%] rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4" style={{ outlineColor: TEAL }}
+          className="absolute inset-[2.5%] rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4" style={{ outlineColor: TEAL }}
         >
           <span className="absolute inset-0 rounded-full"
             style={{
-              background: 'repeating-radial-gradient(circle at 50% 50%, #121212 0px, #121212 2px, #1B1B1B 3px, #121212 4px), radial-gradient(circle at 50% 50%, #222 0%, #0d0d0d 70%)',
+              background: 'repeating-radial-gradient(circle at 50% 50%, #111 0px, #111 1.6px, #1d1d1d 2.4px, #111 3.2px)',
               animation: reduced ? 'none' : 'pd-spin 1.8s linear infinite',
               animationPlayState: playing ? 'running' : 'paused',
             }}
           >
-            <span className="absolute inset-0 rounded-full" style={{ background: 'conic-gradient(from 20deg, transparent 0deg, rgba(255,255,255,0.07) 30deg, transparent 70deg, transparent 180deg, rgba(255,255,255,0.05) 210deg, transparent 250deg)' }} />
-            <span className="absolute inset-[27%] rounded-full overflow-hidden" style={{ boxShadow: '0 0 0 3px #0B0B0B' }}>
+            <span className="absolute inset-0 rounded-full" style={{ background: 'conic-gradient(from 25deg, transparent 0deg, rgba(255,255,255,.10) 28deg, transparent 62deg, transparent 185deg, rgba(255,255,255,.07) 212deg, transparent 245deg)' }} />
+            <span className="absolute inset-[30%] rounded-full overflow-hidden" style={{ boxShadow: '0 0 0 2px #0c0c0c' }}>
               <RecordLabel ep={ep} />
             </span>
-            <span className="absolute left-1/2 top-1/2 w-[3%] aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: 'radial-gradient(circle, #d9d9d9, #7a7a7a)' }} />
+            <span className="absolute left-1/2 top-1/2 w-[3.2%] aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: 'radial-gradient(circle at 35% 35%, #fff, #8d877e)' }} />
           </span>
-          <svg viewBox="0 0 100 100" className="absolute inset-[-3%] w-[106%] h-[106%] -rotate-90 pointer-events-none" aria-hidden>
-            <circle cx="50" cy="50" r="49" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="0.8" />
-            <circle cx="50" cy="50" r="49" fill="none" stroke={TEAL} strokeWidth="0.8" strokeLinecap="round" pathLength={1} strokeDasharray={`${progress} 1`} />
+          <svg viewBox="0 0 100 100" className="absolute inset-[-2%] w-[104%] h-[104%] -rotate-90 pointer-events-none" aria-hidden>
+            <circle cx="50" cy="50" r="49.3" fill="none" stroke={TEAL} strokeWidth="0.9" strokeLinecap="round" pathLength={1} strokeDasharray={`${progress} 1`} opacity=".9" />
           </svg>
         </button>
       </div>
 
+      {/* S-shaped tone arm, pivot at the top right */}
       <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden>
         <defs>
-          <linearGradient id="pd-arm" x1="0" x2="1">
-            <stop offset="0" stopColor="#8d8479" /><stop offset=".5" stopColor="#e2ddd5" /><stop offset="1" stopColor="#8d8479" />
-          </linearGradient>
+          <linearGradient id="pd-steel" x1="0" x2="1"><stop offset="0" stopColor="#9a948b" /><stop offset=".5" stopColor="#f2efea" /><stop offset="1" stopColor="#9a948b" /></linearGradient>
+          <radialGradient id="pd-base" cx=".4" cy=".35"><stop offset="0" stopColor="#ffffff" /><stop offset=".6" stopColor="#d3cdc3" /><stop offset="1" stopColor="#9d968b" /></radialGradient>
         </defs>
-        <circle cx="88" cy="12" r="7.5" fill="#2a241e" />
-        <circle cx="88" cy="12" r="5.2" fill="#4a4139" />
-        <g style={{ transform: `rotate(${arm}deg)`, transformOrigin: '88px 12px', transformBox: 'view-box', transition: 'transform .9s cubic-bezier(.22,1,.36,1)' }}>
-          <rect x="85.6" y="2" width="4.8" height="6" rx="1.4" fill="#3a332c" />
-          <rect x="87.2" y="8" width="1.6" height="62" rx=".8" fill="url(#pd-arm)" />
-          <rect x="85.2" y="69" width="5.6" height="9" rx="1.2" fill="#2b2520" stroke={GOLD} strokeWidth=".35" />
+        <circle cx="84" cy="15" r="8.2" fill="#BDB4A2" />
+        <circle cx="84" cy="15" r="6.6" fill="url(#pd-base)" stroke="rgba(0,0,0,.18)" strokeWidth=".3" />
+        <g style={{ transform: `rotate(${arm}deg)`, transformOrigin: '84px 15px', transformBox: 'view-box', transition: 'transform 1s cubic-bezier(.22,1,.36,1)' }}>
+          <rect x="81.8" y="2.6" width="4.4" height="7" rx="1.3" fill="url(#pd-steel)" stroke="rgba(0,0,0,.2)" strokeWidth=".25" />
+          <path d="M84 15 C84 30, 78.5 38, 80 50 S 84 62, 84 66" fill="none" stroke="rgba(0,0,0,.25)" strokeWidth="2.2" strokeLinecap="round" transform="translate(.6,.8)" />
+          <path d="M84 15 C84 30, 78.5 38, 80 50 S 84 62, 84 66" fill="none" stroke="url(#pd-steel)" strokeWidth="1.5" strokeLinecap="round" />
+          <g transform="rotate(-14 84 66)">
+            <rect x="81.6" y="65" width="4.8" height="8.5" rx="1" fill="#e9e5de" stroke="rgba(0,0,0,.25)" strokeWidth=".3" />
+            <rect x="82.6" y="70.2" width="2.8" height="2.6" rx=".5" fill={TEAL} />
+          </g>
         </g>
-        <circle cx="88" cy="12" r="2" fill="#bdb5aa" />
+        <circle cx="84" cy="15" r="2.4" fill="#f4f1ec" stroke="rgba(0,0,0,.2)" strokeWidth=".3" />
       </svg>
 
-      <span className="absolute left-[7%] bottom-[6%] flex items-center gap-2 text-[11px] font-semibold" style={{ color: 'rgba(255,240,215,0.55)' }}>
-        <span className="w-1.5 h-1.5 rounded-full" style={{ background: playing ? TEAL : 'rgba(255,255,255,0.2)', boxShadow: playing ? `0 0 10px ${TEAL}` : 'none' }} />
-        33⅓
-      </span>
+      <VSlider value={speed} min={0.75} max={2} step={0.25} onChange={setSpeed} label="Playback speed" format={(v) => `${v}x`} />
+      <Knob value={volume} onChange={setVolume} />
     </div>
   );
 }
@@ -232,6 +324,9 @@ export function PodcastDeck() {
   const [time, setTime] = useState(0);
   const [dur, setDur] = useState(ep.length);
   const [speed, setSpeed] = useState(1);
+  const [volume, setVolume] = useState(0.9);
+  useEffect(() => { if (audio.current) audio.current.volume = volume; }, [volume]);
+  useEffect(() => { if (audio.current) audio.current.playbackRate = speed; }, [speed]);
   const [loading, setLoading] = useState(false);
   const dragged = useRef(false);
 
@@ -336,7 +431,7 @@ export function PodcastDeck() {
             <AnimatePresence mode="wait" initial={false} custom={dir}>
               <motion.div key={ep.id + view} {...slide} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
                 {view === 'record'
-                  ? <RecordPlayer ep={ep} playing={playing} progress={progress} onToggle={toggle} />
+                  ? <RecordPlayer ep={ep} playing={playing} progress={progress} onToggle={toggle} speed={speed} setSpeed={setSpeed} volume={volume} setVolume={setVolume} />
                   : <HeadphonesView ep={ep} playing={playing} onToggle={toggle} />}
               </motion.div>
             </AnimatePresence>
