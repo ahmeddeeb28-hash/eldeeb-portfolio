@@ -1,5 +1,5 @@
-import { motion } from 'motion/react';
-import type { ReactNode } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { useState, type ReactNode } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
@@ -132,6 +132,96 @@ const PRINCIPLES: [string, string][] = [
   ['Same numbers everywhere', 'Product page, checkout and account show one plan.'],
 ];
 
+/* the same moment in three journeys: Tabby and Tamara screens from
+   their official merchant materials (captured 5 Nov 2026, used for
+   critique), next to Vault Split */
+const MOMENTS: { key: string; title: string; q: string; tabby: string; tamara: string; vault: string }[] = [
+  {
+    key: 'promise',
+    title: 'The promise',
+    q: 'What does the product page say the shopper will pay?',
+    tabby: 'Leads with “As low as AED 58.40/month”, the best case. The real first payment is only known later, inside Tabby’s checkout.',
+    tamara: 'Leads with the lowest monthly price (208/mo, a 12-month plan). What the shopper pays today isn’t on the page.',
+    vault: 'Shows “your real plan” with a 10-second check, next to the price, before checkout.',
+  },
+  {
+    key: 'plan',
+    title: 'The real plan',
+    q: 'When does the shopper first see the true first payment?',
+    tabby: 'Plans list monthly amounts and say you “may or may not make a down payment”. How much isn’t known until checkout.',
+    tamara: 'The plan is chosen on Tamara’s own checkout, after leaving the store, with the due-today amount behind “See details”.',
+    vault: 'SAR 2,499 today with a one-line reason and three fixes, on the product page.',
+  },
+  {
+    key: 'fees',
+    title: 'Fees and confirm',
+    q: 'Are fees and the total visible at the moment of decision?',
+    tabby: 'At the store’s checkout it still says “As low as 145.00/mo” with “View options”. The exact plan is set later.',
+    tamara: 'The payment option shows no amount, just “Monthly payments. Sharia compliant.” The order is placed before the plan is seen.',
+    vault: '“Same plan you saw on the product page”, SAR 0 fees, before placing the order.',
+  },
+];
+
+function Compare() {
+  const [i, setI] = useState(0);
+  const reduced = useReducedMotion();
+  const m = MOMENTS[i];
+  const cols: [string, string, string, boolean][] = [
+    ['tabby', 'Tabby · before', m.tabby, false],
+    ['tamara', 'Tamara · before', m.tamara, false],
+    ['vault', 'Vault Split · after', m.vault, true],
+  ];
+  return (
+    <div>
+      <div role="tablist" aria-label="Moments in the journey" className="flex flex-wrap gap-2 mb-6">
+        {MOMENTS.map((mm, k) => (
+          <button
+            key={mm.key}
+            type="button"
+            role="tab"
+            aria-selected={k === i}
+            onClick={() => setI(k)}
+            className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+            style={{ background: k === i ? LIME : 'rgba(255,255,255,0.06)', color: k === i ? DEEP : 'rgba(255,255,255,0.75)' }}
+          >
+            {k + 1} · {mm.title}
+          </button>
+        ))}
+      </div>
+      <p className="text-white/60 mb-8">{m.q}</p>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={m.key}
+          initial={reduced ? false : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={reduced ? undefined : { opacity: 0, y: -10 }}
+          transition={{ duration: 0.25 }}
+          className="-mx-6 px-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          <div className="flex md:grid md:grid-cols-3 gap-5 md:gap-6">
+            {cols.map(([who, label, text, after]) => (
+              <figure key={who} className="snap-start flex-none w-[68vw] sm:w-[44vw] md:w-auto">
+                <div
+                  className="rounded-[22px] overflow-hidden bg-white"
+                  style={{ boxShadow: after ? `0 0 0 3px ${LIME}, 0 30px 60px -30px rgba(0,0,0,0.8)` : '0 30px 60px -30px rgba(0,0,0,0.8)' }}
+                >
+                  <img src={`${IMG}/cmp-${m.key}-${who}.webp`} alt={`${label}: ${text}`} loading="lazy" decoding="async" className="block w-full h-auto" />
+                </div>
+                <figcaption className="mt-4">
+                  <p className="text-sm font-semibold" style={{ color: after ? LIME : '#FF9C8F' }}>
+                    {label}
+                  </p>
+                  <p className="text-white/75 text-sm leading-relaxed mt-1">{text}</p>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
+
 const METRICS: { group: string; q: string; rows: [string, string, string][] }[] = [
   {
     group: 'Design',
@@ -176,12 +266,27 @@ export function VaultCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
             </p>
             <p>I took it from discovery to a working prototype: problem framing, flows, UI, prototype and motion.</p>
           </CaseIntro>
-          <motion.div {...reveal} className="rounded-[24px] md:rounded-[32px] overflow-hidden" style={{ background: DEEP }}>
-            <img
-              src={`${IMG}/hero.webp`}
-              alt="Three Vault Split screens: the product page, the real plan with its reason and fixes, and checkout showing the same plan"
-              className="block w-full h-auto"
-            />
+          {/* three whole phones, nothing cut by the panel edge */}
+          <motion.div
+            {...reveal}
+            className="rounded-[24px] md:rounded-[32px] px-5 py-10 md:px-14 md:py-16"
+            style={{ background: `radial-gradient(ellipse 70% 80% at 50% 0%, #2A4A18 0%, transparent 65%), ${DEEP}` }}
+          >
+            <div className="grid grid-cols-3 gap-3 md:gap-8 items-center max-w-4xl mx-auto">
+              {[
+                ['pay-choose', 'The product page, with Vault Split next to the price'],
+                ['plan-reason', 'The real plan: SAR 2,499 today, with the reason and three fixes'],
+                ['checkout', 'Checkout showing the same plan the shopper saw'],
+              ].map(([src, alt], k) => (
+                <img
+                  key={src}
+                  src={`${IMG}/${src}.webp`}
+                  alt={alt}
+                  className="block w-full h-auto rounded-[14px] md:rounded-[24px] shadow-[0_40px_70px_-30px_rgba(0,0,0,0.9)]"
+                  style={{ transform: k === 1 ? 'translateY(-6%)' : 'translateY(4%)' }}
+                />
+              ))}
+            </div>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-x-10 gap-y-6 mt-12 border-t pt-8" style={{ borderColor: LINE }}>
             {[
@@ -380,16 +485,9 @@ export function VaultCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         </Section>
 
         {/* ── 08 BEFORE AND AFTER + MEASURING ── */}
-        <Section i={7} tone="teal" title="From the last step to the first screen.">
-          <div className="rounded-[24px] md:rounded-[32px] overflow-hidden" style={{ background: DEEP }}>
-            <img
-              src={`${IMG}/beforeafter.webp`}
-              alt="Before: today's BNPL checkout reveals the real plan, fees and approval at step 4 of 5, then accept or leave. After: Vault Split shows them at step 2, a 10-second check before buying, then a choice of fixes, the same plan at checkout and an account with every payment, refund and limit."
-              loading="lazy"
-              className="block w-full h-auto"
-            />
-          </div>
-          <div className="rounded-[24px] border mt-4 overflow-hidden" style={{ borderColor: LINE, background: PANEL }}>
+        <Section i={7} tone="teal" title="From the last step to the first screen." lead="The same three moments in today’s buy now, pay later journeys and in Vault Split. Pick a moment.">
+          <Compare />
+          <div className="rounded-[24px] border mt-14 overflow-hidden" style={{ borderColor: LINE, background: PANEL }}>
             {[
               ['When the real plan appears', 'Last step', 'First screen'],
               ['Shopper’s options', 'Accept or leave', '3 ways forward'],
@@ -449,8 +547,10 @@ export function VaultCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
             offer a way forward.
           </Takeaway>
           <p className="text-white/35 text-xs leading-relaxed mt-8 max-w-3xl">
-            Independent concept by Ahmad Eldeeb. Not affiliated with Tabby, Tamara, Apple or Nafath. Customer reviews paraphrased
-            from public Trustpilot pages, read October 2026.
+            Independent concept by Ahmad Eldeeb. Not affiliated with Tabby, Tamara, Apple or Nafath. Tabby and Tamara screens are
+            from their official merchant materials (captured 5 Nov 2026), shown for design critique; they show the intended
+            experience, not a specific shopper’s account. Customer reviews paraphrased from public Trustpilot pages, read
+            October 2026.
           </p>
         </Section>
       </div>
