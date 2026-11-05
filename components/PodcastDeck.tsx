@@ -513,20 +513,26 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
       {/* 4. browse: every episode as a small cover */}
       <div className="mt-7">
         <p className="text-xs text-white/40 mb-1">All episodes</p>
-        <ol className="grid grid-cols-6 gap-1.5 sm:gap-2.5 max-w-[360px] pt-[8%]">
+        <ol className="grid grid-cols-6 gap-2 sm:gap-3 max-w-[440px] pt-[11%]">
           {EPISODES.map((e, i) => {
             const on = i === cur;
             return (
               <li key={e.id} className="relative">
                 {on && (
                   <motion.span layoutId="pd-sleeve-vinyl" aria-hidden
-                    className="absolute left-[6%] right-[6%] aspect-square rounded-full pointer-events-none"
-                    style={{ top: '-46%', zIndex: 0, background: 'repeating-radial-gradient(circle, #111 0 1.2px, #1f1f1f 1.8px 2.4px)', boxShadow: '0 0 0 1px rgba(255,255,255,.22), 0 2px 6px rgba(0,0,0,.5)' }}
-                    transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 32 }}
+                    className="absolute left-[-4%] right-[-4%] aspect-square rounded-full pointer-events-none"
+                    style={{
+                      top: '-62%', zIndex: 0,
+                      /* chrome-like rim, fine grooves, and a brushed sheen */
+                      background: 'repeating-radial-gradient(circle, #0d0d0d 0 1px, #232323 1.4px 1.9px, #121212 2.3px)',
+                      boxShadow: '0 0 0 1.5px #d9d6d0, 0 0 0 2.5px #7d7a74, 0 0 0 3.5px rgba(255,255,255,.35), 0 6px 14px -2px rgba(0,0,0,.7)',
+                    }}
+                    transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 380, damping: 30 }}
                   >
-                    <span className="absolute inset-[34%] rounded-full" style={{ background: SHOWS[e.show].tone }} />
-                    <motion.span className="absolute inset-0 rounded-full" style={{ background: 'conic-gradient(from 20deg, transparent 0 30deg, rgba(255,255,255,.12) 40deg, transparent 70deg)' }}
+                    <motion.span className="absolute inset-0 rounded-full" style={{ background: 'conic-gradient(from 0deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,.28) 22deg, rgba(255,255,255,0) 48deg, rgba(255,255,255,0) 160deg, rgba(255,255,255,.18) 190deg, rgba(255,255,255,0) 220deg, rgba(255,255,255,0) 360deg)', mixBlendMode: 'screen' }}
                       animate={reduced || !playing ? { rotate: 0 } : { rotate: 360 }} transition={{ repeat: Infinity, duration: 1.8, ease: 'linear' }} />
+                    <span className="absolute inset-[33%] rounded-full" style={{ background: `radial-gradient(circle at 35% 30%, ${SHOWS[e.show].tone}, ${SHOWS[e.show].deck.body[2]})`, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.35)' }} />
+                    <span className="absolute left-1/2 top-1/2 w-[9%] aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: 'radial-gradient(circle at 35% 30%, #fff, #a7a39b 55%, #5e5b55)', boxShadow: '0 0 2px rgba(0,0,0,.6)' }} />
                   </motion.span>
                 )}
                 <motion.button type="button" onClick={() => go(i)} aria-label={`${SHOWS[e.show].name}, ${e.title}`} aria-current={on} title={e.title}
