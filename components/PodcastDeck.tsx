@@ -11,10 +11,11 @@ import { ArrowUpRight, Disc3, Headphones, Pause, Play, RotateCcw, RotateCw } fro
    Titles are English translations; the episodes themselves are in Arabic.
    Blueprint episodes come from its Spotify for Creators (Anchor) feed. */
 
-type Show = { name: string; blurb: string; tone: string; ink: string; mark: string; art: string; feed: string };
+type Deck = { body: [string, string, string]; well: string; ink: string; ring: string; edge: string };
+type Show = { name: string; blurb: string; tone: string; ink: string; mark: string; art: string; feed: string; deck: Deck };
 const SHOWS: Record<'blueprint' | 'ask', Show> = {
-  blueprint: { name: 'Blueprint', blurb: 'the product design podcast I co-host', tone: '#1428F5', ink: '#FFE600', mark: '/images/podcasts/blueprint-show.webp', art: '/images/podcasts/blueprint-show.webp', feed: 'https://creators.spotify.com/pod/profile/blueprintcast/' },
-  ask: { name: 'Ask Designer', blurb: 'I was the guest', tone: '#F5B800', ink: '#2B1B00', mark: '/images/podcasts/ask-designer-face.webp', art: '/images/podcasts/ask-designer.webp', feed: 'https://podcasts.apple.com/us/podcast/id1472945887' },
+  blueprint: { deck: { body: ['#3A4CF2', '#2633D6', '#1B25B0'], well: '#1720A3', ink: 'rgba(255,240,140,.75)', ring: '#121A86', edge: 'rgba(255,255,255,.35)' }, name: 'Blueprint', blurb: 'the product design podcast I co-host', tone: '#1428F5', ink: '#FFE600', mark: '/images/podcasts/blueprint-show.webp', art: '/images/podcasts/blueprint-show.webp', feed: 'https://creators.spotify.com/pod/profile/blueprintcast/' },
+  ask: { deck: { body: ['#F7CF45', '#EDBB1E', '#D9A30C'], well: '#C98F06', ink: 'rgba(70,30,90,.7)', ring: '#B47F04', edge: 'rgba(255,255,255,.6)' }, name: 'Ask Designer', blurb: 'I was the guest', tone: '#F5B800', ink: '#2B1B00', mark: '/images/podcasts/ask-designer-face.webp', art: '/images/podcasts/ask-designer.webp', feed: 'https://podcasts.apple.com/us/podcast/id1472945887' },
 };
 
 type Episode = {
@@ -168,19 +169,21 @@ function RecordPlayer({ ep, playing, progress, onToggle, speed, setSpeed, volume
 }) {
   const reduced = useReducedMotion();
   const arm = playing || progress > 0 ? 15 + progress * 18.5 : 0;
+  const d = SHOWS[ep.show].deck;
+  const tint = { transition: 'fill .8s ease' };
   return (
     <div className="relative w-full aspect-square max-w-[460px] mx-auto rounded-[13%] select-none"
-      style={{ background: 'linear-gradient(160deg, #F4EFE4 0%, #E6DDCB 70%, #DCD1BC 100%)', boxShadow: 'inset 0 2px 0 rgba(255,255,255,.8), inset 0 -3px 0 rgba(120,100,70,.18), 0 50px 90px -40px rgba(0,0,0,.95), 0 0 0 1px rgba(0,0,0,.25)' }}
+      style={{ background: `linear-gradient(160deg, ${d.body[0]} 0%, ${d.body[1]} 70%, ${d.body[2]} 100%)`, transition: 'background .8s ease', boxShadow: `inset 0 2px 0 ${d.edge}, inset 0 -3px 0 rgba(0,0,0,.18), 0 50px 90px -40px rgba(0,0,0,.95), 0 0 0 1px rgba(0,0,0,.25)` }}
     >
       {/* recessed well, flat on the left and round around the record */}
       <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden>
-        <path d="M0 9 H43 A41 41 0 0 1 43 91 H0 Z" fill="#CFC5B2" />
-        <path d="M0 9 H43 A41 41 0 0 1 43 91 H0 Z" fill="none" stroke="rgba(90,75,55,.25)" strokeWidth=".5" />
+        <path d="M0 9 H43 A41 41 0 0 1 43 91 H0 Z" fill={d.well} style={tint} />
+        <path d="M0 9 H43 A41 41 0 0 1 43 91 H0 Z" fill="none" stroke="rgba(0,0,0,.2)" strokeWidth=".5" />
         {/* maker plate */}
-        <text x="66" y="95" fontFamily="'Fraunces', Georgia, serif" fontStyle="italic" fontSize="3.2" fill="rgba(90,75,55,.55)">Deeb · Model 33</text>
-        <circle cx="94" cy="95" r="1.1" fill={playing ? TEAL : 'rgba(90,75,55,.35)'} style={{ filter: playing ? `drop-shadow(0 0 1.5px ${TEAL})` : 'none' }} />
-        <text x="89.5" y="31" fontFamily="Inter, sans-serif" fontWeight="600" fontSize="2.6" fill="rgba(90,75,55,.6)">Speed</text>
-        <text x="80.5" y="77.5" fontFamily="Inter, sans-serif" fontWeight="600" fontSize="2.6" fill="rgba(90,75,55,.6)">Volume</text>
+        <text x="66" y="95" fontFamily="'Fraunces', Georgia, serif" fontStyle="italic" fontSize="3.2" fill={d.ink}>Deeb · Model 33</text>
+        <circle cx="94" cy="95" r="1.1" fill={playing ? TEAL : 'rgba(0,0,0,.3)'} style={{ filter: playing ? `drop-shadow(0 0 1.5px ${TEAL})` : 'none' }} />
+        <text x="89.5" y="31" fontFamily="Inter, sans-serif" fontWeight="600" fontSize="2.6" fill={d.ink}>Speed</text>
+        <text x="80.5" y="77.5" fontFamily="Inter, sans-serif" fontWeight="600" fontSize="2.6" fill={d.ink}>Volume</text>
       </svg>
 
       {/* the record */}
@@ -213,7 +216,7 @@ function RecordPlayer({ ep, playing, progress, onToggle, speed, setSpeed, volume
           <linearGradient id="pd-steel" x1="0" x2="1"><stop offset="0" stopColor="#9a948b" /><stop offset=".5" stopColor="#f2efea" /><stop offset="1" stopColor="#9a948b" /></linearGradient>
           <radialGradient id="pd-base" cx=".4" cy=".35"><stop offset="0" stopColor="#ffffff" /><stop offset=".6" stopColor="#d3cdc3" /><stop offset="1" stopColor="#9d968b" /></radialGradient>
         </defs>
-        <circle cx="84" cy="15" r="8.2" fill="#BDB4A2" />
+        <circle cx="84" cy="15" r="8.2" fill={d.ring} style={tint} />
         <circle cx="84" cy="15" r="6.6" fill="url(#pd-base)" stroke="rgba(0,0,0,.18)" strokeWidth=".3" />
         <g style={{ transform: `rotate(${arm}deg)`, transformOrigin: '84px 15px', transformBox: 'view-box', transition: 'transform 1s cubic-bezier(.22,1,.36,1)' }}>
           <rect x="81.8" y="2.6" width="4.4" height="7" rx="1.3" fill="url(#pd-steel)" stroke="rgba(0,0,0,.2)" strokeWidth=".25" />
@@ -442,9 +445,9 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
       <div className="mt-6 flex items-center gap-4">
         <button type="button" onClick={toggle} aria-label={playing ? 'Pause' : 'Play'}
           className="grid place-items-center w-14 h-14 rounded-full flex-none transition-transform hover:scale-105 active:scale-95"
-          style={{ background: TEAL, color: '#04211F', boxShadow: playing ? '0 0 0 6px rgba(74,242,229,0.15)' : 'none' }}
+          style={{ background: '#F5F3EF', color: '#111', boxShadow: playing ? '0 0 0 6px rgba(255,255,255,0.14)' : '0 8px 20px -8px rgba(0,0,0,0.6)' }}
         >
-          {loading && playing ? <span className="w-5 h-5 rounded-full border-2 border-[#04211F]/30 border-t-[#04211F] animate-spin" /> : playing ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current ml-0.5" />}
+          {loading && playing ? <span className="w-5 h-5 rounded-full border-2 border-black/20 border-t-black animate-spin" /> : playing ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current ml-0.5" />}
         </button>
         <div className="flex-1 min-w-0">
           <input
@@ -471,7 +474,7 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
             <li key={e.id}>
               <button type="button" onClick={() => go(i)} aria-label={`${SHOWS[e.show].name}, ${e.title}`} aria-current={i === cur} title={e.title}
                 className="block w-full aspect-square rounded-[10px] overflow-hidden transition-all duration-300"
-                style={{ boxShadow: i === cur ? `0 0 0 2px ${TEAL}` : '0 0 0 1px rgba(255,255,255,0.12)', opacity: i === cur ? 1 : 0.6, transform: i === cur ? 'translateY(-2px)' : 'none' }}
+                style={{ boxShadow: i === cur ? '0 0 0 2px #fff' : '0 0 0 1px rgba(255,255,255,0.12)', opacity: i === cur ? 1 : 0.6, transform: i === cur ? 'translateY(-2px)' : 'none' }}
               >
                 <img src={e.cover ?? SHOWS[e.show].art} alt="" className="w-full h-full object-cover" loading="lazy" />
               </button>
@@ -488,12 +491,12 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
       @keyframes pd-drift { from { transform: translate(-50%,-50%) scale(1) rotate(0deg) } to { transform: translate(-50%,-50%) scale(1.18) rotate(10deg) } }
       @keyframes pd-eq { 0% { transform: scaleY(.15) } 100% { transform: scaleY(1) } }
       .pd-range { -webkit-appearance: none; appearance: none; background: transparent; width: 100%; height: 22px; cursor: pointer }
-      .pd-range::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: linear-gradient(90deg, ${TEAL} var(--p), rgba(255,255,255,.12) var(--p)) }
+      .pd-range::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: linear-gradient(90deg, rgba(255,255,255,.9) var(--p), rgba(255,255,255,.18) var(--p)) }
       .pd-range::-moz-range-track { height: 4px; border-radius: 4px; background: rgba(255,255,255,.12) }
-      .pd-range::-moz-range-progress { height: 4px; border-radius: 4px; background: ${TEAL} }
-      .pd-range::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #fff; margin-top: -5px; box-shadow: 0 0 0 4px rgba(74,242,229,.25) }
+      .pd-range::-moz-range-progress { height: 4px; border-radius: 4px; background: rgba(255,255,255,.9) }
+      .pd-range::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #fff; margin-top: -5px; box-shadow: 0 0 0 4px rgba(255,255,255,.18) }
       .pd-range::-moz-range-thumb { width: 14px; height: 14px; border: 0; border-radius: 50%; background: #fff }
-      .pd-range:focus-visible { outline: 2px solid ${TEAL}; outline-offset: 4px; border-radius: 6px }
+      .pd-range:focus-visible { outline: 2px solid #fff; outline-offset: 4px; border-radius: 6px }
       .pd-lead > * { margin-left: auto !important; margin-right: auto !important }
       .pd-lead > div { justify-content: center }
     `}</style>
