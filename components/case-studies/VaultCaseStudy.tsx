@@ -5,7 +5,7 @@ import { VAULT_STEPS, VaultPlay, type VaultStage } from './vault/VaultPlay';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
 import { CaseIntro, Takeaway } from './_shared/CaseLayout';
-import { reveal } from './_shared/CaseBits';
+import { CaseFilm, reveal } from './_shared/CaseBits';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 
 /* ── Vault Split · see your real plan before you buy ──
@@ -20,6 +20,8 @@ const DEEP = '#16280F';
 const PANEL = '#0F1A0B';
 const LINE = 'rgba(255,255,255,0.08)';
 const IMG = '/images/case-studies/vault';
+const FILM = '/videos/vault-split-film.mp4';
+const POSTER = `${IMG}/film-poster.webp`;
 
 const CHAPTERS: Chapter[] = [
   { id: 'overview', num: '01', roman: 'I', label: 'Overview', beat: 'A promise that changes.' },
@@ -330,32 +332,26 @@ export function VaultCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
             </p>
             <p>I took it from discovery to a working prototype: problem framing, flows, UI, prototype and motion.</p>
           </CaseIntro>
-          {/* the real plan in front, product page and checkout tucked behind,
-              all whole and with room around them */}
-          <motion.div
-            {...reveal}
-            className="rounded-[24px] md:rounded-[32px] overflow-hidden"
-            style={{ background: `radial-gradient(ellipse 60% 70% at 50% 35%, #2E5219 0%, transparent 70%), ${DEEP}` }}
-          >
-            <div className="relative mx-auto w-full max-w-[920px] aspect-square md:aspect-[4/3]">
-              {[
-                ['pay-choose', 'The product page, with Vault Split next to the price', 'left-[6%] md:left-[14%]', -5, 0.8],
-                ['checkout', 'Checkout showing the same plan the shopper saw', 'right-[6%] md:right-[14%]', 5, 0.8],
-              ].map(([src, alt, pos, rot]) => (
+          {/* the prototype walkthrough film: each step with what changes now
+              and how it worked before; loops silently, plays with sound */}
+          <motion.div {...reveal}>
+            <CaseFilm
+              src={FILM}
+              poster={POSTER}
+              length="0:30"
+              accent={LIME}
+              buttonTint={DEEP}
+              background={`radial-gradient(ellipse 60% 70% at 50% 35%, #2E5219 0%, transparent 70%), ${DEEP}`}
+              fallback={
                 <img
-                  key={src as string}
-                  src={`${IMG}/${src}.webp`}
-                  alt={alt as string}
-                  className={`absolute top-[16%] w-[27%] md:w-[22%] h-auto rounded-[12px] md:rounded-[20px] opacity-90 shadow-[0_30px_60px_-30px_rgba(0,0,0,0.9)] ${pos}`}
-                  style={{ transform: `rotate(${rot}deg)` }}
+                  src={`${IMG}/plan-reason.webp`}
+                  alt="The real plan: SAR 2,499 today, with the reason and three fixes"
+                  className="w-[200px] h-auto rounded-[20px]"
                 />
-              ))}
-              <img
-                src={`${IMG}/plan-reason.webp`}
-                alt="The real plan: SAR 2,499 today, with the reason and three fixes"
-                className="absolute left-1/2 -translate-x-1/2 top-[7%] w-[34%] md:w-[28%] h-auto rounded-[14px] md:rounded-[24px] shadow-[0_50px_90px_-30px_rgba(0,0,0,0.95)]"
-              />
-            </div>
+              }
+              decor="Real plan"
+              ticker={['See your real plan', 'Before you buy', 'One tap in Nafath', 'Same plan at checkout', 'Vault Split']}
+            />
           </motion.div>
           <div className="grid md:grid-cols-3 gap-x-10 gap-y-6 mt-12 border-t pt-8" style={{ borderColor: LINE }}>
             {[
