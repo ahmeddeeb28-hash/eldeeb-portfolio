@@ -11,11 +11,10 @@ import { ArrowUpRight, ChevronLeft, ChevronRight, Disc3, Headphones, Pause, Play
    Titles are English translations; the episodes themselves are in Arabic.
    Blueprint episodes come from its Spotify for Creators (Anchor) feed. */
 
-type Show = { name: string; tone: string; ink: string; mark: string; feed: string };
-const SHOWS: Record<'blueprint' | 'ask' | 'living', Show> = {
-  blueprint: { name: 'Blueprint', tone: '#1428F5', ink: '#FFE600', mark: '/images/podcasts/blueprint-show.webp', feed: 'https://creators.spotify.com/pod/profile/blueprintcast/' },
-  ask: { name: 'Ask Designer', tone: '#F5B800', ink: '#2B1B00', mark: '/images/podcasts/ask-designer-face.webp', feed: 'https://podcasts.apple.com/us/podcast/id1472945887' },
-  living: { name: 'Philosophy of Living', tone: '#E9F3E4', ink: '#1F5E2A', mark: '/images/podcasts/philosophy-emblem.webp', feed: 'https://podcasts.apple.com/us/podcast/id1539547101' },
+type Show = { name: string; tone: string; ink: string; mark: string; art: string; feed: string };
+const SHOWS: Record<'blueprint' | 'ask', Show> = {
+  blueprint: { name: 'Blueprint', tone: '#1428F5', ink: '#FFE600', mark: '/images/podcasts/blueprint-show.webp', art: '/images/podcasts/blueprint-show.webp', feed: 'https://creators.spotify.com/pod/profile/blueprintcast/' },
+  ask: { name: 'Ask Designer', tone: '#F5B800', ink: '#2B1B00', mark: '/images/podcasts/ask-designer-face.webp', art: '/images/podcasts/ask-designer.webp', feed: 'https://podcasts.apple.com/us/podcast/id1472945887' },
 };
 
 type Episode = {
@@ -33,8 +32,6 @@ type Episode = {
   link: string;
 };
 
-const SPK = 'https://dts.podtrac.com/redirect.mp3/api.spreaker.com/download/episode/';
-const APL = 'https://podcasts.apple.com/us/podcast/id1539547101?i=';
 
 const BP = (id: string, file: string) => `https://anchor.fm/s/11e702c8/podcast/play/${id}/${encodeURIComponent('https://d3ctxlq1ktw2nl.cloudfront.net/staging/' + file)}`;
 const BPL = 'https://creators.spotify.com/pod/profile/blueprintcast/episodes/';
@@ -58,28 +55,6 @@ const EPISODES: Episode[] = [
     audio: 'https://anchor.fm/s/85e3e74/podcast/play/72871596/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2023-6-1%2Fe588654c-869c-fc54-affc-8a157b216003.mp3',
     link: 'https://podcasts.apple.com/us/podcast/id1472945887?i=1000619024450',
   },
-  ...([
-    [17, 'Across the ages, it’s you', '', '22 Sep 2021', 107, '46641861/podcast_1632346565.mp3', '1000536326934'],
-    [16, 'Consistency', '', '1 Sep 2021', 146, '46336428/podcast_1630537310.mp3', '1000534044434'],
-    [15, 'The ideal day', '', '18 Aug 2021', 112, '46148330/podcast_1629325224.mp3', '1000532431046'],
-    [14, 'The constant struggle', 'Work on yourself if you want to become someone great.', '14 Jul 2021', 144, '45699057/episode_45699057.mp3', '1000528904526'],
-    [13, 'You have to be able to go deep', 'Don’t always live on the surface. Be ready to dive deep when it matters.', '4 Jul 2021', 493, '45573462/podcast_1625433153.mp3', '1000527810058'],
-    [12, 'Why do you carry worries and sadness?', '', '28 Jun 2021', 673, '45472089/podcast_1624839907.mp3', '1000527058458'],
-    [11, 'If your mind is what stops you, challenge it', '', '3 May 2021', 199, '44601144/imported_5bdc74e8_e1e0_4ef3_bff6_668a057c4bfa.mp3', '1000519855738'],
-    [10, 'How to make sure you reach your goals', 'Your day comes from your dreams. Plan what fills it and keep doing it.', '15 Feb 2021', 219, '43467260/podcast_1613352012.mp3', '1000509039986'],
-    [9, 'Don’t build an idol with your own hands', '', '19 Jan 2021', 124, '42999326/podcast_1611015294.mp3', '1000505762762'],
-    [8, 'The fastest way to let go of everyday worries', '', '15 Nov 2020', 140, '41979795/podcast_1605400619.mp3', '1000498626961'],
-    [7, 'Everything comes with practice', '', '14 Nov 2020', 118, '41969016/podcast_1605321470.mp3', '1000498545259'],
-    [6, 'How to raise the productivity of your life', '', '13 Nov 2020', 115, '41951495/podcast_1605232695.mp3', '1000498419680'],
-    [5, 'Protect the effort you put into your work', '', '12 Nov 2020', 84, '41931850/podcast_1605148799.mp3', '1000498245952'],
-    [4, 'Break your problems into small pieces', '', '11 Nov 2020', 119, '41913552/podcast_1605057543.mp3', '1000498061922'],
-    [3, 'Keep yourself busy with something', '', '10 Nov 2020', 98, '41892058/podcast_1604979779.mp3', '1000498024259'],
-    [2, 'Bad thinking habits: an introduction', 'The start of a series on bad thinking habits and how to deal with them.', '30 Apr 2020', 904, '41868958/https_d3ctxlq1ktw2nl_cloudfront_net_production_2020_3_30_68821617_44100_2_e2a46be82ee14.mp3', '1000497859311'],
-    [1, 'An introduction to the show', 'What Philosophy of Living is about.', '3 Mar 2020', 389, '41868959/https_d3ctxlq1ktw2nl_cloudfront_net_staging_2020_1_23_51896514_44100_2_5db7663cd9ded.mp3', '1000497859313'],
-  ] as const).map(([n, title, note, date, length, file, id]): Episode => ({
-    id: `living-${n}`, show: 'living', label: `Ep ${n}`, role: 'Host', title, note: note || undefined, date, length,
-    audio: SPK + file, link: APL + id,
-  })),
 ];
 
 const GOLD = 'rgba(220,190,140,0.85)';
@@ -383,6 +358,7 @@ export function PodcastDeck() {
   };
   const firstOf = (s: keyof typeof SHOWS) => EPISODES.findIndex((e) => e.show === s);
   const progress = dur ? time / dur : 0;
+  const backdrop = ep.cover ?? show.art;
   const slide = reduced ? {} : { initial: { x: dir * 60, opacity: 0 }, animate: { x: 0, opacity: 1 }, exit: { x: -dir * 60, opacity: 0 } };
 
   return (
@@ -390,7 +366,7 @@ export function PodcastDeck() {
       initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       className="relative rounded-[32px] border overflow-hidden"
-      style={{ borderColor: 'rgba(220,190,140,0.16)', background: 'linear-gradient(180deg, rgba(220,190,140,0.05), rgba(255,255,255,0.01))', marginBottom: 96 }}
+      style={{ borderColor: 'rgba(255,255,255,0.12)', background: '#0B0B0B', marginBottom: 96, isolation: 'isolate' }}
       aria-label="Podcasts and talks"
       onKeyDown={(e) => {
         if ((e.target as HTMLElement).tagName === 'INPUT') return;
@@ -400,6 +376,7 @@ export function PodcastDeck() {
     >
       <style>{`
         @keyframes pd-spin { to { transform: rotate(360deg) } }
+        @keyframes pd-drift { from { transform: translate(-50%,-50%) scale(1) rotate(0deg) } to { transform: translate(-50%,-50%) scale(1.18) rotate(10deg) } }
         @keyframes pd-eq { 0% { transform: scaleY(.15) } 100% { transform: scaleY(1) } }
         .pd-range { -webkit-appearance: none; appearance: none; background: transparent; width: 100%; height: 22px; cursor: pointer }
         .pd-range::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: linear-gradient(90deg, ${TEAL} var(--p), rgba(255,255,255,.12) var(--p)) }
@@ -410,6 +387,31 @@ export function PodcastDeck() {
         .pd-range:focus-visible { outline: 2px solid ${TEAL}; outline-offset: 4px; border-radius: 6px }
       `}</style>
       <audio ref={audio} preload="none" />
+
+      {/* the episode's cover, blurred into a soft glow behind everything;
+          crossfades on change and drifts slowly while it plays */}
+      <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
+        <AnimatePresence initial={false}>
+          <motion.img
+            key={backdrop}
+            src={backdrop}
+            alt=""
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.8 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.1, ease: 'easeInOut' }}
+            className="absolute left-1/2 top-1/2 w-[140%] h-[140%] max-w-none object-cover"
+            style={{
+              transform: 'translate(-50%,-50%)',
+              filter: 'blur(80px) saturate(1.6)',
+              animation: reduced ? 'none' : 'pd-drift 22s ease-in-out infinite alternate',
+              animationPlayState: playing ? 'running' : 'paused',
+            }}
+          />
+        </AnimatePresence>
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 70% at 30% 45%, rgba(8,8,8,0.05) 0%, rgba(8,8,8,0.55) 70%, rgba(8,8,8,0.8) 100%), linear-gradient(90deg, rgba(8,8,8,0) 40%, rgba(8,8,8,0.35) 100%)' }} />
+        <div className="absolute inset-0 opacity-[0.07] mix-blend-overlay" style={{ backgroundImage: "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")" }} />
+      </div>
 
       <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-10 lg:gap-14 p-6 sm:p-10 lg:p-14 items-center">
         {/* the instrument: swipe it to change episode */}
