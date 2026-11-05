@@ -337,45 +337,61 @@ const VAULT_SHOTS = [
   { src: '/images/case-studies/vault/plan-reason.webp', label: 'Real plan' },
   { src: '/images/case-studies/vault/checkout.webp', label: 'Checkout' },
 ];
+/* three whole screens read left to right as one flow, in a gentle
+   wave; the step the card's story is on lifts and lights up */
 function VaultStage({ p }: { p: MotionValue<number> }) {
   const v = useStep(p);
   const [ref, box] = useBox<HTMLDivElement>();
-  const w = Math.min(box.w * 0.36, (box.h * 0.76 * 320) / 690);
+  const w = Math.min(box.w * (box.w < 600 ? 0.29 : 0.25), (box.h * 0.66 * 320) / 690);
+  const gap = w * 0.16;
   const focus = v < 0.38 ? 0 : v < 0.7 ? 1 : 2;
+  const WAVE = [5, -4, 5];
   return (
     <div ref={ref} className="absolute inset-0">
-      {w > 0 &&
-        VAULT_SHOTS.map((sh, i) => {
-          const d = (i - focus + 3) % 3;
-          const role = d === 0 ? 0 : d === 1 ? 1 : -1;
-          const on = role === 0;
-          const rise = clamp01((v + 0.02 - i * 0.035) / 0.1);
-          return (
-            <div
-              key={sh.src}
-              className="absolute left-1/2 top-1/2 transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
-              style={{
-                width: w,
-                transform: `translate(calc(-50% + ${role * w * 0.66}px), calc(-55% + ${(1 - rise) * 30}%)) scale(${on ? 1 : 0.8})`,
-                opacity: rise * (on ? 1 : 0.5),
-                zIndex: on ? 3 : 1,
-              }}
-            >
-              <img src={sh.src} alt="" draggable={false} className="block w-full h-auto rounded-[20px] shadow-[0_40px_70px_-30px_rgba(0,0,0,0.85)]" />
-            </div>
-          );
-        })}
-      <div className="absolute left-1/2 -translate-x-1/2 bottom-[3%] flex gap-1.5 z-10">
-        {VAULT_SHOTS.map((sh, i) => (
-          <span
-            key={sh.label}
-            className="rounded-full px-2.5 md:px-3 py-1 text-[10px] md:text-xs font-bold whitespace-nowrap transition-colors duration-300"
-            style={{ background: i === focus ? '#A9EB60' : 'rgba(169,235,96,0.14)', color: i === focus ? '#16280F' : '#DDF5C2' }}
-          >
-            {String(i + 1).padStart(2, '0')} · {sh.label}
-          </span>
-        ))}
-      </div>
+      {w > 0 && (
+        <>
+          {/* the thread between the steps */}
+          <div
+            className="absolute left-1/2 top-[44%] -translate-x-1/2 h-px"
+            style={{ width: (w + gap) * 2, background: 'linear-gradient(90deg, transparent, rgba(169,235,96,0.35), transparent)' }}
+          />
+          {VAULT_SHOTS.map((sh, i) => {
+            const on = i === focus;
+            const rise = clamp01((v + 0.02 - i * 0.05) / 0.1);
+            const x = (i - 1) * (w + gap);
+            return (
+              <div
+                key={sh.src}
+                className="absolute left-1/2 top-[44%] transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                style={{
+                  width: w,
+                  transform: `translate(calc(-50% + ${x}px), calc(-50% + ${WAVE[i] + (on ? -3 : 0) + (1 - rise) * 24}%)) scale(${on ? 1.04 : 0.94})`,
+                  opacity: rise * (on ? 1 : 0.5),
+                  zIndex: on ? 3 : 1,
+                }}
+              >
+                <img
+                  src={sh.src}
+                  alt=""
+                  draggable={false}
+                  className="block w-full h-auto rounded-[12px] md:rounded-[18px] transition-shadow duration-700"
+                  style={{
+                    boxShadow: on
+                      ? '0 0 0 2px #A9EB60, 0 40px 70px -30px rgba(0,0,0,0.9)'
+                      : '0 30px 60px -30px rgba(0,0,0,0.8)',
+                  }}
+                />
+                <p
+                  className="mt-3 md:mt-4 text-center text-[10px] md:text-xs font-semibold whitespace-nowrap transition-colors duration-500"
+                  style={{ color: on ? '#A9EB60' : 'rgba(221,245,194,0.55)' }}
+                >
+                  {String(i + 1).padStart(2, '0')} · {sh.label}
+                </p>
+              </div>
+            );
+          })}
+        </>
+      )}
     </div>
   );
 }
