@@ -1,6 +1,7 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useState, type ReactNode } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Check, MousePointerClick } from 'lucide-react';
+import { VAULT_STEPS, VaultPlay, type VaultStage } from './vault/VaultPlay';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
 import { CaseIntro, Takeaway } from './_shared/CaseLayout';
@@ -222,7 +223,70 @@ function Compare() {
   );
 }
 
-const METRICS: { group: string; q: string; rows: [string, string, string][] }[] = [
+/* the playable flow, framed so it reads as something to try */
+function PlayPanel() {
+  const [stage, setStage] = useState<VaultStage>('idle');
+  const cur = VAULT_STEPS.findIndex((s) => s.at.includes(stage));
+  const now = stage === 'done' ? VAULT_STEPS.length : cur;
+  return (
+    <div className="rounded-[28px] border overflow-hidden" style={{ borderColor: LINE, background: PANEL }}>
+      <div className="flex items-center justify-between gap-4 px-5 md:px-7 py-4 border-b" style={{ borderColor: LINE }}>
+        <span className="flex items-center gap-2.5 text-sm font-medium text-white whitespace-nowrap">
+          <MousePointerClick className="w-4 h-4" style={{ color: LIME }} />
+          Interactive prototype
+        </span>
+        <span className="flex items-center gap-2 rounded-full border border-white/10 px-3 py-1 text-xs text-white/60 whitespace-nowrap">
+          <span className="relative flex w-1.5 h-1.5">
+            <span className="absolute inset-0 rounded-full opacity-60 motion-safe:animate-ping" style={{ background: LIME }} />
+            <span className="relative w-1.5 h-1.5 rounded-full" style={{ background: LIME }} />
+          </span>
+          Live<span className="hidden sm:inline"> · tap to try</span>
+        </span>
+      </div>
+      <div
+        className="grid grid-cols-[minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_minmax(0,380px)] gap-10 md:gap-14 items-center px-5 md:px-12 py-10 md:py-14"
+        style={{ background: `radial-gradient(ellipse 50% 60% at 75% 50%, #22401433 0%, transparent 70%)` }}
+      >
+        <ol className="hidden md:grid gap-1 max-w-sm">
+          {VAULT_STEPS.map((s, k) => {
+            const done = k < now;
+            const on = k === now;
+            return (
+              <li
+                key={s.t}
+                className="flex gap-4 rounded-2xl px-4 py-3.5 transition-colors duration-300"
+                style={{ background: on ? 'rgba(169,235,96,0.08)' : 'transparent' }}
+              >
+                <span
+                  className="grid place-items-center w-7 h-7 rounded-full text-xs font-bold tabular-nums flex-none transition-colors duration-300"
+                  style={{
+                    background: done ? LIME : 'transparent',
+                    color: done ? DEEP : on ? LIME : 'rgba(255,255,255,0.4)',
+                    border: `1.5px solid ${done || on ? LIME : 'rgba(255,255,255,0.15)'}`,
+                  }}
+                >
+                  {done ? <Check className="w-3.5 h-3.5" strokeWidth={3} /> : k + 1}
+                </span>
+                <span>
+                  <span className={`block font-semibold transition-colors duration-300 ${on || done ? 'text-white' : 'text-white/45'}`}>{s.t}</span>
+                  <span className={`block text-sm mt-0.5 transition-colors duration-300 ${on ? 'text-white/60' : 'text-white/30'}`}>{s.d}</span>
+                </span>
+              </li>
+            );
+          })}
+        </ol>
+        <div className="md:order-none">
+          <p className="md:hidden text-center text-white/50 text-sm mb-5 tabular-nums">
+            {now < VAULT_STEPS.length ? `Step ${now + 1} of ${VAULT_STEPS.length} · ${VAULT_STEPS[now].t}` : 'All five steps done'}
+          </p>
+          <VaultPlay onStage={setStage} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const METRICS:{ group: string; q: string; rows: [string, string, string][] }[] = [
   {
     group: 'Design',
     q: 'Is the plan clear and fast?',
@@ -444,6 +508,8 @@ export function VaultCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           title="The real plan, on the product page."
           lead="Shoppers check their plan where they’re deciding, see the reason behind the number, and fix it before they buy."
         >
+          <PlayPanel />
+          <p className="text-white/45 text-sm mt-16 mb-6">The same flow, screen by screen</p>
           <Screens
             cols={3}
             numbered

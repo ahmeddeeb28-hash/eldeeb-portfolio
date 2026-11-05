@@ -330,52 +330,65 @@ function TeamStage({ p }: { p: MotionValue<number> }) {
   );
 }
 
-/* Vault Split: the three real screens from the Figma file, one in
-   front and two behind, rotating with the card's story */
-const VAULT_SHOTS = [
-  { src: '/images/case-studies/vault/pay-choose.webp', label: 'Product page' },
-  { src: '/images/case-studies/vault/plan-reason.webp', label: 'Real plan' },
-  { src: '/images/case-studies/vault/checkout.webp', label: 'Checkout' },
-];
+/* Vault Split: the two strongest screens, big and fully lit, as one
+   hero shot. The dark Nafath check sits behind, the real plan in
+   front; they drift apart a little as the card's story plays. */
+const VAULT_BACK = '/images/case-studies/vault/check.webp';
+const VAULT_FRONT = '/images/case-studies/vault/plan-reason.webp';
+function VaultPhone({ src, w }: { src: string; w: number }) {
+  const bezel = Math.max(4, w * 0.028);
+  return (
+    <div
+      className="bg-[#0A0D08]"
+      style={{
+        padding: bezel,
+        borderRadius: w * 0.13,
+        boxShadow: '0 0 0 1px rgba(255,255,255,0.10), 0 60px 90px -40px rgba(0,0,0,0.95)',
+      }}
+    >
+      <img src={src} alt="" draggable={false} className="block w-full h-auto" style={{ borderRadius: w * 0.13 - bezel }} />
+    </div>
+  );
+}
 function VaultStage({ p }: { p: MotionValue<number> }) {
   const v = useStep(p);
   const [ref, box] = useBox<HTMLDivElement>();
-  const w = Math.min(box.w * 0.36, (box.h * 0.76 * 320) / 690);
-  const focus = v < 0.38 ? 0 : v < 0.7 ? 1 : 2;
+  const w = Math.min(box.w * (box.w < 600 ? 0.47 : 0.4), (box.h * 0.86 * 320) / 690);
+  const inBack = clamp01((v + 0.02) / 0.14);
+  const inFront = clamp01((v - 0.04) / 0.14);
+  const drift = (v - 0.5) * 18;
+  const ease = 'transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]';
   return (
     <div ref={ref} className="absolute inset-0">
-      {w > 0 &&
-        VAULT_SHOTS.map((sh, i) => {
-          const d = (i - focus + 3) % 3;
-          const role = d === 0 ? 0 : d === 1 ? 1 : -1;
-          const on = role === 0;
-          const rise = clamp01((v + 0.02 - i * 0.035) / 0.1);
-          return (
-            <div
-              key={sh.src}
-              className="absolute left-1/2 top-1/2 transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
-              style={{
-                width: w,
-                transform: `translate(calc(-50% + ${role * w * 0.66}px), calc(-55% + ${(1 - rise) * 30}%)) scale(${on ? 1 : 0.8})`,
-                opacity: rise * (on ? 1 : 0.5),
-                zIndex: on ? 3 : 1,
-              }}
-            >
-              <img src={sh.src} alt="" draggable={false} className="block w-full h-auto rounded-[20px] shadow-[0_40px_70px_-30px_rgba(0,0,0,0.85)]" />
-            </div>
-          );
-        })}
-      <div className="absolute left-1/2 -translate-x-1/2 bottom-[3%] flex gap-1.5 z-10">
-        {VAULT_SHOTS.map((sh, i) => (
-          <span
-            key={sh.label}
-            className="rounded-full px-2.5 md:px-3 py-1 text-[10px] md:text-xs font-bold whitespace-nowrap transition-colors duration-300"
-            style={{ background: i === focus ? '#A9EB60' : 'rgba(169,235,96,0.14)', color: i === focus ? '#16280F' : '#DDF5C2' }}
+      {w > 0 && (
+        <>
+          <div
+            className="absolute left-1/2 top-1/2 w-[70%] aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none"
+            style={{ background: 'radial-gradient(circle, rgba(169,235,96,0.16) 0%, transparent 65%)' }}
+          />
+          <div
+            className={`absolute left-1/2 top-1/2 ${ease}`}
+            style={{
+              width: w * 0.92,
+              transform: `translate(calc(-50% - ${w * 0.36 + drift}px), calc(-50% - ${w * 0.08}px)) rotate(-5deg) translateX(${(1 - inBack) * -40}px)`,
+              opacity: inBack,
+            }}
           >
-            {String(i + 1).padStart(2, '0')} · {sh.label}
-          </span>
-        ))}
-      </div>
+            <VaultPhone src={VAULT_BACK} w={w * 0.92} />
+          </div>
+          <div
+            className={`absolute left-1/2 top-1/2 ${ease}`}
+            style={{
+              width: w,
+              transform: `translate(calc(-50% + ${w * 0.34 + drift}px), calc(-50% + ${w * 0.1 + (1 - inFront) * w * 0.3}px)) rotate(3deg)`,
+              opacity: inFront,
+              zIndex: 2,
+            }}
+          >
+            <VaultPhone src={VAULT_FRONT} w={w} />
+          </div>
+        </>
+      )}
     </div>
   );
 }
