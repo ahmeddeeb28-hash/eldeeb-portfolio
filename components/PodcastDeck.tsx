@@ -419,17 +419,16 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
         <span className="text-white/60"> · {show.blurb}</span>
       </p>
       {/* 2. the episode */}
-      <div className="mt-4 lg:min-h-[150px]" aria-live="polite">
+      <div className="mt-3 lg:min-h-[96px]" aria-live="polite">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={ep.id} {...slide} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-            <h3 className="text-white text-[24px] sm:text-[34px] font-bold leading-[1.1] tracking-[-0.02em]" style={{ textWrap: 'balance' }}>{ep.title}</h3>
+            <h3 className="text-white text-[21px] sm:text-[28px] font-bold leading-[1.15] tracking-[-0.015em]" style={{ textWrap: 'balance' }}>{ep.title}</h3>
             <p className="mt-2 text-white/45 text-sm">
               {ep.label === 'S3 · E2' ? 'Season 3, episode 2' : `Episode ${ep.label.replace('Ep ', '')}`} · {mins(ep.length)} · In Arabic
               <a href={ep.link} target="_blank" rel="noopener noreferrer" className="inline-flex align-middle ml-2 hover:text-white" aria-label={`Open on ${ep.show === 'blueprint' ? 'Spotify' : 'Apple Podcasts'}`}>
                 <ArrowUpRight className="w-4 h-4" />
               </a>
             </p>
-            {ep.note && <p className="mt-3 text-white/65 text-[15px] leading-relaxed max-w-[52ch]">{ep.note}</p>}
           </motion.div>
         </AnimatePresence>
       </div>
@@ -461,11 +460,11 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
       {/* 4. browse: every episode as a small cover */}
       <div className="mt-7">
         <p className="text-xs text-white/40 mb-2.5">All episodes</p>
-        <ol className="flex flex-wrap gap-2.5">
+        <ol className="grid grid-cols-6 gap-1.5 sm:gap-2.5 max-w-[360px]">
           {EPISODES.map((e, i) => (
             <li key={e.id}>
               <button type="button" onClick={() => go(i)} aria-label={`${SHOWS[e.show].name}, ${e.title}`} aria-current={i === cur} title={e.title}
-                className="block w-11 h-11 sm:w-12 sm:h-12 rounded-[10px] overflow-hidden transition-all duration-300"
+                className="block w-full aspect-square rounded-[10px] overflow-hidden transition-all duration-300"
                 style={{ boxShadow: i === cur ? `0 0 0 2px ${TEAL}` : '0 0 0 1px rgba(255,255,255,0.12)', opacity: i === cur ? 1 : 0.6, transform: i === cur ? 'translateY(-2px)' : 'none' }}
               >
                 <img src={e.cover ?? SHOWS[e.show].art} alt="" className="w-full h-full object-cover" loading="lazy" />
@@ -495,13 +494,18 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
   /* A · hero: the turntable takes the portrait's place beside the headline */
   if (variant === 'hero') {
     return (
-      <div className="grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-10 lg:gap-16 items-center" style={{ isolation: 'isolate' }} aria-label="Podcast" onKeyDown={keys}>
+      <div style={{ isolation: 'isolate' }} onKeyDown={keys}>
         {styles}<audio ref={audio} preload="none" />
-        <div className="order-2 lg:order-1">{instrument}</div>
-        <div className="order-1 lg:order-2 min-w-0">
-          {lead}
-          <div className="mt-10">{panel}</div>
-        </div>
+        {/* the section's own header, on its own row, so it never reads as the episode's title */}
+        <div className="max-w-3xl">{lead}</div>
+        {/* the podcast, introduced by its own label below a hairline */}
+        <section aria-label="Podcast" className="relative mt-14 lg:mt-16 rounded-[28px] overflow-hidden p-6 sm:p-10 lg:p-12 grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-10 lg:gap-14 items-center"
+          style={{ border: '1px solid rgba(220,190,140,0.18)', background: 'linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))', isolation: 'isolate' }}
+        >
+          <p className="lg:col-span-2 -mb-4 lg:-mb-8 text-xs font-semibold" style={{ color: 'rgba(220,190,140,0.7)' }}>Podcast</p>
+          <div>{instrument}</div>
+          <div className="min-w-0">{panel}</div>
+        </section>
       </div>
     );
   }

@@ -353,43 +353,6 @@ export function ProofOfPresence() {
               </span>
             </motion.h2>
 
-            {/* Meta line */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              style={{
-                marginTop: 30,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 18,
-              }}
-            >
-              <span
-                aria-hidden
-                style={{
-                  display: 'inline-block',
-                  width: 6,
-                  height: 6,
-                  borderRadius: '50%',
-                  background: '#4AF2E5',
-                  boxShadow: '0 0 12px rgba(74,242,229,0.6)',
-                }}
-              />
-              <span
-                style={{
-                  fontFamily: 'Inter, system-ui, sans-serif',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.32em',
-                  textTransform: 'uppercase',
-                  color: 'rgba(255,255,255,0.58)',
-                }}
-              >
-                Talks · Workshops · Community
-              </span>
-            </motion.div>
 
             {/* Short lead-in paragraph */}
             <motion.p
