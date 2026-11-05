@@ -49,6 +49,13 @@
       "image": "/og/sary-design-leadership.jpg",
       "imageAlt": "Design leadership case study: the rhythm from a day to a quarter",
       "type": "article"
+    },
+    "/work/vault-split": {
+      "title": "Vault Split: see your real plan before you buy · Ahmad Eldeeb",
+      "description": "A buy now, pay later concept for Saudi Arabia that shows the real first payment, the reason behind it and three ways forward on the product page, before the shopper commits.",
+      "image": "/og/vault-split.jpg",
+      "imageAlt": "Vault Split case study: the product page, the real plan with its reason, and checkout showing the same plan",
+      "type": "article"
     }
   }
 }
