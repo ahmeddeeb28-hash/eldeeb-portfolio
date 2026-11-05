@@ -1,6 +1,6 @@
 import { PodcastDeck } from './PodcastDeck';
 import { motion, useInView } from 'motion/react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 /* ──────────────────────────────────────────────────────────────
@@ -257,61 +257,28 @@ function QuoteBeat({
   );
 }
 
+/* Where the podcast player sits, while we compare placements:
+   #podcast-a (beside the headline), #podcast-b (after the intro, default),
+   #podcast-c (closing the section). */
+function usePlacement(): 'a' | 'b' | 'c' {
+  const read = () => {
+    if (typeof window === 'undefined') return 'b';
+    const m = (window.location.hash + window.location.search).match(/podcast[-=]([abc])/);
+    return (m ? m[1] : 'b') as 'a' | 'b' | 'c';
+  };
+  const [p, setP] = useState(read);
+  useEffect(() => {
+    const on = () => setP(read());
+    window.addEventListener('hashchange', on);
+    return () => window.removeEventListener('hashchange', on);
+  }, []);
+  return p;
+}
+
 export function ProofOfPresence() {
-  return (
-    <section
-      id="proof-of-presence-section-lock"
-      className="proof-of-presence-locked bg-[#0A0A0A] relative"
-      style={{ paddingTop: 112, paddingBottom: 112 }}
-    >
-      {/* Ambient warm glow */}
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          top: '10%',
-          right: '-8%',
-          width: '55%',
-          height: '55%',
-          background:
-            'radial-gradient(closest-side, rgba(220,190,140,0.06) 0%, transparent 70%)',
-          pointerEvents: 'none',
-          zIndex: 0,
-        }}
-      />
-
-      <div
-        className="container mx-auto max-w-[1560px] relative"
-        style={{ paddingLeft: 40, paddingRight: 40, zIndex: 1 }}
-      >
-        {/* ═══════════════════════════════════════════════════════
-             HEADER ROW — Hero portrait (left) + Headline (right)
-           ═════════════════════════════════════════════════════ */}
-        <div
-          className="grid gap-y-8 lg:gap-12 items-center"
-          style={{
-            gridTemplateColumns: 'repeat(12, minmax(0, 1fr))',
-            marginBottom: 96,
-          }}
-        >
-          {/* Hero image — 5 cols on desktop. Podcast portrait uses its
-              natural 9:16 aspect with object-cover — no letterbox, no crop —
-              capped at 340px wide so the print reads at a comfortable
-              600px tall alongside the headline block. */}
-          <div className="col-span-12 lg:col-span-5">
-            <PhotoTile
-              src={IMAGES.heroTalk}
-              alt="Recording a podcast episode"
-              caption="Podcast · On Air"
-              aspect="9 / 16"
-              maxWidth={340}
-              index={0}
-              priority
-            />
-          </div>
-
-          {/* Headline block — 7 cols */}
-          <div className="col-span-12 lg:col-span-7">
+  const placement = usePlacement();
+  const headline = (
+    <>
             {/* Eyebrow */}
             <motion.div
               initial={{ opacity: 0, y: 12 }}
@@ -443,11 +410,76 @@ export function ProofOfPresence() {
               and show up for the community: mentoring, panels, and rooms
               where product decisions actually get made.
             </motion.p>
+    </>
+  );
+  return (
+    <section
+      id="proof-of-presence-section-lock"
+      className="proof-of-presence-locked bg-[#0A0A0A] relative"
+      style={{ paddingTop: 112, paddingBottom: 112 }}
+    >
+      {/* Ambient warm glow */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          top: '10%',
+          right: '-8%',
+          width: '55%',
+          height: '55%',
+          background:
+            'radial-gradient(closest-side, rgba(220,190,140,0.06) 0%, transparent 70%)',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
+
+      <div
+        className="container mx-auto max-w-[1560px] relative"
+        style={{ paddingLeft: 40, paddingRight: 40, zIndex: 1 }}
+      >
+        {placement === 'a' ? (
+          <div style={{ marginBottom: 96 }}>
+            <PodcastDeck variant="hero" lead={headline} />
+          </div>
+        ) : (
+          <>
+        {/* ═══════════════════════════════════════════════════════
+             HEADER ROW — Hero portrait (left) + Headline (right)
+           ═════════════════════════════════════════════════════ */}
+        <div
+          className="grid gap-y-8 lg:gap-12 items-center"
+          style={{
+            gridTemplateColumns: 'repeat(12, minmax(0, 1fr))',
+            marginBottom: 96,
+          }}
+        >
+          {/* Hero image — 5 cols on desktop. Podcast portrait uses its
+              natural 9:16 aspect with object-cover — no letterbox, no crop —
+              capped at 340px wide so the print reads at a comfortable
+              600px tall alongside the headline block. */}
+          <div className="col-span-12 lg:col-span-5">
+            <PhotoTile
+              src={IMAGES.heroTalk}
+              alt="Recording a podcast episode"
+              caption="Podcast · On Air"
+              aspect="9 / 16"
+              maxWidth={340}
+              index={0}
+              priority
+            />
+          </div>
+
+          {/* Headline block — 7 cols */}
+          <div className="col-span-12 lg:col-span-7">
+            {headline}
           </div>
         </div>
+          </>
+        )}
 
-        {/* Podcasts and talks: a playable record player / headphones deck */}
-        <PodcastDeck />
+        {/* Podcast: a playable record player (placement B: after the intro) */}
+        {placement === 'b' && <PodcastDeck variant="band" />}
 
         {/* Horizontal dateline rule */}
         <motion.div
@@ -620,6 +652,9 @@ export function ProofOfPresence() {
             </div>
           </div>
         </div>
+
+        {/* placement C: the podcast closes the section */}
+        {placement === 'c' && <PodcastDeck variant="closer" />}
       </div>
     </section>
   );

@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, ChevronLeft, ChevronRight, Disc3, Headphones, Pause, Play, RotateCcw, RotateCw } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { ArrowUpRight, Disc3, Headphones, Pause, Play, RotateCcw, RotateCw } from 'lucide-react';
 
 /* ── Podcasts and talks: a playable deck ──
    Every episode plays right here, on a record player (the record spins,
@@ -11,10 +11,10 @@ import { ArrowUpRight, ChevronLeft, ChevronRight, Disc3, Headphones, Pause, Play
    Titles are English translations; the episodes themselves are in Arabic.
    Blueprint episodes come from its Spotify for Creators (Anchor) feed. */
 
-type Show = { name: string; tone: string; ink: string; mark: string; art: string; feed: string };
+type Show = { name: string; blurb: string; tone: string; ink: string; mark: string; art: string; feed: string };
 const SHOWS: Record<'blueprint' | 'ask', Show> = {
-  blueprint: { name: 'Blueprint', tone: '#1428F5', ink: '#FFE600', mark: '/images/podcasts/blueprint-show.webp', art: '/images/podcasts/blueprint-show.webp', feed: 'https://creators.spotify.com/pod/profile/blueprintcast/' },
-  ask: { name: 'Ask Designer', tone: '#F5B800', ink: '#2B1B00', mark: '/images/podcasts/ask-designer-face.webp', art: '/images/podcasts/ask-designer.webp', feed: 'https://podcasts.apple.com/us/podcast/id1472945887' },
+  blueprint: { name: 'Blueprint', blurb: 'the product design podcast I co-host', tone: '#1428F5', ink: '#FFE600', mark: '/images/podcasts/blueprint-show.webp', art: '/images/podcasts/blueprint-show.webp', feed: 'https://creators.spotify.com/pod/profile/blueprintcast/' },
+  ask: { name: 'Ask Designer', blurb: 'I was the guest', tone: '#F5B800', ink: '#2B1B00', mark: '/images/podcasts/ask-designer-face.webp', art: '/images/podcasts/ask-designer.webp', feed: 'https://podcasts.apple.com/us/podcast/id1472945887' },
 };
 
 type Episode = {
@@ -281,7 +281,7 @@ function HeadphonesView({ ep, playing, onToggle }: { ep: Episode; playing: boole
   );
 }
 
-export function PodcastDeck() {
+export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'band' | 'closer'; lead?: React.ReactNode }) {
   const reduced = useReducedMotion();
   const [cur, setCur] = useState(0);
   const [dir, setDir] = useState(1);
@@ -350,140 +350,177 @@ export function PodcastDeck() {
   const backdrop = (ep.cover ?? show.art).replace('/images/podcasts/', '/images/podcasts/bg/');
   const slide = reduced ? {} : { initial: { x: dir * 60, opacity: 0 }, animate: { x: 0, opacity: 1 }, exit: { x: -dir * 60, opacity: 0 } };
 
+  const cardLike = variant !== 'hero';
+  const keys = (e: React.KeyboardEvent) => {
+    if ((e.target as HTMLElement).getAttribute('role') === 'slider' || (e.target as HTMLElement).tagName === 'INPUT') return;
+    if (e.key === 'ArrowRight') go(cur + 1);
+    if (e.key === 'ArrowLeft') go(cur - 1);
+  };
+
+  const glow = (
+    <div className={`absolute -z-10 overflow-hidden pointer-events-none ${variant === 'hero' ? '-inset-[18%]' : 'inset-0'}`} aria-hidden
+      style={{ WebkitMaskImage: 'radial-gradient(closest-side, #000 30%, transparent 100%)', maskImage: 'radial-gradient(closest-side, #000 30%, transparent 100%)' }}
+    >
+      <AnimatePresence initial={false}>
+        <motion.img
+          key={backdrop} src={backdrop} alt=""
+          initial={{ opacity: 0 }} animate={{ opacity: 0.55 }} exit={{ opacity: 0 }}
+          transition={{ duration: 1.1, ease: 'easeInOut' }}
+          className="absolute left-1/2 top-1/2 w-[120%] h-[120%] max-w-none object-cover"
+          style={{
+            transform: 'translate(-50%,-50%)', filter: 'blur(30px) saturate(1.3)', willChange: 'transform, opacity',
+            animation: reduced ? 'none' : 'pd-drift 22s ease-in-out infinite alternate', animationPlayState: playing ? 'running' : 'paused',
+          }}
+        />
+      </AnimatePresence>
+    </div>
+  );
+
+  const instrument = (
+    <div className="relative min-w-0">
+      {!cardLike && glow}
+      <motion.div
+        drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.25} dragSnapToOrigin
+        onDragStart={() => { dragged.current = true; }}
+        onDragEnd={(_, info) => {
+          if (info.offset.x < -60 || info.velocity.x < -400) go(cur + 1);
+          else if (info.offset.x > 60 || info.velocity.x > 400) go(cur - 1);
+          setTimeout(() => { dragged.current = false; }, 0);
+        }}
+        className={`cursor-grab active:cursor-grabbing touch-pan-y mx-auto ${variant === 'hero' ? 'max-w-[400px]' : 'max-w-[360px]'}`}
+      >
+        <AnimatePresence mode="wait" initial={false} custom={dir}>
+          <motion.div key={ep.id + view} {...slide} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
+            {view === 'record'
+              ? <RecordPlayer ep={ep} playing={playing} progress={progress} onToggle={toggle} speed={speed} setSpeed={setSpeed} volume={volume} setVolume={setVolume} />
+              : <HeadphonesView ep={ep} playing={playing} onToggle={toggle} />}
+          </motion.div>
+        </AnimatePresence>
+      </motion.div>
+      {/* the view switch, demoted to two small icons */}
+      <div className="mt-4 flex justify-center gap-1" role="group" aria-label="Player view">
+        {([['record', 'Record player', Disc3], ['headphones', 'Headphones', Headphones]] as const).map(([k, l, I]) => (
+          <button key={k} type="button" onClick={() => setView(k)} aria-pressed={view === k} aria-label={l} title={l}
+            className="grid place-items-center w-8 h-8 rounded-full transition-colors"
+            style={{ background: view === k ? 'rgba(255,255,255,0.12)' : 'transparent', color: view === k ? '#fff' : 'rgba(255,255,255,0.45)' }}
+          >
+            <I className="w-4 h-4" />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  const panel = (
+    <div className="min-w-0">
+      {/* 1. what this is, and my role */}
+      <p className="text-[15px] leading-snug">
+        <span className="font-semibold" style={{ color: GOLD }}>{show.name}</span>
+        <span className="text-white/60"> · {show.blurb}</span>
+      </p>
+      {/* 2. the episode */}
+      <div className="mt-4 lg:min-h-[150px]" aria-live="polite">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div key={ep.id} {...slide} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
+            <h3 className="text-white text-[24px] sm:text-[34px] font-bold leading-[1.1] tracking-[-0.02em]" style={{ textWrap: 'balance' }}>{ep.title}</h3>
+            <p className="mt-2 text-white/45 text-sm">
+              {ep.label === 'S3 · E2' ? 'Season 3, episode 2' : `Episode ${ep.label.replace('Ep ', '')}`} · {mins(ep.length)} · In Arabic
+              <a href={ep.link} target="_blank" rel="noopener noreferrer" className="inline-flex align-middle ml-2 hover:text-white" aria-label={`Open on ${ep.show === 'blueprint' ? 'Spotify' : 'Apple Podcasts'}`}>
+                <ArrowUpRight className="w-4 h-4" />
+              </a>
+            </p>
+            {ep.note && <p className="mt-3 text-white/65 text-[15px] leading-relaxed max-w-[52ch]">{ep.note}</p>}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+      {/* 3. one primary action */}
+      <div className="mt-6 flex items-center gap-4">
+        <button type="button" onClick={toggle} aria-label={playing ? 'Pause' : 'Play'}
+          className="grid place-items-center w-14 h-14 rounded-full flex-none transition-transform hover:scale-105 active:scale-95"
+          style={{ background: TEAL, color: '#04211F', boxShadow: playing ? '0 0 0 6px rgba(74,242,229,0.15)' : 'none' }}
+        >
+          {loading && playing ? <span className="w-5 h-5 rounded-full border-2 border-[#04211F]/30 border-t-[#04211F] animate-spin" /> : playing ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current ml-0.5" />}
+        </button>
+        <div className="flex-1 min-w-0">
+          <input
+            type="range" min={0} max={Math.round(dur)} step={1} value={Math.round(time)}
+            onChange={(e) => seek(+e.target.value)}
+            aria-label="Position in the episode" aria-valuetext={`${clock(time)} of ${clock(dur)}`}
+            className="pd-range" style={{ ['--p' as string]: `${progress * 100}%` }}
+          />
+          <div className="flex items-center justify-between text-xs text-white/45 tabular-nums">
+            <span>{clock(time)}</span>
+            <span className="flex items-center gap-1">
+              <button type="button" onClick={() => skip(-15)} aria-label="Back 15 seconds" className="p-1.5 hover:text-white"><RotateCcw className="w-4 h-4" /></button>
+              <button type="button" onClick={() => skip(30)} aria-label="Forward 30 seconds" className="p-1.5 hover:text-white"><RotateCw className="w-4 h-4" /></button>
+            </span>
+            <span>-{clock(dur - time)}</span>
+          </div>
+        </div>
+      </div>
+      {/* 4. browse: every episode as a small cover */}
+      <div className="mt-7">
+        <p className="text-xs text-white/40 mb-2.5">All episodes</p>
+        <ol className="flex flex-wrap gap-2.5">
+          {EPISODES.map((e, i) => (
+            <li key={e.id}>
+              <button type="button" onClick={() => go(i)} aria-label={`${SHOWS[e.show].name}, ${e.title}`} aria-current={i === cur} title={e.title}
+                className="block w-11 h-11 sm:w-12 sm:h-12 rounded-[10px] overflow-hidden transition-all duration-300"
+                style={{ boxShadow: i === cur ? `0 0 0 2px ${TEAL}` : '0 0 0 1px rgba(255,255,255,0.12)', opacity: i === cur ? 1 : 0.6, transform: i === cur ? 'translateY(-2px)' : 'none' }}
+              >
+                <img src={e.cover ?? SHOWS[e.show].art} alt="" className="w-full h-full object-cover" loading="lazy" />
+              </button>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  );
+
+  const styles = (
+    <style>{`
+      @keyframes pd-spin { to { transform: rotate(360deg) } }
+      @keyframes pd-drift { from { transform: translate(-50%,-50%) scale(1) rotate(0deg) } to { transform: translate(-50%,-50%) scale(1.18) rotate(10deg) } }
+      @keyframes pd-eq { 0% { transform: scaleY(.15) } 100% { transform: scaleY(1) } }
+      .pd-range { -webkit-appearance: none; appearance: none; background: transparent; width: 100%; height: 22px; cursor: pointer }
+      .pd-range::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: linear-gradient(90deg, ${TEAL} var(--p), rgba(255,255,255,.12) var(--p)) }
+      .pd-range::-moz-range-track { height: 4px; border-radius: 4px; background: rgba(255,255,255,.12) }
+      .pd-range::-moz-range-progress { height: 4px; border-radius: 4px; background: ${TEAL} }
+      .pd-range::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #fff; margin-top: -5px; box-shadow: 0 0 0 4px rgba(74,242,229,.25) }
+      .pd-range::-moz-range-thumb { width: 14px; height: 14px; border: 0; border-radius: 50%; background: #fff }
+      .pd-range:focus-visible { outline: 2px solid ${TEAL}; outline-offset: 4px; border-radius: 6px }
+    `}</style>
+  );
+
+  /* A · hero: the turntable takes the portrait's place beside the headline */
+  if (variant === 'hero') {
+    return (
+      <div className="grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-10 lg:gap-16 items-center" style={{ isolation: 'isolate' }} aria-label="Podcast" onKeyDown={keys}>
+        {styles}<audio ref={audio} preload="none" />
+        <div className="order-2 lg:order-1">{instrument}</div>
+        <div className="order-1 lg:order-2 min-w-0">
+          {lead}
+          <div className="mt-10">{panel}</div>
+        </div>
+      </div>
+    );
+  }
+
+  /* B and C · a soft, borderless band: the glow fades into the section */
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="relative rounded-[32px] border overflow-hidden"
-      style={{ borderColor: 'rgba(255,255,255,0.12)', background: '#0B0B0B', marginBottom: 96, isolation: 'isolate' }}
-      aria-label="Podcasts and talks"
-      onKeyDown={(e) => {
-        if ((e.target as HTMLElement).tagName === 'INPUT') return;
-        if (e.key === 'ArrowRight') go(cur + 1);
-        if (e.key === 'ArrowLeft') go(cur - 1);
-      }}
+      className="relative mx-auto max-w-[1080px]"
+      style={{ isolation: 'isolate', marginBottom: variant === 'closer' ? 0 : 96, marginTop: variant === 'closer' ? 96 : 0 }}
+      aria-label="Podcast" onKeyDown={keys}
     >
-      <style>{`
-        @keyframes pd-spin { to { transform: rotate(360deg) } }
-        @keyframes pd-drift { from { transform: translate(-50%,-50%) scale(1) rotate(0deg) } to { transform: translate(-50%,-50%) scale(1.18) rotate(10deg) } }
-        @keyframes pd-eq { 0% { transform: scaleY(.15) } 100% { transform: scaleY(1) } }
-        .pd-range { -webkit-appearance: none; appearance: none; background: transparent; width: 100%; height: 22px; cursor: pointer }
-        .pd-range::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: linear-gradient(90deg, ${TEAL} var(--p), rgba(255,255,255,.12) var(--p)) }
-        .pd-range::-moz-range-track { height: 4px; border-radius: 4px; background: rgba(255,255,255,.12) }
-        .pd-range::-moz-range-progress { height: 4px; border-radius: 4px; background: ${TEAL} }
-        .pd-range::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #fff; margin-top: -5px; box-shadow: 0 0 0 4px rgba(74,242,229,.25) }
-        .pd-range::-moz-range-thumb { width: 14px; height: 14px; border: 0; border-radius: 50%; background: #fff }
-        .pd-range:focus-visible { outline: 2px solid ${TEAL}; outline-offset: 4px; border-radius: 6px }
-      `}</style>
-      <audio ref={audio} preload="none" />
-
-      {/* the episode's cover, blurred into a soft glow behind everything;
-          crossfades on change and drifts slowly while it plays */}
-      <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
-        <AnimatePresence initial={false}>
-          <motion.img
-            key={backdrop}
-            src={backdrop}
-            alt=""
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.8 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.1, ease: 'easeInOut' }}
-            className="absolute left-1/2 top-1/2 w-[140%] h-[140%] max-w-none object-cover"
-            style={{
-              transform: 'translate(-50%,-50%)',
-              filter: 'blur(28px) saturate(1.6)',
-              willChange: 'transform, opacity',
-              animation: reduced ? 'none' : 'pd-drift 22s ease-in-out infinite alternate',
-              animationPlayState: playing ? 'running' : 'paused',
-            }}
-          />
-        </AnimatePresence>
-        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 70% at 30% 45%, rgba(8,8,8,0.05) 0%, rgba(8,8,8,0.55) 70%, rgba(8,8,8,0.8) 100%), linear-gradient(90deg, rgba(8,8,8,0) 40%, rgba(8,8,8,0.35) 100%)' }} />
-        <div className="absolute inset-0 opacity-[0.07] mix-blend-overlay" style={{ backgroundImage: "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")" }} />
-      </div>
-
-      <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-8 lg:gap-14 p-5 sm:p-10 lg:p-14 items-center">
-        {/* the instrument: swipe it to change episode */}
-        <div className="min-w-0">
-          <div className="flex justify-center mb-5">
-            <div className="inline-flex rounded-full p-1" role="group" aria-label="Player view" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)' }}>
-              {([['record', 'Record', Disc3], ['headphones', 'Headphones', Headphones]] as const).map(([k, l, I]) => (
-                <button key={k} type="button" onClick={() => setView(k)} aria-pressed={view === k}
-                  className="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors"
-                  style={{ background: view === k ? 'rgba(255,255,255,0.14)' : 'transparent', color: view === k ? '#fff' : 'rgba(255,255,255,0.55)' }}
-                >
-                  <I className="w-3.5 h-3.5" /> {l}
-                </button>
-              ))}
-            </div>
-          </div>
-          <motion.div
-            drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.25} dragSnapToOrigin
-            onDragStart={() => { dragged.current = true; }}
-            onDragEnd={(_, info) => {
-              if (info.offset.x < -60 || info.velocity.x < -400) go(cur + 1);
-              else if (info.offset.x > 60 || info.velocity.x > 400) go(cur - 1);
-              setTimeout(() => { dragged.current = false; }, 0);
-            }}
-            className="cursor-grab active:cursor-grabbing touch-pan-y max-w-[400px] lg:max-w-none mx-auto"
-          >
-            <AnimatePresence mode="wait" initial={false} custom={dir}>
-              <motion.div key={ep.id + view} {...slide} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
-                {view === 'record'
-                  ? <RecordPlayer ep={ep} playing={playing} progress={progress} onToggle={toggle} speed={speed} setSpeed={setSpeed} volume={volume} setVolume={setVolume} />
-                  : <HeadphonesView ep={ep} playing={playing} onToggle={toggle} />}
-              </motion.div>
-            </AnimatePresence>
-          </motion.div>
-        </div>
-
-        {/* the episode and the controls */}
-        <div className="min-w-0">
-          <div className="flex items-center justify-between gap-4">
-            <p className="text-sm font-semibold" style={{ color: GOLD }}>Podcasts and talks</p>
-            <span className="text-sm text-white/45 tabular-nums">{cur + 1} / {EPISODES.length}</span>
-          </div>
-          <div className="mt-4 lg:min-h-[170px]" aria-live="polite">
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div key={ep.id} {...slide} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-                <p className="text-white/55 text-sm">
-                  {show.name} · {ep.label} · {ep.role} · {mins(ep.length)}
-                  <a href={ep.link} target="_blank" rel="noopener noreferrer" className="inline-flex align-middle ml-2 text-white/55 hover:text-white" aria-label={`Open on ${ep.show === 'blueprint' ? 'Spotify' : 'Apple Podcasts'}`}>
-                    <ArrowUpRight className="w-4 h-4" />
-                  </a>
-                </p>
-                <h3 className="mt-2 text-white text-[22px] sm:text-3xl font-bold leading-tight tracking-[-0.01em]" style={{ textWrap: 'balance' }}>{ep.title}</h3>
-                {ep.note && <p className="mt-3 text-white/65 text-[15px] sm:text-base leading-relaxed">{ep.note}</p>}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* transport: previous episode, back 15, play, forward 30, next episode */}
-          <div className="mt-6 rounded-[20px] p-4 sm:p-5" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <input
-              type="range" min={0} max={Math.round(dur)} step={1} value={Math.round(time)}
-              onChange={(e) => seek(+e.target.value)}
-              aria-label="Position in the episode" aria-valuetext={`${clock(time)} of ${clock(dur)}`}
-              className="pd-range" style={{ ['--p' as string]: `${progress * 100}%` }}
-            />
-            <div className="flex justify-between text-xs text-white/45 tabular-nums mt-1">
-              <span>{clock(time)}</span><span>-{clock(dur - time)}</span>
-            </div>
-            <div className="mt-3 flex items-center justify-between">
-              <button type="button" onClick={() => go(cur - 1)} aria-label="Previous episode" className="p-2 text-white/60 hover:text-white"><ChevronLeft className="w-6 h-6" /></button>
-              <button type="button" onClick={() => skip(-15)} aria-label="Back 15 seconds" className="p-2 text-white/70 hover:text-white"><RotateCcw className="w-5 h-5" /></button>
-              <button type="button" onClick={toggle} aria-label={playing ? 'Pause' : 'Play'}
-                className="grid place-items-center w-14 h-14 rounded-full transition-transform hover:scale-105 active:scale-95"
-                style={{ background: TEAL, color: '#04211F', boxShadow: playing ? '0 0 0 6px rgba(74,242,229,0.15)' : 'none' }}
-              >
-                {loading && playing ? <span className="w-5 h-5 rounded-full border-2 border-[#04211F]/30 border-t-[#04211F] animate-spin" /> : playing ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current ml-0.5" />}
-              </button>
-              <button type="button" onClick={() => skip(30)} aria-label="Forward 30 seconds" className="p-2 text-white/70 hover:text-white"><RotateCw className="w-5 h-5" /></button>
-              <button type="button" onClick={() => go(cur + 1)} aria-label="Next episode" className="p-2 text-white/60 hover:text-white"><ChevronRight className="w-6 h-6" /></button>
-            </div>
-          </div>
-        </div>
+      {styles}<audio ref={audio} preload="none" />
+      {glow}
+      {variant === 'closer' && <p className="text-center text-white/50 text-sm mb-8">Listen in</p>}
+      <div className="grid md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] gap-8 md:gap-14 items-center py-6 md:py-12">
+        {instrument}
+        {panel}
       </div>
     </motion.div>
   );
