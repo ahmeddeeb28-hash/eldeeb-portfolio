@@ -266,26 +266,31 @@ export function VaultCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
             </p>
             <p>I took it from discovery to a working prototype: problem framing, flows, UI, prototype and motion.</p>
           </CaseIntro>
-          {/* three whole phones, nothing cut by the panel edge */}
+          {/* the real plan in front, product page and checkout tucked behind,
+              all whole and with room around them */}
           <motion.div
             {...reveal}
-            className="rounded-[24px] md:rounded-[32px] px-5 py-10 md:px-14 md:py-16"
-            style={{ background: `radial-gradient(ellipse 70% 80% at 50% 0%, #2A4A18 0%, transparent 65%), ${DEEP}` }}
+            className="rounded-[24px] md:rounded-[32px] overflow-hidden"
+            style={{ background: `radial-gradient(ellipse 60% 70% at 50% 35%, #2E5219 0%, transparent 70%), ${DEEP}` }}
           >
-            <div className="grid grid-cols-3 gap-3 md:gap-8 items-center max-w-4xl mx-auto">
+            <div className="relative mx-auto w-full max-w-[920px] aspect-square md:aspect-[4/3]">
               {[
-                ['pay-choose', 'The product page, with Vault Split next to the price'],
-                ['plan-reason', 'The real plan: SAR 2,499 today, with the reason and three fixes'],
-                ['checkout', 'Checkout showing the same plan the shopper saw'],
-              ].map(([src, alt], k) => (
+                ['pay-choose', 'The product page, with Vault Split next to the price', 'left-[6%] md:left-[14%]', -5, 0.8],
+                ['checkout', 'Checkout showing the same plan the shopper saw', 'right-[6%] md:right-[14%]', 5, 0.8],
+              ].map(([src, alt, pos, rot]) => (
                 <img
-                  key={src}
+                  key={src as string}
                   src={`${IMG}/${src}.webp`}
-                  alt={alt}
-                  className="block w-full h-auto rounded-[14px] md:rounded-[24px] shadow-[0_40px_70px_-30px_rgba(0,0,0,0.9)]"
-                  style={{ transform: k === 1 ? 'translateY(-6%)' : 'translateY(4%)' }}
+                  alt={alt as string}
+                  className={`absolute top-[16%] w-[27%] md:w-[22%] h-auto rounded-[12px] md:rounded-[20px] opacity-90 shadow-[0_30px_60px_-30px_rgba(0,0,0,0.9)] ${pos}`}
+                  style={{ transform: `rotate(${rot}deg)` }}
                 />
               ))}
+              <img
+                src={`${IMG}/plan-reason.webp`}
+                alt="The real plan: SAR 2,499 today, with the reason and three fixes"
+                className="absolute left-1/2 -translate-x-1/2 top-[7%] w-[34%] md:w-[28%] h-auto rounded-[14px] md:rounded-[24px] shadow-[0_50px_90px_-30px_rgba(0,0,0,0.95)]"
+              />
             </div>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-x-10 gap-y-6 mt-12 border-t pt-8" style={{ borderColor: LINE }}>
