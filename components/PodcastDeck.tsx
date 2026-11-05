@@ -253,7 +253,7 @@ function HeadphonesView({ ep, playing, onToggle }: { ep: Episode; playing: boole
   const reduced = useReducedMotion();
   return (
     <div className="relative w-full aspect-square max-w-[460px] mx-auto rounded-[28px] overflow-hidden grid place-items-center"
-      style={{ background: 'radial-gradient(circle at 50% 42%, rgba(74,242,229,0.10) 0%, transparent 55%), linear-gradient(160deg, #141617 0%, #0B0C0D 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)' }}
+      style={{ background: `radial-gradient(circle at 50% 45%, ${SHOWS[ep.show].deck.body[0]}66 0%, transparent 60%), linear-gradient(160deg, ${SHOWS[ep.show].deck.body[2]}55 0%, rgba(0,0,0,0.45) 100%)`, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12), 0 40px 80px -40px rgba(0,0,0,0.9)', backdropFilter: 'blur(2px)' }}
     >
       <div className="relative w-[78%] aspect-square">
         <svg viewBox="0 0 200 200" className="absolute inset-0 w-full h-full" aria-hidden>
@@ -404,30 +404,62 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
         }}
         className={`cursor-grab active:cursor-grabbing touch-pan-y mx-auto ${variant === 'hero' ? 'max-w-[400px]' : 'max-w-[360px]'}`}
       >
-        <AnimatePresence mode="wait" initial={false} custom={dir}>
-          <motion.div key={view === 'record' ? 'record' : ep.id + view} {...(view === 'record' ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } } : slide)} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
-            {view === 'record'
-              ? <RecordPlayer ep={ep} swapDir={dir} playing={playing} progress={progress} onToggle={toggle} speed={speed} setSpeed={setSpeed} volume={volume} setVolume={setVolume} />
-              : <HeadphonesView ep={ep} playing={playing} onToggle={toggle} />}
-          </motion.div>
-        </AnimatePresence>
-      </motion.div>
-      {/* the view switch: a small segmented toggle with a sliding thumb */}
-      <div className="mt-4 flex justify-center">
-        <div className="relative inline-grid grid-cols-2 rounded-full p-1" role="radiogroup" aria-label="Player view"
-          style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.12)' }}
-        >
-          <motion.span aria-hidden className="absolute top-1 bottom-1 left-1 rounded-full" style={{ width: 'calc(50% - 4px)', background: 'rgba(255,255,255,0.16)' }}
-            animate={{ x: view === 'record' ? '0%' : '100%' }} transition={{ type: 'spring', stiffness: 500, damping: 36 }} />
-          {([['record', 'Record player', Disc3], ['headphones', 'Headphones', Headphones]] as const).map(([k, l, I]) => (
-            <button key={k} type="button" role="radio" onClick={() => setView(k)} aria-checked={view === k} aria-label={l} title={l}
-              className="relative grid place-items-center w-11 h-8 rounded-full transition-colors"
-              style={{ color: view === k ? '#fff' : 'rgba(255,255,255,0.5)' }}
+        {/* both views share one cell; the incoming one opens as a circle
+            from the selector knob below, the outgoing one turns away and dims */}
+        <div className="grid">
+          <AnimatePresence initial={false}>
+            <motion.div key={view} className="[grid-area:1/1]"
+              style={{ zIndex: 2 }}
+              initial={reduced ? { opacity: 0 } : { clipPath: 'circle(0% at 50% 112%)', rotate: view === 'record' ? -10 : 10, scale: 0.96 }}
+              animate={reduced ? { opacity: 1 } : { clipPath: 'circle(150% at 50% 112%)', rotate: 0, scale: 1 }}
+              exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.9, rotate: view === 'record' ? 14 : -14, zIndex: 1, transition: { duration: 0.55, ease: [0.4, 0, 0.2, 1] } }}
+              transition={{ duration: 0.75, ease: [0.65, 0, 0.35, 1] }}
             >
-              <I className="w-4 h-4" />
-            </button>
-          ))}
+              {view === 'record'
+                ? <RecordPlayer ep={ep} swapDir={dir} playing={playing} progress={progress} onToggle={toggle} speed={speed} setSpeed={setSpeed} volume={volume} setVolume={setVolume} />
+                : <HeadphonesView ep={ep} playing={playing} onToggle={toggle} />}
+            </motion.div>
+          </AnimatePresence>
         </div>
+      </motion.div>
+      {/* the view selector: a rotary knob, like a hi-fi source selector */}
+      <div className="mt-5 flex items-center justify-center gap-4" role="radiogroup" aria-label="Player view"
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); e.stopPropagation(); setView('record'); }
+          if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); e.stopPropagation(); setView('headphones'); }
+        }}
+      >
+        <button type="button" role="radio" aria-checked={view === 'record'} aria-label="Record player" title="Record player" onClick={() => setView('record')}
+          className="grid place-items-center w-9 h-9 rounded-full transition-colors duration-300"
+          style={{ color: view === 'record' ? '#fff' : 'rgba(255,255,255,0.4)', background: view === 'record' ? 'rgba(255,255,255,0.12)' : 'transparent' }}
+        >
+          <Disc3 className="w-[18px] h-[18px]" />
+        </button>
+        <button type="button" aria-label={`Switch to ${view === 'record' ? 'headphones' : 'record player'}`} tabIndex={-1}
+          onClick={() => setView(view === 'record' ? 'headphones' : 'record')}
+          className="relative w-14 h-14 rounded-full cursor-pointer"
+        >
+          {/* scale ticks around the knob */}
+          <svg viewBox="0 0 56 56" className="absolute -inset-2 w-[calc(100%+16px)] h-[calc(100%+16px)] pointer-events-none" aria-hidden>
+            {[-50, -25, 0, 25, 50].map((a) => (
+              <line key={a} x1="28" y1="1.5" x2="28" y2={Math.abs(a) === 50 ? 6 : 4} stroke="rgba(255,255,255,0.45)" strokeWidth={Math.abs(a) === 50 ? 1.6 : 1} strokeLinecap="round" transform={`rotate(${a} 28 28)`} />
+            ))}
+          </svg>
+          <span className="absolute inset-0 rounded-full" style={{ background: 'radial-gradient(circle at 35% 28%, #fbfaf7, #c9c3b9 52%, #847d72)', boxShadow: '0 8px 16px -6px rgba(0,0,0,.7), inset 0 -3px 4px rgba(0,0,0,.25), inset 0 2px 2px rgba(255,255,255,.7)' }} />
+          <motion.span className="absolute inset-[14%] rounded-full"
+            style={{ background: 'repeating-conic-gradient(from 0deg, #e3ded5 0deg 3deg, #c7c1b6 3deg 6deg)', boxShadow: 'inset 0 1px 2px rgba(0,0,0,.25)' }}
+            animate={{ rotate: view === 'record' ? -50 : 50 }}
+            transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 260, damping: 13, mass: 0.8 }}
+          >
+            <span className="absolute left-1/2 top-[7%] -translate-x-1/2 w-[12%] h-[30%] rounded-full" style={{ background: '#2b2620' }} />
+          </motion.span>
+        </button>
+        <button type="button" role="radio" aria-checked={view === 'headphones'} aria-label="Headphones" title="Headphones" onClick={() => setView('headphones')}
+          className="grid place-items-center w-9 h-9 rounded-full transition-colors duration-300"
+          style={{ color: view === 'headphones' ? '#fff' : 'rgba(255,255,255,0.4)', background: view === 'headphones' ? 'rgba(255,255,255,0.12)' : 'transparent' }}
+        >
+          <Headphones className="w-[18px] h-[18px]" />
+        </button>
       </div>
     </div>
   );
@@ -481,20 +513,26 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
       {/* 4. browse: every episode as a small cover */}
       <div className="mt-7">
         <p className="text-xs text-white/40 mb-1">All episodes</p>
-        <ol className="grid grid-cols-6 gap-1.5 sm:gap-2.5 max-w-[360px] pt-[8%]">
+        <ol className="grid grid-cols-6 gap-2 sm:gap-3 max-w-[440px] pt-[11%]">
           {EPISODES.map((e, i) => {
             const on = i === cur;
             return (
               <li key={e.id} className="relative">
                 {on && (
                   <motion.span layoutId="pd-sleeve-vinyl" aria-hidden
-                    className="absolute left-[6%] right-[6%] aspect-square rounded-full pointer-events-none"
-                    style={{ top: '-46%', zIndex: 0, background: 'repeating-radial-gradient(circle, #111 0 1.2px, #1f1f1f 1.8px 2.4px)', boxShadow: '0 0 0 1px rgba(255,255,255,.22), 0 2px 6px rgba(0,0,0,.5)' }}
-                    transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 32 }}
+                    className="absolute left-[-4%] right-[-4%] aspect-square rounded-full pointer-events-none"
+                    style={{
+                      top: '-62%', zIndex: 0,
+                      /* chrome-like rim, fine grooves, and a brushed sheen */
+                      background: 'repeating-radial-gradient(circle, #0d0d0d 0 1px, #232323 1.4px 1.9px, #121212 2.3px)',
+                      boxShadow: '0 0 0 1.5px #d9d6d0, 0 0 0 2.5px #7d7a74, 0 0 0 3.5px rgba(255,255,255,.35), 0 6px 14px -2px rgba(0,0,0,.7)',
+                    }}
+                    transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 380, damping: 30 }}
                   >
-                    <span className="absolute inset-[34%] rounded-full" style={{ background: SHOWS[e.show].tone }} />
-                    <motion.span className="absolute inset-0 rounded-full" style={{ background: 'conic-gradient(from 20deg, transparent 0 30deg, rgba(255,255,255,.12) 40deg, transparent 70deg)' }}
+                    <motion.span className="absolute inset-0 rounded-full" style={{ background: 'conic-gradient(from 0deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,.28) 22deg, rgba(255,255,255,0) 48deg, rgba(255,255,255,0) 160deg, rgba(255,255,255,.18) 190deg, rgba(255,255,255,0) 220deg, rgba(255,255,255,0) 360deg)', mixBlendMode: 'screen' }}
                       animate={reduced || !playing ? { rotate: 0 } : { rotate: 360 }} transition={{ repeat: Infinity, duration: 1.8, ease: 'linear' }} />
+                    <span className="absolute inset-[33%] rounded-full" style={{ background: `radial-gradient(circle at 35% 30%, ${SHOWS[e.show].tone}, ${SHOWS[e.show].deck.body[2]})`, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.35)' }} />
+                    <span className="absolute left-1/2 top-1/2 w-[9%] aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: 'radial-gradient(circle at 35% 30%, #fff, #a7a39b 55%, #5e5b55)', boxShadow: '0 0 2px rgba(0,0,0,.6)' }} />
                   </motion.span>
                 )}
                 <motion.button type="button" onClick={() => go(i)} aria-label={`${SHOWS[e.show].name}, ${e.title}`} aria-current={on} title={e.title}
