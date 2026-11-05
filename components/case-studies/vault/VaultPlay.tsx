@@ -23,7 +23,7 @@ const HINTS: Record<Stage, string> = {
   idle: 'Tap Check my plan',
   nafath: 'Tap 47 to approve in Nafath',
   checking: '',
-  plan: 'Not 999.75. Tap Raise my limit',
+  plan: 'Not SAR 999.75. Tap Raise my limit',
   raising: '',
   raised: 'Tap Update my plan',
   updated: 'Tap Continue to checkout',
@@ -276,7 +276,7 @@ function Phone({ stage, nTick, rTick }: { stage: Stage; nTick: number; rTick: nu
                         </span>
                       </div>
                       <p className="text-[14px] text-[#444] mt-1">
-                        then 3 × <Num v={updated ? 833 : 500} /> on 14 Nov, 14 Dec, 14 Jan
+                        then <Num v={updated ? 833 : 500} /> on 14 Nov, 14 Dec, 14 Jan
                       </p>
                       <div className="relative flex justify-between items-center mt-3 mb-3.5 px-0.5">
                         <span className="absolute inset-x-1 top-1/2 h-[2px] -translate-y-1/2 bg-[#D9DDD4]" />
@@ -312,7 +312,7 @@ function Phone({ stage, nTick, rTick }: { stage: Stage; nTick: number; rTick: nu
                             {updated ? <Check className="w-3.5 h-3.5" strokeWidth={3} /> : '?'}
                           </span>
                           <span>
-                            <b className="block text-[15px]">{updated ? 'Limit raised to SAR 2,500' : 'Why more than 4 × 999.75?'}</b>
+                            <b className="block text-[15px]">{updated ? 'Limit raised to SAR 2,500' : 'Why not SAR 999.75 today?'}</b>
                             <span className="block text-[13px] text-[#4A5045] leading-snug mt-0.5">
                               {updated
                                 ? 'Your salary check raised your limit, so only SAR 1,499 is due today.'
@@ -323,7 +323,7 @@ function Phone({ stage, nTick, rTick }: { stage: Stage; nTick: number; rTick: nu
                       </AnimatePresence>
                       <p className="text-[15px] font-semibold mt-4 mb-2.5">Make it work for you</p>
                       <div className="grid gap-2">
-                        <Option on title="Keep this plan" line={updated ? 'SAR 1,499 today, then 3 × 833' : 'SAR 2,499 today, then 3 × 500'} />
+                        <Option on title="Keep this plan" line={updated ? 'SAR 1,499 today, then SAR 833 a month' : 'SAR 2,499 today, then SAR 500 a month'} />
                         <Option title="Choose 128 GB" line={`SAR 3,499 · SAR ${updated ? '999' : '1,999'} today`} chip={<Chip>−500 today</Chip>} />
                         {updated ? (
                           <Option title="Limit raised" line="Done · SAR 2,500 limit" chip={<Chip>Done</Chip>} />
