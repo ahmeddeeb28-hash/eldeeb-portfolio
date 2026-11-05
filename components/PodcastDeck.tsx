@@ -56,6 +56,13 @@ const EPISODES: Episode[] = [
   },
 ];
 
+/* A build can point the player at self-hosted copies of the audio
+   (VITE_PODCAST_AUDIO_BASE=audio → audio/<episode id>.mp3), used for
+   previews that can't reach the podcast hosts. Production streams from
+   each episode's own feed. */
+const AUDIO_BASE = import.meta.env.VITE_PODCAST_AUDIO_BASE as string | undefined;
+const srcOf = (ep: Episode) => (AUDIO_BASE ? `${AUDIO_BASE}/${ep.id}.mp3` : ep.audio);
+
 const GOLD = 'rgba(220,190,140,0.85)';
 const TEAL = '#4AF2E5';
 
@@ -313,7 +320,7 @@ export function PodcastDeck() {
     const a = audio.current;
     if (!a) return;
     if (a.paused) {
-      if (!a.src) a.src = ep.audio;
+      if (!a.src) a.src = srcOf(ep);
       a.playbackRate = speed;
       setLoading(true);
       void a.play().catch(() => setLoading(false));
@@ -326,7 +333,7 @@ export function PodcastDeck() {
   const seek = (v: number) => {
     const a = audio.current;
     if (!a) return;
-    if (!a.src) a.src = ep.audio;
+    if (!a.src) a.src = srcOf(ep);
     a.currentTime = v;
     setTime(v);
   };
@@ -339,7 +346,8 @@ export function PodcastDeck() {
     setCur(n); setTime(0); setDur(EPISODES[n].length); setPlaying(false); setLoading(false);
   };
   const progress = dur ? time / dur : 0;
-  const backdrop = ep.cover ?? show.art;
+  // a tiny, pre-blurred copy of the cover: cheap to scale and animate
+  const backdrop = (ep.cover ?? show.art).replace('/images/podcasts/', '/images/podcasts/bg/');
   const slide = reduced ? {} : { initial: { x: dir * 60, opacity: 0 }, animate: { x: 0, opacity: 1 }, exit: { x: -dir * 60, opacity: 0 } };
 
   return (
@@ -384,7 +392,8 @@ export function PodcastDeck() {
             className="absolute left-1/2 top-1/2 w-[140%] h-[140%] max-w-none object-cover"
             style={{
               transform: 'translate(-50%,-50%)',
-              filter: 'blur(80px) saturate(1.6)',
+              filter: 'blur(28px) saturate(1.6)',
+              willChange: 'transform, opacity',
               animation: reduced ? 'none' : 'pd-drift 22s ease-in-out infinite alternate',
               animationPlayState: playing ? 'running' : 'paused',
             }}
