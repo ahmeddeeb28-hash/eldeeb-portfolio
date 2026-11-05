@@ -1,3 +1,4 @@
+import { PodcastDeck } from './PodcastDeck';
 import { motion, useInView } from 'motion/react';
 import { useRef, useState } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -444,6 +445,9 @@ export function ProofOfPresence() {
             </motion.p>
           </div>
         </div>
+
+        {/* Podcasts and talks: a playable record player / headphones deck */}
+        <PodcastDeck />
 
         {/* Horizontal dateline rule */}
         <motion.div
