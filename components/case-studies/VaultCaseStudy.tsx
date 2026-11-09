@@ -23,6 +23,17 @@ const IMG = '/images/case-studies/vault';
 const FILM = '/videos/vault-split-film.mp4';
 const POSTER = `${IMG}/film-poster.webp`;
 
+/* official wordmarks, from tabby.ai and tamara.co, set in white for the dark page */
+const LOGOS = {
+  tabby: { src: `${IMG}/logo-tabby.svg`, name: 'Tabby', h: 'h-[18px]' },
+  tamara: { src: `${IMG}/logo-tamara.svg`, name: 'Tamara', h: 'h-[17px]' },
+} as const;
+
+function BrandLogo({ who, className = '' }: { who: keyof typeof LOGOS; className?: string }) {
+  const l = LOGOS[who];
+  return <img src={l.src} alt={l.name} className={`${l.h} w-auto ${className}`} />;
+}
+
 const CHAPTERS: Chapter[] = [
   { id: 'overview', num: '01', roman: 'I', label: 'Overview', beat: 'A promise that changes.' },
   { id: 'problem', num: '02', roman: 'II', label: 'Problem', beat: 'A different number.' },
@@ -211,9 +222,16 @@ function Compare() {
                   <img src={`${IMG}/cmp-${m.key}-${who}.webp`} alt={`${label}: ${text}`} loading="lazy" decoding="async" className="block w-full h-auto" />
                 </div>
                 <figcaption className="mt-4">
-                  <p className="text-sm font-semibold" style={{ color: after ? LIME : '#FF9C8F' }}>
-                    {label}
-                  </p>
+                  {who === 'tabby' || who === 'tamara' ? (
+                    <p className="flex items-center gap-2.5 h-5 text-sm font-semibold" style={{ color: '#FF9C8F' }}>
+                      <BrandLogo who={who} className="opacity-90" />
+                      <span aria-hidden>·</span> before
+                    </p>
+                  ) : (
+                    <p className="flex items-center h-5 text-sm font-semibold" style={{ color: after ? LIME : '#FF9C8F' }}>
+                      {label}
+                    </p>
+                  )}
                   <p className="text-white/75 text-sm leading-relaxed mt-1">{text}</p>
                 </figcaption>
               </figure>
@@ -398,6 +416,11 @@ export function VaultCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           title="What GCC customers are saying."
           lead="Recent public reviews of Tabby and Tamara on Trustpilot, June to October 2026, paraphrased and grouped into three themes."
         >
+          <div className="flex items-center gap-5 mb-6 text-sm text-white/45">
+            Reviews of
+            <BrandLogo who="tabby" className="opacity-80" />
+            <BrandLogo who="tamara" className="opacity-80" />
+          </div>
           <ol className="grid md:grid-cols-3 gap-4">
             {EVIDENCE.map((e, k) => (
               <li key={e.theme} className="rounded-[24px] border p-6 md:p-7" style={{ borderColor: LINE, background: PANEL }}>
