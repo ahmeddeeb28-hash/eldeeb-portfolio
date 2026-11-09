@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useState, type ReactNode } from 'react';
-import { ArrowRight, Check, MousePointerClick } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 import { VAULT_STEPS, VaultPlay, type VaultStage } from './vault/VaultPlay';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
@@ -23,15 +23,21 @@ const IMG = '/images/case-studies/vault';
 const FILM = '/videos/vault-split-film.mp4';
 const POSTER = `${IMG}/film-poster.webp`;
 
-/* official wordmarks, from tabby.ai and tamara.co, set in white for the dark page */
+/* official wordmarks from tabby.ai and tamara.co, each on its own brand
+   colour like their checkout badges: Tabby's green (#6CFF93, ink #1A1919)
+   and Tamara's purple-to-pink gradient, both taken from their sites */
 const LOGOS = {
-  tabby: { src: `${IMG}/logo-tabby.svg`, name: 'Tabby', h: 'h-[18px]' },
-  tamara: { src: `${IMG}/logo-tamara.svg`, name: 'Tamara', h: 'h-[17px]' },
+  tabby: { src: `${IMG}/logo-tabby-ink.svg`, name: 'Tabby', h: 'h-[15px]', bg: '#6CFF93' },
+  tamara: { src: `${IMG}/logo-tamara.svg`, name: 'Tamara', h: 'h-[14px]', bg: 'linear-gradient(104deg, #370a56 0%, #7121af 29%, #8b00ef 60%, #f933a1 100%)' },
 } as const;
 
 function BrandLogo({ who, className = '' }: { who: keyof typeof LOGOS; className?: string }) {
   const l = LOGOS[who];
-  return <img src={l.src} alt={l.name} className={`${l.h} w-auto ${className}`} />;
+  return (
+    <span className={`inline-flex items-center h-7 px-2.5 rounded-lg ${className}`} style={{ background: l.bg }}>
+      <img src={l.src} alt={l.name} className={`${l.h} w-auto`} />
+    </span>
+  );
 }
 
 const CHAPTERS: Chapter[] = [
@@ -132,11 +138,13 @@ const CHAIN: [string, string][] = [
   ['Surprise', 'No reason, no options'],
 ];
 
-const PEOPLE: { n: string; who: string; problem: string; fix: string }[] = [
-  { n: 'Noura', who: 'First-timer, low limit', problem: 'Expects SAR 999.75 today. Her limit means SAR 2,499.', fix: 'Raises her limit with a 1-minute salary check.' },
-  { n: 'Faisal', who: 'Near his limit', problem: 'Two open plans leave little room for a new one.', fix: 'Finishes an almost-done plan to free up limit.' },
-  { n: 'Lama', who: 'Over the SAR 5,000 cap', problem: 'A big-ticket item can only be partly split.', fix: 'Sees the cap upfront and picks a cheaper option.' },
-  { n: 'Omar', who: 'Limit dropped', problem: 'One late payment lowered his limit without explanation.', fix: 'Sees why, pays by card, and tracks his rebuild.' },
+/* illustrated portraits: Open Peeps by Pablo Stanley (CC0), drawn with
+   DiceBear. `tint` is the card's own colour, matched to the shirt. */
+const PEOPLE: { n: string; who: string; problem: string; fix: string; tint: string }[] = [
+  { n: 'Noura', tint: '#A9EB60', who: 'First-timer, low limit', problem: 'Expects SAR 999.75 today. Her limit means SAR 2,499.', fix: 'Raises her limit with a 1-minute salary check.' },
+  { n: 'Faisal', tint: '#78E185', who: 'Near his limit', problem: 'Two open plans leave little room for a new one.', fix: 'Finishes an almost-done plan to free up limit.' },
+  { n: 'Lama', tint: '#8FA7DF', who: 'Over the SAR 5,000 cap', problem: 'A big-ticket item can only be partly split.', fix: 'Sees the cap upfront and picks a cheaper option.' },
+  { n: 'Omar', tint: '#E78276', who: 'Limit dropped', problem: 'One late payment lowered his limit without explanation.', fix: 'Sees why, pays by card, and tracks his rebuild.' },
 ];
 
 const PRINCIPLES: [string, string][] = [
@@ -223,12 +231,12 @@ function Compare() {
                 </div>
                 <figcaption className="mt-4">
                   {who === 'tabby' || who === 'tamara' ? (
-                    <p className="flex items-center gap-2.5 h-5 text-sm font-semibold" style={{ color: '#FF9C8F' }}>
-                      <BrandLogo who={who} className="opacity-90" />
+                    <p className="flex items-center gap-2.5 h-7 text-sm font-semibold" style={{ color: '#FF9C8F' }}>
+                      <BrandLogo who={who} />
                       <span aria-hidden>·</span> before
                     </p>
                   ) : (
-                    <p className="flex items-center h-5 text-sm font-semibold" style={{ color: after ? LIME : '#FF9C8F' }}>
+                    <p className="flex items-center h-7 text-sm font-semibold" style={{ color: after ? LIME : '#FF9C8F' }}>
                       {label}
                     </p>
                   )}
@@ -243,64 +251,76 @@ function Compare() {
   );
 }
 
-/* the playable flow, framed so it reads as something to try */
+/* the playable flow, told as Noura's story: one sentence per step,
+   lit as the phone reaches it */
+const STORY: { at: string; text: ReactNode }[] = [
+  { at: 'idle', text: <>Noura wants the iPhone 18 Pro. Next to the price she sees <b className="font-semibold">Check my plan</b> and taps it.</> },
+  { at: 'nafath', text: <>She approves once in Nafath. Nothing is charged and her credit isn’t touched.</> },
+  { at: 'plan', text: <>Her real plan shows up right away: <b className="font-semibold">SAR 2,499 today</b>, not the SAR 999.75 she expected, and one sentence on why.</> },
+  { at: 'raise', text: <>She doesn’t leave. A one-minute salary check raises her limit.</> },
+  { at: 'checkout', text: <>At checkout she sees the same plan she saw on the product page. No new numbers.</> },
+];
+
 function PlayPanel() {
   const [stage, setStage] = useState<VaultStage>('idle');
   const cur = VAULT_STEPS.findIndex((s) => s.at.includes(stage));
-  const now = stage === 'done' ? VAULT_STEPS.length : cur;
+  const now = stage === 'done' ? STORY.length : cur;
+  const reduced = useReducedMotion();
   return (
-    <div className="rounded-[28px] border overflow-hidden" style={{ borderColor: LINE, background: PANEL }}>
-      <div className="flex items-center justify-between gap-4 px-5 md:px-7 py-4 border-b" style={{ borderColor: LINE }}>
-        <span className="flex items-center gap-2.5 text-sm font-medium text-white whitespace-nowrap">
-          <MousePointerClick className="w-4 h-4" style={{ color: LIME }} />
-          Interactive prototype
-        </span>
-        <span className="flex items-center gap-2 rounded-full border border-white/10 px-3 py-1 text-xs text-white/60 whitespace-nowrap">
-          <span className="relative flex w-1.5 h-1.5">
-            <span className="absolute inset-0 rounded-full opacity-60 motion-safe:animate-ping" style={{ background: LIME }} />
-            <span className="relative w-1.5 h-1.5 rounded-full" style={{ background: LIME }} />
-          </span>
-          Live<span className="hidden sm:inline"> · tap to try</span>
-        </span>
-      </div>
-      <div
-        className="grid grid-cols-[minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_minmax(0,380px)] gap-10 md:gap-14 items-center px-5 md:px-12 py-10 md:py-14"
-        style={{ background: `radial-gradient(ellipse 50% 60% at 75% 50%, #22401433 0%, transparent 70%)` }}
-      >
-        <ol className="hidden md:grid gap-1 max-w-sm">
-          {VAULT_STEPS.map((s, k) => {
+    <div
+      className="rounded-[28px] border overflow-hidden grid grid-cols-[minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_minmax(0,380px)] gap-10 md:gap-14 items-center px-5 md:px-12 py-10 md:py-14"
+      style={{ borderColor: LINE, background: `radial-gradient(ellipse 50% 60% at 75% 50%, #22401433 0%, transparent 70%), ${PANEL}` }}
+    >
+      <div className="max-w-md">
+        <div className="flex items-center gap-3 mb-7">
+          <img src={`${IMG}/people/noura.svg`} alt="" className="w-11 h-11 rounded-full" style={{ background: '#F2F0EA' }} />
+          <p className="text-white/55 text-sm leading-snug">
+            Go through it as Noura.
+            <br />
+            Tap the phone to take each step with her.
+          </p>
+        </div>
+        <ol className="hidden md:grid gap-4">
+          {STORY.map((s, k) => {
             const done = k < now;
             const on = k === now;
             return (
-              <li
-                key={s.t}
-                className="flex gap-4 rounded-2xl px-4 py-3.5 transition-colors duration-300"
-                style={{ background: on ? 'rgba(169,235,96,0.08)' : 'transparent' }}
-              >
+              <li key={s.at} className="relative pl-5">
                 <span
-                  className="grid place-items-center w-7 h-7 rounded-full text-xs font-bold tabular-nums flex-none transition-colors duration-300"
-                  style={{
-                    background: done ? LIME : 'transparent',
-                    color: done ? DEEP : on ? LIME : 'rgba(255,255,255,0.4)',
-                    border: `1.5px solid ${done || on ? LIME : 'rgba(255,255,255,0.15)'}`,
-                  }}
+                  aria-hidden
+                  className="absolute left-0 top-1 bottom-1 w-[2px] rounded-full transition-colors duration-500"
+                  style={{ background: on ? LIME : done ? `${LIME}55` : 'rgba(255,255,255,0.08)' }}
+                />
+                <p
+                  className={`text-lg leading-relaxed transition-colors duration-500 ${on ? 'text-white/90' : done ? 'text-white/45' : 'text-white/20'}`}
                 >
-                  {done ? <Check className="w-3.5 h-3.5" strokeWidth={3} /> : k + 1}
-                </span>
-                <span>
-                  <span className={`block font-semibold transition-colors duration-300 ${on || done ? 'text-white' : 'text-white/45'}`}>{s.t}</span>
-                  <span className={`block text-sm mt-0.5 transition-colors duration-300 ${on ? 'text-white/60' : 'text-white/30'}`}>{s.d}</span>
-                </span>
+                  {s.text}
+                </p>
               </li>
             );
           })}
         </ol>
-        <div className="md:order-none">
-          <p className="md:hidden text-center text-white/50 text-sm mb-5 tabular-nums">
-            {now < VAULT_STEPS.length ? `Step ${now + 1} of ${VAULT_STEPS.length} · ${VAULT_STEPS[now].t}` : 'All five steps done'}
-          </p>
-          <VaultPlay onStage={setStage} />
-        </div>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.p
+            key={now}
+            initial={reduced ? false : { opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduced ? undefined : { opacity: 0, y: -6 }}
+            transition={{ duration: 0.25 }}
+            className="md:hidden text-white/85 text-base leading-relaxed min-h-[4.5rem]"
+          >
+            {now < STORY.length ? STORY[now].text : 'Order placed. The plan never changed on her.'}
+          </motion.p>
+        </AnimatePresence>
+        <p
+          className={`hidden md:block mt-6 pl-5 text-lg font-semibold transition-opacity duration-500 ${now >= STORY.length ? 'opacity-100' : 'opacity-0'}`}
+          style={{ color: LIME }}
+        >
+          Order placed. The plan never changed on her.
+        </p>
+      </div>
+      <div>
+        <VaultPlay onStage={setStage} />
       </div>
     </div>
   );
@@ -416,10 +436,10 @@ export function VaultCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           title="What GCC customers are saying."
           lead="Recent public reviews of Tabby and Tamara on Trustpilot, June to October 2026, paraphrased and grouped into three themes."
         >
-          <div className="flex items-center gap-5 mb-6 text-sm text-white/45">
-            Reviews of
-            <BrandLogo who="tabby" className="opacity-80" />
-            <BrandLogo who="tamara" className="opacity-80" />
+          <div className="flex items-center gap-3 mb-6 text-sm text-white/45">
+            <span className="mr-1">Reviews of</span>
+            <BrandLogo who="tabby" />
+            <BrandLogo who="tamara" />
           </div>
           <ol className="grid md:grid-cols-3 gap-4">
             {EVIDENCE.map((e, k) => (
@@ -486,24 +506,51 @@ export function VaultCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         {/* ── 05 USERS + PRINCIPLES ── */}
         <Section i={4} title="Four shoppers, four reasons the plan changes.">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {PEOPLE.map((p) => (
-              <article key={p.n} className="rounded-[24px] border p-6 flex flex-col" style={{ borderColor: LINE, background: PANEL }}>
-                <div className="flex items-center gap-3 mb-5">
-                  <span className="grid place-items-center w-10 h-10 rounded-full text-sm font-bold" style={{ background: LIME, color: DEEP }}>
-                    {p.n[0]}
+            {PEOPLE.map((p, k) => (
+              <motion.article
+                key={p.n}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-10% 0px' }}
+                transition={{ duration: 0.5, delay: k * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                className="group relative rounded-[28px] border overflow-hidden flex flex-col transition-[transform,border-color] duration-300 motion-safe:hover:-translate-y-1"
+                style={{ borderColor: LINE, background: PANEL }}
+              >
+                {/* portrait band in the shopper's own colour */}
+                <div className="relative h-24 flex-none" style={{ background: `linear-gradient(160deg, ${p.tint}40 0%, ${p.tint}14 75%)` }}>
+                  <span className="absolute right-6 top-5 text-xs font-semibold tabular-nums text-white/50">
+                    {String(k + 1).padStart(2, '0')} / 04
                   </span>
-                  <span>
-                    <span className="block text-white font-semibold">{p.n}</span>
-                    <span className="block text-white/50 text-sm">{p.who}</span>
+                  <span
+                    className="absolute left-6 top-8 w-24 h-24 rounded-full overflow-hidden transition-transform duration-300 ease-out motion-safe:group-hover:-rotate-3 motion-safe:group-hover:scale-[1.04]"
+                    style={{ background: '#F2F0EA', boxShadow: `0 0 0 5px ${PANEL}, 0 0 0 6px ${p.tint}80` }}
+                  >
+                    <img src={`${IMG}/people/${p.n.toLowerCase()}.svg`} alt={`Illustration of ${p.n}`} className="w-full h-full" loading="lazy" />
                   </span>
                 </div>
-                <p className="text-white/45 text-xs font-semibold mb-1">Problem</p>
-                <p className="text-white/75 text-sm leading-relaxed mb-4">{p.problem}</p>
-                <p className="text-xs font-semibold mb-1 mt-auto" style={{ color: LIME }}>
-                  Solved by
-                </p>
-                <p className="text-white text-sm leading-relaxed">{p.fix}</p>
-              </article>
+                <div className="px-6 pt-12">
+                  <p className="text-white text-xl font-semibold tracking-[-0.02em]">{p.n}</p>
+                  <p className="text-sm font-medium mt-0.5" style={{ color: p.tint }}>{p.who}</p>
+                </div>
+                {/* the plan story: what goes wrong today, then what Vault Split does */}
+                <ol className="relative flex-1 flex flex-col p-6 pt-6 gap-5">
+                  <span aria-hidden className="absolute left-[33px] top-9 bottom-16 w-px" style={{ background: `linear-gradient(${'#FF9C8F'}66, ${LIME}99)` }} />
+                  <li className="relative pl-9">
+                    <span aria-hidden className="absolute left-0 top-0.5 w-5 h-5 rounded-full grid place-items-center" style={{ background: '#FF9C8F22', boxShadow: 'inset 0 0 0 1.5px #FF9C8F' }}>
+                      <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#FF9C8F' }} />
+                    </span>
+                    <p className="text-xs font-semibold mb-1" style={{ color: '#FF9C8F' }}>Today</p>
+                    <p className="text-white/70 text-sm leading-relaxed">{p.problem}</p>
+                  </li>
+                  <li className="relative pl-9 mt-auto">
+                    <span aria-hidden className="absolute left-0 top-0.5 w-5 h-5 rounded-full grid place-items-center" style={{ background: LIME }}>
+                      <Check className="w-3 h-3" strokeWidth={3} style={{ color: DEEP }} />
+                    </span>
+                    <p className="text-xs font-semibold mb-1" style={{ color: LIME }}>With Vault Split</p>
+                    <p className="text-white text-sm leading-relaxed">{p.fix}</p>
+                  </li>
+                </ol>
+              </motion.article>
             ))}
           </div>
           <p className="text-white/45 text-sm mt-14 mb-4">Four rules every screen had to pass</p>
