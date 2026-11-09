@@ -180,9 +180,10 @@ export function FloatingNav({ items, progress, onLogo, logoLabel, lockScroll, fo
                 if (open) close(false);
                 onLogo();
               }}
-              className="flex items-center min-h-[44px] px-1.5 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+              className="group flex items-center gap-2.5 min-h-[44px] pl-0.5 pr-1.5 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
               style={{ textDecoration: 'none' }}
             >
+              <DMark />
               <span style={wordmark}>ELDEEB</span>
             </a>
             <button
@@ -295,6 +296,34 @@ export function FloatingNav({ items, progress, onLogo, logoLabel, lockScroll, fo
         </motion.div>
       </div>
     </>
+  );
+}
+
+/* the "d." mark (same drawing as the favicon), sat before the wordmark.
+   On hover the tile tips back a few degrees and the gold dot steps out,
+   like a full stop being placed. CSS only, so it stays still for
+   reduced motion. */
+function DMark() {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 64 64"
+      className="w-[30px] h-[30px] flex-none transition-transform duration-300 ease-out motion-safe:group-hover:-rotate-6"
+      style={{ filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.45))' }}
+    >
+      <rect width="64" height="64" rx="15" fill="#0A0A0A" />
+      <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="14.25" fill="none" stroke="#fff" strokeOpacity="0.16" strokeWidth="1.5" />
+      <path fill="#F2F0EA" fillRule="evenodd" d="M25 23 A14 14 0 1 0 25 51 A14 14 0 1 0 25 23 Z M25 30.5 A6.5 6.5 0 1 1 25 43.5 A6.5 6.5 0 1 1 25 30.5 Z" />
+      <rect x="32" y="12" width="7.5" height="39" fill="#F2F0EA" />
+      <circle
+        cx="49"
+        cy="46.5"
+        r="4.5"
+        fill="#DCBE8C"
+        className="transition-transform duration-300 ease-out motion-safe:group-hover:translate-x-[2px] motion-safe:group-hover:scale-110"
+        style={{ transformOrigin: '49px 46.5px', transformBox: 'view-box' }}
+      />
+    </svg>
   );
 }
 
