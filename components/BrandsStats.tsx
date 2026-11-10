@@ -1,5 +1,5 @@
-import { motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { animate, motion, useInView, useReducedMotion } from "motion/react";
+import { useEffect, useRef } from "react";
 import { SectionHeader } from "./SectionHeader";
 
 /* ──────────────────────────────────────────────────────────────
@@ -85,13 +85,77 @@ const stats = [
   },
 ];
 
-export function BrandsStats() {
-  const [isVisible, setIsVisible] = useState(false);
-
+/* "+22%" → a figure that counts up from zero the first time it is seen,
+   with the increase shown as a small arrow beside it (the way
+   fantasy.co sets its small + and ★ marks) */
+function Figure({ value }: { value: string }) {
+  const m = value.match(/^([+-]?)(\d+(?:\.\d+)?)(.*)$/);
+  const n = m ? parseFloat(m[2]) : 0;
+  const unit = m ? m[3] : '';
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-15% 0px' });
+  const reduced = useReducedMotion();
   useEffect(() => {
-    setIsVisible(true);
-  }, []);
+    const el = ref.current;
+    if (!el || !m) return;
+    if (reduced || !inView) {
+      el.textContent = `${m[2]}${unit}`;
+      if (!inView && !reduced) el.textContent = `0${unit}`;
+      return;
+    }
+    const c = animate(0, n, {
+      duration: 1.4,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: (x) => (el.textContent = `${Math.round(x)}${unit}`),
+    });
+    return () => c.stop();
+  }, [inView, reduced]);
+  return (
+    <p
+      aria-label={value}
+      className="flex items-start text-white"
+      style={{
+        fontFamily: "Inter, system-ui, -apple-system, sans-serif",
+        fontSize: "clamp(64px, 6.4vw, 96px)",
+        fontWeight: 500,
+        lineHeight: 0.9,
+        letterSpacing: "-0.05em",
+      }}
+    >
+      <span ref={ref} aria-hidden="true" className="tabular-nums">{value.replace(/^[+-]/, '')}</span>
+      {m?.[1] === '+' && (
+        <span aria-hidden="true" style={{ fontSize: "0.34em", marginLeft: "0.18em", marginTop: "0.22em", letterSpacing: 0 }}>
+          ↑
+        </span>
+      )}
+    </p>
+  );
+}
 
+function ImpactCard({ stat, index }: { stat: (typeof stats)[number]; index: number }) {
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-10% 0px" }}
+      transition={{ delay: index * 0.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      className="group snap-start flex-none w-[78vw] sm:w-[46vw] md:w-auto flex flex-col justify-between transition-colors duration-300 hover:bg-[#1C1C1C]"
+      style={{ minHeight: "460px", borderRadius: "6px", background: "#161616", padding: "26px 24px 28px" }}
+    >
+      <Figure value={stat.number} />
+      <div>
+        <p className="text-white" style={{ fontSize: "16px", fontWeight: 600, lineHeight: 1.3, letterSpacing: "-0.01em" }}>
+          {stat.brand} {stat.label.toLowerCase()}
+        </p>
+        <p className="mt-3" style={{ fontSize: "14px", lineHeight: 1.55, color: "rgba(255,255,255,0.55)", maxWidth: "34ch" }}>
+          {stat.description}
+        </p>
+      </div>
+    </motion.article>
+  );
+}
+
+export function BrandsStats() {
   return (
     <section
       className="relative px-6"
@@ -201,265 +265,21 @@ export function BrandsStats() {
         </div>
 
         {/*
-          Statistics Row.
-          Runs the full width of the section container rather than sitting
-          inset in a narrower max-w-6xl. Cards that are narrower than the
-          heading above them read as a footnote to it, full width reads as
-          the point of the section.
+          Statistics row, in the manner of fantasy.co/impact: flat, tall,
+          quiet cards. A big figure up top with a small mark beside it, the
+          name of the result and one sentence pinned to the bottom. No glow,
+          no accent rule, no noise: the number carries the card. On phones
+          the row scrolls sideways with snap, like a reel of results.
         */}
         <div
-          className="grid gap-6 grid-cols-1 md:grid-cols-3"
-          style={{
-            marginTop: "80px",
-          }}
+          className="-mx-6 px-6 scroll-px-6 md:mx-0 md:px-0 overflow-x-auto md:overflow-visible snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          style={{ marginTop: "80px" }}
         >
-          {stats.map((stat, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
-              animate={
-                isVisible
-                  ? {
-                      opacity: 1,
-                      y: 0,
-                    }
-                  : {}
-              }
-              transition={{
-                delay: index * 0.15,
-                duration: 0.8,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              whileHover={{
-                y: -10,
-                borderColor: "rgba(255, 255, 255, 0.16)",
-                boxShadow: `0 40px 80px -32px rgba(0, 0, 0, 0.95), 0 0 60px -20px ${stat.accent}30, inset 0 1px 0 rgba(255, 255, 255, 0.10)`,
-                transition: { duration: 0.4, ease: [0.25, 1, 0.5, 1] },
-              }}
-              className="group relative flex flex-col justify-between overflow-hidden"
-              style={{
-                minHeight: "440px",
-                borderRadius: "28px",
-                /*
-                  Three stacked layers, top to bottom:
-                  1. a wash of the card's accent anchored to the top-left corner
-                  2. a soft top-lit sheen so the surface reads as physical
-                  3. the base fill
-                  The old flat #0F0F0F sat 5 points off the #0A0A0A section, so
-                  the cards had almost no edge until you hovered them.
-                */
-                background: `
-                  radial-gradient(130% 100% at 0% 0%, ${stat.accent}14, transparent 58%),
-                  linear-gradient(168deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.018) 26%, rgba(255,255,255,0) 60%),
-                  #101010
-                `,
-                border: "1px solid rgba(255, 255, 255, 0.09)",
-                boxShadow:
-                  "0 24px 48px -28px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.06)",
-                padding: "40px",
-              }}
-            >
-              {/* Dynamic Glow Beam (Hover) */}
-              <div
-                className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                style={{
-                  background: `radial-gradient(1000px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${stat.accent}15, transparent 40%)`,
-                  zIndex: 1,
-                }}
-              />
-
-              {/*
-                Accent rule along the top edge. Unlike the old version this is
-                visible at rest, it is the thing that makes a card look
-                deliberately featured instead of merely present. Left anchored
-                and fading out to the right so it reads editorial, not like a
-                progress bar.
-              */}
-              <div
-                className="pointer-events-none absolute top-0 left-0 right-0 transition-opacity duration-500 group-hover:!opacity-100"
-                style={{
-                  height: "2px",
-                  background: `linear-gradient(90deg, ${stat.accent} 0%, ${stat.accent}66 34%, transparent 78%)`,
-                  opacity: 0.6,
-                  zIndex: 2,
-                }}
-              />
-
-              {/* Subtle Noise texture overlay */}
-              <div
-                className="pointer-events-none absolute inset-0 z-[0]"
-                style={{
-                  opacity: 0.03,
-                  mixBlendMode: "overlay",
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilterMetric${index}'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilterMetric${index})'/%3E%3C/svg%3E")`,
-                }}
-              />
-
-              <div className="relative z-10 transition-transform duration-700 group-hover:translate-y-[-4px]">
-                {/*
-                  Brand mark. Ties the figure to the company that produced it,
-                  using the same asset and desaturation treatment as the logo
-                  strip above so the card reads as part of the same family.
-                */}
-                <div
-                  className="inline-flex items-center transition-colors duration-500 group-hover:!border-white/20"
-                  style={{
-                    gap: "10px",
-                    marginBottom: "30px",
-                    height: "38px",
-                    paddingLeft: "10px",
-                    paddingRight: "15px",
-                    borderRadius: "999px",
-                    border: "1px solid rgba(255, 255, 255, 0.09)",
-                    background: "rgba(255, 255, 255, 0.035)",
-                  }}
-                >
-                  {stat.logo ? (
-                    <img
-                      src={stat.logo}
-                      alt=""
-                      loading="lazy"
-                      draggable={false}
-                      style={{
-                        maxHeight: "24px",
-                        maxWidth: "76px",
-                        width: "auto",
-                        height: "auto",
-                        objectFit: "contain",
-                        opacity: 0.6,
-                        filter: "grayscale(1) brightness(1.9) contrast(0.85)",
-                        transition: "opacity 400ms ease, filter 400ms ease",
-                      }}
-                      className="group-hover:!opacity-100 group-hover:![filter:none]"
-                    />
-                  ) : (
-                    <span
-                      aria-hidden="true"
-                      className="flex items-center justify-center transition-all duration-500 group-hover:!border-white/25"
-                      style={{
-                        width: "24px",
-                        height: "24px",
-                        borderRadius: "7px",
-                        border: "1px solid rgba(255, 255, 255, 0.12)",
-                        background: "rgba(255, 255, 255, 0.04)",
-                        fontSize: "12px",
-                        fontWeight: "700",
-                        color: "rgba(255, 255, 255, 0.6)",
-                        letterSpacing: "0",
-                      }}
-                    >
-                      {stat.brand.charAt(0)}
-                    </span>
-                  )}
-
-                  <span
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "600",
-                      letterSpacing: "0.09em",
-                      textTransform: "uppercase",
-                      color: "rgba(255, 255, 255, 0.72)",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {stat.brand}
-                  </span>
-
-                  <span
-                    aria-hidden="true"
-                    style={{
-                      width: "3px",
-                      height: "3px",
-                      borderRadius: "50%",
-                      background: "rgba(255, 255, 255, 0.22)",
-                      flexShrink: 0,
-                    }}
-                  />
-
-                  <span
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "500",
-                      letterSpacing: "0.06em",
-                      textTransform: "uppercase",
-                      color: "rgba(255, 255, 255, 0.34)",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {stat.sector}
-                  </span>
-                </div>
-
-                {/* Big Number Value */}
-                <motion.p
-                  style={{
-                    fontSize: "clamp(72px, 9vw, 104px)",
-                    fontFamily: "Inter, system-ui, -apple-system, sans-serif",
-                    fontWeight: "900",
-                    color: "#FFFFFF",
-                    lineHeight: "0.82",
-                    letterSpacing: "-0.065em",
-                    textShadow: `0 10px 30px rgba(0,0,0,0.5)`,
-                  }}
-                >
-                  {stat.number}
-                </motion.p>
-
-                {/*
-                  Accent underline. Anchors the figure and carries the card's
-                  identity colour at the one place the eye already is. Grows on
-                  hover, which is the only motion the card needs to feel alive.
-                */}
-                <div
-                  aria-hidden="true"
-                  className="transition-all duration-500 ease-out group-hover:!w-[72px]"
-                  style={{
-                    width: "44px",
-                    height: "3px",
-                    borderRadius: "999px",
-                    marginTop: "24px",
-                    background: stat.accent,
-                    opacity: 0.9,
-                  }}
-                />
-              </div>
-
-              <div
-                className="relative z-10 text-left transition-transform duration-700 group-hover:translate-y-[-2px]"
-                style={{
-                  borderTop: "1px solid rgba(255, 255, 255, 0.07)",
-                  paddingTop: "26px",
-                }}
-              >
-                {/* Label */}
-                <p
-                  className="mb-3"
-                  style={{
-                    fontSize: "20px",
-                    fontFamily: "Inter, system-ui, -apple-system, sans-serif",
-                    fontWeight: "700",
-                    color: "#FFFFFF",
-                    lineHeight: "1.2",
-                    letterSpacing: "-0.025em",
-                  }}
-                >
-                  {stat.label}
-                </p>
-
-                {/* Description */}
-                <p
-                  style={{
-                    fontSize: "15px",
-                    color: "rgba(255, 255, 255, 0.52)",
-                    lineHeight: "1.62",
-                    fontWeight: "400",
-                  }}
-                >
-                  {stat.description}
-                </p>
-              </div>
-            </motion.div>
-          ))}
+          <div className="flex md:grid md:grid-cols-3 gap-3">
+            {stats.map((stat, index) => (
+              <ImpactCard key={stat.brand} stat={stat} index={index} />
+            ))}
+          </div>
         </div>
       </div>
     </section>
