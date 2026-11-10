@@ -320,59 +320,6 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
           }}
         />
 
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '14px',
-            padding: '8px 20px',
-            borderRadius: '100px',
-            border: '1px solid rgba(200,140,70,0.22)',
-            background:
-              'rgba(255,255,255,0.03)',
-            backdropFilter: 'blur(10px)',
-            marginBottom: '32px',
-            position: 'relative',
-            zIndex: 1,
-          }}
-        >
-          <span
-            style={{
-              fontSize: '10px',
-              fontWeight: 700,
-              letterSpacing: '0.32em',
-              textTransform: 'uppercase',
-              color: 'rgba(228,184,120,0.9)',
-              fontFamily: 'Inter, system-ui, sans-serif',
-            }}
-          >
-2020 — 2026
-          </span>
-          <span
-            aria-hidden="true"
-            style={{
-              width: '1px',
-              height: '10px',
-              background: 'rgba(255,255,255,0.14)',
-            }}
-          />
-          <span
-            style={{
-              fontSize: '10px',
-              fontWeight: 700,
-              letterSpacing: '0.32em',
-              textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.78)',
-              fontFamily: 'Inter, system-ui, sans-serif',
-            }}
-          >
-            Selected Work
-          </span>
-        </motion.div>
 
         <motion.h2
           initial={{ opacity: 0, y: 26 }}
@@ -380,33 +327,19 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 1.0, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           style={{
-            fontSize: 'clamp(44px, 6.4vw, 80px)',
-            fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-            fontWeight: 800,
-            letterSpacing: '-0.045em',
-            lineHeight: 1.0,
+            fontSize: 'clamp(34px, 4.2vw, 58px)',
+            fontFamily: "'Inter Tight', Inter, system-ui, -apple-system, sans-serif",
+            fontWeight: 600,
+            letterSpacing: '-0.042em',
+            lineHeight: 1.02,
             margin: '0 0 20px 0',
             textAlign: 'center',
             position: 'relative',
             zIndex: 1,
           }}
         >
-          <span
-            style={{
-              backgroundImage:
-                'linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.82) 100%)',
-              WebkitBackgroundClip: 'text',
-              backgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}
-          >
-            Case
-          </span>{' '}
-          <span
-            style={{
-              color: 'rgba(255,255,255,0.45)',
-            }}
-          >
+          <span style={{ color: '#FFFFFF' }}>Case</span>{' '}
+          <span style={{ color: 'rgba(255,255,255,0.42)' }}>
             studies.
           </span>
         </motion.h2>

@@ -1,8 +1,8 @@
 /* ────────────────────────────────────────────────────────────────────────────
  * SectionHeader — the unified headline block used by every section on the
  * landing page (excluding the animated hero). Mirrors the Case Studies
- * pattern: flanking-rules eyebrow → gradient title with an optional italic
- * Fraunces flourish word → subtitle → cyan-dot closer rule.
+ * pattern: flanking-rules eyebrow → title in Inter Tight with an optional
+ * closing phrase set in grey → subtitle → cyan-dot closer rule.
  *
  * Props are intentionally small — the only creative lever is `flourish`,
  * which (if present) is rendered as an italic serif span at the end of the
@@ -11,11 +11,7 @@
 
 import { motion } from 'motion/react';
 import type { CSSProperties, ReactNode } from 'react';
-import {
-  ds,
-  titleGradientFill,
-  titleGlowBackground,
-} from '../styles/designSystem';
+import { ds, titleGlowBackground } from '../styles/designSystem';
 
 export interface SectionHeaderProps {
   /** 10px uppercase label between the two hairlines */
@@ -154,34 +150,25 @@ export function SectionHeader({
       >
         <h2
           style={{
-            ...ds.type.sectionTitle,
-            fontFamily: ds.font.display,
-            color: ds.color.text.primary,
+            /* the same voice as the impact figures: Inter Tight, firm but
+               not black, tight tracking. Two-tone like fantasy.co: the
+               statement in white, the closing phrase in a quieter grey. */
+            fontFamily: "'Inter Tight', Inter, system-ui, -apple-system, sans-serif",
+            fontSize: 'clamp(34px, 4.2vw, 58px)',
+            fontWeight: 600,
+            letterSpacing: '-0.042em',
+            lineHeight: 1.02,
+            color: '#FFFFFF',
             margin: 0,
             textAlign: isCenter ? 'center' : 'left',
-            ...titleGradientFill,
+            textWrap: 'balance',
           }}
         >
           {title}
           {flourish && (
             <>
               {' '}
-              <span
-                style={{
-                  fontFamily: ds.font.serif,
-                  fontStyle: 'italic',
-                  fontWeight: 500,
-                  letterSpacing: '-0.02em',
-                  // Subtle teal tint so the flourish echoes the accent dot
-                  backgroundImage:
-                    'linear-gradient(180deg, #BFFAF3 0%, #4AF2E5 100%)',
-                  WebkitBackgroundClip: 'text',
-                  backgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}
-              >
-                {flourish}
-              </span>
+              <span style={{ color: 'rgba(255,255,255,0.42)' }}>{flourish}</span>
             </>
           )}
         </h2>
