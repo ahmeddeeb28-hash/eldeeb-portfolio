@@ -89,10 +89,9 @@ const DISPLAY = "'Inter Tight', Inter, system-ui, -apple-system, sans-serif";
 const NOISE = `url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
 
 /* "+22%": the figure counts up from zero the first time it is seen. The
-   digits carry the weight; the % sits smaller on the same baseline and the
-   increase is a small arrow raised beside it (the way fantasy.co sets its
-   small + and star marks). */
-function Figure({ value, accent }: { value: string; accent: string }) {
+   digits carry the weight and the % sits smaller on the same baseline. The
+   + stays implied by the section: these are all increases. */
+function Figure({ value }: { value: string }) {
   const m = value.match(/^([+-]?)(\d+(?:\.\d+)?)(.*)$/);
   const n = m ? parseFloat(m[2]) : 0;
   const unit = m ? m[3] : '';
@@ -119,11 +118,6 @@ function Figure({ value, accent }: { value: string; accent: string }) {
     >
       <span ref={ref} aria-hidden="true" style={{ fontVariantNumeric: "tabular-nums" }}>{m ? m[2] : value}</span>
       <span aria-hidden="true" style={{ fontSize: "0.5em", fontWeight: 600, letterSpacing: "-0.02em", marginLeft: "0.04em" }}>{unit}</span>
-      {m?.[1] === '+' && (
-        <svg aria-hidden="true" viewBox="0 0 24 24" className="self-start" style={{ width: "0.2em", height: "0.2em", marginLeft: "-0.01em", marginTop: "0.1em", color: accent }}>
-          <path d="M12 20V5M5.5 11.5 12 5l6.5 6.5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      )}
     </p>
   );
 }
@@ -146,12 +140,6 @@ function ImpactCard({ stat, index }: { stat: (typeof stats)[number]; index: numb
     >
       {/* a fine paper grain, so the surface reads as a material, not a flat fill */}
       <span aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ backgroundImage: NOISE, backgroundSize: "160px", opacity: 0.07, mixBlendMode: "overlay" }} />
-      {/* the card's own colour, only as a faint light from the top corner, brighter on hover */}
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-60 transition-opacity duration-500 group-hover:opacity-100"
-        style={{ background: `radial-gradient(90% 60% at 0% 0%, ${stat.accent}14, transparent 70%)` }}
-      />
 
       <div className="relative flex items-center justify-between gap-4" style={{ minHeight: "28px" }}>
         {stat.logo ? (
@@ -168,11 +156,10 @@ function ImpactCard({ stat, index }: { stat: (typeof stats)[number]; index: numb
             {stat.brand}
           </span>
         )}
-        <span className="text-white/40" style={{ fontSize: "13px", fontWeight: 500 }}>{stat.sector}</span>
       </div>
 
       <div className="relative" style={{ marginTop: "56px" }}>
-        <Figure value={stat.number} accent={stat.accent} />
+        <Figure value={stat.number} />
       </div>
 
       <div className="relative mt-auto" style={{ paddingTop: "40px" }}>
