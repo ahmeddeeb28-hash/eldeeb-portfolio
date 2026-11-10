@@ -85,10 +85,14 @@ const stats = [
   },
 ];
 
-/* "+22%" → a figure that counts up from zero the first time it is seen,
-   with the increase shown as a small arrow beside it (the way
-   fantasy.co sets its small + and ★ marks) */
-function Figure({ value }: { value: string }) {
+const DISPLAY = "'Inter Tight', Inter, system-ui, -apple-system, sans-serif";
+const NOISE = `url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
+
+/* "+22%": the figure counts up from zero the first time it is seen. The
+   digits carry the weight; the % sits smaller on the same baseline and the
+   increase is a small arrow raised beside it (the way fantasy.co sets its
+   small + and star marks). */
+function Figure({ value, accent }: { value: string; accent: string }) {
   const m = value.match(/^([+-]?)(\d+(?:\.\d+)?)(.*)$/);
   const n = m ? parseFloat(m[2]) : 0;
   const unit = m ? m[3] : '';
@@ -98,35 +102,27 @@ function Figure({ value }: { value: string }) {
   useEffect(() => {
     const el = ref.current;
     if (!el || !m) return;
-    if (reduced || !inView) {
-      el.textContent = `${m[2]}${unit}`;
-      if (!inView && !reduced) el.textContent = `0${unit}`;
-      return;
-    }
+    if (reduced) { el.textContent = m[2]; return; }
+    if (!inView) { el.textContent = '0'; return; }
     const c = animate(0, n, {
-      duration: 1.4,
+      duration: 1.5,
       ease: [0.16, 1, 0.3, 1],
-      onUpdate: (x) => (el.textContent = `${Math.round(x)}${unit}`),
+      onUpdate: (x) => (el.textContent = String(Math.round(x))),
     });
     return () => c.stop();
   }, [inView, reduced]);
   return (
     <p
       aria-label={value}
-      className="flex items-start text-white"
-      style={{
-        fontFamily: "Inter, system-ui, -apple-system, sans-serif",
-        fontSize: "clamp(64px, 6.4vw, 96px)",
-        fontWeight: 500,
-        lineHeight: 0.9,
-        letterSpacing: "-0.05em",
-      }}
+      className="flex items-baseline text-white"
+      style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: "clamp(84px, 8.4vw, 128px)", lineHeight: 0.86, letterSpacing: "-0.055em" }}
     >
-      <span ref={ref} aria-hidden="true" className="tabular-nums">{value.replace(/^[+-]/, '')}</span>
+      <span ref={ref} aria-hidden="true" style={{ fontVariantNumeric: "tabular-nums" }}>{m ? m[2] : value}</span>
+      <span aria-hidden="true" style={{ fontSize: "0.5em", fontWeight: 600, letterSpacing: "-0.02em", marginLeft: "0.04em" }}>{unit}</span>
       {m?.[1] === '+' && (
-        <span aria-hidden="true" style={{ fontSize: "0.34em", marginLeft: "0.18em", marginTop: "0.22em", letterSpacing: 0 }}>
-          ↑
-        </span>
+        <svg aria-hidden="true" viewBox="0 0 24 24" className="self-start" style={{ width: "0.2em", height: "0.2em", marginLeft: "-0.01em", marginTop: "0.1em", color: accent }}>
+          <path d="M12 20V5M5.5 11.5 12 5l6.5 6.5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       )}
     </p>
   );
@@ -139,15 +135,51 @@ function ImpactCard({ stat, index }: { stat: (typeof stats)[number]; index: numb
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-10% 0px" }}
       transition={{ delay: index * 0.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-      className="group snap-start flex-none w-[78vw] sm:w-[46vw] md:w-auto flex flex-col justify-between transition-colors duration-300 hover:bg-[#1C1C1C]"
-      style={{ minHeight: "460px", borderRadius: "6px", background: "#161616", padding: "26px 24px 28px" }}
+      className="group relative snap-start flex-none w-[80vw] sm:w-[46vw] md:w-auto flex flex-col overflow-hidden transition-transform duration-500 ease-out motion-safe:hover:-translate-y-1"
+      style={{
+        minHeight: "500px",
+        borderRadius: "22px",
+        background: "linear-gradient(180deg, #1A1A1A 0%, #131313 100%)",
+        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.07), inset 0 0 0 1px rgba(255,255,255,0.05), 0 30px 60px -40px rgba(0,0,0,0.9)",
+        padding: "28px 30px 32px",
+      }}
     >
-      <Figure value={stat.number} />
-      <div>
-        <p className="text-white" style={{ fontSize: "16px", fontWeight: 600, lineHeight: 1.3, letterSpacing: "-0.01em" }}>
-          {stat.brand} {stat.label.toLowerCase()}
+      {/* a fine paper grain, so the surface reads as a material, not a flat fill */}
+      <span aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ backgroundImage: NOISE, backgroundSize: "160px", opacity: 0.07, mixBlendMode: "overlay" }} />
+      {/* the card's own colour, only as a faint light from the top corner, brighter on hover */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-60 transition-opacity duration-500 group-hover:opacity-100"
+        style={{ background: `radial-gradient(90% 60% at 0% 0%, ${stat.accent}14, transparent 70%)` }}
+      />
+
+      <div className="relative flex items-center justify-between gap-4" style={{ minHeight: "28px" }}>
+        {stat.logo ? (
+          <img
+            src={stat.logo}
+            alt={stat.brand}
+            loading="lazy"
+            draggable={false}
+            className="transition-[filter,opacity] duration-500 group-hover:[filter:none] group-hover:opacity-100"
+            style={{ height: "24px", width: "auto", maxWidth: "96px", objectFit: "contain", filter: "grayscale(1) brightness(2.2)", opacity: 0.85 }}
+          />
+        ) : (
+          <span className="text-white/85" style={{ fontFamily: DISPLAY, fontSize: "19px", fontWeight: 700, letterSpacing: "-0.03em" }}>
+            {stat.brand}
+          </span>
+        )}
+        <span className="text-white/40" style={{ fontSize: "13px", fontWeight: 500 }}>{stat.sector}</span>
+      </div>
+
+      <div className="relative" style={{ marginTop: "56px" }}>
+        <Figure value={stat.number} accent={stat.accent} />
+      </div>
+
+      <div className="relative mt-auto" style={{ paddingTop: "40px" }}>
+        <p className="text-white" style={{ fontFamily: DISPLAY, fontSize: "21px", fontWeight: 600, lineHeight: 1.2, letterSpacing: "-0.02em" }}>
+          {stat.label}
         </p>
-        <p className="mt-3" style={{ fontSize: "14px", lineHeight: 1.55, color: "rgba(255,255,255,0.55)", maxWidth: "34ch" }}>
+        <p className="mt-3" style={{ fontSize: "15px", lineHeight: 1.6, color: "rgba(255,255,255,0.56)", maxWidth: "36ch" }}>
           {stat.description}
         </p>
       </div>
@@ -275,7 +307,7 @@ export function BrandsStats() {
           className="-mx-6 px-6 scroll-px-6 md:mx-0 md:px-0 overflow-x-auto md:overflow-visible snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           style={{ marginTop: "80px" }}
         >
-          <div className="flex md:grid md:grid-cols-3 gap-3">
+          <div className="flex md:grid md:grid-cols-3 gap-4">
             {stats.map((stat, index) => (
               <ImpactCard key={stat.brand} stat={stat} index={index} />
             ))}
