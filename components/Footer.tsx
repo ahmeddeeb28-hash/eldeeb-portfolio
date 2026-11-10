@@ -242,7 +242,7 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
             >
               <AnimatedLetters text="Let's Build" delay={0.3} />
               <br />
-              <span style={{ color: 'rgba(255,255,255,0.15)', fontStyle: 'italic' }}>
+              <span style={{ color: 'rgba(255,255,255,0.42)' }}>
                 <AnimatedLetters text="Together." delay={0.6} />
               </span>
             </h2>
