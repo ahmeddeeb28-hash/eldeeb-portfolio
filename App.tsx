@@ -1,5 +1,6 @@
 import { Navigation } from './components/Navigation';
 import { PremiumHero } from './components/PremiumHero';
+import { WhyHire } from './components/WhyHire';
 import { Hero } from './components/Hero';
 import { Features } from './components/Features';
 import { WorkLanguage } from './components/WorkLanguage';
@@ -187,6 +188,7 @@ export default function App() {
       >
         <Navigation onOpenAboutPage={openAboutPage} />
         <PremiumHero />
+        <WhyHire />
         <BrandsStats />
         <Projects onProjectClick={openProject} paused={overlayOpen} />
         {/* Hidden but preserved — restore by uncommenting the line below */}
