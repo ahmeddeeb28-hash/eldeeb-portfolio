@@ -332,7 +332,7 @@ export function PremiumHero() {
                 <span className="absolute inset-0 rounded-full bg-[#34D399] opacity-60 motion-safe:animate-ping" />
                 <span className="relative w-2 h-2 rounded-full bg-[#34D399]" />
               </span>
-              <span className="text-white/90">Open to remote &amp; relocation</span>
+              <span className="text-white/90">Open to Lead &amp; Principal roles</span>
               <span aria-hidden className="h-3.5 w-px bg-white/20" />
               <span className="text-white/55">Based in Egypt</span>
             </p>
