@@ -2,7 +2,7 @@ import { motion } from 'motion/react';
 import type { ReactNode } from 'react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
-import { CaseIntro } from './_shared/CaseLayout';
+import { CaseIntro, MyPart } from './_shared/CaseLayout';
 import { Eyebrow as BaseEyebrow, reveal } from './_shared/CaseBits';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 import { ConversionTiles, Funnel, HeatReel } from './report/ReportUI';
@@ -94,6 +94,21 @@ export function SaryReportCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
               </div>
             </div>
           </motion.div>
+          <MyPart
+            accent={ACCENT}
+            role="Senior Product Designer, Experience Design at Sary, Q4 2022"
+            did={
+              <>
+                <p>Every quarter I wrote one report on how Sary’s app was doing, journey by journey: what converted, where shoppers dropped off, and what we should fix next.</p>
+                <p>The numbers told me where shoppers left. The heatmaps told me why.</p>
+              </>
+            }
+            calls={[
+              { call: 'Apply the banner code to the basket automatically', why: 'Copying a code from a banner gave no success message, and nothing changed in the basket.' },
+              { call: 'Make Discover worth visiting', why: 'Only 9.63% of the 34,860 shoppers who opened the catalogue reached Discover.' },
+              { call: 'Count every rate from the shoppers who reached the step', why: 'So 9.63% reads as 3,357 people, not a share of everyone.', instead: 'Listing every drop-off as “of 34,860”.' },
+            ]}
+          />
         </section>
 
         {/* ── 02 FUNNEL ── */}

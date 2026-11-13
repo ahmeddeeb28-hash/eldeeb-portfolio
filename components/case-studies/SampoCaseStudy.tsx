@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useState, type ReactNode } from 'react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
-import { CaseIntro, Takeaway } from './_shared/CaseLayout';
+import { CaseIntro, Takeaway, MyPart } from './_shared/CaseLayout';
 import { CaseFilm, reveal } from './_shared/CaseBits';
 import { ScrollSteps } from './_shared/ScrollSteps';
 import { AgreedVisual, DiagnosisVisual, FixesVisual, PrototypeVisual, RulesVisual } from './sampo/ProcessVisuals';
@@ -343,6 +343,16 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
               ticker={['Explainable', 'Previewable', 'Reversible', 'Sampo AI', 'SAR 289']}
             />
           </motion.div>
+          <MyPart
+            accent={ACCENT}
+            role="Product Design Consultant (Contract) at Sampo AI, Nov 2024 – Dec 2025"
+            did={<p>I came in as a consultant and led the design team. I got product, data and engineering to agree on the feature and how we’d measure it, built the prototype with Claude, tested it with the team flow by flow, and handed over the rules to keep building with.</p>}
+            calls={[
+              { call: 'Explain the engine before asking for the keys', why: 'Merchants did not distrust the math, they could not see it.' },
+              { call: 'Turn a risky decision into a choice of temperament', why: 'Control is handed over one rung at a time: Careful, Balanced or High Impact, each previewed before it goes live.' },
+              { call: 'Name every action for what it does', why: 'Destructive is named and red, so “Keep strategy” or “Disable strategy” can’t be confused.', instead: '“Yes, Disable” next to “Yes, Cancel”.' },
+            ]}
+          />
         </section>
 
         {/* ── 02 PROBLEM ── */}

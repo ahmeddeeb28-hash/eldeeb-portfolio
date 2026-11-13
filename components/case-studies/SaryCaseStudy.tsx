@@ -1,6 +1,6 @@
 import { motion, useInView, useMotionValue, useReducedMotion, useSpring, useTransform } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
-import { CaseIntro, LeadStats, Takeaway } from './_shared/CaseLayout';
+import { CaseIntro, LeadStats, Takeaway, MyPart } from './_shared/CaseLayout';
 import { ChevronsLeftRight, MousePointerClick } from 'lucide-react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
@@ -396,6 +396,16 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
               ticker={['Restock in one tap', 'Running low', 'Weekly routine', 'Sary', 'Al Amana Grocery · Riyadh']}
             />
           </motion.div>
+          <MyPart
+            accent={ACCENT}
+            role="Product Design Lead at Sary, 2023"
+            did={<p>I designed a Buy Again hub that turns that routine into one tap, flags what’s running low before the shelf is empty, and suggests the next order on the store’s own restock day.</p>}
+            calls={[
+              { call: 'Make the usual basket the first screen', why: 'Returning stores aren’t browsing. Reordering should start on the first screen, not after a search.', instead: 'A discount banner, category shortcuts and brand rails, the same for every store, every visit.' },
+              { call: 'Let owners watch their own products go into the cart', why: 'Owners trust what they can see. Adding 18 items at once only feels safe when they watch their own products go in.' },
+              { call: 'Say when to reorder, not only what', why: 'Running out costs a store sales. The app knows the cycle, so it should say when.', instead: 'Searching the category rails and adding the same items one by one, every week.' },
+            ]}
+          />
         </section>
 
         {/* ── 02 PROBLEM ── */}
