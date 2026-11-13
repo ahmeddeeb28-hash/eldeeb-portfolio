@@ -255,19 +255,21 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
               style={{
                 fontSize: '17px',
                 lineHeight: '1.7',
-                color: 'rgba(255,255,255,0.3)',
+                color: 'rgba(255,255,255,0.6)',
                 fontWeight: '400',
-                maxWidth: '480px',
+                maxWidth: '520px',
                 marginBottom: '48px',
               }}
             >
-              Got a product challenge, a vision, or just an interesting idea?
-              Let's talk and turn it into something that ships.
+              I'm looking for my next Lead or Principal Product Designer role:
+              remote, in the Gulf, or relocating to Europe. If you're hiring,
+              let's talk.
             </motion.p>
 
             {/* CTA Button */}
+            <div className="flex flex-wrap items-center justify-center gap-3" style={{ marginBottom: '64px' }}>
             <motion.a
-              href={CONTACT_EMAIL}
+              href={`${CONTACT_EMAIL}?subject=Hiring%3A%20Lead%20Product%20Designer`}
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.9, delay: 1, ease: [0.22, 1, 0.36, 1] }}
@@ -286,15 +288,26 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
                 fontFamily: 'Inter, system-ui, sans-serif',
                 boxShadow:
                   '0 4px 24px rgba(0,0,0,0.3), 0 0 60px rgba(200,140,70,0.08), 0 0 120px rgba(200,140,70,0.04)',
-                marginBottom: '64px',
               }}
             >
-              Start a Conversation
+              Email me about a role
               <ArrowUpRight
                 className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                 style={{ width: 18, height: 18 }}
               />
             </motion.a>
+            <motion.a
+              href="/cv/Ahmad_Eldeeb_Lead_Product_Designer_CV.pdf"
+              download
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.9, delay: 1.05, ease: [0.22, 1, 0.36, 1] }}
+              className="inline-flex items-center gap-2 transition-colors duration-300 hover:text-white hover:border-white/40"
+              style={{ padding: '18px 32px', borderRadius: '100px', border: '1px solid rgba(255,255,255,0.18)', fontSize: '15px', fontWeight: '700', color: 'rgba(255,255,255,0.85)', textDecoration: 'none' }}
+            >
+              Download CV
+            </motion.a>
+            </div>
           </motion.div>
 
           {/* Navigation Links */}
