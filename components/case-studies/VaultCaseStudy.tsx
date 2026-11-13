@@ -4,7 +4,7 @@ import { ArrowRight, Check } from 'lucide-react';
 import { VAULT_STEPS, VaultPlay, type VaultStage } from './vault/VaultPlay';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
-import { CaseIntro, Takeaway } from './_shared/CaseLayout';
+import { CaseIntro, MyPart, Takeaway } from './_shared/CaseLayout';
 import { CaseFilm, reveal } from './_shared/CaseBits';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 
@@ -391,20 +391,21 @@ export function VaultCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
               ticker={['See your real plan', 'Before you buy', 'One tap in Nafath', 'Same plan at checkout', 'Vault Split']}
             />
           </motion.div>
-          <div className="grid md:grid-cols-3 gap-x-10 gap-y-6 mt-12 border-t pt-8" style={{ borderColor: LINE }}>
-            {[
-              ['The challenge', 'Show an honest plan without slowing checkout or loosening risk.'],
-              ['My role', 'Discovery, problem framing, flows, UI, prototype and motion, end to end.'],
-              ['The outcome', 'A product-page check, a plan with reasons and choices, and an account that keeps the promise after purchase.'],
-            ].map(([k, v]) => (
-              <div key={k}>
-                <p className="text-sm font-semibold mb-2" style={{ color: LIME }}>
-                  {k}
-                </p>
-                <p className="text-white/75 leading-relaxed">{v}</p>
-              </div>
-            ))}
-          </div>
+          <MyPart
+            accent={LIME}
+            role="Lead Product Designer, end to end · independent concept, 2026"
+            did={
+              <>
+                <p>I took it from discovery to a working prototype: problem framing, flows, UI, prototype and motion.</p>
+                <p>The challenge: show an honest plan without slowing checkout or loosening risk.</p>
+              </>
+            }
+            calls={[
+              { call: 'Show the real plan on the product page', why: 'Even when a number is technically shown, shoppers don’t see it at the moment they decide. The problem isn’t disclosure, it’s timing.', instead: 'The ideal plan, which assumes everyone has a full limit.' },
+              { call: 'Design the declines and missed payments, not just the happy path', why: 'They are where trust is won or lost, so each one says what happened, what didn’t, and what to do now.' },
+            ]}
+            tradeoff="Honesty can lower the headline conversion. The bet is that fewer surprises and fewer abandoned checkouts win it back, with risk rates as the guardrail."
+          />
         </section>
 
         {/* ── 02 PROBLEM ── */}

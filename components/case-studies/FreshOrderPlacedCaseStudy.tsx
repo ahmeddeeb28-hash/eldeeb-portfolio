@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
-import { CaseIntro, LeadStats, Takeaway } from './_shared/CaseLayout';
+import { CaseIntro, LeadStats, Takeaway, MyPart } from './_shared/CaseLayout';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 import { FreshPhone, LoopingPhone, type PhoneState } from './fresh/FreshPhone';
 import { FreshPlay } from './fresh/FreshPlay';
@@ -289,6 +289,15 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
               ticker={['5 second window', 'Edit before cancel', 'Sent to Vapiano', 'fresh', 'Arrives 19:45']}
             />
           </motion.div>
+          <MyPart
+            accent={ACCENT}
+            role="Product Designer (Freelance) at fresh"
+            did={<p>I used those seconds to let people fix the two most costly mistakes, a wrong address and wrong items, then sent them straight to tracking.</p>}
+            calls={[
+              { call: 'Turn the wait after Pay into a 5 second window', why: 'A wrong address is the most expensive mistake. This catches it before the kitchen starts.', instead: 'A spinner after Pay.' },
+              { call: 'Edit before cancel', why: 'If cancel is the only option, a quick correction turns into a lost order, a refund and often a ticket.', instead: 'Cancel as the only way to fix an order.' },
+            ]}
+          />
         </section>
 
         {/* ── 02 PROBLEM ── */}

@@ -13,7 +13,10 @@ import { CountUp } from './CountUp';
    anything else ("14.5s") shows as written.
 
    Takeaway: the closing thought in a panel lit by the study's
-   accent, with a large quote mark. No patterns or cards. */
+   accent, with a large quote mark. No patterns or cards.
+
+   MyPart: my role, what I did, and the design calls I made with
+   the reason for each. */
 
 export function CaseIntro({ meta, title, children }: { meta: [string, string][]; title: ReactNode; children: ReactNode }) {
   return (
@@ -99,6 +102,74 @@ export function Takeaway({ accent, deep, label = 'What I carry forward', childre
         <p className="text-white/45 text-sm mb-4">{label}</p>
         <div className="text-white text-2xl md:text-4xl font-semibold leading-snug tracking-[-0.02em]">{children}</div>
         {note && <div className="text-white/45 text-[15px] leading-relaxed mt-8">{note}</div>}
+      </div>
+    </motion.div>
+  );
+}
+
+/* ── My part ──
+   What I actually did on the project and the design calls I made, each
+   with the reason behind it and, where the case says so, what it
+   replaced. Every line comes from the case study's own copy, so the
+   block never claims more than the case does. */
+export type DesignCall = { call: string; why: string; instead?: string };
+
+export function MyPart({
+  accent,
+  role,
+  did,
+  calls,
+  tradeoff,
+}: {
+  accent: string;
+  role: string;
+  did: ReactNode;
+  calls: DesignCall[];
+  tradeoff?: ReactNode;
+}) {
+  return (
+    <motion.div
+      {...reveal}
+      className="mt-14 grid gap-10 rounded-[28px] border border-white/[0.07] p-7 md:p-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16"
+      style={{ background: '#0F1012' }}
+    >
+      <div>
+        <p className="text-sm font-semibold mb-3" style={{ color: accent }}>My part</p>
+        <p className="text-white text-2xl md:text-3xl font-semibold leading-tight tracking-[-0.02em]">{role}</p>
+        <div className="text-white/65 text-base md:text-lg leading-relaxed mt-5 space-y-4">{did}</div>
+        {tradeoff && (
+          <div className="mt-8 border-t border-white/[0.08] pt-6">
+            <p className="text-white/45 text-sm font-semibold mb-2">The trade-off I accepted</p>
+            <p className="text-white/75 leading-relaxed">{tradeoff}</p>
+          </div>
+        )}
+      </div>
+      <div>
+        <p className="text-white/45 text-sm font-semibold mb-5">The calls I made, and why</p>
+        <ol className="grid gap-px overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.08]">
+          {calls.map((c, k) => (
+            <li key={c.call} className="bg-[#0F1012] p-5 md:p-6">
+              <div className="flex gap-4">
+                <span className="text-sm font-semibold tabular-nums pt-0.5" style={{ color: accent }}>
+                  {String(k + 1).padStart(2, '0')}
+                </span>
+                <div>
+                  <p className="text-white text-lg font-semibold leading-snug tracking-[-0.01em]">{c.call}</p>
+                  <p className="text-white/60 leading-relaxed mt-2">
+                    <span className="text-white/40">Why: </span>
+                    {c.why}
+                  </p>
+                  {c.instead && (
+                    <p className="text-white/45 text-[15px] leading-relaxed mt-2">
+                      <span className="text-white/35">Instead of: </span>
+                      {c.instead}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
       </div>
     </motion.div>
   );
