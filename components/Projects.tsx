@@ -71,19 +71,6 @@ interface ProjectsProps {
 */
 const allProjects = [
   {
-    id: 'sary-design-leadership',
-    image: CASE_STUDY_IMAGES.saryGrocery,
-    year: '2021–now',
-    category: 'Design Leadership',
-    title: 'How I Lead Design Teams',
-    summary:
-      'My leadership playbook: five principles, a rhythm from a day to a quarter, one owner per objective, and one bar for hiring. Proven at Sary and Lobah.',
-    accentColor: 'rgba(3,67,248,0.95)',
-    imageGlow:
-      'radial-gradient(ellipse 65% 55% at 30% 30%, rgba(3,67,248,0.09) 0%, transparent 70%)',
-    hasStudy: true,
-  },
-  {
     id: 'shorefield-holidays',
     image: CASE_STUDY_IMAGES.saasDashboard,
     year: '2020',
@@ -202,6 +189,19 @@ const allProjects = [
     accentColor: 'rgba(95,224,162,0.9)',
     imageGlow:
       'radial-gradient(ellipse 65% 55% at 50% 40%, rgba(60,170,115,0.09) 0%, transparent 70%)',
+    hasStudy: true,
+  },
+  {
+    id: 'sary-design-leadership',
+    image: CASE_STUDY_IMAGES.saryGrocery,
+    year: '2021–now',
+    category: 'Design Leadership',
+    title: 'How I Lead Design Teams',
+    summary:
+      'My leadership playbook: five principles, a rhythm from a day to a quarter, one owner per objective, and one bar for hiring. Proven at Sary and Lobah.',
+    accentColor: 'rgba(3,67,248,0.95)',
+    imageGlow:
+      'radial-gradient(ellipse 65% 55% at 30% 30%, rgba(3,67,248,0.09) 0%, transparent 70%)',
     hasStudy: true,
   },
 ];
