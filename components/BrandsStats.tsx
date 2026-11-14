@@ -183,6 +183,11 @@ function ImpactCard({ stat, index }: { stat: (typeof stats)[number]; index: numb
   );
 }
 
+/* The three result cards are hidden for now: reviewers found they
+   repeated the case studies and took a lot of room. The header and logo
+   strip stay. Set to true to bring the cards back. */
+const SHOW_IMPACT_CARDS = false;
+
 export function BrandsStats() {
   const { tr } = useLang();
   return (
@@ -300,6 +305,7 @@ export function BrandsStats() {
           no accent rule, no noise: the number carries the card. On phones
           the row scrolls sideways with snap, like a reel of results.
         */}
+        {SHOW_IMPACT_CARDS && (
         <div
           className="-mx-6 px-6 scroll-px-6 md:mx-0 md:px-0 overflow-x-auto md:overflow-visible snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           style={{ marginTop: "80px" }}
@@ -310,6 +316,7 @@ export function BrandsStats() {
             ))}
           </div>
         </div>
+        )}
       </div>
     </section>
   );
