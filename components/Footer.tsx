@@ -2,16 +2,18 @@ import { Linkedin, Mail, ArrowUpRight, PenLine, Users } from 'lucide-react';
 import { motion, useInView } from 'motion/react';
 import { useRef, useState, useEffect } from 'react';
 import { SECTION_IDS, scrollToSection } from '../lib/scrollToSection';
+import { useLang } from '../lib/i18n';
 
 const CONTACT_EMAIL = 'mailto:ahmeddeeb28@gmail.com';
 
-function AnimatedLetters({ text, delay = 0 }: { text: string; delay?: number }) {
+function AnimatedLetters({ text, delay = 0, words = false }: { text: string; delay?: number; words?: boolean }) {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-40px' });
 
   return (
     <span ref={ref} className="inline-block">
-      {text.split('').map((char, i) => (
+      {/* Arabic letters join, so Arabic animates word by word */}
+      {(words ? text.split(/(\s+)/) : text.split('')).map((char, i) => (
         <motion.span
           key={i}
           initial={{ opacity: 0, y: 60, rotateX: -90 }}
@@ -24,7 +26,7 @@ function AnimatedLetters({ text, delay = 0 }: { text: string; delay?: number }) 
           className="inline-block"
           style={{ transformOrigin: 'bottom' }}
         >
-          {char === ' ' ? '\u00A0' : char}
+          {/^\s+$/.test(char) ? '\u00A0' : char}
         </motion.span>
       ))}
     </span>
@@ -116,6 +118,7 @@ interface FooterProps {
 }
 
 export function Footer({ onOpenAboutPage }: FooterProps) {
+  const { tr, isAr } = useLang();
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: '-60px' });
   const [hoveredSocial, setHoveredSocial] = useState<number | null>(null);
@@ -132,17 +135,17 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
      page does not have. About opens the Director's Cut overlay;
      Contact is the same mailto as the CTA above. */
   const navLinks: { label: string; href: string; onClick?: () => void }[] = [
-    { label: 'Work', href: `#${SECTION_IDS.work}`, onClick: () => scrollToSection(SECTION_IDS.work) },
-    { label: 'My Story', href: '/about', onClick: onOpenAboutPage },
+    { label: tr('Work', 'أعمالي'), href: `#${SECTION_IDS.work}`, onClick: () => scrollToSection(SECTION_IDS.work) },
+    { label: tr('My Story', 'قصتي'), href: '/about', onClick: onOpenAboutPage },
     // Hidden with the Mentorship section in App.tsx — restore together.
     // { label: 'Mentorship', href: `#${SECTION_IDS.mentorship}`, onClick: () => scrollToSection(SECTION_IDS.mentorship) },
-    { label: 'Speaking', href: `#${SECTION_IDS.speaking}`, onClick: () => scrollToSection(SECTION_IDS.speaking) },
-    { label: 'Articles', href: `#${SECTION_IDS.articles}`, onClick: () => scrollToSection(SECTION_IDS.articles) },
-    { label: 'Contact', href: CONTACT_EMAIL },
+    { label: tr('Speaking', 'المشاركات'), href: `#${SECTION_IDS.speaking}`, onClick: () => scrollToSection(SECTION_IDS.speaking) },
+    { label: tr('Articles', 'مقالات'), href: `#${SECTION_IDS.articles}`, onClick: () => scrollToSection(SECTION_IDS.articles) },
+    { label: tr('Contact', 'تواصل'), href: CONTACT_EMAIL },
   ];
 
   // Marquee text
-  const marqueeText = 'LET\'S CREATE SOMETHING EXTRAORDINARY  ·  OPEN FOR COLLABORATIONS  ·  STRATEGY THAT SHIPS  ·  ';
+  const marqueeText = tr('LET\'S CREATE SOMETHING EXTRAORDINARY  ·  OPEN FOR COLLABORATIONS  ·  STRATEGY THAT SHIPS  ·  ', 'لنصنع شيئًا استثنائيًا  ·  متاح للتعاون  ·  استراتيجية تصل إلى الإطلاق  ·  ');
 
   return (
     <footer
@@ -224,7 +227,7 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
                   fontFamily: 'Inter, system-ui, sans-serif',
                 }}
               >
-                Available for Projects
+                {tr('Available for Projects', 'متاح للمشاريع')}
               </span>
             </motion.div>
 
@@ -240,10 +243,10 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
                 marginBottom: '32px',
               }}
             >
-              <AnimatedLetters text="Let's Build" delay={0.3} />
+              <AnimatedLetters text={tr("Let's Build", "لنبنِ")} delay={0.3} words={isAr} />
               <br />
               <span style={{ color: 'rgba(255,255,255,0.42)' }}>
-                <AnimatedLetters text="Together." delay={0.6} />
+                <AnimatedLetters text={tr("Together.", "معًا.")} delay={0.6} words={isAr} />
               </span>
             </h2>
 
@@ -261,8 +264,7 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
                 marginBottom: '48px',
               }}
             >
-              Got a product challenge, a vision, or just an interesting idea?
-              Let's talk and turn it into something that ships.
+              {tr("Got a product challenge, a vision, or just an interesting idea? Let's talk and turn it into something that ships.", 'لديك تحدٍّ في منتج، أو رؤية، أو مجرد فكرة مثيرة؟ لنتحدث ونحوّلها إلى شيء يصل إلى الإطلاق.')}
             </motion.p>
 
             {/* CTA Button */}
@@ -289,7 +291,7 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
                 marginBottom: '64px',
               }}
             >
-              Start a Conversation
+              {tr('Start a Conversation', 'ابدأ محادثة')}
               <ArrowUpRight
                 className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                 style={{ width: 18, height: 18 }}
@@ -390,7 +392,7 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
                   fontFamily: 'Inter, system-ui, sans-serif',
                 }}
               >
-                © {currentYear} Ahmad Eldeeb. Crafted with intention.
+                © {currentYear} {tr('Ahmad Eldeeb. Crafted with intention.', 'أحمد الديب. صُنع بعناية.')}
               </p>
               <p
                 style={{
@@ -400,7 +402,7 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
                   textTransform: 'uppercase' as const,
                 }}
               >
-                Strategy · Design · Delivery
+                {tr('Strategy · Design · Delivery', 'استراتيجية · تصميم · تنفيذ')}
               </p>
             </div>
           </motion.div>

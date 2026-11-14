@@ -578,7 +578,7 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
         {/* the section's own header, on its own row, so it never reads as the episode's title */}
         <div className="pd-lead max-w-3xl mx-auto text-center">{lead}</div>
         {/* the podcast, introduced by its own label below a hairline */}
-        <section aria-label="Podcast" className="relative mt-14 lg:mt-16 rounded-[28px] overflow-hidden p-6 sm:p-10 lg:p-12 grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-10 lg:gap-14 items-center"
+        <section dir="ltr" aria-label="Podcast" className="relative mt-14 lg:mt-16 rounded-[28px] overflow-hidden p-6 sm:p-10 lg:p-12 grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-10 lg:gap-14 items-center"
           style={{ border: '1px solid rgba(255,255,255,0.12)', background: '#0B0B0B', isolation: 'isolate' }}
         >
           {glow}
@@ -601,7 +601,7 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
       {styles}<audio ref={audio} preload="none" />
       {glow}
       {variant === 'closer' && <p className="text-center text-white/50 text-sm mb-8">Listen in</p>}
-      <div className="grid md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] gap-8 md:gap-14 items-center py-6 md:py-12">
+      <div dir="ltr" className="grid md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] gap-8 md:gap-14 items-center py-6 md:py-12">
         {instrument}
         {panel}
       </div>

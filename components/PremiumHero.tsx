@@ -1,6 +1,7 @@
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useRef, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
+import { useLang } from '../lib/i18n';
 
 interface StickyNoteData {
   id: string;
@@ -119,6 +120,7 @@ export function PremiumHero() {
   const [ctaOffset, setCtaOffset] = useState({ x: 0, y: 0 });
   const [photoFailed, setPhotoFailed] = useState(false);
   const [hoveredNote, setHoveredNote] = useState<string | null>(null);
+  const { tr, isAr } = useLang();
 
   const heroViews = [
     {
@@ -159,8 +161,8 @@ export function PremiumHero() {
   const stickyNotes: StickyNoteData[] = [
     {
       id: 'years',
-      value: '10+ Years',
-      label: 'Shaping products',
+      value: tr('10+ Years', '+10 سنوات'),
+      label: tr('Shaping products', 'في صناعة المنتجات'),
       rotate: -7,
       style: { top: '4%', left: '-13%' },
       floatDuration: 5.5,
@@ -170,8 +172,8 @@ export function PremiumHero() {
     },
     {
       id: 'launches',
-      value: '4 Years',
-      label: 'Leading design teams',
+      value: tr('4 Years', '4 سنوات'),
+      label: tr('Leading design teams', 'في قيادة فرق التصميم'),
       rotate: 6,
       style: { bottom: '32%', right: '-14%' },
       floatDuration: 6.2,
@@ -181,8 +183,8 @@ export function PremiumHero() {
     },
     {
       id: 'industries',
-      value: 'EU · Gulf',
-      label: 'Multinational teams',
+      value: tr('EU · Gulf', 'أوروبا · الخليج'),
+      label: tr('Multinational teams', 'فرق متعددة الجنسيات'),
       rotate: -5,
       style: { bottom: '2%', left: '-10%' },
       floatDuration: 5.8,
@@ -309,7 +311,8 @@ export function PremiumHero() {
               marginBottom: '1.6rem',
             }}
           >
-            <span style={{ color: currentView.accent }}>Hello, I’m Ahmad.</span> Lead Product Designer.
+            <span style={{ color: currentView.accent }}>{tr('Hello, I’m Ahmad.', 'مرحبًا، أنا أحمد.')}</span>{' '}
+            {tr('Lead Product Designer.', 'مصمم منتجات رئيسي.')}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 16 }}
@@ -317,8 +320,10 @@ export function PremiumHero() {
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.25 }}
             className="text-white/70 text-lg md:text-xl leading-relaxed max-w-xl mb-10"
           >
-            I lead product design teams and still design the hard parts myself. Ten years across e-commerce, SaaS, fintech,
-            AI and gaming, with teams in Europe and the Gulf.
+            {tr(
+              'I lead product design teams and still design the hard parts myself. Ten years across e-commerce, SaaS, fintech, AI and gaming, with teams in Europe and the Gulf.',
+              'أقود فرق تصميم المنتجات، وما زلت أصمم الأجزاء الصعبة بنفسي. عشر سنوات في التجارة الإلكترونية، والبرمجيات كخدمة، والتقنية المالية، والذكاء الاصطناعي، والألعاب، مع فرق في أوروبا والخليج.',
+            )}
           </motion.p>
           {/* the facts a recruiter scans for first, matching the CV */}
           <motion.div
@@ -332,13 +337,13 @@ export function PremiumHero() {
                 <span className="absolute inset-0 rounded-full bg-[#34D399] opacity-60 motion-safe:animate-ping" />
                 <span className="relative w-2 h-2 rounded-full bg-[#34D399]" />
               </span>
-              <span className="text-white/90">Open to remote &amp; relocation</span>
+              <span className="text-white/90">{tr('Open to remote & relocation', 'متاح للعمل عن بُعد أو الانتقال')}</span>
               <span aria-hidden className="h-3.5 w-px bg-white/20" />
-              <span className="text-white/55">Based in Egypt</span>
+              <span className="text-white/55">{tr('Based in Egypt', 'مقيم في مصر')}</span>
             </p>
             <ul aria-label="Focus" className="flex flex-wrap items-center gap-x-4 sm:gap-x-0 gap-y-2 text-[13px] sm:text-sm md:text-[15px] text-white/60">
-              {['AI product builder', 'Design systems', 'Design leadership'].map((f, i) => (
-                <li key={f} className={i ? 'sm:pl-4 sm:ml-4 sm:border-l border-white/15 leading-none' : 'leading-none'}>
+              {tr(['AI product builder', 'Design systems', 'Design leadership'], ['بناء منتجات بالذكاء الاصطناعي', 'أنظمة التصميم', 'قيادة التصميم']).map((f, i) => (
+                <li key={f} className={i ? 'sm:ps-4 sm:ms-4 sm:border-s border-white/15 leading-none' : 'leading-none'}>
                   {f}
                 </li>
               ))}
@@ -379,8 +384,8 @@ export function PremiumHero() {
                 border: '1px solid rgba(220,190,140,0.6)',
               }}
             >
-              <span className="relative z-10">Hire me</span>
-              <ArrowRight className="relative z-10 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              <span className="relative z-10">{tr('Hire me', 'وظّفني')}</span>
+              <ArrowRight className="relative z-10 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 rtl:-scale-x-100 rtl:group-hover:-translate-x-1" />
             </motion.a>
 
             <a
@@ -397,8 +402,8 @@ export function PremiumHero() {
               onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.95)')}
               onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')}
             >
-              Say hello
-              <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              {tr('Say hello', 'لنتحدث')}
+              <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 rtl:-scale-x-100" />
             </a>
           </motion.div>
         </div>
@@ -492,13 +497,13 @@ export function PremiumHero() {
               <div
                 style={{
                   fontFamily: "'Fraunces', 'Times New Roman', serif",
-                  fontStyle: 'italic',
+                  fontStyle: isAr ? 'normal' : 'italic',
                   fontSize: '1.2rem',
                   color: '#fff',
                   marginBottom: '3px',
                 }}
               >
-                Ahmad Eldeeb
+                {tr('Ahmad Eldeeb', 'أحمد الديب')}
               </div>
               <div
                 style={{
@@ -509,7 +514,7 @@ export function PremiumHero() {
                   color: 'rgba(255,255,255,0.5)',
                 }}
               >
-                Lead Product Designer
+                {tr('Lead Product Designer', 'مصمم منتجات رئيسي')}
               </div>
             </div>
           </div>
@@ -529,7 +534,7 @@ export function PremiumHero() {
           </div>
 
           {/* Gold corner seal echoing the nav identity */}
-          <div
+          <div dir="ltr"
             style={{
               position: 'absolute',
               top: '-14px',

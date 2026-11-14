@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProp
 import { motion, useReducedMotion, type MotionValue } from 'motion/react';
 import { Download, Linkedin, X } from 'lucide-react';
 import { track } from '../lib/analytics';
+import { useLang } from '../lib/i18n';
 
 const CV_URL = '/cv/Ahmad_Eldeeb_Lead_Product_Designer_CV.pdf';
 const LINKEDIN_URL = 'https://www.linkedin.com/in/el-deeb-39032b131/';
@@ -35,6 +36,8 @@ interface FloatingNavProps {
   progress: MotionValue<number>;
   onLogo: () => void;
   logoLabel: string;
+  /* show the English / Arabic switch in the pill (landing page only for now) */
+  langSwitch?: boolean;
   /* locks the page behind the open panel; returns the unlock */
   lockScroll: () => () => void;
   /* an optional quiet link above the CV button, e.g. back to home */
@@ -46,7 +49,7 @@ const PILL_H = 56;
 const PILL_W = 400;
 const PANEL_W = 460;
 
-export function FloatingNav({ items, progress, onLogo, logoLabel, lockScroll, footerLink }: FloatingNavProps) {
+export function FloatingNav({ items, progress, onLogo, logoLabel, lockScroll, footerLink, langSwitch }: FloatingNavProps) {
   const [open, setOpen] = useState(false);
   const [vw, setVw] = useState(() => (typeof window === 'undefined' ? 1440 : window.innerWidth));
   const [panelH, setPanelH] = useState(640);
@@ -120,6 +123,8 @@ export function FloatingNav({ items, progress, onLogo, logoLabel, lockScroll, fo
     window.setTimeout(onSelect, 40);
   };
 
+  const { tr } = useLang();
+  const cvLabel = tr('Download CV', 'تحميل السيرة الذاتية');
   const pillW = Math.min(PILL_W, vw - 32);
   const panelW = Math.min(PANEL_W, vw - 24);
   const sizeT = reduced ? { duration: 0 } : { type: 'spring' as const, bounce: 0.12, duration: 0.6 };
@@ -142,7 +147,7 @@ export function FloatingNav({ items, progress, onLogo, logoLabel, lockScroll, fo
       />
 
       <div
-        className="fixed inset-x-0 z-50 flex justify-center pointer-events-none"
+        className="fixed inset-x-0 z-50 flex justify-center items-start gap-2 pointer-events-none"
         style={{ top: 'max(14px, env(safe-area-inset-top))' }}
       >
         <motion.div
@@ -167,7 +172,7 @@ export function FloatingNav({ items, progress, onLogo, logoLabel, lockScroll, fo
         >
           {/* scroll progress: a lighter layer behind the top row, filling with the page */}
           <div aria-hidden className="absolute left-1 right-1 top-1 overflow-hidden pointer-events-none" style={{ height: PILL_H - 10, borderRadius: 16 }}>
-            <motion.div className="h-full origin-left" style={{ scaleX: progress, background: 'rgba(255,255,255,0.08)' }} />
+            <motion.div className="h-full origin-left rtl:origin-right" style={{ scaleX: progress, background: 'rgba(255,255,255,0.08)' }} />
           </div>
 
           {/* top row: wordmark, menu toggle */}
@@ -184,8 +189,10 @@ export function FloatingNav({ items, progress, onLogo, logoLabel, lockScroll, fo
               style={{ textDecoration: 'none' }}
             >
               <DMark />
-              <span style={wordmark}>ELDEEB</span>
+              <span dir="ltr" style={wordmark}>ELDEEB</span>
             </a>
+            <div className="flex items-center gap-1.5">
+            {langSwitch && <div className="md:hidden"><LangSwitch /></div>}
             <button
               ref={toggleRef}
               type="button"
@@ -220,6 +227,7 @@ export function FloatingNav({ items, progress, onLogo, logoLabel, lockScroll, fo
                 <X className="w-5 h-5" strokeWidth={2} />
               </motion.span>
             </button>
+            </div>
           </div>
 
           {/* the menu: rendered always, inert and hidden while collapsed */}
@@ -253,7 +261,7 @@ export function FloatingNav({ items, progress, onLogo, logoLabel, lockScroll, fo
                       style={{ textDecoration: 'none' }}
                     >
                       <span className="text-[13px] tabular-nums text-white/35 w-6">{String(i + 1).padStart(2, '0')}</span>
-                      <span className="text-[30px] md:text-[34px] font-semibold tracking-[-0.03em] leading-tight transition-transform duration-300 group-hover:translate-x-1">
+                      <span className="text-[30px] md:text-[34px] font-semibold tracking-[-0.03em] leading-tight transition-transform duration-300 group-hover:translate-x-1 rtl:group-hover:-translate-x-1">
                         {item.label}
                       </span>
                     </a>
@@ -280,7 +288,7 @@ export function FloatingNav({ items, progress, onLogo, logoLabel, lockScroll, fo
                 style={{ textDecoration: 'none' }}
               >
                 <Download size={16} strokeWidth={2.25} />
-                Download CV
+                {cvLabel}
               </a>
               <a
                 href={LINKEDIN_URL}
@@ -294,6 +302,24 @@ export function FloatingNav({ items, progress, onLogo, logoLabel, lockScroll, fo
             </div>
           </motion.nav>
         </motion.div>
+        {langSwitch && (
+          <motion.div
+            className="hidden md:flex pointer-events-auto items-center rounded-[20px] px-1.5"
+            initial={reduced ? false : { opacity: 0, y: -16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: EASE, delay: 0.1 }}
+            style={{
+              height: PILL_H,
+              backgroundColor: 'rgba(14,14,16,0.62)',
+              backdropFilter: 'blur(24px) saturate(140%)',
+              WebkitBackdropFilter: 'blur(24px) saturate(140%)',
+              border: '1px solid rgba(255,255,255,0.09)',
+              boxShadow: '0 12px 40px -12px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05)',
+            }}
+          >
+            <LangSwitch wide />
+          </motion.div>
+        )}
       </div>
     </>
   );
@@ -324,6 +350,51 @@ function DMark() {
         style={{ transformOrigin: '49px 46.5px', transformBox: 'view-box' }}
       />
     </svg>
+  );
+}
+
+/* English / Arabic: two letters in a small track, the thumb slides to the
+   chosen language. Each side is labelled in its own language. */
+function LangSwitch({ wide = false }: { wide?: boolean }) {
+  const { lang, setLang } = useLang();
+  const reduced = useReducedMotion();
+  const opts = [
+    { v: 'en' as const, label: wide ? 'English' : 'EN', name: 'English' },
+    { v: 'ar' as const, label: wide ? 'العربية' : 'ع', name: 'العربية' },
+  ];
+  return (
+    <div role="radiogroup" aria-label="Language / اللغة" dir="ltr" className={`relative flex items-center rounded-full bg-white/[0.07] p-0.5 ${wide ? 'h-11' : 'h-9'}`}>
+      {opts.map((o) => {
+        const on = lang === o.v;
+        return (
+          <button
+            key={o.v}
+            type="button"
+            role="radio"
+            aria-checked={on}
+            aria-label={o.name}
+            lang={o.v}
+            onClick={() => {
+              if (!on) {
+                setLang(o.v);
+                track('lang_switch', { lang: o.v });
+              }
+            }}
+            className={`relative z-10 rounded-full font-semibold ${wide ? 'h-10 px-4 text-[14px]' : 'h-8 w-9 text-[13px]'} transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 ${on ? 'text-[#0A0A0A]' : 'text-white/60 hover:text-white'}`}
+            style={o.v === 'ar' ? { fontFamily: "'IBM Plex Sans Arabic', system-ui, sans-serif", fontSize: 15 } : undefined}
+          >
+            {on && (
+              <motion.span
+                layoutId={wide ? 'lang-thumb-wide' : 'lang-thumb'}
+                className="absolute inset-0 -z-10 rounded-full bg-white"
+                transition={reduced ? { duration: 0 } : { type: 'spring', bounce: 0.2, duration: 0.45 }}
+              />
+            )}
+            {o.label}
+          </button>
+        );
+      })}
+    </div>
   );
 }
 

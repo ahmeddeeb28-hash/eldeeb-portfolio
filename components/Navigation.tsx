@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useScroll } from 'motion/react';
 import { FloatingNav } from './FloatingNav';
+import { useLang } from '../lib/i18n';
 import { SECTION_IDS, scrollToSection, scrollToTop } from '../lib/scrollToSection';
 
 /* ── Landing-page navigation ─────────────────────────
@@ -16,13 +17,14 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
   const { scrollYProgress } = useScroll();
   const [activeId, setActiveId] = useState<string | null>(null);
 
+  const { tr } = useLang();
   const sections: { label: string; targetId?: string; onClick?: () => void }[] = [
-    { label: 'Work', targetId: SECTION_IDS.work },
-    { label: 'My Story', onClick: onOpenAboutPage },
+    { label: tr('Work', 'أعمالي'), targetId: SECTION_IDS.work },
+    { label: tr('My Story', 'قصتي'), onClick: onOpenAboutPage },
     // Hidden with the Mentorship section in App.tsx — restore together.
     // { label: 'Mentorship', targetId: SECTION_IDS.mentorship },
-    { label: 'Speaking', targetId: SECTION_IDS.speaking },
-    { label: 'Articles', targetId: SECTION_IDS.articles },
+    { label: tr('Speaking', 'المشاركات'), targetId: SECTION_IDS.speaking },
+    { label: tr('Articles', 'مقالات'), targetId: SECTION_IDS.articles },
   ];
 
   // Highlight the section in view inside the menu
@@ -59,7 +61,8 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
   return (
     <FloatingNav
       progress={scrollYProgress}
-      logoLabel="Eldeeb, back to top"
+      logoLabel={tr("Eldeeb, back to top", "الديب، العودة إلى الأعلى")}
+      langSwitch
       onLogo={scrollToTop}
       lockScroll={lockScroll}
       items={sections.map((s) => ({

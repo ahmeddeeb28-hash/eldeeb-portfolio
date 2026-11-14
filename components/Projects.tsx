@@ -30,6 +30,7 @@ const CASE_STUDY_IMAGES = {
 
 import { ArrowUpRight } from 'lucide-react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
+import { useLang } from '../lib/i18n';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { HIDDEN_PROJECTS } from './case-studies/registry';
 import { track } from '../lib/analytics';
@@ -210,6 +211,7 @@ const projects = allProjects.filter((p) => !HIDDEN_PROJECTS.has(p.id));
 /* ─────────────────────────────────────────────────────────────────────── */
 
 export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
+  const { tr } = useLang();
   const rowRefs = useRef<Array<HTMLElement | null>>([]);
   const stackRef = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -338,9 +340,9 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
             zIndex: 1,
           }}
         >
-          <span style={{ color: '#FFFFFF' }}>Case</span>{' '}
+          <span style={{ color: '#FFFFFF' }}>{tr('Case', 'دراسات')}</span>{' '}
           <span style={{ color: 'rgba(255,255,255,0.42)' }}>
-            studies.
+            {tr('studies.', 'الحالة.')}
           </span>
         </motion.h2>
 
@@ -361,9 +363,10 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
             zIndex: 1,
           }}
         >
-          One methodology across products: Sary's grocery marketplace and
-          how we measured it, SAMPO's AI pricing, and fresh's checkout
-          moment. Strategy that ships, and numbers that show it.
+          {tr(
+            "One methodology across products: Sary's grocery marketplace and how we measured it, SAMPO's AI pricing, and fresh's checkout moment. Strategy that ships, and numbers that show it.",
+            'منهجية واحدة عبر المنتجات: سوق Sary للبقالة وكيف قسنا أثره، وتسعير SAMPO بالذكاء الاصطناعي، ولحظة الدفع في fresh. استراتيجية تصل إلى الإطلاق، وأرقام تثبت ذلك.',
+          )}
         </motion.p>
       </div>
 

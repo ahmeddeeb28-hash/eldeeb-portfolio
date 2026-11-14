@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { ArrowRight, Calendar } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
+import { useLang } from '../lib/i18n';
 
 /* ────────────────────────────────────────────────────────────────────────
  * ARTICLE IMAGES
@@ -52,18 +53,19 @@ const ARTICLES = [
 ] as const;
 
 export function Articles() {
+  const { tr, isAr } = useLang();
   return (
     <section id="articles-activities" className="bg-[#0A0A0A] py-[88px] border-t border-white/[0.03]">
       <div className="container mx-auto px-10 max-w-[1560px]">
         <SectionHeader
-          eyebrow="Perspectives"
-          title="Articles &"
-          flourish="activities."
-          subtitle="Essays and field notes on design critique, research, and what it takes to lead product teams through ambiguity."
+          eyebrow={tr("Perspectives", "وجهات نظر")}
+          title={tr("Articles &", "مقالات")}
+          flourish={tr("activities.", "ومشاركات.")}
+          subtitle={tr("Essays and field notes on design critique, research, and what it takes to lead product teams through ambiguity.", "مقالات وملاحظات ميدانية عن نقد التصميم، والبحث، وما تتطلبه قيادة فرق المنتج وسط الغموض.")}
         />
 
         {/* Articles Grid - Editorial Strip */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
+        <div dir="ltr" className="grid grid-cols-1 md:grid-cols-3 gap-16">
           {ARTICLES.map((article, i) => (
             <motion.a
               key={article.href}

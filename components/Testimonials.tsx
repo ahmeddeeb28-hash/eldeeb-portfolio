@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from 'motion/react';
 import { useRef } from 'react';
 import { ArrowLeft, ArrowRight, Linkedin } from 'lucide-react';
+import { useLang } from '../lib/i18n';
 
 /* ── Recommendations ─────────────────────────────────
    What people say about working with me, word for word from their
@@ -76,6 +77,7 @@ const QUOTES: Quote[] = [
 ];
 
 export function Testimonials() {
+  const { tr, isAr } = useLang();
   const row = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
   const nudge = (dir: 1 | -1) => {
@@ -91,10 +93,10 @@ export function Testimonials() {
         <div className="flex flex-wrap items-end justify-between gap-6 mb-10 md:mb-14">
           <div className="max-w-2xl">
             <h2 id="recommendations-title" className="text-white font-extrabold tracking-[-0.045em] leading-[0.95]" style={{ fontSize: 'clamp(40px, 6vw, 80px)' }}>
-              In their words.
+              {tr('In their words.', 'بكلماتهم.')}
             </h2>
             <p className="text-white/60 text-base md:text-xl leading-snug mt-4">
-              From Sary’s CEO, design and growth directors, and the designers who reported to me.
+              {tr('From Sary’s CEO, design and growth directors, and the designers who reported to me.', 'من الرئيس التنفيذي لـ Sary، ومديري التصميم والنمو، والمصممين الذين عملوا ضمن فريقي.')}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -102,16 +104,16 @@ export function Testimonials() {
               href={LINKEDIN_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-white/15 text-white/80 hover:text-white hover:border-white/30 text-sm font-medium px-4 py-2.5 mr-2 transition-colors"
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 text-white/80 hover:text-white hover:border-white/30 text-sm font-medium px-4 py-2.5 me-2 transition-colors"
             >
               <Linkedin className="w-4 h-4" />
-              All on LinkedIn
+              {tr('All on LinkedIn', 'كلها على LinkedIn')}
             </a>
             <button type="button" onClick={() => nudge(-1)} aria-label="Previous recommendation" className="grid place-items-center w-11 h-11 rounded-full border border-white/15 text-white/80 hover:text-white hover:border-white/30 transition-colors">
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4 rtl:-scale-x-100" />
             </button>
             <button type="button" onClick={() => nudge(1)} aria-label="Next recommendation" className="grid place-items-center w-11 h-11 rounded-full border border-white/15 text-white/80 hover:text-white hover:border-white/30 transition-colors">
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4 rtl:-scale-x-100" />
             </button>
           </div>
         </div>
@@ -121,6 +123,7 @@ export function Testimonials() {
         ref={row}
         role="list"
         aria-label="Recommendations"
+        dir="ltr"
         className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         // line the first card up with the heading, and keep snapping on that edge
         style={{ paddingInline: 'max(16px, calc((100vw - 1440px) / 2 + 24px))', scrollPaddingInline: 'max(16px, calc((100vw - 1440px) / 2 + 24px))' }}

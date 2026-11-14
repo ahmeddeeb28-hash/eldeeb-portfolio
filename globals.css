@@ -257,3 +257,22 @@ h3:not([style*="Bricolage"]):not([style*="Bricolage"] *) {
   -webkit-text-fill-color: rgba(255, 255, 255, 0.42) !important;
   background: none !important;
 }
+
+/* ── Arabic ───────────────────────────────────────────────────────────
+   With <html lang="ar" dir="rtl"> the page reads right to left. Body copy
+   and headlines use IBM Plex Sans Arabic. Arabic letters join,
+   so tracking goes back to normal everywhere (negative tracking breaks
+   the joins). Anything inside an element marked dir="ltr" keeps its own
+   type: product mock-ups, the ELDEEB wordmark, the language switch. */
+html[lang="ar"] body,
+html[lang="ar"] body *:not([dir="ltr"]):not([dir="ltr"] *):not(svg *) {
+  font-family: 'IBM Plex Sans Arabic', Inter, system-ui, sans-serif !important;
+  letter-spacing: normal !important;
+}
+html[lang="ar"] body :is(h1, h2, h3):not([dir="ltr"]):not([dir="ltr"] *):not(svg *),
+html[lang="ar"] body :is(h1, h2, h3):not([dir="ltr"]):not([dir="ltr"] *):not(svg *) *:not(svg *) {
+  font-family: 'IBM Plex Sans Arabic', 'Inter Tight', system-ui, sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: normal !important;
+  line-height: 1.25;
+}

@@ -4,6 +4,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { ArrowLeft, ArrowRight, ArrowUpRight, Compass, Users, Boxes, BarChart3, FlaskConical, BookOpen, Lock, X, Mail, Check, Copy, Linkedin } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { SectionHeader } from './SectionHeader';
+import { useLang } from '../lib/i18n';
 
 /* ────────────────────────────────────────────────────────────────────────
  * LEADERSHIP & STRATEGY
@@ -540,6 +541,7 @@ function AccessDialog({
 }
 
 export function LeadershipStrategy() {
+  const { tr, isAr } = useLang();
   const [openArea, setOpenArea] = useState<Area | null>(null);
   /* Links stay in memory for this visit only; a reload asks again. */
   const [links, setLinks] = useState<Record<string, WorkspaceLink[]> | null>(null);
@@ -580,14 +582,15 @@ export function LeadershipStrategy() {
         className="relative mx-auto max-w-7xl"
       >
         <SectionHeader
-          eyebrow="Private Workspace"
-          title="Leadership &"
-          flourish="strategy."
-          subtitle="Beyond designing experiences, I focus on building the teams, strategies, and systems that make great products possible. Explore how I approach leadership, product decisions, operational excellence, and measurable business impact."
+          eyebrow={tr("Private Workspace", "مساحة خاصة")}
+          title={tr("Leadership &", "القيادة")}
+          flourish={tr("strategy.", "والاستراتيجية.")}
+          subtitle={tr("Beyond designing experiences, I focus on building the teams, strategies, and systems that make great products possible. Explore how I approach leadership, product decisions, operational excellence, and measurable business impact.", "إلى جانب تصميم التجارب، أركّز على بناء الفرق والاستراتيجيات والأنظمة التي تجعل المنتجات العظيمة ممكنة. تعرّف على طريقتي في القيادة، وقرارات المنتج، وجودة التشغيل، والأثر التجاري القابل للقياس.")}
         />
 
         {/* ── Stage: covers in a row, the middle one in focus ── */}
         <div
+          dir="ltr"
           className="relative"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}

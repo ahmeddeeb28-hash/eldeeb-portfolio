@@ -2,6 +2,7 @@ import { PodcastDeck } from './PodcastDeck';
 import { motion, useInView } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { useLang } from '../lib/i18n';
 
 /* ──────────────────────────────────────────────────────────────
  * BEYOND THE SCREEN — Public talks, workshops & community activities.
@@ -276,6 +277,7 @@ function usePlacement(): 'a' | 'b' | 'c' {
 }
 
 export function ProofOfPresence() {
+  const { tr, isAr } = useLang();
   const placement = usePlacement();
   const headline = (
     <>
@@ -311,7 +313,7 @@ export function ProofOfPresence() {
                   color: 'rgba(220,190,140,0.85)',
                 }}
               >
-                Beyond the Screen
+                {tr('Beyond the Screen', 'خارج الشاشة')}
               </span>
             </motion.div>
 
@@ -335,9 +337,9 @@ export function ProofOfPresence() {
                 WebkitTextFillColor: 'transparent',
               }}
             >
-              I share what
+              {tr('I share what', 'أشارك ما')}
               <br />
-              the work{' '}
+              {tr('the work', 'تعلّمته')}{' '}
               <span
                 style={{
                   fontFamily: "'Fraunces', 'Times New Roman', serif",
@@ -349,7 +351,7 @@ export function ProofOfPresence() {
                   letterSpacing: '-0.03em',
                 }}
               >
-                taught me.
+                {tr('taught me.', 'من العمل.')}
               </span>
             </motion.h2>
 
@@ -426,6 +428,7 @@ export function ProofOfPresence() {
         {/* Podcast: a playable record player (placement B: after the intro) */}
         {placement === 'b' && <PodcastDeck variant="band" />}
 
+        <div dir="ltr">
         {/* Horizontal dateline rule */}
         <motion.div
           initial={{ scaleX: 0 }}
@@ -596,6 +599,8 @@ export function ProofOfPresence() {
               </span>
             </div>
           </div>
+        </div>
+
         </div>
 
         {/* placement C: the podcast closes the section */}
