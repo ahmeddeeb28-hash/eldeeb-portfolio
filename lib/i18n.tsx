@@ -13,6 +13,11 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 
 export type Lang = 'en' | 'ar';
 
+/* Arabic is parked for now: the copy and right-to-left styling stay in
+   the code, but the switch is hidden and the page always reads in
+   English. Set this back to true to bring Arabic back. */
+export const ARABIC_ENABLED = false;
+
 type Ctx = { lang: Lang; setLang: (l: Lang) => void; tr: <T,>(en: T, ar: T) => T; isAr: boolean };
 
 const LangContext = createContext<Ctx>({ lang: 'en', setLang: () => {}, tr: (en) => en, isAr: false });
@@ -23,7 +28,7 @@ const FONT_URL =
   'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap';
 
 function initialLang(): Lang {
-  if (typeof window === 'undefined') return 'en';
+  if (typeof window === 'undefined' || !ARABIC_ENABLED) return 'en';
   try {
     const q = new URLSearchParams(window.location.search).get('lang');
     if (q === 'ar' || q === 'en') return q;
@@ -55,6 +60,7 @@ export function LangProvider({ children }: { children: ReactNode }) {
   }, [lang]);
 
   const setLang = useCallback((l: Lang) => {
+    if (!ARABIC_ENABLED) return;
     setLangState(l);
     try {
       window.localStorage.setItem(STORE, l);

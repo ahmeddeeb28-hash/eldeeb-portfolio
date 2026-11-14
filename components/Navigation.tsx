@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useScroll } from 'motion/react';
 import { FloatingNav } from './FloatingNav';
-import { useLang } from '../lib/i18n';
+import { ARABIC_ENABLED, useLang } from '../lib/i18n';
 import { SECTION_IDS, scrollToSection, scrollToTop } from '../lib/scrollToSection';
 
 /* ── Landing-page navigation ─────────────────────────
@@ -62,7 +62,7 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
     <FloatingNav
       progress={scrollYProgress}
       logoLabel={tr("Eldeeb, back to top", "الديب، العودة إلى الأعلى")}
-      langSwitch
+      langSwitch={ARABIC_ENABLED}
       onLogo={scrollToTop}
       lockScroll={lockScroll}
       items={sections.map((s) => ({
