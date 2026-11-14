@@ -139,13 +139,13 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
     { label: tr('My Story', 'قصتي'), href: '/about', onClick: onOpenAboutPage },
     // Hidden with the Mentorship section in App.tsx — restore together.
     // { label: 'Mentorship', href: `#${SECTION_IDS.mentorship}`, onClick: () => scrollToSection(SECTION_IDS.mentorship) },
-    { label: tr('Speaking', 'المشاركات'), href: `#${SECTION_IDS.speaking}`, onClick: () => scrollToSection(SECTION_IDS.speaking) },
+    { label: tr('Speaking', 'محاضرات'), href: `#${SECTION_IDS.speaking}`, onClick: () => scrollToSection(SECTION_IDS.speaking) },
     { label: tr('Articles', 'مقالات'), href: `#${SECTION_IDS.articles}`, onClick: () => scrollToSection(SECTION_IDS.articles) },
     { label: tr('Contact', 'تواصل'), href: CONTACT_EMAIL },
   ];
 
   // Marquee text
-  const marqueeText = tr('LET\'S CREATE SOMETHING EXTRAORDINARY  ·  OPEN FOR COLLABORATIONS  ·  STRATEGY THAT SHIPS  ·  ', 'لنصنع شيئًا استثنائيًا  ·  متاح للتعاون  ·  استراتيجية تصل إلى الإطلاق  ·  ');
+  const marqueeText = tr('LET\'S CREATE SOMETHING EXTRAORDINARY  ·  OPEN FOR COLLABORATIONS  ·  STRATEGY THAT SHIPS  ·  ', 'فكرة جيدة تستحق أن تصل     مفتوح للتعاون     من الاستراتيجية إلى الإطلاق     ');
 
   return (
     <footer
@@ -227,7 +227,7 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
                   fontFamily: 'Inter, system-ui, sans-serif',
                 }}
               >
-                {tr('Available for Projects', 'متاح للمشاريع')}
+                {tr('Available for Projects', 'متاح لمشاريع جديدة')}
               </span>
             </motion.div>
 
@@ -243,10 +243,10 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
                 marginBottom: '32px',
               }}
             >
-              <AnimatedLetters text={tr("Let's Build", "لنبنِ")} delay={0.3} words={isAr} />
+              <AnimatedLetters text={tr("Let's Build", "لنبنِ شيئًا")} delay={0.3} words={isAr} />
               <br />
               <span style={{ color: 'rgba(255,255,255,0.42)' }}>
-                <AnimatedLetters text={tr("Together.", "معًا.")} delay={0.6} words={isAr} />
+                <AnimatedLetters text={tr("Together.", "معًا")} delay={0.6} words={isAr} />
               </span>
             </h2>
 
@@ -264,7 +264,7 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
                 marginBottom: '48px',
               }}
             >
-              {tr("Got a product challenge, a vision, or just an interesting idea? Let's talk and turn it into something that ships.", 'لديك تحدٍّ في منتج، أو رؤية، أو مجرد فكرة مثيرة؟ لنتحدث ونحوّلها إلى شيء يصل إلى الإطلاق.')}
+              {tr("Got a product challenge, a vision, or just an interesting idea? Let's talk and turn it into something that ships.", 'عندك تحدٍّ في منتج، أو رؤية، أو فكرة لم تجد طريقها بعد؟ لنتحدث ونحوّلها إلى شيء يصل إلى الناس.')}
             </motion.p>
 
             {/* CTA Button */}
@@ -291,7 +291,7 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
                 marginBottom: '64px',
               }}
             >
-              {tr('Start a Conversation', 'ابدأ محادثة')}
+              {tr('Start a Conversation', 'لنبدأ الحديث')}
               <ArrowUpRight
                 className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                 style={{ width: 18, height: 18 }}
@@ -402,7 +402,7 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
                   textTransform: 'uppercase' as const,
                 }}
               >
-                {tr('Strategy · Design · Delivery', 'استراتيجية · تصميم · تنفيذ')}
+                {tr('Strategy · Design · Delivery', 'استراتيجية، تصميم، تنفيذ')}
               </p>
             </div>
           </motion.div>

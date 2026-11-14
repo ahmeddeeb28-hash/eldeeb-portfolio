@@ -55,8 +55,8 @@ const stats = [
   {
     number: "+22%",
     label: "Weekly Active Users",
-    labelAr: "المستخدمون النشطون أسبوعيًا",
-    descriptionAr: "إعادة بناء تجربة الادخار الأساسية والإشعارات من حولها أعادت الناس أسبوعًا بعد أسبوع.",
+    labelAr: "مستخدمون يعودون كل أسبوع",
+    descriptionAr: "أعدت بناء تجربة الادخار من أساسها، ومعها التنبيهات المحيطة بها، فصار الناس يعودون أسبوعًا بعد أسبوع.",
     brand: "Hakbah",
     sector: "Fintech",
     logo: "/images/brands/g8.png",
@@ -67,8 +67,8 @@ const stats = [
   {
     number: "+27%",
     label: "Average Order Value",
-    labelAr: "متوسط قيمة الطلب",
-    descriptionAr: "وصل المشترون إلى المنتجات المناسبة أسرع بعد إعادة تصميم التصفح والدفع حول طريقة تسوقهم الفعلية.",
+    labelAr: "قيمة السلة في كل طلب",
+    descriptionAr: "أعدت تصميم التصفح والدفع على طريقة التسوق الحقيقية، فوصل المشترون إلى ما يحتاجونه أسرع.",
     brand: "Sary",
     sector: "B2B Commerce",
     logo: "/images/brands/image 8.png",
@@ -82,7 +82,7 @@ const stats = [
     number: "+40%",
     label: "Dashboard Usage",
     labelAr: "استخدام لوحة التحكم",
-    descriptionAr: "شرح كل استراتيجية تسعير واختبارها قبل تفعيلها جعل التجار يستخدمون لوحة التحكم أكثر خلال التجربة الأولية.",
+    descriptionAr: "كل استراتيجية تسعير تُشرح وتُجرَّب قبل تفعيلها، فزاد اعتماد التجار على اللوحة في التجربة الأولى.",
     brand: "Sampo AI",
     sector: "AI · SaaS",
     logo: null,
@@ -208,10 +208,10 @@ export function BrandsStats() {
 
       <div className="relative mx-auto max-w-7xl">
         <SectionHeader
-          eyebrow={tr("Impact", "الأثر")}
-          title={tr("Designing products that drive", "أصمم منتجات تحقق")}
-          flourish={tr("real results.", "نتائج حقيقية.")}
-          subtitle={tr("A decade of design work, measured by what changed after launch.", "عشر سنوات من التصميم، تُقاس بما تغيّر بعد الإطلاق.")}
+          eyebrow={tr("Impact", "ما تغيّر")}
+          title={tr("Designing products that drive", "منتجات صمّمتها")}
+          flourish={tr("real results.", "وأرقام تحكي عنها")}
+          subtitle={tr("A decade of design work, measured by what changed after launch.", "عشر سنوات من العمل، والحكم الأخير دائمًا لما يحدث بعد الإطلاق.")}
         />
 
         {/* Brands & Social Proof Subsection */}

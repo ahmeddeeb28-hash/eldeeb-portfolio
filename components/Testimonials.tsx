@@ -76,6 +76,19 @@ const QUOTES: Quote[] = [
   },
 ];
 
+/* Arabic renderings of the same recommendations, same order. The
+   originals are in English on LinkedIn; names and job titles stay as
+   they are there. */
+const QUOTES_AR: { text: string; relation: string }[] = [
+  { text: 'قدرته على تحويل البيانات المعقدة إلى رؤى قابلة للتنفيذ كانت لا تُقدَّر بثمن في قراراتنا الاستراتيجية. زرع ثقافة الابتكار في فريق التصميم، فتحسّن التعاون وارتفع مستوى ما نقدّمه.', relation: 'عملنا معًا في ساري' },
+  { text: 'لدى أحمد قدرة على ابتكار حلول خلّاقة للمشكلات المعقدة، ويتخذ قرارات سليمة مبنية على تواصله مع مديري المنتج وفهمه لاحتياجات فريقه. منفتح على تجربة الجديد، ومستعد دائمًا لخوض التحديات.', relation: 'عملنا معًا' },
+  { text: 'أحمد قائد ممتاز، والعمل معه كان مريحًا وممتعًا في آن واحد. منتبه دائمًا للتفاصيل، شغوف بعمله، وملتزم بكل ما يقوم به. يجيد تنظيم العمل وتوزيع المهام حسب نقاط قوة كل فرد، ويهتم بنموّنا المهني، فكان مرشدًا حقيقيًا على الطريق.', relation: 'كانت في فريقه مباشرة' },
+  { text: 'أحمد قائد استثنائي، وأشعر بأنني محظوظة جدًا لأنني كنت في فريقه. تحت قيادته كان كل شيء منظمًا وشفافًا وواضحًا. صنع بيئة يشعر فيها الجميع بالدعم، وبأن صوتهم مسموع وجهدهم مقدَّر.', relation: 'كانت في فريقه مباشرة' },
+  { text: 'إدارة أحمد البارعة لطقوس التقارير، وجهده الاستثنائي في تخصيصها لتعكس أداء المنتج، يكشفان مهارته في بناء ثقافة جديدة تجمع التصميم بنمو المنتج.', relation: 'عملنا معًا' },
+  { text: 'عملت تحت إدارة أحمد شهورًا طويلة، ولا تكفي الكلمات لوصف انتباهه للتفاصيل، وإيجابيته، ومعرفته بتصميم التجربة والواجهات داخل صناعة الألعاب وخارجها. أحمد مصمم جاد ومدير رائع، وسيكون إضافة لأي فريق.', relation: 'كان في فريقه مباشرة' },
+  { text: 'أحمد من المصممين الذين يصلون إلى جوهر المشكلة ويحلّونها بأناقة وفعالية. لم يكتفِ بعرض النتائج، بل حدّد ما يعنيه النجاح، وأوضح كيف سيُحدث عملنا فرقًا حقيقيًا.', relation: 'عملنا في الفريق نفسه' },
+];
+
 export function Testimonials() {
   const { tr, isAr } = useLang();
   const row = useRef<HTMLDivElement>(null);
@@ -84,7 +97,7 @@ export function Testimonials() {
     const el = row.current;
     if (!el) return;
     const card = el.querySelector<HTMLElement>('[data-card]');
-    el.scrollBy({ left: dir * ((card?.offsetWidth ?? 480) + 16), behavior: reduced ? 'auto' : 'smooth' });
+    el.scrollBy({ left: (isAr ? -dir : dir) * ((card?.offsetWidth ?? 480) + 16), behavior: reduced ? 'auto' : 'smooth' });
   };
 
   return (
@@ -93,10 +106,10 @@ export function Testimonials() {
         <div className="flex flex-wrap items-end justify-between gap-6 mb-10 md:mb-14">
           <div className="max-w-2xl">
             <h2 id="recommendations-title" className="text-white font-extrabold tracking-[-0.045em] leading-[0.95]" style={{ fontSize: 'clamp(40px, 6vw, 80px)' }}>
-              {tr('In their words.', 'بكلماتهم.')}
+              {tr('In their words.', 'بلسان من عمل معي')}
             </h2>
             <p className="text-white/60 text-base md:text-xl leading-snug mt-4">
-              {tr('From Sary’s CEO, design and growth directors, and the designers who reported to me.', 'من الرئيس التنفيذي لـ Sary، ومديري التصميم والنمو، والمصممين الذين عملوا ضمن فريقي.')}
+              {tr('From Sary’s CEO, design and growth directors, and the designers who reported to me.', 'الرئيس التنفيذي لساري، ومديرو تصميم ونمو، ومصممون كانوا في فريقي. نقلتُ كلماتهم إلى العربية، والنص الأصلي على لينكدإن.')}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -107,7 +120,7 @@ export function Testimonials() {
               className="inline-flex items-center gap-2 rounded-full border border-white/15 text-white/80 hover:text-white hover:border-white/30 text-sm font-medium px-4 py-2.5 me-2 transition-colors"
             >
               <Linkedin className="w-4 h-4" />
-              {tr('All on LinkedIn', 'كلها على LinkedIn')}
+              {tr('All on LinkedIn', 'اقرأها على لينكدإن')}
             </a>
             <button type="button" onClick={() => nudge(-1)} aria-label="Previous recommendation" className="grid place-items-center w-11 h-11 rounded-full border border-white/15 text-white/80 hover:text-white hover:border-white/30 transition-colors">
               <ArrowLeft className="w-4 h-4 rtl:-scale-x-100" />
@@ -123,7 +136,6 @@ export function Testimonials() {
         ref={row}
         role="list"
         aria-label="Recommendations"
-        dir="ltr"
         className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         // line the first card up with the heading, and keep snapping on that edge
         style={{ paddingInline: 'max(16px, calc((100vw - 1440px) / 2 + 24px))', scrollPaddingInline: 'max(16px, calc((100vw - 1440px) / 2 + 24px))' }}
@@ -143,7 +155,7 @@ export function Testimonials() {
               “
             </span>
             <blockquote className="mt-6 mb-8 flex-1 flex items-center">
-              <p className="text-white text-lg md:text-[21px] leading-[1.45] tracking-[-0.01em]">{q.text}</p>
+              <p className="text-white text-lg md:text-[21px] leading-[1.45] tracking-[-0.01em] rtl:text-[19px] rtl:md:text-[20px]">{isAr ? QUOTES_AR[i].text : q.text}</p>
             </blockquote>
             <figcaption className="flex items-center gap-3.5">
               <img
@@ -158,9 +170,9 @@ export function Testimonials() {
                 style={{ boxShadow: `0 0 0 2px ${q.tint}` }}
               />
               <span className="min-w-0">
-                <span className="block text-white font-semibold text-[15px]">{q.name}</span>
-                <span className="block text-white/55 text-[13px] leading-snug">{q.role}</span>
-                <span className="block text-white/40 text-[12px] mt-0.5">{q.relation}</span>
+                <span dir="ltr" className="block text-white font-semibold text-[15px] rtl:text-right">{q.name}</span>
+                <span dir="ltr" className="block text-white/55 text-[13px] leading-snug rtl:text-right">{q.role}</span>
+                <span className="block text-white/40 text-[12px] mt-0.5">{isAr ? QUOTES_AR[i].relation : q.relation}</span>
               </span>
             </figcaption>
           </motion.figure>

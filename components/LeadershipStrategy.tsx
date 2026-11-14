@@ -39,6 +39,15 @@ const AREAS: Area[] = [
   { id: 'playbooks', icon: BookOpen, title: 'Leadership Playbooks & Case Studies', keywords: 'Challenges · Scaling · Lessons', image: '/images/leadership/06-playbooks.webp' },
 ];
 
+const AREAS_AR: Record<string, { title: string; keywords: string }> = {
+  strategy: { title: 'استراتيجية المنتج والتصميم', keywords: 'الرؤية، وخرائط الطريق، والأولويات' },
+  operations: { title: 'تشغيل التصميم وقيادة الفرق', keywords: 'الفرق، وطرق العمل، والإرشاد' },
+  systems: { title: 'أنظمة التصميم وحوكمتها', keywords: 'البنية، والرموز، والمعايير' },
+  analytics: { title: 'تحليلات المنتج وأثره التجاري', keywords: 'المؤشرات، والاحتفاظ، والعائد' },
+  research: { title: 'البحث وأُطر اتخاذ القرار', keywords: 'الاكتشاف، والاختبار، والموازنة بين الخيارات' },
+  playbooks: { title: 'أدلة القيادة ودراسات الحالة', keywords: 'التحديات، والتوسع، والدروس' },
+};
+
 const GOLD = '#DCBE8C';
 
 /* Stand-in until a real image is added: a blurred document silhouette, so
@@ -582,10 +591,10 @@ export function LeadershipStrategy() {
         className="relative mx-auto max-w-7xl"
       >
         <SectionHeader
-          eyebrow={tr("Private Workspace", "مساحة خاصة")}
-          title={tr("Leadership &", "القيادة")}
-          flourish={tr("strategy.", "والاستراتيجية.")}
-          subtitle={tr("Beyond designing experiences, I focus on building the teams, strategies, and systems that make great products possible. Explore how I approach leadership, product decisions, operational excellence, and measurable business impact.", "إلى جانب تصميم التجارب، أركّز على بناء الفرق والاستراتيجيات والأنظمة التي تجعل المنتجات العظيمة ممكنة. تعرّف على طريقتي في القيادة، وقرارات المنتج، وجودة التشغيل، والأثر التجاري القابل للقياس.")}
+          eyebrow={tr("Private Workspace", "خلف الكواليس")}
+          title={tr("Leadership &", "كيف أقود")}
+          flourish={tr("strategy.", "الفرق والقرارات")}
+          subtitle={tr("Beyond designing experiences, I focus on building the teams, strategies, and systems that make great products possible. Explore how I approach leadership, product decisions, operational excellence, and measurable business impact.", "التصميم الجيد وحده لا يكفي. وراء كل منتج ناجح فريق متماسك، واستراتيجية واضحة، ونظام يحمي الجودة. هنا أشارك كيف أبني ذلك: القيادة، وقرارات المنتج، وتشغيل التصميم، والأثر الذي يُقاس.")}
         />
 
         {/* ── Stage: covers in a row, the middle one in focus ── */}
@@ -686,14 +695,14 @@ export function LeadershipStrategy() {
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             >
-              <p style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.16em', color: GOLD, fontVariantNumeric: 'tabular-nums' }}>
+              <p dir="ltr" style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.16em', color: GOLD, fontVariantNumeric: 'tabular-nums' }}>
                 {String(active + 1).padStart(2, '0')} / {String(count).padStart(2, '0')}
               </p>
               <h3 className="mt-2 font-semibold" style={{ fontSize: '20px', color: 'rgba(255,255,255,0.95)' }}>
-                {current.title}
+                {isAr ? AREAS_AR[current.id]?.title ?? current.title : current.title}
               </h3>
-              <p className="mt-1" style={{ fontSize: '13.5px', color: 'rgba(255,255,255,0.55)' }}>
-                {current.keywords}
+              <p className="mt-1" style={{ fontSize: isAr ? '15px' : '13.5px', color: 'rgba(255,255,255,0.55)' }}>
+                {isAr ? AREAS_AR[current.id]?.keywords ?? current.keywords : current.keywords}
               </p>
             </motion.div>
           </AnimatePresence>
@@ -705,7 +714,7 @@ export function LeadershipStrategy() {
             style={{ fontSize: '14px' }}
           >
             <Lock className="h-3.5 w-3.5" style={{ color: GOLD }} aria-hidden="true" />
-            {links ? 'Open resources' : 'Request access'}
+            {links ? tr('Open resources', 'افتح المصادر') : tr('Request access', 'اطلب الاطلاع')}
           </button>
 
           {/* Progress dots */}

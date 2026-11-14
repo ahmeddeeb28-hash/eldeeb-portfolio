@@ -162,7 +162,7 @@ export function PremiumHero() {
     {
       id: 'years',
       value: tr('10+ Years', '+10 سنوات'),
-      label: tr('Shaping products', 'في صناعة المنتجات'),
+      label: tr('Shaping products', 'أبني منتجات'),
       rotate: -7,
       style: { top: '4%', left: '-13%' },
       floatDuration: 5.5,
@@ -173,7 +173,7 @@ export function PremiumHero() {
     {
       id: 'launches',
       value: tr('4 Years', '4 سنوات'),
-      label: tr('Leading design teams', 'في قيادة فرق التصميم'),
+      label: tr('Leading design teams', 'أقود فرق تصميم'),
       rotate: 6,
       style: { bottom: '32%', right: '-14%' },
       floatDuration: 6.2,
@@ -183,8 +183,8 @@ export function PremiumHero() {
     },
     {
       id: 'industries',
-      value: tr('EU · Gulf', 'أوروبا · الخليج'),
-      label: tr('Multinational teams', 'فرق متعددة الجنسيات'),
+      value: tr('EU · Gulf', 'أوروبا والخليج'),
+      label: tr('Multinational teams', 'فرق من جنسيات مختلفة'),
       rotate: -5,
       style: { bottom: '2%', left: '-10%' },
       floatDuration: 5.8,
@@ -311,8 +311,8 @@ export function PremiumHero() {
               marginBottom: '1.6rem',
             }}
           >
-            <span style={{ color: currentView.accent }}>{tr('Hello, I’m Ahmad.', 'مرحبًا، أنا أحمد.')}</span>{' '}
-            {tr('Lead Product Designer.', 'مصمم منتجات رئيسي.')}
+            <span style={{ color: currentView.accent }}>{tr('Hello, I’m Ahmad.', 'أهلًا، أنا أحمد')}</span>{' '}
+            {tr('Lead Product Designer.', 'وأقود تصميم المنتجات')}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 16 }}
@@ -322,7 +322,7 @@ export function PremiumHero() {
           >
             {tr(
               'I lead product design teams and still design the hard parts myself. Ten years across e-commerce, SaaS, fintech, AI and gaming, with teams in Europe and the Gulf.',
-              'أقود فرق تصميم المنتجات، وما زلت أصمم الأجزاء الصعبة بنفسي. عشر سنوات في التجارة الإلكترونية، والبرمجيات كخدمة، والتقنية المالية، والذكاء الاصطناعي، والألعاب، مع فرق في أوروبا والخليج.',
+              'أقود فرق التصميم، ولا أترك القلم حين تصعب المهمة. عشر سنوات بين التجارة الإلكترونية والتقنية المالية والذكاء الاصطناعي والألعاب ومنصات الأعمال، مع فرق في أوروبا والخليج.',
             )}
           </motion.p>
           {/* the facts a recruiter scans for first, matching the CV */}
@@ -337,13 +337,13 @@ export function PremiumHero() {
                 <span className="absolute inset-0 rounded-full bg-[#34D399] opacity-60 motion-safe:animate-ping" />
                 <span className="relative w-2 h-2 rounded-full bg-[#34D399]" />
               </span>
-              <span className="text-white/90">{tr('Open to remote & relocation', 'متاح للعمل عن بُعد أو الانتقال')}</span>
-              <span aria-hidden className="h-3.5 w-px bg-white/20" />
-              <span className="text-white/55">{tr('Based in Egypt', 'مقيم في مصر')}</span>
+              <span className="text-white/90">{tr('Open to remote & relocation', 'جاهز للعمل عن بُعد أو الانتقال')}</span>
+              <span aria-hidden className={isAr ? 'w-1 h-1 rounded-full bg-white/30' : 'h-3.5 w-px bg-white/20'} />
+              <span className="text-white/55">{tr('Based in Egypt', 'من مصر')}</span>
             </p>
             <ul aria-label="Focus" className="flex flex-wrap items-center gap-x-4 sm:gap-x-0 gap-y-2 text-[13px] sm:text-sm md:text-[15px] text-white/60">
-              {tr(['AI product builder', 'Design systems', 'Design leadership'], ['بناء منتجات بالذكاء الاصطناعي', 'أنظمة التصميم', 'قيادة التصميم']).map((f, i) => (
-                <li key={f} className={i ? 'sm:ps-4 sm:ms-4 sm:border-s border-white/15 leading-none' : 'leading-none'}>
+              {tr(['AI product builder', 'Design systems', 'Design leadership'], ['منتجات بالذكاء الاصطناعي', 'أنظمة تصميم', 'قيادة فرق التصميم']).map((f, i) => (
+                <li key={f} className={i && !isAr ? 'sm:ps-4 sm:ms-4 sm:border-s border-white/15 leading-none' : isAr ? 'leading-none sm:me-6 last:me-0' : 'leading-none'}>
                   {f}
                 </li>
               ))}
@@ -384,7 +384,7 @@ export function PremiumHero() {
                 border: '1px solid rgba(220,190,140,0.6)',
               }}
             >
-              <span className="relative z-10">{tr('Hire me', 'وظّفني')}</span>
+              <span className="relative z-10">{tr('Hire me', 'لنعمل معًا')}</span>
               <ArrowRight className="relative z-10 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 rtl:-scale-x-100 rtl:group-hover:-translate-x-1" />
             </motion.a>
 
@@ -402,7 +402,7 @@ export function PremiumHero() {
               onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.95)')}
               onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')}
             >
-              {tr('Say hello', 'لنتحدث')}
+              {tr('Say hello', 'راسلني')}
               <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 rtl:-scale-x-100" />
             </a>
           </motion.div>
@@ -514,7 +514,7 @@ export function PremiumHero() {
                   color: 'rgba(255,255,255,0.5)',
                 }}
               >
-                {tr('Lead Product Designer', 'مصمم منتجات رئيسي')}
+                {tr('Lead Product Designer', 'قائد تصميم المنتجات')}
               </div>
             </div>
           </div>

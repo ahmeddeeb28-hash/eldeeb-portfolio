@@ -23,7 +23,7 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
     { label: tr('My Story', 'قصتي'), onClick: onOpenAboutPage },
     // Hidden with the Mentorship section in App.tsx — restore together.
     // { label: 'Mentorship', targetId: SECTION_IDS.mentorship },
-    { label: tr('Speaking', 'المشاركات'), targetId: SECTION_IDS.speaking },
+    { label: tr('Speaking', 'محاضرات'), targetId: SECTION_IDS.speaking },
     { label: tr('Articles', 'مقالات'), targetId: SECTION_IDS.articles },
   ];
 

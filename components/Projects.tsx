@@ -340,9 +340,9 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
             zIndex: 1,
           }}
         >
-          <span style={{ color: '#FFFFFF' }}>{tr('Case', 'دراسات')}</span>{' '}
+          <span style={{ color: '#FFFFFF' }}>{tr('Case', 'قصص')}</span>{' '}
           <span style={{ color: 'rgba(255,255,255,0.42)' }}>
-            {tr('studies.', 'الحالة.')}
+            {tr('studies.', 'من داخل العمل')}
           </span>
         </motion.h2>
 
@@ -365,7 +365,7 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
         >
           {tr(
             "One methodology across products: Sary's grocery marketplace and how we measured it, SAMPO's AI pricing, and fresh's checkout moment. Strategy that ships, and numbers that show it.",
-            'منهجية واحدة عبر المنتجات: سوق Sary للبقالة وكيف قسنا أثره، وتسعير SAMPO بالذكاء الاصطناعي، ولحظة الدفع في fresh. استراتيجية تصل إلى الإطلاق، وأرقام تثبت ذلك.',
+            'طريقة تفكير واحدة طبّقتها على منتجات مختلفة: سوق ساري للبقالة وكيف قسنا أثره، وتسعير سامبو بالذكاء الاصطناعي، ولحظة الدفع في فريش. قرارات وصلت إلى الناس، وأرقام تشهد لها.',
           )}
         </motion.p>
       </div>

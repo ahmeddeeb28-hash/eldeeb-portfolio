@@ -52,21 +52,29 @@ const ARTICLES = [
   },
 ] as const;
 
+const ARTICLES_AR = [
+  { tag: 'نقد التصميم', meta: ['ميديوم', 'الجزء الأول'], title: 'أساسيات نقد التصميم', summary: 'كيف تقدّم الملاحظة وتتلقاها وترتّبها، بحيث يرفع النقد مستوى الفريق كله بدل أن يثقله.' },
+  { tag: 'البحث', meta: ['Design Bootcamp', 'ميديوم'], title: 'فن طرح الأسئلة الدقيقة', summary: 'السؤال المقصود يفتح فهمًا أعمق للمستخدم، ويقود فرق المنتج إلى قرارات تصميم أقوى.' },
+  { tag: 'القيادة', meta: ['ميديوم', 'القيادة'], title: 'إعادة تعريف قيادة التصميم: مسؤوليات لم يُعدّك لها أحد', summary: 'كيف يتحول دور قائد التصميم من الحرفة إلى الاستراتيجية والإرشاد، وكيف تتعامل مع ما لم يخبرك به أحد.' },
+] as const;
+
 export function Articles() {
   const { tr, isAr } = useLang();
   return (
     <section id="articles-activities" className="bg-[#0A0A0A] py-[88px] border-t border-white/[0.03]">
       <div className="container mx-auto px-10 max-w-[1560px]">
         <SectionHeader
-          eyebrow={tr("Perspectives", "وجهات نظر")}
+          eyebrow={tr("Perspectives", "أكتب لأفكّر")}
           title={tr("Articles &", "مقالات")}
-          flourish={tr("activities.", "ومشاركات.")}
-          subtitle={tr("Essays and field notes on design critique, research, and what it takes to lead product teams through ambiguity.", "مقالات وملاحظات ميدانية عن نقد التصميم، والبحث، وما تتطلبه قيادة فرق المنتج وسط الغموض.")}
+          flourish={tr("activities.", "وتأملات")}
+          subtitle={tr("Essays and field notes on design critique, research, and what it takes to lead product teams through ambiguity.", "ما تعلّمته عن نقد التصميم، والبحث، وقيادة فرق المنتج حين لا يكون الطريق واضحًا. كتبتها بالإنجليزية على ميديوم.")}
         />
 
         {/* Articles Grid - Editorial Strip */}
-        <div dir="ltr" className="grid grid-cols-1 md:grid-cols-3 gap-16">
-          {ARTICLES.map((article, i) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
+          {ARTICLES.map((en, i) => {
+            const article = isAr ? { ...en, ...ARTICLES_AR[i] } : en;
+            return (
             <motion.a
               key={article.href}
               href={article.href}
@@ -85,7 +93,7 @@ export function Articles() {
                   className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000 ease-[0.22, 1, 0.36, 1]"
                   loading="lazy"
                 />
-                <div className="absolute bottom-6 left-6 z-10">
+                <div className="absolute bottom-6 start-6 z-10">
                   <span className="px-4 py-1.5 rounded-full bg-black/60 backdrop-blur-xl border border-white/10 text-[#4AF2E5] text-[10px] font-black uppercase tracking-widest">
                     {article.tag}
                   </span>
@@ -101,7 +109,7 @@ export function Articles() {
                   <span className="w-1 h-1 rounded-full bg-white/10" />
                   <span>{article.meta[1]}</span>
                 </div>
-                <h3 className="text-white text-2xl md:text-3xl font-black uppercase leading-tight tracking-tighter mb-4 group-hover:text-[#4AF2E5] transition-colors duration-500">
+                <h3 className="text-white text-2xl md:text-3xl font-black uppercase leading-tight tracking-tighter rtl:leading-snug mb-4 group-hover:text-[#4AF2E5] transition-colors duration-500">
                   {article.title}
                 </h3>
                 <p className="text-white/40 text-lg leading-relaxed font-medium mb-8 flex-grow">
@@ -109,16 +117,17 @@ export function Articles() {
                 </p>
                 <div className="pt-6 border-t border-white/[0.05] flex items-center justify-between group-hover:border-[#4AF2E5]/20 transition-colors">
                   <span className="text-white/20 group-hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest">
-                    Read Full Article
+                    {tr('Read Full Article', 'اقرأ المقال كاملًا')}
                     <span className="sr-only"> on Medium (opens in a new tab)</span>
                   </span>
-                  <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center transform group-hover:translate-x-2 group-hover:border-[#4AF2E5]/40 transition-all duration-500">
-                    <ArrowRight className="w-5 h-5 text-white/40 group-hover:text-white" />
+                  <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center transform group-hover:translate-x-2 rtl:group-hover:-translate-x-2 group-hover:border-[#4AF2E5]/40 transition-all duration-500">
+                    <ArrowRight className="w-5 h-5 text-white/40 group-hover:text-white rtl:-scale-x-100" />
                   </div>
                 </div>
               </div>
             </motion.a>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

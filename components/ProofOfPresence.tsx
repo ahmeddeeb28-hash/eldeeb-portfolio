@@ -35,6 +35,21 @@ const IMAGES = {
 } as const;
 
 /* ── Editorial photo tile ──────────────────────────────────── */
+const CAPTION_AR: Record<string, string> = {
+  'Podcast · On Air': 'على الهواء',
+  'Speaking · Talk': 'محاضرة',
+  Workshop: 'ورشة عمل',
+  'Between the Talks': 'بين المحاضرات',
+  'Audience · Listening': 'قاعة تُنصت',
+  'Community · Meetup': 'لقاء مجتمع',
+  Gathering: 'تجمّع',
+};
+const BEAT_AR: Record<string, string> = {
+  'Some ideas begin quietly.': 'بعض الأفكار تبدأ بهدوء',
+  'They become clearer in the room.': 'وتتضح حين تُقال في القاعة',
+  'And stronger when shared.': 'وتقوى حين نتشاركها',
+};
+
 function PhotoTile({
   src,
   alt,
@@ -63,6 +78,7 @@ function PhotoTile({
    *  so it never renders soft/scaled on first paint. */
   priority?: boolean;
 }) {
+  const { isAr } = useLang();
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
   const [hovered, setHovered] = useState(false);
@@ -165,6 +181,7 @@ function PhotoTile({
           }}
         >
           <span
+            dir={isAr ? 'rtl' : undefined}
             style={{
               display: 'inline-block',
               fontSize: 10,
@@ -183,7 +200,7 @@ function PhotoTile({
               transition: 'color 500ms, border-color 500ms',
             }}
           >
-            {caption}
+            {isAr ? CAPTION_AR[caption] ?? caption : caption}
           </span>
         </div>
       </div>
@@ -201,6 +218,7 @@ function QuoteBeat({
   align: 'left' | 'right';
   index: number;
 }) {
+  const { isAr } = useLang();
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
 
@@ -250,9 +268,11 @@ function QuoteBeat({
           color: 'rgba(255,255,255,0.82)',
           maxWidth: '22ch',
           fontVariationSettings: "'opsz' 48, 'SOFT' 100",
+          ...(isAr ? { fontWeight: 500, lineHeight: 1.5, color: 'rgba(255,255,255,0.86)' } : null),
         }}
+        dir={isAr ? 'rtl' : undefined}
       >
-        {text}
+        {isAr ? BEAT_AR[text] ?? text : text}
       </p>
     </motion.div>
   );
@@ -313,7 +333,7 @@ export function ProofOfPresence() {
                   color: 'rgba(220,190,140,0.85)',
                 }}
               >
-                {tr('Beyond the Screen', 'خارج الشاشة')}
+                {tr('Beyond the Screen', 'بعيدًا عن الشاشة')}
               </span>
             </motion.div>
 
@@ -337,9 +357,9 @@ export function ProofOfPresence() {
                 WebkitTextFillColor: 'transparent',
               }}
             >
-              {tr('I share what', 'أشارك ما')}
+              {tr('I share what', 'ما يعلّمني إياه العمل')}
               <br />
-              {tr('the work', 'تعلّمته')}{' '}
+              {tr('the work', 'أشاركه')}{' '}
               <span
                 style={{
                   fontFamily: "'Fraunces', 'Times New Roman', serif",
@@ -351,7 +371,7 @@ export function ProofOfPresence() {
                   letterSpacing: '-0.03em',
                 }}
               >
-                {tr('taught me.', 'من العمل.')}
+                {tr('taught me.', 'مع الناس')}
               </span>
             </motion.h2>
 
@@ -595,7 +615,7 @@ export function ProofOfPresence() {
                   color: 'rgba(220,190,140,0.7)',
                 }}
               >
-                A quiet thread across every talk, workshop, and meetup.
+                <span dir={isAr ? 'rtl' : undefined}>{tr('A quiet thread across every talk, workshop, and meetup.', 'خيط هادئ يجمع كل محاضرة وورشة ولقاء')}</span>
               </span>
             </div>
           </div>

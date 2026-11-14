@@ -276,3 +276,33 @@ html[lang="ar"] body :is(h1, h2, h3):not([dir="ltr"]):not([dir="ltr"] *):not(svg
   letter-spacing: normal !important;
   line-height: 1.25;
 }
+
+/* Arabic text placed inside a left-to-right block (the podcast panel,
+   the collage captions) is marked dir="rtl" and gets the same face. */
+html[lang="ar"] body [dir="rtl"],
+html[lang="ar"] body [dir="rtl"] *:not(svg *):not([dir="ltr"]):not([dir="ltr"] *) {
+  font-family: 'IBM Plex Sans Arabic', Inter, system-ui, sans-serif !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  font-style: normal !important;
+}
+
+/* Arabic reading rhythm: no capitals or italics to lean on, so labels
+   grow to a readable size, nothing is tracked or slanted, and running
+   text gets the taller line Arabic needs for its dots and marks. */
+html[lang="ar"] body *:not([dir="ltr"]):not([dir="ltr"] *):not(svg *) {
+  text-transform: none !important;
+  font-style: normal !important;
+}
+html[lang="ar"] body p:not([dir="ltr"]):not([dir="ltr"] *) {
+  line-height: 1.8 !important;
+}
+html[lang="ar"] body :is(.text-\[10px\], .text-\[11px\], .text-xs, [style*="font-size: 10px"], [style*="font-size: 11px"]):not([dir="ltr"]):not([dir="ltr"] *) {
+  font-size: 13px !important;
+}
+html[lang="ar"] body :is(.text-\[12px\], .text-\[13px\], [style*="font-size: 12px"], [style*="font-size: 13px"]):not([dir="ltr"]):not([dir="ltr"] *) {
+  font-size: 14px !important;
+}
+html[lang="ar"] body :is(h1, h2, h3):not([dir="ltr"]):not([dir="ltr"] *) {
+  text-wrap: balance;
+}

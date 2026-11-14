@@ -1,3 +1,4 @@
+import { useLang } from '../lib/i18n';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Disc3, Headphones, Pause, Play, RotateCcw, RotateCw } from 'lucide-react';
@@ -61,6 +62,17 @@ const EPISODES: Episode[] = [
    (VITE_PODCAST_AUDIO_BASE=audio → audio/<episode id>.mp3), used for
    previews that can't reach the podcast hosts. Production streams from
    each episode's own feed. */
+/* The shows are in Arabic, so the Arabic page uses their Arabic names */
+const TITLE_AR: Record<string, string> = {
+  'blueprint-5': 'قرارات التصميم: من الحيرة إلى الإلهام',
+  'blueprint-4': 'كيف تتجاوز الاحتراق الوظيفي',
+  'blueprint-3': 'تحديثات Figma وعملية التصميم',
+  'blueprint-2': 'كيف تبدأ في تصميم المنتجات وتجد مكانك',
+  'blueprint-1': 'البداية',
+  'ask-designer-s3e2': 'قادة الفرق، وأولويات التواصل بين الفريق والشركة',
+};
+const BLURB_AR: Record<string, string> = { blueprint: 'بودكاست تصميم المنتجات الذي أشارك في تقديمه', ask: 'استضافوني ضيفًا' };
+
 const AUDIO_BASE = import.meta.env.VITE_PODCAST_AUDIO_BASE as string | undefined;
 const srcOf = (ep: Episode) => (AUDIO_BASE ? `${AUDIO_BASE}/${ep.id}.mp3` : ep.audio);
 
@@ -298,6 +310,7 @@ function HeadphonesView({ ep, playing, onToggle }: { ep: Episode; playing: boole
 
 export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'band' | 'closer'; lead?: React.ReactNode }) {
   const reduced = useReducedMotion();
+  const { isAr } = useLang();
   const [cur, setCur] = useState(0);
   const [dir, setDir] = useState(1);
   const ep = EPISODES[cur];
@@ -465,20 +478,22 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
   );
 
   const panel = (
-    <div className="min-w-0">
+    <div className="min-w-0" dir={isAr ? 'rtl' : undefined}>
       {/* 1. what this is, and my role */}
       <p className="text-[15px] leading-snug">
         <span className="font-semibold" style={{ color: GOLD }}>{show.name}</span>
-        <span className="text-white/60"> · {show.blurb}</span>
+        <span className="text-white/60">{isAr ? `، ${BLURB_AR[ep.show]}` : ` · ${show.blurb}`}</span>
       </p>
       {/* 2. the episode */}
       <div className="mt-3 lg:min-h-[96px]" aria-live="polite">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={ep.id} {...slide} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-            <h3 className="text-white text-[21px] sm:text-[28px] font-bold leading-[1.15] tracking-[-0.015em]" style={{ textWrap: 'balance' }}>{ep.title}</h3>
+            <h3 className="text-white text-[21px] sm:text-[28px] font-bold leading-[1.15] tracking-[-0.015em]" style={{ textWrap: 'balance' }}>{isAr ? TITLE_AR[ep.id] ?? ep.title : ep.title}</h3>
             <p className="mt-2 text-white/45 text-sm">
-              {ep.label === 'S3 · E2' ? 'Season 3, episode 2' : `Episode ${ep.label.replace('Ep ', '')}`} · {mins(ep.length)} · In Arabic
-              <a href={ep.link} target="_blank" rel="noopener noreferrer" className="inline-flex align-middle ml-2 hover:text-white" aria-label={`Open on ${ep.show === 'blueprint' ? 'Spotify' : 'Apple Podcasts'}`}>
+              {isAr
+                ? `${ep.label === 'S3 · E2' ? 'الموسم 3، الحلقة 2' : `الحلقة ${ep.label.replace('Ep ', '')}`}، ${Math.max(1, Math.round(ep.length / 60))} دقيقة، بالعربية`
+                : `${ep.label === 'S3 · E2' ? 'Season 3, episode 2' : `Episode ${ep.label.replace('Ep ', '')}`} · ${mins(ep.length)} · In Arabic`}
+              <a href={ep.link} target="_blank" rel="noopener noreferrer" className="inline-flex align-middle ms-2 hover:text-white" aria-label={`Open on ${ep.show === 'blueprint' ? 'Spotify' : 'Apple Podcasts'}`}>
                 <ArrowUpRight className="w-4 h-4" />
               </a>
             </p>
@@ -493,14 +508,14 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
         >
           {loading && playing ? <span className="w-5 h-5 rounded-full border-2 border-black/20 border-t-black animate-spin" /> : playing ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current ml-0.5" />}
         </button>
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0" dir="ltr">
           <input
             type="range" min={0} max={Math.round(dur)} step={1} value={Math.round(time)}
             onChange={(e) => seek(+e.target.value)}
             aria-label="Position in the episode" aria-valuetext={`${clock(time)} of ${clock(dur)}`}
             className="pd-range" style={{ ['--p' as string]: `${progress * 100}%` }}
           />
-          <div className="flex items-center justify-between text-xs text-white/45 tabular-nums">
+          <div dir="ltr" className="flex items-center justify-between text-xs text-white/45 tabular-nums">
             <span>{clock(time)}</span>
             <span className="flex items-center gap-1">
               <button type="button" onClick={() => skip(-15)} aria-label="Back 15 seconds" className="p-1.5 hover:text-white"><RotateCcw className="w-4 h-4" /></button>
@@ -512,7 +527,7 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
       </div>
       {/* 4. browse: every episode as a small cover */}
       <div className="mt-7">
-        <p className="text-xs text-white/40 mb-1">All episodes</p>
+        <p className="text-xs text-white/40 mb-1">{isAr ? 'كل الحلقات' : 'All episodes'}</p>
         <ol className="grid grid-cols-6 gap-2 sm:gap-3 max-w-[440px] pt-[11%]">
           {EPISODES.map((e, i) => {
             const on = i === cur;

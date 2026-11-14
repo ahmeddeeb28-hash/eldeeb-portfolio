@@ -12,6 +12,7 @@
 import { motion } from 'motion/react';
 import type { CSSProperties, ReactNode } from 'react';
 import { ds, titleGlowBackground } from '../styles/designSystem';
+import { useLang } from '../lib/i18n';
 
 export interface SectionHeaderProps {
   /** 10px uppercase label between the two hairlines */
@@ -48,6 +49,7 @@ export function SectionHeader({
   align = 'center',
 }: SectionHeaderProps) {
   const isCenter = align === 'center';
+  const { isAr } = useLang();
 
   return (
     <div
@@ -112,6 +114,8 @@ export function SectionHeader({
             ...ds.type.eyebrow,
             color: ds.color.text.tertiary,
             fontFamily: ds.font.body,
+            /* Arabic has no capitals to carry a tiny tracked label */
+            ...(isAr ? { fontSize: 14, fontWeight: 500, textTransform: 'none', color: 'rgba(255,255,255,0.62)' } : null),
           }}
         >
           {eyebrow}
@@ -157,7 +161,7 @@ export function SectionHeader({
             fontSize: 'clamp(34px, 4.2vw, 58px)',
             fontWeight: 600,
             letterSpacing: '-0.042em',
-            lineHeight: 1.02,
+            lineHeight: isAr ? 1.3 : 1.02,
             color: '#FFFFFF',
             margin: 0,
             textAlign: isCenter ? 'center' : 'left',
@@ -182,6 +186,7 @@ export function SectionHeader({
               margin: isCenter ? '0 auto' : 0,
               textAlign: isCenter ? 'center' : 'left',
               fontFamily: ds.font.body,
+              ...(isAr ? { fontSize: 17, lineHeight: 1.85, color: 'rgba(255,255,255,0.62)' } : null),
             }}
           >
             {subtitle}
