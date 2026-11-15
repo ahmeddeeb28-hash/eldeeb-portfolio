@@ -26,13 +26,32 @@ const STYLE = `
 @keyframes mg-down { from { transform: translate3d(0,-50%,0) } to { transform: translate3d(0,0,0) } }
 `;
 
-function layout(w: number) {
+type Layout = { n: number; size: number; gap: number; speed: number };
+
+function phoneLayout(w: number): Layout {
   if (w >= 1024) return { n: 6, size: 260, gap: 40, speed: 24 };
   if (w >= 640) return { n: 4, size: 210, gap: 32, speed: 20 };
   return { n: 3, size: 150, gap: 18, speed: 14 };
 }
 
-export function MarqueeGallery({ columns, label, aspect }: { columns: Screen[][]; label: string; aspect: number }) {
+/* wide screens (desktop dashboards) need fewer, wider columns */
+export function desktopLayout(w: number): Layout {
+  if (w >= 1024) return { n: 4, size: 460, gap: 36, speed: 22 };
+  if (w >= 640) return { n: 3, size: 340, gap: 28, speed: 18 };
+  return { n: 2, size: 250, gap: 16, speed: 13 };
+}
+
+export function MarqueeGallery({
+  columns,
+  label,
+  aspect,
+  layout = phoneLayout,
+}: {
+  columns: Screen[][];
+  label: string;
+  aspect: number;
+  layout?: (w: number) => Layout;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
   const inView = useInView(ref, { margin: '10% 0px' });

@@ -8,7 +8,10 @@ import { ScrollSteps } from './_shared/ScrollSteps';
 import { AgreedVisual, DiagnosisVisual, FixesVisual, PrototypeVisual, RulesVisual } from './sampo/ProcessVisuals';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 import { FocusFilm, type FocusScene, type FocusStep } from './sampo/FocusFilm';
+import { MarqueeGallery, desktopLayout, type Screen } from './_shared/MarqueeGallery';
+import { LiveStrategyView, ProductView, SimulationView } from './sampo/SampoMoreUI';
 import {
+  DesktopFrame,
   DashboardView,
   MonitorView,
   PreviewView,
@@ -38,8 +41,10 @@ const CHAPTERS: Chapter[] = [
   { id: 'problem', num: '02', roman: 'II', label: 'Problem', beat: 'Trust, not capability.' },
   { id: 'concept', num: '03', roman: 'III', label: 'Concept', beat: 'A ladder of trust.' },
   { id: 'process', num: '04', roman: 'IV', label: 'Process', beat: 'Agreed, prototyped, tested.' },
-  { id: 'flows', num: '05', roman: 'V', label: 'The Flows', beat: 'Five rungs, five screens.' },
-  { id: 'dashboard', num: '06', roman: 'VI', label: 'Dashboard', beat: 'Answers before decoration.' },
+  { id: 'decisions', num: '05', roman: 'V', label: 'Decisions', beat: 'What I changed, and why.' },
+  { id: 'screens', num: '06', roman: 'VI', label: 'Screens', beat: 'The whole product, side by side.' },
+  { id: 'flows', num: '07', roman: 'VII', label: 'The Flows', beat: 'Five rungs, five screens.' },
+  { id: 'dashboard', num: '08', roman: 'VIII', label: 'Dashboard', beat: 'Answers before decoration.' },
 ];
 
 const GLANCE: [string, string][] = [
@@ -293,12 +298,134 @@ function Dashboard() {
   );
 }
 
+/* ── Decisions: earlier Figma versions against what shipped ── */
+type Decision = { n: string; title: string; before?: { img: string; cap: string }; saw: string; weighed: string; chose: string; after: ReactNode; afterCap: string };
+
+const frame = (node: ReactNode, active: 'dashboard' | 'strategies' | 'products' | 'yours' = 'strategies', url?: string) => (
+  <DesktopFrame canvasH={700} active={active} url={url}>
+    {node}
+  </DesktopFrame>
+);
+
+const DECISIONS: Decision[] = [
+  {
+    n: '01',
+    title: 'Choose a strategy, don’t configure one.',
+    before: { img: '/images/case-studies/sampo/iteration-params.webp', cap: 'Earlier version: the engine’s own settings, from stock thresholds to markup ranges up to 900%.' },
+    saw: 'Merchants think in goals, like winning back someone who looked twice. Every slider was a call they could not judge, so they made none.',
+    weighed: 'Keep the controls and add help text, or hide the controls and lead with the goal.',
+    chose: 'Named strategies, each read as trigger, action and outcome. The settings moved behind a mode, where Sampo sets them from the store’s data.',
+    after: frame(<UnderstandView />),
+    afterCap: 'Shipped: strategies explained before anything is asked.',
+  },
+  {
+    n: '02',
+    title: 'A test, not a promise.',
+    before: { img: '/images/case-studies/sampo/iteration-toggle.webp', cap: 'Next version: one Enable switch and a predicted gain of +28% revenue and +47% profit.' },
+    saw: 'One number reads as a promise the engine can’t keep. One switch makes trying it feel permanent, so doing nothing stayed the safest choice.',
+    weighed: 'A single forecast with a confidence note, or three paces shown as ranges and settled by a real test.',
+    chose: 'Three modes previewed against the store today, then a 21-day A/B test on real traffic that picks the winner. The forecast became a range, the switch became a trial.',
+    after: frame(<SimulationView />),
+    afterCap: 'Shipped: the A/B simulation, three modes against today.',
+  },
+  {
+    n: '03',
+    title: 'Let status travel.',
+    saw: 'After launch the strategy went silent. Nothing told the merchant whether it was working, or where it was touching their store.',
+    weighed: 'A separate reports page, or the same status and result shown wherever the strategy acts.',
+    chose: 'One status chip and one result that follow the strategy: on the dashboard, on the strategy itself, and on every product it prices.',
+    after: frame(<ProductView />, 'products', 'app.sampo.ai/products/watch-series-7'),
+    afterCap: 'Shipped: a product page that shows the strategy and its mode.',
+  },
+];
+
+function Decisions() {
+  return (
+    <div className="space-y-24">
+      {DECISIONS.map((d) => (
+        <motion.article key={d.n} {...reveal}>
+          <div className="flex items-baseline gap-4 mb-6">
+            <span className="font-semibold tabular-nums text-2xl" style={{ color: ACCENT }}>
+              {d.n}
+            </span>
+            <h3 className="text-white text-2xl md:text-4xl font-semibold tracking-[-0.02em]">{d.title}</h3>
+          </div>
+          <dl className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 mb-10">
+            {[
+              ['What I saw', d.saw],
+              ['What I weighed', d.weighed],
+              ['What I chose', d.chose],
+            ].map(([k, v], i) => (
+              <div key={k} className={i === 2 ? 'md:border-l md:pl-8' : ''} style={i === 2 ? { borderColor: `${ACCENT}55` } : undefined}>
+                <dt className="text-xs mb-2" style={{ color: i === 2 ? ACCENT : 'rgba(255,255,255,0.4)' }}>
+                  {k}
+                </dt>
+                <dd className={`leading-relaxed ${i === 2 ? 'text-white' : 'text-white/65'}`}>{v}</dd>
+              </div>
+            ))}
+          </dl>
+          <div className={`grid grid-cols-1 ${d.before ? 'md:grid-cols-[0.8fr_1.2fr]' : 'md:grid-cols-[1fr]'} gap-5 items-start`}>
+            {d.before && (
+              <figure className="min-w-0">
+                <div className="rounded-[14px] overflow-hidden border border-white/10 bg-white/[0.03]">
+                  <img src={d.before.img} alt={d.before.cap} loading="lazy" className="w-full h-auto block opacity-80 grayscale-[35%]" />
+                </div>
+                <figcaption className="text-white/45 text-sm mt-3 leading-snug">{d.before.cap}</figcaption>
+              </figure>
+            )}
+            <figure className={`min-w-0 ${d.before ? '' : 'max-w-4xl'}`}>
+              {d.after}
+              <figcaption className="text-white/70 text-sm mt-3 leading-snug">{d.afterCap}</figcaption>
+            </figure>
+          </div>
+        </motion.article>
+      ))}
+    </div>
+  );
+}
+
+/* ── Screens gallery: every screen in the same frame ── */
+const shot = (node: ReactNode, active: 'dashboard' | 'strategies' | 'products' | 'yours' = 'strategies', url?: string): Screen => (w) => (
+  <div style={{ width: w, pointerEvents: 'none' }}>
+    <DesktopFrame canvasH={700} active={active} url={url}>
+      {node}
+    </DesktopFrame>
+  </div>
+);
+const live: Screen = (w, on) => (
+  <div style={{ width: w, pointerEvents: 'none' }}>
+    <SampoLoop playing={on} />
+  </div>
+);
+const G = {
+  understand: shot(<UnderstandView />),
+  sim: shot(<SimulationView />),
+  coach: shot(<SimulationView coach />),
+  preview: shot(<PreviewView interactive={false} />),
+  confirm: shot(<PreviewView interactive={false} stage="confirm" />),
+  strategies: shot(<StrategiesView />, 'yours', 'app.sampo.ai/your-strategies'),
+  monitor: shot(<MonitorView />, 'yours', 'app.sampo.ai/strategies/returning-visitor/results'),
+  winner: shot(<MonitorView initialWinner />, 'yours', 'app.sampo.ai/strategies/returning-visitor/results'),
+  detail: shot(<LiveStrategyView />, 'yours', 'app.sampo.ai/strategies/returning-visitor'),
+  reverse: shot(<ReverseView />, 'yours', 'app.sampo.ai/strategies/returning-visitor'),
+  product: shot(<ProductView />, 'products', 'app.sampo.ai/products/watch-series-7'),
+  dashboard: shot(<DashboardView />, 'dashboard', 'app.sampo.ai/dashboard'),
+};
+const SCREENS: Screen[][] = [
+  [G.understand, G.monitor, G.product],
+  [G.sim, live, G.detail],
+  [G.dashboard, G.coach, G.strategies],
+  [G.confirm, G.reverse, G.winner],
+  [G.preview, G.product, G.understand],
+  [G.detail, G.dashboard, G.sim],
+];
+
 export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
   return (
     <CaseShell chapters={CHAPTERS} metaLine="Sampo AI · Pricing" onBack={onBack} onNext={onNext} resetKey="sampo-ai-pricing" pillId="sampo-tab-pill">
       <div className="max-w-6xl mx-auto px-6 pt-16 pb-24">
         {/* ── 01 OVERVIEW ── */}
-        <ChapterTitle total="VI" chapter={CHAPTERS[0]} />
+        <ChapterTitle total="VIII" chapter={CHAPTERS[0]} />
         <section id="overview" className="mb-32 scroll-mt-24">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
             <CaseIntro
@@ -356,7 +483,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         </section>
 
         {/* ── 02 PROBLEM ── */}
-        <ChapterTitle total="VI" chapter={CHAPTERS[1]} tone="red" />
+        <ChapterTitle total="VIII" chapter={CHAPTERS[1]} tone="red" />
         <section id="problem" className="mb-32 scroll-mt-24">
           <motion.p {...reveal} className="text-white text-3xl md:text-5xl font-semibold leading-[1.1] tracking-tight max-w-4xl mb-12">
             Merchants were asked to trust a black box with their margin.
@@ -376,7 +503,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         </section>
 
         {/* ── 03 CONCEPT ── */}
-        <ChapterTitle total="VI" chapter={CHAPTERS[2]} tone="teal" />
+        <ChapterTitle total="VIII" chapter={CHAPTERS[2]} tone="teal" />
         <section id="concept" className="mb-32 scroll-mt-24">
           <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] mb-10 max-w-3xl">
             Control is handed over one rung at a time.
@@ -403,7 +530,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         </section>
 
         {/* ── 04 PROCESS ── */}
-        <ChapterTitle total="VI" chapter={CHAPTERS[3]} tone="teal" />
+        <ChapterTitle total="VIII" chapter={CHAPTERS[3]} tone="teal" />
         <section id="process" className="mb-32 scroll-mt-24">
           <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] mb-4 max-w-3xl">
             I ran it as a consultant: agree first, then prototype, then test.
@@ -414,8 +541,36 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           <ScrollSteps steps={PROCESS.map((p, i) => ({ ...p, visual: PROCESS_VISUALS[i] }))} accent={ACCENT} label="Process steps" />
         </section>
 
-        {/* ── 05 FLOWS ── */}
-        <ChapterTitle total="VI" chapter={CHAPTERS[4]} tone="teal" />
+        {/* ── 05 DECISIONS ── */}
+        <ChapterTitle total="VIII" chapter={CHAPTERS[4]} tone="teal" />
+        <section id="decisions" className="mb-32 scroll-mt-24">
+          <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] mb-4 max-w-3xl">
+            Three versions in Figma, and the call behind each change.
+          </motion.h2>
+          <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-14">
+            The first designs worked on paper. Each one still asked the merchant for something they could not give. Here is what I saw, what I weighed, and what I chose.
+          </motion.p>
+          <Decisions />
+        </section>
+      </div>
+
+      {/* ── 06 SCREENS ── full width, like the Sary gallery */}
+      <div className="max-w-6xl mx-auto px-6">
+        <ChapterTitle total="VIII" chapter={CHAPTERS[5]} />
+        <motion.h2 {...reveal} className="text-white text-3xl md:text-5xl font-semibold tracking-[-0.03em] mb-4 max-w-3xl">
+          Twelve screens, one system.
+        </motion.h2>
+        <motion.p {...reveal} className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-10">
+          Strategies, the A/B simulation, confirmation, results, a live strategy, products and the store dashboard. Same parts, same status, same three mode colours throughout.
+        </motion.p>
+      </div>
+      <section id="screens" className="mb-32 scroll-mt-24">
+        <MarqueeGallery columns={SCREENS} aspect={1180 / 740} layout={desktopLayout} label="The Sampo dashboard screens, scrolling in columns" />
+      </section>
+
+      <div className="max-w-6xl mx-auto px-6 pb-24">
+        {/* ── 07 FLOWS ── */}
+        <ChapterTitle total="VIII" chapter={CHAPTERS[6]} tone="teal" />
         <section id="flows" className="mb-32 scroll-mt-24">
           <p className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl mb-10">
             Every screen here is the prototype I built with Claude and tested with the team. Watch each flow, or click the screen and use it.
@@ -423,8 +578,8 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           <Flows />
         </section>
 
-        {/* ── 06 DASHBOARD ── */}
-        <ChapterTitle total="VI" chapter={CHAPTERS[5]} />
+        {/* ── 08 DASHBOARD ── */}
+        <ChapterTitle total="VIII" chapter={CHAPTERS[7]} />
         <section id="dashboard" className="mb-16 scroll-mt-24">
           <Dashboard />
           <p className="text-white/45 text-sm mb-5 mt-16">One status, everywhere</p>
