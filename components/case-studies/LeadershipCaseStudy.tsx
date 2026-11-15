@@ -465,7 +465,137 @@ function OkrFormat() {
 
 /* ── 06 people ───────────────────────────────────── */
 
-const HIRING = ['Intro chat', 'Portfolio interview', 'Take-home, 6 days', 'Presentation', 'Decision in 2–4 weeks'];
+
+/* The hiring path as a story you step through: one candidate moves
+   from the first chat to the decision, then into the team, where the
+   same four things they were scored on become their growth plan. */
+const BAR = ['Storytelling', 'Rationale', 'Quality', 'Prioritisation'];
+const STORY: { t: string; d: string; bar: 'off' | 'test' | 'score' | 'grow' }[] = [
+  { t: 'Intro chat', d: 'A first conversation about the role, the team and how we work.', bar: 'off' },
+  { t: 'Portfolio interview', d: 'The candidate walks through their own work, and the thinking behind it.', bar: 'off' },
+  { t: 'Take-home, 6 days', d: 'Every finalist gets the same open brief and six days to work on it. Nobody gets an easier one.', bar: 'test' },
+  { t: 'Presentation', d: 'They present the brief, and everyone is scored on the same four things.', bar: 'score' },
+  { t: 'Decision in 2–4 weeks', d: 'A clear answer within two to four weeks, made against the same bar.', bar: 'score' },
+  { t: 'Then, the team', d: 'Bi-weekly 1:1s turn the same four into a growth plan. The bar they were hired on is the bar they grow on.', bar: 'grow' },
+];
+
+function HiringStory() {
+  const reduced = useReducedMotion();
+  const [i, setI] = useState(0);
+  const step = STORY[i];
+  const last = STORY.length - 1;
+  const go = (n: number) => setI(Math.max(0, Math.min(last, n)));
+  return (
+    <div
+      role="group"
+      aria-label="The hiring path, step by step"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'ArrowRight') go(i + 1);
+        if (e.key === 'ArrowLeft') go(i - 1);
+      }}
+      className="rounded-[28px] border p-5 md:p-9 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+      style={{ background: PANEL, borderColor: LINE, outlineColor: ACCENT }}
+    >
+      {/* the path: tap any stop, the candidate walks there */}
+      <div className="relative pt-8">
+        <div className="absolute left-[18px] right-[18px] top-[49px] h-[2px] rounded" style={{ background: LINE }} />
+        <motion.div
+          className="absolute left-[18px] top-[49px] h-[2px] rounded"
+          style={{ background: ACCENT }}
+          animate={{ width: `calc(${(i / last) * 100}% - ${(i / last) * 36}px)` }}
+          transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 160, damping: 24 }}
+        />
+        <ol className="relative flex items-center justify-between">
+          {STORY.map((s, k) => {
+            const done = k <= i;
+            return (
+              <li key={s.t}>
+                <button
+                  type="button"
+                  onClick={() => go(k)}
+                  aria-current={k === i ? 'step' : undefined}
+                  aria-label={s.t}
+                  className="relative grid place-items-center w-9 h-9 rounded-full text-xs font-bold tabular-nums transition-colors"
+                  style={{ background: done ? ACCENT : '#15171D', color: done ? '#0B0B0B' : 'rgba(255,255,255,0.55)', boxShadow: `0 0 0 1px ${done ? ACCENT : LINE}` }}
+                >
+                  {k === last ? '★' : String(k + 1).padStart(2, '0')}
+                  {k === i && (
+                    <motion.span
+                      layoutId="hire-you"
+                      className={`absolute -top-8 whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] font-bold ${k === 0 ? 'left-0' : k === last ? 'right-0' : 'left-1/2 -translate-x-1/2'}`}
+                      style={{ background: '#fff', color: '#0B0B0B' }}
+                      transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 260, damping: 26 }}
+                    >
+                      {k === last ? 'Hired' : 'Candidate'}
+                    </motion.span>
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+
+      <div className="grid md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] gap-6 md:gap-10 mt-9 md:mt-10 items-start">
+        <div className="min-h-[150px]">
+          <motion.div key={i} initial={reduced ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
+            <p className="text-sm tabular-nums mb-2" style={{ color: ACCENT }}>
+              {i === last ? 'After the offer' : `Step ${i + 1} of ${last}`}
+            </p>
+            <h3 className="text-white text-2xl md:text-3xl font-semibold tracking-[-0.02em] leading-tight">{step.t}</h3>
+            <p className="text-white/60 text-base md:text-lg leading-relaxed mt-3">{step.d}</p>
+          </motion.div>
+          <div className="flex items-center gap-2 mt-6">
+            <button type="button" onClick={() => go(i - 1)} disabled={i === 0} aria-label="Previous step" className="grid place-items-center w-10 h-10 rounded-full border text-white/70 disabled:opacity-30" style={{ borderColor: LINE }}>
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => (i === last ? setI(0) : go(i + 1))}
+              className="h-10 px-5 rounded-full text-sm font-semibold"
+              style={{ background: ACCENT, color: '#0B0B0B' }}
+            >
+              {i === last ? 'Start over' : i === last - 1 ? 'Join the team' : 'Next step'}
+            </button>
+          </div>
+        </div>
+
+        {/* the bar: the same four things, lighting up where they count */}
+        <div className="rounded-2xl p-5" style={{ background: '#0B0C10', boxShadow: `inset 0 0 0 1px ${LINE}` }}>
+          <p className="text-white/45 text-sm mb-4">
+            {step.bar === 'off' && 'The bar, not used yet'}
+            {step.bar === 'test' && 'The brief tests the bar'}
+            {step.bar === 'score' && 'Scored on the bar'}
+            {step.bar === 'grow' && 'The same bar, now a growth plan'}
+          </p>
+          <ul className="grid gap-3">
+            {BAR.map((b, k) => {
+              const on = step.bar !== 'off';
+              const fill = step.bar === 'test' ? 0.35 : step.bar === 'score' ? 0.7 : step.bar === 'grow' ? 1 : 0;
+              return (
+                <li key={b}>
+                  <div className="flex justify-between text-sm mb-1.5">
+                    <span className={on ? 'text-white' : 'text-white/35'}>{b}</span>
+                    {step.bar === 'grow' && <span style={{ color: ACCENT }}>in the plan</span>}
+                  </div>
+                  <div className="h-2 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                    <motion.div
+                      className="h-full rounded-full"
+                      style={{ background: ACCENT }}
+                      animate={{ width: `${fill * (0.82 + k * 0.06) * 100}%` }}
+                      transition={reduced ? { duration: 0 } : { duration: 0.6, delay: k * 0.06, ease: [0.22, 1, 0.36, 1] }}
+                    />
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /* ── 07 proof ────────────────────────────────────── */
 
@@ -545,16 +675,7 @@ export function LeadershipCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
         </Section>
 
         <Section i={6} title="Hire on one bar, grow on the same one." lead="Every finalist gets the same open brief and is scored on the same four things: storytelling, rationale, quality and prioritisation. Bi-weekly 1:1s turn the same bar into a growth plan.">
-          <ol className="grid grid-cols-1 sm:grid-cols-5 border-t" style={{ borderColor: LINE }}>
-            {HIRING.map((p, i) => (
-              <li key={p} className="pt-5 pb-2 sm:pr-4 grid grid-cols-[32px_minmax(0,1fr)] sm:block gap-2">
-                <span className="text-sm font-semibold tabular-nums" style={{ color: ACCENT }}>
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <span className="text-white font-semibold sm:block sm:mt-2">{p}</span>
-              </li>
-            ))}
-          </ol>
+          <HiringStory />
         </Section>
 
         <Section i={7} tone="teal" title="Where it worked." lead="The same playbook, two very different teams.">
