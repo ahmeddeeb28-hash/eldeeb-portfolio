@@ -466,17 +466,17 @@ function OkrFormat() {
 /* ── 06 people ───────────────────────────────────── */
 
 
-/* The hiring path as a story you step through: one candidate moves
-   from the first chat to the decision, then into the team, where the
-   same four things they were scored on become their growth plan. */
+/* The hiring path as a story about mindset: each step is there to show
+   how someone thinks, and lights up the parts of the bar it reveals.
+   After the offer, the same four things become the growth plan. */
 const BAR = ['Storytelling', 'Rationale', 'Quality', 'Prioritisation'];
-const STORY: { t: string; d: string; bar: 'off' | 'test' | 'score' | 'grow' }[] = [
-  { t: 'Intro chat', d: 'A first conversation about the role, the team and how we work.', bar: 'off' },
-  { t: 'Portfolio interview', d: 'The candidate walks through their own work, and the thinking behind it.', bar: 'off' },
-  { t: 'Take-home, 6 days', d: 'Every finalist gets the same open brief and six days to work on it. Nobody gets an easier one.', bar: 'test' },
-  { t: 'Presentation', d: 'They present the brief, and everyone is scored on the same four things.', bar: 'score' },
-  { t: 'Decision in 2–4 weeks', d: 'A clear answer within two to four weeks, made against the same bar.', bar: 'score' },
-  { t: 'Then, the team', d: 'Bi-weekly 1:1s turn the same four into a growth plan. The bar they were hired on is the bar they grow on.', bar: 'grow' },
+const STORY: { t: string; d: string; shows: number[]; grow?: boolean }[] = [
+  { t: 'Intro chat', d: 'Mindset first: what they are curious about, and how they talk about the problems they want to solve.', shows: [0] },
+  { t: 'Portfolio interview', d: 'The thinking behind the work, not the pixels: why each call was made, and what they would change now.', shows: [1, 2] },
+  { t: 'Take-home, 6 days', d: 'An open brief with no single right answer, the same for every finalist. It shows how they frame a problem and where they take it further.', shows: [0, 1, 2, 3] },
+  { t: 'Presentation', d: 'How they tell the story, defend their trade-offs and choose what matters first.', shows: [0, 1, 3] },
+  { t: 'Decision in 2–4 weeks', d: 'One decision, made against the same four things for everyone.', shows: [0, 1, 2, 3] },
+  { t: 'Then, the team', d: 'Bi-weekly 1:1s keep growing the same mindset: the four things become a growth plan.', shows: [0, 1, 2, 3], grow: true },
 ];
 
 function HiringStory() {
@@ -488,7 +488,7 @@ function HiringStory() {
   return (
     <div
       role="group"
-      aria-label="The hiring path, step by step"
+      aria-label="How each hiring step reads mindset"
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === 'ArrowRight') go(i + 1);
@@ -498,10 +498,10 @@ function HiringStory() {
       style={{ background: PANEL, borderColor: LINE, outlineColor: ACCENT }}
     >
       {/* the path: tap any stop, the candidate walks there */}
-      <div className="relative pt-8">
-        <div className="absolute left-[18px] right-[18px] top-[49px] h-[2px] rounded" style={{ background: LINE }} />
+      <div className="relative">
+        <div className="absolute left-[18px] right-[18px] top-[17px] h-[2px] rounded" style={{ background: LINE }} />
         <motion.div
-          className="absolute left-[18px] top-[49px] h-[2px] rounded"
+          className="absolute left-[18px] top-[17px] h-[2px] rounded"
           style={{ background: ACCENT }}
           animate={{ width: `calc(${(i / last) * 100}% - ${(i / last) * 36}px)` }}
           transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 160, damping: 24 }}
@@ -520,16 +520,6 @@ function HiringStory() {
                   style={{ background: done ? ACCENT : '#15171D', color: done ? '#0B0B0B' : 'rgba(255,255,255,0.55)', boxShadow: `0 0 0 1px ${done ? ACCENT : LINE}` }}
                 >
                   {k === last ? '★' : String(k + 1).padStart(2, '0')}
-                  {k === i && (
-                    <motion.span
-                      layoutId="hire-you"
-                      className={`absolute -top-8 whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] font-bold ${k === 0 ? 'left-0' : k === last ? 'right-0' : 'left-1/2 -translate-x-1/2'}`}
-                      style={{ background: '#fff', color: '#0B0B0B' }}
-                      transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 260, damping: 26 }}
-                    >
-                      {k === last ? 'Hired' : 'Candidate'}
-                    </motion.span>
-                  )}
                 </button>
               </li>
             );
@@ -541,7 +531,7 @@ function HiringStory() {
         <div className="min-h-[150px]">
           <motion.div key={i} initial={reduced ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
             <p className="text-sm tabular-nums mb-2" style={{ color: ACCENT }}>
-              {i === last ? 'After the offer' : `Step ${i + 1} of ${last}`}
+              {i === last ? 'After the offer' : `Step ${i + 1} of ${last} · what it shows`}
             </p>
             <h3 className="text-white text-2xl md:text-3xl font-semibold tracking-[-0.02em] leading-tight">{step.t}</h3>
             <p className="text-white/60 text-base md:text-lg leading-relaxed mt-3">{step.d}</p>
@@ -556,35 +546,29 @@ function HiringStory() {
               className="h-10 px-5 rounded-full text-sm font-semibold"
               style={{ background: ACCENT, color: '#0B0B0B' }}
             >
-              {i === last ? 'Start over' : i === last - 1 ? 'Join the team' : 'Next step'}
+              {i === last ? 'Start over' : 'Next step'}
             </button>
           </div>
         </div>
 
         {/* the bar: the same four things, lighting up where they count */}
         <div className="rounded-2xl p-5" style={{ background: '#0B0C10', boxShadow: `inset 0 0 0 1px ${LINE}` }}>
-          <p className="text-white/45 text-sm mb-4">
-            {step.bar === 'off' && 'The bar, not used yet'}
-            {step.bar === 'test' && 'The brief tests the bar'}
-            {step.bar === 'score' && 'Scored on the bar'}
-            {step.bar === 'grow' && 'The same bar, now a growth plan'}
-          </p>
+          <p className="text-white/45 text-sm mb-4">{step.grow ? 'The same four, now a growth plan' : 'The bar: what this step reveals'}</p>
           <ul className="grid gap-3">
             {BAR.map((b, k) => {
-              const on = step.bar !== 'off';
-              const fill = step.bar === 'test' ? 0.35 : step.bar === 'score' ? 0.7 : step.bar === 'grow' ? 1 : 0;
+              const on = step.shows.includes(k);
               return (
                 <li key={b}>
                   <div className="flex justify-between text-sm mb-1.5">
                     <span className={on ? 'text-white' : 'text-white/35'}>{b}</span>
-                    {step.bar === 'grow' && <span style={{ color: ACCENT }}>in the plan</span>}
+                    {on && <span style={{ color: ACCENT }}>{step.grow ? 'growing' : 'shows here'}</span>}
                   </div>
                   <div className="h-2 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
                     <motion.div
                       className="h-full rounded-full"
                       style={{ background: ACCENT }}
-                      animate={{ width: `${fill * (0.82 + k * 0.06) * 100}%` }}
-                      transition={reduced ? { duration: 0 } : { duration: 0.6, delay: k * 0.06, ease: [0.22, 1, 0.36, 1] }}
+                      animate={{ width: on ? '100%' : '0%' }}
+                      transition={reduced ? { duration: 0 } : { duration: 0.55, delay: k * 0.06, ease: [0.22, 1, 0.36, 1] }}
                     />
                   </div>
                 </li>
@@ -703,7 +687,7 @@ export function LeadershipCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
             ))}
           </div>
           {/* The one moment on the page that breaks the dark-panel rhythm:
-              the testimonial on the lime of the illustrations. */}
+              the testimonial on a quiet warm paper tone. */}
           <div ref={quoteRef} className="relative mt-16 md:mt-20">
           <PopAvatar target={quoteRef} />
           <motion.figure
@@ -712,7 +696,7 @@ export function LeadershipCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
             viewport={{ once: true, margin: '-10% 0px' }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             className="relative overflow-hidden rounded-[32px] px-7 pt-20 pb-10 md:px-16 md:py-16"
-            style={{ background: ACCENT, color: '#0B0B0B' }}
+            style={{ background: '#E9E7DF', color: '#0B0B0B' }}
           >
             <span aria-hidden className="absolute -bottom-24 md:-bottom-36 right-6 md:right-10 select-none font-extrabold leading-none" style={{ fontSize: 'clamp(160px, 22vw, 300px)', color: 'rgba(11,11,11,0.08)' }}>
               ”
@@ -722,7 +706,7 @@ export function LeadershipCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
             </p>
             <blockquote className="relative font-semibold tracking-[-0.025em] leading-[1.18] max-w-4xl md:pr-40" style={{ fontSize: 'clamp(24px, 3.4vw, 44px)' }}>
               “He has a great talent for organizing work, skillfully delegating tasks based on his team members’ individual strengths, while also fostering their professional growth,{' '}
-              <span style={{ background: '#0B0B0B', color: ACCENT, padding: '0 0.18em', borderRadius: 6, boxDecorationBreak: 'clone', WebkitBoxDecorationBreak: 'clone' }}>
+              <span style={{ background: '#0B0B0B', color: '#F4F2EC', padding: '0 0.18em', borderRadius: 6, boxDecorationBreak: 'clone', WebkitBoxDecorationBreak: 'clone' }}>
                 acting as a true mentor in the process.
               </span>
               ”
