@@ -1,5 +1,5 @@
-import { motion, useReducedMotion } from 'motion/react';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'motion/react';
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
@@ -235,6 +235,48 @@ const Panel = ({ children, className = '' }: { children: ReactNode; className?: 
   </div>
 );
 
+/* Polina's avatar pops out of the testimonial card as it scrolls into
+   view: it grows from behind the card's edge, overshoots a little and
+   settles with a slight tilt. Linked to the case study's own scroller. */
+function PopAvatar({ target }: { target: RefObject<HTMLElement | null> }) {
+  const reduced = useReducedMotion();
+  const raw = useMotionValue(0);
+  // after commit both refs exist: follow the case study's own scroller
+  useEffect(() => {
+    const el = target.current;
+    if (!el) return;
+    const scroller: HTMLElement | Window = (el.closest('.overflow-y-auto') as HTMLElement | null) ?? window;
+    const update = () => {
+      const r = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      // 0 when the card's top enters the bottom of the screen, 1 when it reaches the middle
+      raw.set(Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.5))));
+    };
+    update();
+    scroller.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    return () => {
+      scroller.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, [target, raw]);
+  const p = useSpring(raw, { stiffness: 140, damping: 16, mass: 0.6 });
+  const scale = useTransform(p, [0.15, 0.75, 1], [0.2, 1.12, 1]);
+  const y = useTransform(p, [0.15, 1], [80, 0]);
+  const rotate = useTransform(p, [0.15, 1], [-28, 7]);
+  const opacity = useTransform(p, [0.1, 0.35], [0, 1]);
+  const ring = '0 0 0 5px #0B0B0B, 0 24px 50px -12px rgba(0,0,0,0.7)';
+  return (
+    <motion.img
+      src="/images/people/polina.webp"
+      alt=""
+      aria-hidden
+      className="absolute z-10 rounded-full object-cover w-24 h-24 md:w-36 md:h-36 -top-10 right-6 md:-top-16 md:right-14"
+      style={reduced ? { boxShadow: ring } : { scale, y, rotate, opacity, boxShadow: ring }}
+    />
+  );
+}
+
 /* ── 01 ───────────────────────────────────────────── */
 
 const SCALE: [string, string][] = [
@@ -432,6 +474,8 @@ const PROOF: { where: string; when: string; role: string; points: [string, strin
 ];
 
 export function LeadershipCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
+  const reduced = useReducedMotion();
+  const quoteRef = useRef<HTMLDivElement>(null);
   return (
     <CaseShell chapters={CHAPTERS} metaLine="Design leadership" onBack={onBack} onNext={onNext} resetKey="sary-design-leadership" pillId="lead-tab-pill">
       <div className="max-w-5xl mx-auto px-6 pt-16 pb-24">
@@ -496,41 +540,70 @@ export function LeadershipCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
         </Section>
 
         <Section i={7} tone="teal" title="Where it worked." lead="The same playbook, two very different teams.">
-          <div className="grid md:grid-cols-2 gap-3 mb-12">
+          <div className="grid md:grid-cols-2 gap-3">
             {PROOF.map((t) => (
-              <Panel key={t.where} className="!p-6 md:!p-8">
-                <div className="flex items-baseline justify-between gap-4">
-                  <p className="text-white text-2xl font-bold">{t.where}</p>
-                  <p className="text-white/45 text-sm tabular-nums">{t.when}</p>
+              <Panel key={t.where} className="!p-6 md:!p-9 flex flex-col">
+                <div className="flex items-start justify-between gap-4 md:min-h-[5.25rem]">
+                  <div>
+                    <p className="text-white text-2xl font-bold leading-tight">{t.where}</p>
+                    <p className="text-sm mt-1.5" style={{ color: ACCENT }}>
+                      {t.role}
+                    </p>
+                  </div>
+                  <p className="text-white/45 text-sm tabular-nums whitespace-nowrap pt-1.5">{t.when}</p>
                 </div>
-                <p className="text-sm mt-1 mb-6" style={{ color: ACCENT }}>
-                  {t.role}
-                </p>
-                <dl className="grid gap-3">
+                <dl className="mt-8 pt-6 border-t grid gap-4" style={{ borderColor: LINE }}>
                   {t.points.map(([v, k]) => (
-                    <div key={k} className="flex items-baseline gap-4">
-                      <dt className="sr-only">{k}</dt>
-                      <dd className="text-white text-3xl font-extrabold tracking-[-0.04em] tabular-nums min-w-[3.2ch]">{v}</dd>
-                      <span className="text-white/55">{k}</span>
+                    <div key={k} className="grid grid-cols-[6.5rem_minmax(0,1fr)] md:grid-cols-[7.5rem_minmax(0,1fr)] items-baseline gap-4">
+                      <dd className="text-white text-3xl font-extrabold tracking-[-0.04em] tabular-nums">{v}</dd>
+                      <dt className="text-white/60 leading-snug">{k}</dt>
                     </div>
                   ))}
                 </dl>
               </Panel>
             ))}
           </div>
-          <figure className="border-l-2 pl-6 max-w-3xl" style={{ borderColor: ACCENT }}>
-            <blockquote className="text-white text-xl md:text-2xl leading-snug">
-              “He has a great talent for organizing work, skillfully delegating tasks based on his team members’ individual
-              strengths, while also fostering their professional growth, acting as a true mentor in the process.”
+          {/* The one moment on the page that breaks the dark-panel rhythm:
+              the testimonial on the lime of the illustrations. */}
+          <div ref={quoteRef} className="relative mt-16 md:mt-20">
+          <PopAvatar target={quoteRef} />
+          <motion.figure
+            initial={reduced ? false : { opacity: 0, y: 28, scale: 0.98 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, margin: '-10% 0px' }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="relative overflow-hidden rounded-[32px] px-7 py-10 md:px-16 md:py-16"
+            style={{ background: ACCENT, color: '#0B0B0B' }}
+          >
+            <span aria-hidden className="absolute -bottom-24 md:-bottom-36 right-6 md:right-10 select-none font-extrabold leading-none" style={{ fontSize: 'clamp(160px, 22vw, 300px)', color: 'rgba(11,11,11,0.08)' }}>
+              ”
+            </span>
+            <p className="relative text-xs md:text-sm font-semibold mb-6 md:mb-8" style={{ color: 'rgba(11,11,11,0.6)' }}>
+              From the team
+            </p>
+            <blockquote className="relative font-semibold tracking-[-0.025em] leading-[1.18] max-w-4xl md:pr-40" style={{ fontSize: 'clamp(24px, 3.4vw, 44px)' }}>
+              “He has a great talent for organizing work, skillfully delegating tasks based on his team members’ individual strengths, while also fostering their professional growth,{' '}
+              <span style={{ background: '#0B0B0B', color: ACCENT, padding: '0 0.18em', borderRadius: 6, boxDecorationBreak: 'clone', WebkitBoxDecorationBreak: 'clone' }}>
+                acting as a true mentor in the process.
+              </span>
+              ”
             </blockquote>
-            <figcaption className="text-white/45 text-sm mt-4">Polina Kosheleva, Senior Game UI Artist, reported to Ahmad at Lobah</figcaption>
-          </figure>
+            <figcaption className="relative flex items-center gap-4 mt-10 md:mt-12">
+              <img src="/images/people/polina.webp" alt="" width={56} height={56} loading="lazy" className="w-14 h-14 rounded-full object-cover" style={{ boxShadow: '0 0 0 3px #0B0B0B' }} />
+              <span>
+                <span className="block font-bold text-base md:text-lg">Polina Kosheleva</span>
+                <span className="block text-sm" style={{ color: 'rgba(11,11,11,0.65)' }}>
+                  Senior Game UI Artist, reported to Ahmad at Lobah
+                </span>
+              </span>
+            </figcaption>
+          </motion.figure>
+          </div>
         </Section>
 
         <Takeaway
           accent={ACCENT}
           deep={DEEP}
-          note="“He has fostered a culture of innovation within our design team, enhancing collaboration and elevating our deliverables.” — Mohammed Aldossary, Co-founder & CEO, Sary"
         >
           A team doesn’t need more pressure. It needs an owner for every objective, a rhythm people can rely on, and one source
           of truth.
