@@ -11,16 +11,18 @@ import { SECTION_IDS, scrollToSection, scrollToTop } from '../lib/scrollToSectio
 
 interface NavigationProps {
   onOpenAboutPage?: () => void;
+  onOpenPodcastPage?: () => void;
 }
 
-export function Navigation({ onOpenAboutPage }: NavigationProps) {
+export function Navigation({ onOpenAboutPage, onOpenPodcastPage }: NavigationProps) {
   const { scrollYProgress } = useScroll();
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const { tr } = useLang();
-  const sections: { label: string; targetId?: string; onClick?: () => void }[] = [
+  const sections: { label: string; targetId?: string; onClick?: () => void; href?: string }[] = [
     { label: tr('Work', 'أعمالي'), targetId: SECTION_IDS.work },
-    { label: tr('My Story', 'قصتي'), onClick: onOpenAboutPage },
+    { label: tr('My Story', 'قصتي'), onClick: onOpenAboutPage, href: '/about' },
+    { label: tr('Podcast', 'البودكاست'), onClick: onOpenPodcastPage, href: '/podcast' },
     // Hidden with the Mentorship section in App.tsx — restore together.
     // { label: 'Mentorship', targetId: SECTION_IDS.mentorship },
     { label: tr('Speaking', 'محاضرات'), targetId: SECTION_IDS.speaking },
@@ -67,7 +69,7 @@ export function Navigation({ onOpenAboutPage }: NavigationProps) {
       lockScroll={lockScroll}
       items={sections.map((s) => ({
         label: s.label,
-        href: s.targetId ? `#${s.targetId}` : '/about',
+        href: s.targetId ? `#${s.targetId}` : s.href ?? '/about',
         active: Boolean(s.targetId && activeId === s.targetId),
         onSelect: () => (s.onClick ? s.onClick() : s.targetId && scrollToSection(s.targetId)),
       }))}

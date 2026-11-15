@@ -115,9 +115,10 @@ function PulsingDot() {
 
 interface FooterProps {
   onOpenAboutPage?: () => void;
+  onOpenPodcastPage?: () => void;
 }
 
-export function Footer({ onOpenAboutPage }: FooterProps) {
+export function Footer({ onOpenAboutPage, onOpenPodcastPage }: FooterProps) {
   const { tr, isAr } = useLang();
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: '-60px' });
@@ -137,6 +138,7 @@ export function Footer({ onOpenAboutPage }: FooterProps) {
   const navLinks: { label: string; href: string; onClick?: () => void }[] = [
     { label: tr('Work', 'أعمالي'), href: `#${SECTION_IDS.work}`, onClick: () => scrollToSection(SECTION_IDS.work) },
     { label: tr('My Story', 'قصتي'), href: '/about', onClick: onOpenAboutPage },
+    { label: tr('Podcast', 'البودكاست'), href: '/podcast', onClick: onOpenPodcastPage },
     // Hidden with the Mentorship section in App.tsx — restore together.
     // { label: 'Mentorship', href: `#${SECTION_IDS.mentorship}`, onClick: () => scrollToSection(SECTION_IDS.mentorship) },
     { label: tr('Speaking', 'محاضرات'), href: `#${SECTION_IDS.speaking}`, onClick: () => scrollToSection(SECTION_IDS.speaking) },

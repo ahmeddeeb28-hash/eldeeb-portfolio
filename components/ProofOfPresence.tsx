@@ -296,7 +296,7 @@ function usePlacement(): 'a' | 'b' | 'c' {
   return p;
 }
 
-export function ProofOfPresence() {
+export function ProofOfPresence({ onOpenPodcastPage }: { onOpenPodcastPage?: () => void } = {}) {
   const { tr, isAr } = useLang();
   const placement = usePlacement();
   const headline = (
@@ -383,7 +383,7 @@ export function ProofOfPresence() {
     <section
       id="proof-of-presence-section-lock"
       className="proof-of-presence-locked bg-[#0A0A0A] relative"
-      style={{ paddingTop: 112, paddingBottom: 112 }}
+      style={{ paddingTop: placement === 'a' ? 72 : 112, paddingBottom: 112 }}
     >
       {/* Ambient warm glow */}
       <div
@@ -406,9 +406,10 @@ export function ProofOfPresence() {
         style={{ paddingLeft: 40, paddingRight: 40, zIndex: 1 }}
       >
         {placement === 'a' ? (
-          <div style={{ marginBottom: 96 }}>
-            <PodcastDeck variant="hero" lead={headline} />
-          </div>
+          /* the headline and the podcast link were removed: the podcast
+             has its own page (/podcast) and the collage now opens the
+             section on its own */
+          null
         ) : (
           <>
         {/* ═══════════════════════════════════════════════════════
@@ -449,8 +450,8 @@ export function ProofOfPresence() {
         {placement === 'b' && <PodcastDeck variant="band" />}
 
         <div dir="ltr">
-        {/* Horizontal dateline rule */}
-        <motion.div
+        {/* Horizontal dateline rule (only under the old header placements) */}
+        {placement !== 'a' && <motion.div
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
           viewport={{ once: true }}
@@ -462,7 +463,7 @@ export function ProofOfPresence() {
               'linear-gradient(90deg, transparent, rgba(220,190,140,0.22) 20%, rgba(220,190,140,0.22) 80%, transparent)',
             transformOrigin: 'left',
           }}
-        />
+        />}
 
         {/* ═══════════════════════════════════════════════════════
              ROW A — [Quote] [Speaking landscape 4:3] [Workshop portrait 3:4]

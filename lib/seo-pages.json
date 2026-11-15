@@ -15,6 +15,13 @@
       "imageAlt": "Ahmad Eldeeb — Lead Product Designer",
       "type": "profile"
     },
+    "/podcast": {
+      "title": "Podcast · Ahmad Eldeeb",
+      "description": "Blueprint, the product design podcast I co-host in Arabic, and my episode as a guest on Ask Designer.",
+      "image": "/og-image.png",
+      "imageAlt": "Ahmad Eldeeb — Lead Product Designer",
+      "type": "website"
+    },
     "/work/sary-repeat-customers": {
       "title": "Sary Buy Again: Restock in 3 taps, not 39 · Ahmad Eldeeb",
       "description": "Restocking 18 usual items went from 39 taps to 3. A Buy Again hub for grocery stores lifted repeat purchases 28% and order value 27%.",

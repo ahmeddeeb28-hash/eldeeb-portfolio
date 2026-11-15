@@ -23,6 +23,7 @@ import { ConsentBanner } from './components/ConsentBanner';
 /* The Director's Cut is the heaviest view on the site and only opens
    on demand, so it ships as its own chunk. */
 const AboutPage = lazy(() => import('./components/AboutPage').then((m) => ({ default: m.AboutPage })));
+const PodcastPage = lazy(() => import('./components/PodcastPage').then((m) => ({ default: m.PodcastPage })));
 
 /* ── Routing ──────────────────────────────────────────
    The overlays used to be pure state, and every pushState call
@@ -32,6 +33,7 @@ const AboutPage = lazy(() => import('./components/AboutPage').then((m) => ({ def
 
      /                      home
      /about                 the Director's Cut
+     /podcast               the podcast player and every episode
      /work/<case-study-id>  a single case study
 
    vercel.json already rewrites every path to index.html, so
@@ -39,11 +41,13 @@ const AboutPage = lazy(() => import('./components/AboutPage').then((m) => ({ def
 type Route =
   | { view: 'home' }
   | { view: 'about' }
+  | { view: 'podcast' }
   | { view: 'case'; id: string };
 
 function parseRoute(pathname: string): Route {
   const path = pathname.replace(/\/+$/, '') || '/';
   if (path === '/about') return { view: 'about' };
+  if (path === '/podcast') return { view: 'podcast' };
   const match = path.match(/^\/work\/([A-Za-z0-9._-]+)$/);
   /* An unknown slug resolves to home rather than rendering an
      empty overlay; the mount effect then corrects the URL. */
@@ -53,6 +57,7 @@ function parseRoute(pathname: string): Route {
 
 function routeToPath(route: Route): string {
   if (route.view === 'about') return '/about';
+  if (route.view === 'podcast') return '/podcast';
   if (route.view === 'case') return `/work/${route.id}`;
   return '/';
 }
@@ -68,7 +73,8 @@ export default function App() {
 
   const activeProjectId = route.view === 'case' ? route.id : null;
   const aboutPageOpen = route.view === 'about';
-  const overlayOpen = Boolean(activeProjectId) || aboutPageOpen;
+  const podcastPageOpen = route.view === 'podcast';
+  const overlayOpen = Boolean(activeProjectId) || aboutPageOpen || podcastPageOpen;
 
 
   /* Normalise the address bar once on load, so a trailing slash or
@@ -126,6 +132,12 @@ export default function App() {
     navigate({ view: 'about' });
   };
   const closeAboutPage = goHome;
+  const openPodcastPage = () => {
+    track('podcast_open');
+    navigate({ view: 'podcast' });
+  };
+  /* from one page's floating nav straight to the other page */
+  const openPage = (page: 'about' | 'podcast') => (page === 'about' ? openAboutPage() : openPodcastPage());
   /* From the About page's floating nav: back home, then to a section
      (or the top) once the homepage has faded back in. */
   const leaveAboutTo = (sectionId: string | null) => {
@@ -160,7 +172,8 @@ export default function App() {
         )}
 
         <AnimatePresence>
-          {aboutPageOpen && <AboutPage key="about-page" onBack={closeAboutPage} onNavigate={leaveAboutTo} />}
+          {aboutPageOpen && <AboutPage key="about-page" onBack={closeAboutPage} onNavigate={leaveAboutTo} onPage={openPage} />}
+          {podcastPageOpen && <PodcastPage key="podcast-page" onBack={goHome} onNavigate={leaveAboutTo} onPage={openPage} />}
         </AnimatePresence>
       </Suspense>
 
@@ -185,7 +198,7 @@ export default function App() {
           overlayOpen ? 'opacity-0 invisible pointer-events-none' : 'opacity-100 visible'
         }`}
       >
-        <Navigation onOpenAboutPage={openAboutPage} />
+        <Navigation onOpenAboutPage={openAboutPage} onOpenPodcastPage={openPodcastPage} />
         <PremiumHero />
         <BrandsStats />
         <Projects onProjectClick={openProject} paused={overlayOpen} />
@@ -196,12 +209,12 @@ export default function App() {
         {/* Hidden but preserved — restore by flipping the guard below, and
             uncomment the Mentorship links in Navigation.tsx and Footer.tsx */}
         {false && <Mentorship />}
-        <ProofOfPresence />
+        <ProofOfPresence onOpenPodcastPage={openPodcastPage} />
         {/* Hidden but preserved — restore by flipping the guard below */}
         {false && <Features />}
         <Results />
         <Articles />
-        <Footer onOpenAboutPage={openAboutPage} />
+        <Footer onOpenAboutPage={openAboutPage} onOpenPodcastPage={openPodcastPage} />
       </main>
       <ConsentBanner />
     </div>

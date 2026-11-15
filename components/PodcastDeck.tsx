@@ -1,7 +1,7 @@
 import { useLang } from '../lib/i18n';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, Disc3, Headphones, Pause, Play, RotateCcw, RotateCw } from 'lucide-react';
+import { ArrowUpRight, Disc3, Headphones, Pause, Play, RotateCcw, RotateCw, SkipBack, SkipForward } from 'lucide-react';
 
 /* ── Podcasts and talks: a playable deck ──
    Every episode plays right here, on a record player (the record spins,
@@ -308,7 +308,7 @@ function HeadphonesView({ ep, playing, onToggle }: { ep: Episode; playing: boole
   );
 }
 
-export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'band' | 'closer'; lead?: React.ReactNode }) {
+export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'band' | 'closer' | 'page'; lead?: React.ReactNode }) {
   const reduced = useReducedMotion();
   const { isAr } = useLang();
   const [cur, setCur] = useState(0);
@@ -374,6 +374,18 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
     setCur(n); setTime(0); setDur(EPISODES[n].length); setPlaying(false); setLoading(false);
   };
   const progress = dur ? time / dur : 0;
+
+  /* Podcast page: once the main player scrolls away, a mini player
+     floats at the bottom so the episode stays in reach while reading
+     the list. It hides again when the main player is back in view. */
+  const mainRef = useRef<HTMLElement>(null);
+  const [mainOut, setMainOut] = useState(false);
+  useEffect(() => {
+    if (variant !== 'page' || !mainRef.current) return;
+    const io = new IntersectionObserver(([e]) => setMainOut(!e.isIntersecting), { threshold: 0.15 });
+    io.observe(mainRef.current);
+    return () => io.disconnect();
+  }, [variant]);
   // a tiny, pre-blurred copy of the cover: cheap to scale and animate
   const backdrop = (ep.cover ?? show.art).replace('/images/podcasts/', '/images/podcasts/bg/');
   const slide = reduced ? {} : { initial: { x: dir * 60, opacity: 0 }, animate: { x: 0, opacity: 1 }, exit: { x: -dir * 60, opacity: 0 } };
@@ -525,8 +537,8 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
           </div>
         </div>
       </div>
-      {/* 4. browse: every episode as a small cover */}
-      <div className="mt-7">
+      {/* 4. browse: every episode as a small cover (the page lists them below instead) */}
+      <div className={variant === 'page' ? 'hidden' : 'mt-7'}>
         <p className="text-xs text-white/40 mb-1">{isAr ? 'كل الحلقات' : 'All episodes'}</p>
         <ol className="grid grid-cols-6 gap-2 sm:gap-3 max-w-[440px] pt-[11%]">
           {EPISODES.map((e, i) => {
@@ -584,6 +596,98 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
       .pd-lead > div { justify-content: center }
     `}</style>
   );
+
+  /* Podcast page · one column: the player on top, the controls under it,
+     then every episode as a full row */
+  if (variant === 'page') {
+    return (
+      <div style={{ isolation: 'isolate' }} onKeyDown={keys}>
+        {styles}<audio ref={audio} preload="none" />
+        <section ref={mainRef} dir="ltr" aria-label="Podcast player" className="relative mx-auto max-w-[680px] rounded-[28px] overflow-hidden px-6 py-10 sm:px-12 sm:py-12 flex flex-col gap-10"
+          style={{ border: '1px solid rgba(255,255,255,0.12)', background: '#0B0B0B', isolation: 'isolate' }}
+        >
+          {glow}
+          <div>{instrument}</div>
+          <div className="min-w-0">{panel}</div>
+        </section>
+        <div id="episodes" className="mx-auto max-w-[680px] mt-16 scroll-mt-24">
+          <p className="text-white/45 text-sm mb-4">All episodes · {EPISODES.length}</p>
+          <ol className="flex flex-col gap-2">
+            {EPISODES.map((e, i) => {
+              const on = i === cur;
+              const sh = SHOWS[e.show];
+              return (
+                <li key={e.id}>
+                  <button type="button" onClick={() => go(i)} aria-current={on}
+                    className="w-full text-left flex gap-4 sm:gap-5 items-start rounded-2xl p-3 sm:p-4 transition-colors"
+                    style={{ background: on ? 'rgba(255,255,255,0.07)' : 'transparent', boxShadow: on ? 'inset 0 0 0 1px rgba(255,255,255,0.14)' : 'none' }}
+                  >
+                    <img src={e.cover ?? sh.art} alt="" loading="lazy" className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover flex-none" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-xs mb-1" style={{ color: on ? GOLD : 'rgba(255,255,255,0.45)' }}>
+                        {sh.name} · {e.label === 'S3 · E2' ? 'Season 3, episode 2' : `Episode ${e.label.replace('Ep ', '')}`} · {mins(e.length)} · {e.date}
+                        {on && playing ? ' · Playing' : ''}
+                      </span>
+                      <span className="block text-white font-semibold text-base sm:text-lg leading-snug">{e.title}</span>
+                      {e.note && <span className="block text-white/50 text-sm leading-relaxed mt-1">{e.note}</span>}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+        <AnimatePresence>
+          {mainOut && (
+            <motion.div
+              key="mini"
+              dir="ltr"
+              role="region"
+              aria-label="Now playing"
+              initial={{ y: 90, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 90, opacity: 0 }}
+              transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 320, damping: 32 }}
+              className="fixed z-[120] left-3 right-3 bottom-3 sm:left-1/2 sm:right-auto sm:w-[560px] sm:-translate-x-1/2 sm:bottom-5"
+            >
+              <div
+                className="relative overflow-hidden rounded-2xl flex items-center gap-3 p-2.5 pr-3"
+                style={{ background: 'rgba(20,20,22,0.88)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', boxShadow: '0 0 0 1px rgba(255,255,255,0.12), 0 20px 40px -16px rgba(0,0,0,0.8)' }}
+              >
+                <button type="button" onClick={() => mainRef.current?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' })}
+                  aria-label="Back to the full player" className="relative flex-none w-12 h-12 rounded-xl overflow-hidden"
+                >
+                  <img src={ep.cover ?? show.art} alt="" className="w-full h-full object-cover" style={{ animation: playing && !reduced ? 'pd-spin 6s linear infinite' : 'none', borderRadius: playing ? '50%' : undefined, transition: 'border-radius .4s' }} />
+                </button>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[11px] truncate" style={{ color: GOLD }}>
+                    {show.name} · {ep.label === 'S3 · E2' ? 'S3 E2' : `Episode ${ep.label.replace('Ep ', '')}`}
+                  </span>
+                  <span className="block text-white text-sm font-semibold truncate">{isAr ? TITLE_AR[ep.id] ?? ep.title : ep.title}</span>
+                  <span className="block text-white/45 text-[11px] tabular-nums">
+                    {clock(time)} / {clock(dur)}
+                  </span>
+                </span>
+                <button type="button" onClick={() => go(cur - 1)} aria-label="Previous episode" className="hidden sm:grid place-items-center w-9 h-9 rounded-full text-white/70 hover:text-white hover:bg-white/10">
+                  <SkipBack className="w-4 h-4" />
+                </button>
+                <button type="button" onClick={toggle} aria-label={playing ? 'Pause' : 'Play'}
+                  className="grid place-items-center w-11 h-11 rounded-full flex-none transition-transform hover:scale-105 active:scale-95"
+                  style={{ background: '#F5F3EF', color: '#111' }}
+                >
+                  {loading && playing ? <span className="w-4 h-4 rounded-full border-2 border-black/20 border-t-black animate-spin" /> : playing ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
+                </button>
+                <button type="button" onClick={() => go(cur + 1)} aria-label="Next episode" className="grid place-items-center w-9 h-9 rounded-full text-white/70 hover:text-white hover:bg-white/10">
+                  <SkipForward className="w-4 h-4" />
+                </button>
+                <span aria-hidden className="absolute left-0 bottom-0 h-[2px] bg-white/80" style={{ width: `${progress * 100}%` }} />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  }
 
   /* A · hero: the turntable takes the portrait's place beside the headline */
   if (variant === 'hero') {

@@ -32,6 +32,7 @@ export function CaseShell({
   children,
   pillId,
   siteNav,
+  hideTabs = false,
 }: {
   chapters: Chapter[];
   metaLine: string;
@@ -42,7 +43,9 @@ export function CaseShell({
   pillId?: string;
   /* My Story: show the site's floating navigation instead of the
      Back row; it gets the landing section to go to, or null for top */
-  siteNav?: { onNavigate: (sectionId: string | null) => void; current: string };
+  siteNav?: { onNavigate: (sectionId: string | null) => void; current: string; onPage?: (page: 'about' | 'podcast') => void };
+  /* a single-part page (Podcast) has no chapters to jump between */
+  hideTabs?: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -133,17 +136,27 @@ export function CaseShell({
           lockScroll={lockScroll}
           items={[
             { label: 'Work', href: `/#${SECTION_IDS.work}`, onSelect: () => siteNav.onNavigate(SECTION_IDS.work) },
-            {
-              label: siteNav.current,
-              href: window.location.pathname,
-              active: true,
-              onSelect: () => (lenisRef.current ? lenisRef.current.scrollTo(0) : containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })),
-            },
+            ...(
+              [
+                ['My Story', '/about', 'about'],
+                ['Podcast', '/podcast', 'podcast'],
+              ] as const
+            ).map(([label, href, page]) =>
+              label === siteNav.current
+                ? {
+                    label,
+                    href,
+                    active: true,
+                    onSelect: () => (lenisRef.current ? lenisRef.current.scrollTo(0) : containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })),
+                  }
+                : { label, href, onSelect: () => (siteNav.onPage ? siteNav.onPage(page) : siteNav.onNavigate(null)) },
+            ),
             { label: 'Speaking', href: `/#${SECTION_IDS.speaking}`, onSelect: () => siteNav.onNavigate(SECTION_IDS.speaking) },
             { label: 'Articles', href: `/#${SECTION_IDS.articles}`, onSelect: () => siteNav.onNavigate(SECTION_IDS.articles) },
           ]}
         />
       )}
+      {!(hideTabs && siteNav) && (
       <header
         className={`sticky top-0 z-40 bg-[#0A0A0A]/90 backdrop-blur-md border-b border-white/5 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${siteNav ? 'pt-[84px]' : ''}`}
         style={{ transform: siteNav && barHidden ? 'translateY(-100%)' : 'translateY(0)' }}
@@ -176,6 +189,7 @@ export function CaseShell({
         </div>
         )}
 
+        {!hideTabs && (
         <StoryTabs
           chapters={chapters}
           activeId={activeId}
@@ -183,7 +197,9 @@ export function CaseShell({
           progress={scrollProgress}
           pillId={pillId}
         />
+        )}
       </header>
+      )}
 
       {children}
       </div>
