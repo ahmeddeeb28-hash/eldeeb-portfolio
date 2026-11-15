@@ -261,19 +261,37 @@ function PopAvatar({ target }: { target: RefObject<HTMLElement | null> }) {
     };
   }, [target, raw]);
   const p = useSpring(raw, { stiffness: 140, damping: 16, mass: 0.6 });
-  const scale = useTransform(p, [0.15, 0.75, 1], [0.2, 1.12, 1]);
-  const y = useTransform(p, [0.15, 1], [80, 0]);
-  const rotate = useTransform(p, [0.15, 1], [-28, 7]);
-  const opacity = useTransform(p, [0.1, 0.35], [0, 1]);
-  const ring = '0 0 0 5px #0B0B0B, 0 24px 50px -12px rgba(0,0,0,0.7)';
+  // the chat head pops first, then its message bubble, like a Messenger head
+  const scale = useTransform(p, [0.15, 0.6, 0.75], [0.2, 1.15, 1]);
+  const y = useTransform(p, [0.15, 0.75], [60, 0]);
+  const opacity = useTransform(p, [0.1, 0.3], [0, 1]);
+  const bScale = useTransform(p, [0.6, 0.85, 1], [0.6, 1.04, 1]);
+  const bOpacity = useTransform(p, [0.6, 0.8], [0, 1]);
+  const bX = useTransform(p, [0.6, 1], [16, 0]);
   return (
-    <motion.img
-      src="/images/people/polina.webp"
-      alt=""
-      aria-hidden
-      className="absolute z-10 rounded-full object-cover w-24 h-24 md:w-36 md:h-36 -top-10 right-6 md:-top-16 md:right-14"
-      style={reduced ? { boxShadow: ring } : { scale, y, rotate, opacity, boxShadow: ring }}
-    />
+    <div aria-hidden className="absolute z-10 -top-7 right-5 md:-top-9 md:right-12 flex items-end gap-2.5">
+      <motion.div
+        className="origin-bottom-right max-w-[230px] md:max-w-[280px] rounded-[20px] rounded-br-[6px] bg-white px-4 py-2.5 text-[13px] md:text-sm leading-snug text-[#0B0B0B]"
+        style={{
+          boxShadow: '0 12px 30px -10px rgba(0,0,0,0.45)',
+          ...(reduced ? {} : { scale: bScale, opacity: bOpacity, x: bX }),
+        }}
+      >
+        <span className="block text-[11px] font-semibold text-black/45 mb-0.5">Polina</span>
+        acting as a true mentor in the process.
+      </motion.div>
+      <motion.span className="relative flex-none" style={reduced ? undefined : { scale, y, opacity }}>
+        <img
+          src="/images/people/polina.webp"
+          alt=""
+          width={60}
+          height={60}
+          className="w-[52px] h-[52px] md:w-[60px] md:h-[60px] rounded-full object-cover"
+          style={{ boxShadow: '0 0 0 3px #fff, 0 14px 30px -8px rgba(0,0,0,0.55)' }}
+        />
+        <span className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-[#31A24C]" style={{ boxShadow: '0 0 0 2.5px #fff' }} />
+      </motion.span>
+    </div>
   );
 }
 
@@ -572,7 +590,7 @@ export function LeadershipCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true, margin: '-10% 0px' }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="relative overflow-hidden rounded-[32px] px-7 py-10 md:px-16 md:py-16"
+            className="relative overflow-hidden rounded-[32px] px-7 pt-20 pb-10 md:px-16 md:py-16"
             style={{ background: ACCENT, color: '#0B0B0B' }}
           >
             <span aria-hidden className="absolute -bottom-24 md:-bottom-36 right-6 md:right-10 select-none font-extrabold leading-none" style={{ fontSize: 'clamp(160px, 22vw, 300px)', color: 'rgba(11,11,11,0.08)' }}>
