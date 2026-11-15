@@ -1,5 +1,5 @@
-import { motion, useReducedMotion } from 'motion/react';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'motion/react';
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
@@ -235,6 +235,66 @@ const Panel = ({ children, className = '' }: { children: ReactNode; className?: 
   </div>
 );
 
+/* Polina's avatar pops out of the testimonial card as it scrolls into
+   view: it grows from behind the card's edge, overshoots a little and
+   settles with a slight tilt. Linked to the case study's own scroller. */
+function PopAvatar({ target }: { target: RefObject<HTMLElement | null> }) {
+  const reduced = useReducedMotion();
+  const raw = useMotionValue(0);
+  // after commit both refs exist: follow the case study's own scroller
+  useEffect(() => {
+    const el = target.current;
+    if (!el) return;
+    const scroller: HTMLElement | Window = (el.closest('.overflow-y-auto') as HTMLElement | null) ?? window;
+    const update = () => {
+      const r = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      // 0 when the card's top enters the bottom of the screen, 1 when it reaches the middle
+      raw.set(Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.5))));
+    };
+    update();
+    scroller.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    return () => {
+      scroller.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, [target, raw]);
+  const p = useSpring(raw, { stiffness: 140, damping: 16, mass: 0.6 });
+  // the chat head pops first, then its message bubble, like a Messenger head
+  const scale = useTransform(p, [0.15, 0.6, 0.75], [0.2, 1.15, 1]);
+  const y = useTransform(p, [0.15, 0.75], [60, 0]);
+  const opacity = useTransform(p, [0.1, 0.3], [0, 1]);
+  const bScale = useTransform(p, [0.6, 0.85, 1], [0.6, 1.04, 1]);
+  const bOpacity = useTransform(p, [0.6, 0.8], [0, 1]);
+  const bX = useTransform(p, [0.6, 1], [16, 0]);
+  return (
+    <div aria-hidden className="absolute z-10 -top-7 right-5 md:-top-9 md:right-12 flex items-end gap-2.5">
+      <motion.div
+        className="origin-bottom-right max-w-[230px] md:max-w-[280px] rounded-[20px] rounded-br-[6px] bg-white px-4 py-2.5 text-[13px] md:text-sm leading-snug text-[#0B0B0B]"
+        style={{
+          boxShadow: '0 12px 30px -10px rgba(0,0,0,0.45)',
+          ...(reduced ? {} : { scale: bScale, opacity: bOpacity, x: bX }),
+        }}
+      >
+        <span className="block text-[11px] font-semibold text-black/45 mb-0.5">Polina</span>
+        acting as a true mentor in the process.
+      </motion.div>
+      <motion.span className="relative flex-none" style={reduced ? undefined : { scale, y, opacity }}>
+        <img
+          src="/images/people/polina.webp"
+          alt=""
+          width={60}
+          height={60}
+          className="w-[52px] h-[52px] md:w-[60px] md:h-[60px] rounded-full object-cover"
+          style={{ boxShadow: '0 0 0 3px #fff, 0 14px 30px -8px rgba(0,0,0,0.55)' }}
+        />
+        <span className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-[#31A24C]" style={{ boxShadow: '0 0 0 2.5px #fff' }} />
+      </motion.span>
+    </div>
+  );
+}
+
 /* ── 01 ───────────────────────────────────────────── */
 
 const SCALE: [string, string][] = [
@@ -405,7 +465,121 @@ function OkrFormat() {
 
 /* ── 06 people ───────────────────────────────────── */
 
-const HIRING = ['Intro chat', 'Portfolio interview', 'Take-home, 6 days', 'Presentation', 'Decision in 2–4 weeks'];
+
+/* The hiring path as a story about mindset: each step is there to show
+   how someone thinks, and lights up the parts of the bar it reveals.
+   After the offer, the same four things become the growth plan. */
+const BAR = ['Storytelling', 'Rationale', 'Quality', 'Prioritisation'];
+const STORY: { t: string; d: string; shows: number[]; grow?: boolean }[] = [
+  { t: 'Intro chat', d: 'Mindset first: what they are curious about, and how they talk about the problems they want to solve.', shows: [0] },
+  { t: 'Portfolio interview', d: 'The thinking behind the work, not the pixels: why each call was made, and what they would change now.', shows: [1, 2] },
+  { t: 'Take-home, 6 days', d: 'An open brief with no single right answer, the same for every finalist. It shows how they frame a problem and where they take it further.', shows: [0, 1, 2, 3] },
+  { t: 'Presentation', d: 'How they tell the story, defend their trade-offs and choose what matters first.', shows: [0, 1, 3] },
+  { t: 'Decision in 2–4 weeks', d: 'One decision, made against the same four things for everyone.', shows: [0, 1, 2, 3] },
+  { t: 'Then, the team', d: 'Bi-weekly 1:1s keep growing the same mindset: the four things become a growth plan.', shows: [0, 1, 2, 3], grow: true },
+];
+
+function HiringStory() {
+  const reduced = useReducedMotion();
+  const [i, setI] = useState(0);
+  const step = STORY[i];
+  const last = STORY.length - 1;
+  const go = (n: number) => setI(Math.max(0, Math.min(last, n)));
+  return (
+    <div
+      role="group"
+      aria-label="How each hiring step reads mindset"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'ArrowRight') go(i + 1);
+        if (e.key === 'ArrowLeft') go(i - 1);
+      }}
+      className="rounded-[28px] border p-5 md:p-9 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+      style={{ background: PANEL, borderColor: LINE, outlineColor: ACCENT }}
+    >
+      {/* the path: tap any stop, the candidate walks there */}
+      <div className="relative">
+        <div className="absolute left-[18px] right-[18px] top-[17px] h-[2px] rounded" style={{ background: LINE }} />
+        <motion.div
+          className="absolute left-[18px] top-[17px] h-[2px] rounded"
+          style={{ background: ACCENT }}
+          animate={{ width: `calc(${(i / last) * 100}% - ${(i / last) * 36}px)` }}
+          transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 160, damping: 24 }}
+        />
+        <ol className="relative flex items-center justify-between">
+          {STORY.map((s, k) => {
+            const done = k <= i;
+            return (
+              <li key={s.t}>
+                <button
+                  type="button"
+                  onClick={() => go(k)}
+                  aria-current={k === i ? 'step' : undefined}
+                  aria-label={s.t}
+                  className="relative grid place-items-center w-9 h-9 rounded-full text-xs font-bold tabular-nums transition-colors"
+                  style={{ background: done ? ACCENT : '#15171D', color: done ? '#0B0B0B' : 'rgba(255,255,255,0.55)', boxShadow: `0 0 0 1px ${done ? ACCENT : LINE}` }}
+                >
+                  {k === last ? '★' : String(k + 1).padStart(2, '0')}
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+
+      <div className="grid md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] gap-6 md:gap-10 mt-9 md:mt-10 items-start">
+        <div className="min-h-[150px]">
+          <motion.div key={i} initial={reduced ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
+            <p className="text-sm tabular-nums mb-2" style={{ color: ACCENT }}>
+              {i === last ? 'After the offer' : `Step ${i + 1} of ${last} · what it shows`}
+            </p>
+            <h3 className="text-white text-2xl md:text-3xl font-semibold tracking-[-0.02em] leading-tight">{step.t}</h3>
+            <p className="text-white/60 text-base md:text-lg leading-relaxed mt-3">{step.d}</p>
+          </motion.div>
+          <div className="flex items-center gap-2 mt-6">
+            <button type="button" onClick={() => go(i - 1)} disabled={i === 0} aria-label="Previous step" className="grid place-items-center w-10 h-10 rounded-full border text-white/70 disabled:opacity-30" style={{ borderColor: LINE }}>
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => (i === last ? setI(0) : go(i + 1))}
+              className="h-10 px-5 rounded-full text-sm font-semibold"
+              style={{ background: ACCENT, color: '#0B0B0B' }}
+            >
+              {i === last ? 'Start over' : 'Next step'}
+            </button>
+          </div>
+        </div>
+
+        {/* the bar: the same four things, lighting up where they count */}
+        <div className="rounded-2xl p-5" style={{ background: '#0B0C10', boxShadow: `inset 0 0 0 1px ${LINE}` }}>
+          <p className="text-white/45 text-sm mb-4">{step.grow ? 'The same four, now a growth plan' : 'The bar: what this step reveals'}</p>
+          <ul className="grid gap-3">
+            {BAR.map((b, k) => {
+              const on = step.shows.includes(k);
+              return (
+                <li key={b}>
+                  <div className="flex justify-between text-sm mb-1.5">
+                    <span className={on ? 'text-white' : 'text-white/35'}>{b}</span>
+                    {on && <span style={{ color: ACCENT }}>{step.grow ? 'growing' : 'shows here'}</span>}
+                  </div>
+                  <div className="h-2 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                    <motion.div
+                      className="h-full rounded-full"
+                      style={{ background: ACCENT }}
+                      animate={{ width: on ? '100%' : '0%' }}
+                      transition={reduced ? { duration: 0 } : { duration: 0.55, delay: k * 0.06, ease: [0.22, 1, 0.36, 1] }}
+                    />
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /* ── 07 proof ────────────────────────────────────── */
 
@@ -432,6 +606,8 @@ const PROOF: { where: string; when: string; role: string; points: [string, strin
 ];
 
 export function LeadershipCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
+  const reduced = useReducedMotion();
+  const quoteRef = useRef<HTMLDivElement>(null);
   return (
     <CaseShell chapters={CHAPTERS} metaLine="Design leadership" onBack={onBack} onNext={onNext} resetKey="sary-design-leadership" pillId="lead-tab-pill">
       <div className="max-w-5xl mx-auto px-6 pt-16 pb-24">
@@ -483,54 +659,74 @@ export function LeadershipCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
         </Section>
 
         <Section i={6} title="Hire on one bar, grow on the same one." lead="Every finalist gets the same open brief and is scored on the same four things: storytelling, rationale, quality and prioritisation. Bi-weekly 1:1s turn the same bar into a growth plan.">
-          <ol className="grid grid-cols-1 sm:grid-cols-5 border-t" style={{ borderColor: LINE }}>
-            {HIRING.map((p, i) => (
-              <li key={p} className="pt-5 pb-2 sm:pr-4 grid grid-cols-[32px_minmax(0,1fr)] sm:block gap-2">
-                <span className="text-sm font-semibold tabular-nums" style={{ color: ACCENT }}>
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <span className="text-white font-semibold sm:block sm:mt-2">{p}</span>
-              </li>
-            ))}
-          </ol>
+          <HiringStory />
         </Section>
 
         <Section i={7} tone="teal" title="Where it worked." lead="The same playbook, two very different teams.">
-          <div className="grid md:grid-cols-2 gap-3 mb-12">
+          <div className="grid md:grid-cols-2 gap-3">
             {PROOF.map((t) => (
-              <Panel key={t.where} className="!p-6 md:!p-8">
-                <div className="flex items-baseline justify-between gap-4">
-                  <p className="text-white text-2xl font-bold">{t.where}</p>
-                  <p className="text-white/45 text-sm tabular-nums">{t.when}</p>
+              <Panel key={t.where} className="!p-6 md:!p-9 flex flex-col">
+                <div className="flex items-start justify-between gap-4 md:min-h-[5.25rem]">
+                  <div>
+                    <p className="text-white text-2xl font-bold leading-tight">{t.where}</p>
+                    <p className="text-sm mt-1.5" style={{ color: ACCENT }}>
+                      {t.role}
+                    </p>
+                  </div>
+                  <p className="text-white/45 text-sm tabular-nums whitespace-nowrap pt-1.5">{t.when}</p>
                 </div>
-                <p className="text-sm mt-1 mb-6" style={{ color: ACCENT }}>
-                  {t.role}
-                </p>
-                <dl className="grid gap-3">
+                <dl className="mt-8 pt-6 border-t grid gap-4" style={{ borderColor: LINE }}>
                   {t.points.map(([v, k]) => (
-                    <div key={k} className="flex items-baseline gap-4">
-                      <dt className="sr-only">{k}</dt>
-                      <dd className="text-white text-3xl font-extrabold tracking-[-0.04em] tabular-nums min-w-[3.2ch]">{v}</dd>
-                      <span className="text-white/55">{k}</span>
+                    <div key={k} className="grid grid-cols-[6.5rem_minmax(0,1fr)] md:grid-cols-[7.5rem_minmax(0,1fr)] items-baseline gap-4">
+                      <dd className="text-white text-3xl font-extrabold tracking-[-0.04em] tabular-nums">{v}</dd>
+                      <dt className="text-white/60 leading-snug">{k}</dt>
                     </div>
                   ))}
                 </dl>
               </Panel>
             ))}
           </div>
-          <figure className="border-l-2 pl-6 max-w-3xl" style={{ borderColor: ACCENT }}>
-            <blockquote className="text-white text-xl md:text-2xl leading-snug">
-              “He has a great talent for organizing work, skillfully delegating tasks based on his team members’ individual
-              strengths, while also fostering their professional growth, acting as a true mentor in the process.”
+          {/* The one moment on the page that breaks the dark-panel rhythm:
+              the testimonial on a quiet warm paper tone. */}
+          <div ref={quoteRef} className="relative mt-16 md:mt-20">
+          <PopAvatar target={quoteRef} />
+          <motion.figure
+            initial={reduced ? false : { opacity: 0, y: 28, scale: 0.98 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, margin: '-10% 0px' }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="relative overflow-hidden rounded-[32px] px-7 pt-20 pb-10 md:px-16 md:py-16"
+            style={{ background: '#E9E7DF', color: '#0B0B0B' }}
+          >
+            <span aria-hidden className="absolute -bottom-24 md:-bottom-36 right-6 md:right-10 select-none font-extrabold leading-none" style={{ fontSize: 'clamp(160px, 22vw, 300px)', color: 'rgba(11,11,11,0.08)' }}>
+              ”
+            </span>
+            <p className="relative text-xs md:text-sm font-semibold mb-6 md:mb-8" style={{ color: 'rgba(11,11,11,0.6)' }}>
+              From the team
+            </p>
+            <blockquote className="relative font-semibold tracking-[-0.025em] leading-[1.18] max-w-4xl md:pr-40" style={{ fontSize: 'clamp(24px, 3.4vw, 44px)' }}>
+              “He has a great talent for organizing work, skillfully delegating tasks based on his team members’ individual strengths, while also fostering their professional growth,{' '}
+              <span style={{ background: '#0B0B0B', color: '#F4F2EC', padding: '0 0.18em', borderRadius: 6, boxDecorationBreak: 'clone', WebkitBoxDecorationBreak: 'clone' }}>
+                acting as a true mentor in the process.
+              </span>
+              ”
             </blockquote>
-            <figcaption className="text-white/45 text-sm mt-4">Polina Kosheleva, Senior Game UI Artist, reported to Ahmad at Lobah</figcaption>
-          </figure>
+            <figcaption className="relative flex items-center gap-4 mt-10 md:mt-12">
+              <img src="/images/people/polina.webp" alt="" width={56} height={56} loading="lazy" className="w-14 h-14 rounded-full object-cover" style={{ boxShadow: '0 0 0 3px #0B0B0B' }} />
+              <span>
+                <span className="block font-bold text-base md:text-lg">Polina Kosheleva</span>
+                <span className="block text-sm" style={{ color: 'rgba(11,11,11,0.65)' }}>
+                  Senior Game UI Artist, reported to Ahmad at Lobah
+                </span>
+              </span>
+            </figcaption>
+          </motion.figure>
+          </div>
         </Section>
 
         <Takeaway
           accent={ACCENT}
           deep={DEEP}
-          note="“He has fostered a culture of innovation within our design team, enhancing collaboration and elevating our deliverables.” — Mohammed Aldossary, Co-founder & CEO, Sary"
         >
           A team doesn’t need more pressure. It needs an owner for every objective, a rhythm people can rely on, and one source
           of truth.
