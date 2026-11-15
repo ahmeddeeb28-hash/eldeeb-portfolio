@@ -1,4 +1,5 @@
 import { AnimatePresence, motion, useInView, useMotionValueEvent, useReducedMotion, useScroll, useTransform, type MotionValue } from 'motion/react';
+import { useLang } from '../lib/i18n';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ArrowUpRight, Leaf } from 'lucide-react';
 import { FUNNEL } from './case-studies/report/ReportData';
@@ -93,6 +94,48 @@ const COPY: Record<string, { name: string; line: string; tint: string; beats: st
     tint: '#0E7A4E',
     beats: ['Pay, and a five second window opens', 'Fix the address or the items while it runs', 'Placed, and straight on to tracking'],
   },
+};
+
+/* Arabic copy for the cards, same order as COPY and STATS */
+const COPY_AR: Record<string, { name: string; line: string; beats: string[] }> = {
+  'sary-design-leadership': {
+    name: 'هكذا أقود فرق التصميم',
+    line: 'لكل هدف صاحب واحد، وللعمل إيقاع ثابت، وللقرار مرجع واحد. طريقة اختبرتها في Lobah وفي ساري.',
+    beats: ['أبني الفريق قبل المنتج', 'أحوّل الأولوية إلى خطوة لها صاحب', 'أحوّل النقد إلى قرار', 'وأدرّب الفريق داخل العمل نفسه'],
+  },
+  'sary-repeat-customers': {
+    name: '3 لمسات للتموين بدل 39',
+    line: 'صاحب البقالة يطلب السلة نفسها كل أسبوع، فجعلتها جاهزة له في «اطلب مجددًا». ارتفعت المشتريات المتكررة 28٪ وقيمة الطلب 27٪ بعدها.',
+    beats: ['صاحب محل يفتح ساري ليملأ رفوفه', 'سلّته المعتادة تنتظره جاهزة', '«أضف الكل»: 18 منتجًا في السلة بلمسة واحدة'],
+  },
+  'sary-usability-report': {
+    name: 'أين توقّف المتسوقون، ولماذا',
+    line: 'تقريري الفصلي عن سهولة الاستخدام: تتبّعت رحلة المتسوق في الكتالوج خطوة بخطوة، وخرائط الحرارة كشفت السبب.',
+    beats: ['34,860 متسوقًا فتحوا الكتالوج', 'ومع كل خطوة كنا نخسر بعضهم', '3,357 فقط وصلوا إلى «اكتشف»، وخريطة الحرارة تقول لماذا'],
+  },
+  'sampo-ai-pricing': {
+    name: 'تسعير ذكي يثق به التاجر',
+    line: 'ذكاء اصطناعي يقترح أسعار المتجر، والقرار يبقى للتاجر: يرى سبب كل استراتيجية، ويجرّبها قبل أن تعمل، ويتراجع عنها متى شاء.',
+    beats: ['الحذر: خطوات صغيرة وآمنة', 'الأثر الأكبر: وصول أوسع وربح أقل', 'المتوازن: أفضل ربح بمخاطرة محسوبة', 'لا شيء يعمل قبل أن يُختبر'],
+  },
+  'vault-split': {
+    name: 'خطتك الحقيقية، قبل أن تشتري',
+    line: 'اشترِ الآن وادفع لاحقًا، من دون مفاجآت: الدفعة الأولى الحقيقية وسببها أمامك على صفحة المنتج.',
+    beats: ['اختر طريقة الدفع', 'فحص يستغرق 10 ثوانٍ', 'خطتك الحقيقية، ومعها السبب', 'والخطة نفسها عند الدفع'],
+  },
+  'fresh-order-placed': {
+    name: 'خمس ثوانٍ لتصحيح الطلب',
+    line: 'بدل أن ينتظر العميل دائرة التحميل بعد الدفع، صارت تلك الثواني فرصة لتعديل العنوان أو المنتجات، ثم التتبع مباشرة.',
+    beats: ['تدفع، فتبدأ خمس ثوانٍ', 'عدّل العنوان أو المنتجات خلالها', 'تم الطلب، وإلى التتبع مباشرة'],
+  },
+};
+const STATS_AR: Record<string, { k: string; note?: string; pre?: string; suf?: string }[]> = {
+  'sary-design-leadership': [{ k: 'سرعة التصميم', note: 'من الفكرة إلى جاهزية التطوير' }, { k: 'مصممًا في فريقي' }, { k: 'تسليم أسرع' }],
+  'sary-repeat-customers': [{ k: 'المشتريات المتكررة' }, { k: 'متوسط قيمة الطلب' }, { k: 'استخدام الاقتراحات' }],
+  'sary-usability-report': [{ k: 'من المتسوقين وصلوا إلى «اكتشف»' }],
+  'sampo-ai-pricing': [{ k: 'استخدام لوحة التحكم', note: 'في التجربة الأولى' }, { k: 'صعوبة الإعداد' }, { k: 'نية التسجيل' }],
+  'vault-split': [{ k: 'لترى خطتك الحقيقية', note: 'تقديرًا', pre: 'ث\u00a0\u200e', suf: '' }, { k: 'خطوات اختُصرت في واحدة' }, { k: 'خيارات بدل «اقبل أو غادر»' }],
+  'fresh-order-placed': [{ k: 'لتعديل العنوان أو المنتجات بعد الدفع', pre: 'ث\u00a0\u200e', suf: '' }],
 };
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
@@ -626,7 +669,7 @@ function Stats({ p, stats, th }: { p: MotionValue<number>; stats: Stat[]; th: Th
   return (
     <div className="flex items-end gap-8 xl:gap-12">
       <div className="min-w-0">
-        <p className="font-extrabold tabular-nums leading-[0.85] tracking-[-0.06em] whitespace-nowrap text-[clamp(56px,6vw,104px)]" style={{ color: th.beatOn }}>
+        <p dir="ltr" className="font-extrabold tabular-nums leading-[0.85] tracking-[-0.06em] whitespace-nowrap text-[clamp(56px,6vw,104px)] rtl:text-right" style={{ color: th.beatOn }}>
           {show(lead)}
         </p>
         <p className="text-sm md:text-base mt-3 leading-snug" style={{ color: th.sub }}>
@@ -634,11 +677,11 @@ function Stats({ p, stats, th }: { p: MotionValue<number>; stats: Stat[]; th: Th
           {lead.note && <span className="opacity-70"> · {lead.note}</span>}
         </p>
       </div>
-      {rest.length > 0 && <dl className="grid gap-3 pb-1 pl-6 xl:pl-8" style={{ borderLeft: `1px solid ${th.tile.border}` }}>
+      {rest.length > 0 && <dl className="grid gap-3 pb-1 ps-6 xl:ps-8" style={{ borderInlineStart: `1px solid ${th.tile.border}` }}>
         {rest.map((s2) => (
           <div key={s2.k} className="flex items-baseline gap-2.5 whitespace-nowrap">
             <dt className="sr-only">{s2.k}</dt>
-            <dd className="text-xl xl:text-2xl font-bold tabular-nums tracking-[-0.04em]" style={{ color: th.ink }}>
+            <dd dir="ltr" className="text-xl xl:text-2xl font-bold tabular-nums tracking-[-0.04em]" style={{ color: th.ink }}>
               {show(s2)}
             </dd>
             <span aria-hidden className="text-sm" style={{ color: th.sub }}>
@@ -694,7 +737,9 @@ function Card({
 }) {
   const reduced = useReducedMotion();
   const right = i % 2 === 1;
-  const copy = COPY[project.id];
+  const { isAr, tr } = useLang();
+  const copy = isAr && COPY_AR[project.id] ? { ...COPY[project.id], ...COPY_AR[project.id] } : COPY[project.id];
+  const stats = STATS[project.id]?.map((s, k) => (isAr && STATS_AR[project.id]?.[k] ? { ...s, ...STATS_AR[project.id][k] } : s));
   const th = THEMES[project.id];
   const Stage = STAGE[project.id];
   const x = useTransform(enter, [0, 1], [right ? '14%' : '-14%', '0%']);
@@ -743,9 +788,9 @@ function Card({
             <h3 className="font-extrabold tracking-[-0.05em] leading-[0.95] max-w-[12ch]" style={{ fontSize: 'clamp(36px, 4.4vw, 80px)', color: th.ink }}>{copy.name}</h3>
             <p className="text-base md:text-xl leading-snug mt-4 md:mt-5 max-w-xl tracking-[-0.01em]" style={{ color: th.sub }}>{copy.line}</p>
           </div>
-          {STATS[project.id] && (
+          {stats && (
             <div className="hidden lg:block">
-              <Stats p={story} stats={STATS[project.id]} th={th} />
+              <Stats p={story} stats={stats} th={th} />
             </div>
           )}
           <div className="grid gap-5">
@@ -763,15 +808,15 @@ function Card({
                   className="group flex-none w-fit inline-flex items-center gap-2 rounded-full text-[15px] font-semibold pl-6 pr-5 py-3 transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                   style={{ background: th.btn.bg, color: th.btn.ink, outlineColor: th.btn.bg }}
                 >
-                  View case
-                  <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  {tr('View case', 'عرض الدراسة')}
+                  <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 rtl:-scale-x-100" />
                 </button>
               )}
             </div>
           </div>
         </div>
         {/* the app */}
-        <div className="relative min-h-0" aria-hidden>
+        <div className="relative min-h-0" aria-hidden dir="ltr">
           {Stage && <Stage p={story} />}
         </div>
         {/* sinks back as the next card covers it */}

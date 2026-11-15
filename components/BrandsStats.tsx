@@ -1,5 +1,6 @@
 import { animate, motion, useInView, useReducedMotion } from "motion/react";
 import { useEffect, useRef } from "react";
+import { useLang } from "../lib/i18n";
 import { SectionHeader } from "./SectionHeader";
 
 /* ──────────────────────────────────────────────────────────────
@@ -54,6 +55,8 @@ const stats = [
   {
     number: "+22%",
     label: "Weekly Active Users",
+    labelAr: "مستخدمون يعودون كل أسبوع",
+    descriptionAr: "أعدت بناء تجربة الادخار من أساسها، ومعها التنبيهات المحيطة بها، فصار الناس يعودون أسبوعًا بعد أسبوع.",
     brand: "Hakbah",
     sector: "Fintech",
     logo: "/images/brands/g8.png",
@@ -64,6 +67,8 @@ const stats = [
   {
     number: "+27%",
     label: "Average Order Value",
+    labelAr: "قيمة السلة في كل طلب",
+    descriptionAr: "أعدت تصميم التصفح والدفع على طريقة التسوق الحقيقية، فوصل المشترون إلى ما يحتاجونه أسرع.",
     brand: "Sary",
     sector: "B2B Commerce",
     logo: "/images/brands/image 8.png",
@@ -76,6 +81,8 @@ const stats = [
     // this is Sampo's measured pilot result
     number: "+40%",
     label: "Dashboard Usage",
+    labelAr: "استخدام لوحة التحكم",
+    descriptionAr: "كل استراتيجية تسعير تُشرح وتُجرَّب قبل تفعيلها، فزاد اعتماد التجار على اللوحة في التجربة الأولى.",
     brand: "Sampo AI",
     sector: "AI · SaaS",
     logo: null,
@@ -113,7 +120,8 @@ function Figure({ value }: { value: string }) {
   return (
     <p
       aria-label={value}
-      className="flex items-baseline text-white"
+      dir="ltr"
+      className="flex items-baseline text-white rtl:justify-end"
       style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: "clamp(84px, 8.4vw, 128px)", lineHeight: 0.86, letterSpacing: "-0.055em" }}
     >
       <span ref={ref} aria-hidden="true" style={{ fontVariantNumeric: "tabular-nums" }}>{m ? m[2] : value}</span>
@@ -123,6 +131,7 @@ function Figure({ value }: { value: string }) {
 }
 
 function ImpactCard({ stat, index }: { stat: (typeof stats)[number]; index: number }) {
+  const { tr } = useLang();
   return (
     <motion.article
       initial={{ opacity: 0, y: 24 }}
@@ -164,17 +173,23 @@ function ImpactCard({ stat, index }: { stat: (typeof stats)[number]; index: numb
 
       <div className="relative mt-auto" style={{ paddingTop: "40px" }}>
         <p className="text-white" style={{ fontFamily: DISPLAY, fontSize: "21px", fontWeight: 600, lineHeight: 1.2, letterSpacing: "-0.02em" }}>
-          {stat.label}
+          {tr(stat.label, stat.labelAr)}
         </p>
         <p className="mt-3" style={{ fontSize: "15px", lineHeight: 1.6, color: "rgba(255,255,255,0.56)", maxWidth: "36ch" }}>
-          {stat.description}
+          {tr(stat.description, stat.descriptionAr)}
         </p>
       </div>
     </motion.article>
   );
 }
 
+/* The three result cards are hidden for now: reviewers found they
+   repeated the case studies and took a lot of room. The header and logo
+   strip stay. Set to true to bring the cards back. */
+const SHOW_IMPACT_CARDS = false;
+
 export function BrandsStats() {
+  const { tr } = useLang();
   return (
     <section
       className="relative px-6"
@@ -198,10 +213,10 @@ export function BrandsStats() {
 
       <div className="relative mx-auto max-w-7xl">
         <SectionHeader
-          eyebrow="Impact"
-          title="Designing products that drive"
-          flourish="real results."
-          subtitle="A decade of design work, measured by what changed after launch."
+          eyebrow={tr("Impact", "ما تغيّر")}
+          title={tr("Designing products that drive", "منتجات صمّمتها")}
+          flourish={tr("real results.", "وأرقام تحكي عنها")}
+          subtitle={tr("A decade of design work, measured by what changed after launch.", "عشر سنوات من العمل، والحكم الأخير دائمًا لما يحدث بعد الإطلاق.")}
         />
 
         {/* Brands & Social Proof Subsection */}
@@ -290,6 +305,7 @@ export function BrandsStats() {
           no accent rule, no noise: the number carries the card. On phones
           the row scrolls sideways with snap, like a reel of results.
         */}
+        {SHOW_IMPACT_CARDS && (
         <div
           className="-mx-6 px-6 scroll-px-6 md:mx-0 md:px-0 overflow-x-auto md:overflow-visible snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           style={{ marginTop: "80px" }}
@@ -300,6 +316,7 @@ export function BrandsStats() {
             ))}
           </div>
         </div>
+        )}
       </div>
     </section>
   );

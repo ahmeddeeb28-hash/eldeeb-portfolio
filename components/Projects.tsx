@@ -30,6 +30,7 @@ const CASE_STUDY_IMAGES = {
 
 import { ArrowUpRight } from 'lucide-react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
+import { useLang } from '../lib/i18n';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { HIDDEN_PROJECTS } from './case-studies/registry';
 import { track } from '../lib/analytics';
@@ -69,19 +70,6 @@ interface ProjectsProps {
    opening a blank overlay.
 */
 const allProjects = [
-  {
-    id: 'sary-design-leadership',
-    image: CASE_STUDY_IMAGES.saryGrocery,
-    year: '2021–now',
-    category: 'Design Leadership',
-    title: 'How I Lead Design Teams',
-    summary:
-      'My leadership playbook: five principles, a rhythm from a day to a quarter, one owner per objective, and one bar for hiring. Proven at Sary and Lobah.',
-    accentColor: 'rgba(3,67,248,0.95)',
-    imageGlow:
-      'radial-gradient(ellipse 65% 55% at 30% 30%, rgba(3,67,248,0.09) 0%, transparent 70%)',
-    hasStudy: true,
-  },
   {
     id: 'shorefield-holidays',
     image: CASE_STUDY_IMAGES.saasDashboard,
@@ -203,6 +191,19 @@ const allProjects = [
       'radial-gradient(ellipse 65% 55% at 50% 40%, rgba(60,170,115,0.09) 0%, transparent 70%)',
     hasStudy: true,
   },
+  {
+    id: 'sary-design-leadership',
+    image: CASE_STUDY_IMAGES.saryGrocery,
+    year: '2021–now',
+    category: 'Design Leadership',
+    title: 'How I Lead Design Teams',
+    summary:
+      'My leadership playbook: five principles, a rhythm from a day to a quarter, one owner per objective, and one bar for hiring. Proven at Sary and Lobah.',
+    accentColor: 'rgba(3,67,248,0.95)',
+    imageGlow:
+      'radial-gradient(ellipse 65% 55% at 30% 30%, rgba(3,67,248,0.09) 0%, transparent 70%)',
+    hasStudy: true,
+  },
 ];
 
 const projects = allProjects.filter((p) => !HIDDEN_PROJECTS.has(p.id));
@@ -210,6 +211,7 @@ const projects = allProjects.filter((p) => !HIDDEN_PROJECTS.has(p.id));
 /* ─────────────────────────────────────────────────────────────────────── */
 
 export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
+  const { tr } = useLang();
   const rowRefs = useRef<Array<HTMLElement | null>>([]);
   const stackRef = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -338,9 +340,9 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
             zIndex: 1,
           }}
         >
-          <span style={{ color: '#FFFFFF' }}>Case</span>{' '}
+          <span style={{ color: '#FFFFFF' }}>{tr('Case', 'قصص')}</span>{' '}
           <span style={{ color: 'rgba(255,255,255,0.42)' }}>
-            studies.
+            {tr('studies.', 'من داخل العمل')}
           </span>
         </motion.h2>
 
@@ -361,9 +363,10 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
             zIndex: 1,
           }}
         >
-          One methodology across products: Sary's grocery marketplace and
-          how we measured it, SAMPO's AI pricing, and fresh's checkout
-          moment. Strategy that ships, and numbers that show it.
+          {tr(
+            "One methodology across products: Sary's grocery marketplace and how we measured it, SAMPO's AI pricing, and fresh's checkout moment. Strategy that ships, and numbers that show it.",
+            'طريقة تفكير واحدة طبّقتها على منتجات مختلفة: سوق ساري للبقالة وكيف قسنا أثره، وتسعير سامبو بالذكاء الاصطناعي، ولحظة الدفع في فريش. قرارات وصلت إلى الناس، وأرقام تشهد لها.',
+          )}
         </motion.p>
       </div>
 

@@ -48,7 +48,7 @@ export const C = {
   redBg: '#FDECEE',
 };
 
-const ui = 'Inter, system-ui, -apple-system, sans-serif';
+export const ui = 'Inter, system-ui, -apple-system, sans-serif';
 
 export type ModeId = 'careful' | 'balanced' | 'high';
 
@@ -314,7 +314,7 @@ export function StatusChip({ s }: { s: keyof typeof CHIP }) {
   );
 }
 
-function PageHead({ kicker, title, right }: { kicker: string; title: string; right?: ReactNode }) {
+export function PageHead({ kicker, title, right }: { kicker: string; title: string; right?: ReactNode }) {
   return (
     <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 18 }}>
       <div>
@@ -326,7 +326,7 @@ function PageHead({ kicker, title, right }: { kicker: string; title: string; rig
   );
 }
 
-function Panel({ children, style, f }: { children: ReactNode; style?: CSSProperties; f?: string }) {
+export function Panel({ children, style, f }: { children: ReactNode; style?: CSSProperties; f?: string }) {
   return (
     <div data-f={f} style={{ background: '#fff', border: `1px solid ${C.line}`, borderRadius: 14, ...style }}>
       {children}
@@ -734,7 +734,7 @@ export function PreviewView({
   );
 }
 
-function Modal({ children, onClose }: { children: ReactNode; onClose?: () => void }) {
+export function Modal({ children, onClose }: { children: ReactNode; onClose?: () => void }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -759,7 +759,7 @@ function Modal({ children, onClose }: { children: ReactNode; onClose?: () => voi
   );
 }
 
-function ModalIcon({ children, bg, fg }: { children: ReactNode; bg: string; fg: string }) {
+export function ModalIcon({ children, bg, fg }: { children: ReactNode; bg: string; fg: string }) {
   return <span style={{ width: 38, height: 38, borderRadius: 10, background: bg, color: fg, display: 'grid', placeItems: 'center' }}>{children}</span>;
 }
 
@@ -870,7 +870,7 @@ export const AB: Record<ModeId, number[]> = {
 };
 
 // Per-product results from the board, sorted by revenue lift.
-const PRODUCTS: [string, string, ModeId, string, string, number, boolean][] = [
+export const PRODUCTS: [string, string, ModeId, string, string, number, boolean][] = [
   ['Leather Backpack', 'LB-2207', 'balanced', '2.2%', '2.8%', 24, true],
   ['Watch Series 7', 'OG-01500ML-006', 'balanced', '2.9%', '3.6%', 21, true],
   ['Running Shoes X', 'RS-1180', 'balanced', '3.4%', '4.0%', 17, true],
@@ -938,9 +938,9 @@ function WinnerBody({ onClose }: { onClose?: () => void }) {
   );
 }
 
-export function MonitorView() {
+export function MonitorView({ initialWinner = false }: { initialWinner?: boolean } = {}) {
   const [day, setDay] = useState(21);
-  const [winner, setWinner] = useState(false);
+  const [winner, setWinner] = useState(initialWinner);
   const W = 860;
   const H = 230;
   const x = (d: number) => 40 + (d / 21) * (W - 70);
@@ -1403,9 +1403,9 @@ const THIS_YEAR = [44, 47, 52, 49, 55, 58, 54, 61, 58.8, 63, 60, 66, 68.5];
 const LAST_YEAR = [42, 43, 46, 45, 48, 50, 49, 53, 52.1, 55, 54, 57, 59];
 // Watch Series 7 by month: sales in SAR and gross margin. October matches
 // the board's tooltip (SAR 12,900 sales, SAR 5,900 profit).
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const SALES = [9300, 11800, 7400, 10600, 7800, 9600, 8200, 5600, 11400, 12900, 10400, 8700];
-const PROFIT = [3813, 4484, 3182, 4664, 3120, 4032, 3198, 2072, 5130, 5900, 4472, 3567];
+export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+export const SALES = [9300, 11800, 7400, 10600, 7800, 9600, 8200, 5600, 11400, 12900, 10400, 8700];
+export const PROFIT = [3813, 4484, 3182, 4664, 3120, 4032, 3198, 2072, 5130, 5900, 4472, 3567];
 const RANGES: Record<string, string> = { '7D': 'Last 7 days', '30D': 'Last 30 days', '90D': 'Last 90 days', '12M': 'Last 12 months' };
 
 export function DashboardView() {
