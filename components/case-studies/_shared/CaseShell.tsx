@@ -32,6 +32,7 @@ export function CaseShell({
   children,
   pillId,
   siteNav,
+  hideTabs = false,
 }: {
   chapters: Chapter[];
   metaLine: string;
@@ -43,6 +44,8 @@ export function CaseShell({
   /* My Story: show the site's floating navigation instead of the
      Back row; it gets the landing section to go to, or null for top */
   siteNav?: { onNavigate: (sectionId: string | null) => void; current: string; onPage?: (page: 'about' | 'podcast') => void };
+  /* a single-part page (Podcast) has no chapters to jump between */
+  hideTabs?: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -153,6 +156,7 @@ export function CaseShell({
           ]}
         />
       )}
+      {!(hideTabs && siteNav) && (
       <header
         className={`sticky top-0 z-40 bg-[#0A0A0A]/90 backdrop-blur-md border-b border-white/5 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${siteNav ? 'pt-[84px]' : ''}`}
         style={{ transform: siteNav && barHidden ? 'translateY(-100%)' : 'translateY(0)' }}
@@ -185,6 +189,7 @@ export function CaseShell({
         </div>
         )}
 
+        {!hideTabs && (
         <StoryTabs
           chapters={chapters}
           activeId={activeId}
@@ -192,7 +197,9 @@ export function CaseShell({
           progress={scrollProgress}
           pillId={pillId}
         />
+        )}
       </header>
+      )}
 
       {children}
       </div>

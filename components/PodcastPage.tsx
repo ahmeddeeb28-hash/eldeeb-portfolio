@@ -28,9 +28,10 @@ export function PodcastPage({
       metaLine="Podcast"
       onBack={onBack}
       pillId="podcast-tab-pill"
+      hideTabs
       siteNav={onNavigate ? { onNavigate, current: 'Podcast', onPage } : undefined}
     >
-      <div className="max-w-6xl mx-auto px-6 pt-16 pb-28">
+      <div className="max-w-6xl mx-auto px-6 pt-36 md:pt-40 pb-28">
         <section id="listen" className="scroll-mt-24">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
