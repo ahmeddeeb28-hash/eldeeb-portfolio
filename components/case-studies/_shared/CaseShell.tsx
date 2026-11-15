@@ -42,7 +42,7 @@ export function CaseShell({
   pillId?: string;
   /* My Story: show the site's floating navigation instead of the
      Back row; it gets the landing section to go to, or null for top */
-  siteNav?: { onNavigate: (sectionId: string | null) => void; current: string };
+  siteNav?: { onNavigate: (sectionId: string | null) => void; current: string; onPage?: (page: 'about' | 'podcast') => void };
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -133,12 +133,21 @@ export function CaseShell({
           lockScroll={lockScroll}
           items={[
             { label: 'Work', href: `/#${SECTION_IDS.work}`, onSelect: () => siteNav.onNavigate(SECTION_IDS.work) },
-            {
-              label: siteNav.current,
-              href: window.location.pathname,
-              active: true,
-              onSelect: () => (lenisRef.current ? lenisRef.current.scrollTo(0) : containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })),
-            },
+            ...(
+              [
+                ['My Story', '/about', 'about'],
+                ['Podcast', '/podcast', 'podcast'],
+              ] as const
+            ).map(([label, href, page]) =>
+              label === siteNav.current
+                ? {
+                    label,
+                    href,
+                    active: true,
+                    onSelect: () => (lenisRef.current ? lenisRef.current.scrollTo(0) : containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })),
+                  }
+                : { label, href, onSelect: () => (siteNav.onPage ? siteNav.onPage(page) : siteNav.onNavigate(null)) },
+            ),
             { label: 'Speaking', href: `/#${SECTION_IDS.speaking}`, onSelect: () => siteNav.onNavigate(SECTION_IDS.speaking) },
             { label: 'Articles', href: `/#${SECTION_IDS.articles}`, onSelect: () => siteNav.onNavigate(SECTION_IDS.articles) },
           ]}

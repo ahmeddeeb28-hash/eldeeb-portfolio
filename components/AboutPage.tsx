@@ -2313,14 +2313,22 @@ function ConnectSection() {
 }
 
 /* ── AboutPage — assembled inside the shared CaseShell overlay ──────── */
-export function AboutPage({ onBack, onNavigate }: { onBack: () => void; onNavigate?: (sectionId: string | null) => void }) {
+export function AboutPage({
+  onBack,
+  onNavigate,
+  onPage,
+}: {
+  onBack: () => void;
+  onNavigate?: (sectionId: string | null) => void;
+  onPage?: (page: 'about' | 'podcast') => void;
+}) {
   return (
     <CaseShell
       chapters={CHAPTERS}
       metaLine="The Director's Cut"
       onBack={onBack}
       pillId="about-tab-pill"
-      siteNav={onNavigate ? { onNavigate, current: 'My Story' } : undefined}
+      siteNav={onNavigate ? { onNavigate, current: 'My Story', onPage } : undefined}
     >
       <style>{ABOUT_TYPE_CSS}</style>
       <div className="about-type">

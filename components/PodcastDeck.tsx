@@ -308,7 +308,7 @@ function HeadphonesView({ ep, playing, onToggle }: { ep: Episode; playing: boole
   );
 }
 
-export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'band' | 'closer'; lead?: React.ReactNode }) {
+export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'band' | 'closer' | 'page'; lead?: React.ReactNode }) {
   const reduced = useReducedMotion();
   const { isAr } = useLang();
   const [cur, setCur] = useState(0);
@@ -525,8 +525,8 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
           </div>
         </div>
       </div>
-      {/* 4. browse: every episode as a small cover */}
-      <div className="mt-7">
+      {/* 4. browse: every episode as a small cover (the page lists them below instead) */}
+      <div className={variant === 'page' ? 'hidden' : 'mt-7'}>
         <p className="text-xs text-white/40 mb-1">{isAr ? 'كل الحلقات' : 'All episodes'}</p>
         <ol className="grid grid-cols-6 gap-2 sm:gap-3 max-w-[440px] pt-[11%]">
           {EPISODES.map((e, i) => {
@@ -584,6 +584,50 @@ export function PodcastDeck({ variant = 'band', lead }: { variant?: 'hero' | 'ba
       .pd-lead > div { justify-content: center }
     `}</style>
   );
+
+  /* Podcast page · one column: the player on top, the controls under it,
+     then every episode as a full row */
+  if (variant === 'page') {
+    return (
+      <div style={{ isolation: 'isolate' }} onKeyDown={keys}>
+        {styles}<audio ref={audio} preload="none" />
+        <section dir="ltr" aria-label="Podcast player" className="relative mx-auto max-w-[680px] rounded-[28px] overflow-hidden px-6 py-10 sm:px-12 sm:py-12 flex flex-col gap-10"
+          style={{ border: '1px solid rgba(255,255,255,0.12)', background: '#0B0B0B', isolation: 'isolate' }}
+        >
+          {glow}
+          <div>{instrument}</div>
+          <div className="min-w-0">{panel}</div>
+        </section>
+        <div id="episodes" className="mx-auto max-w-[680px] mt-16 scroll-mt-24">
+          <p className="text-white/45 text-sm mb-4">All episodes · {EPISODES.length}</p>
+          <ol className="flex flex-col gap-2">
+            {EPISODES.map((e, i) => {
+              const on = i === cur;
+              const sh = SHOWS[e.show];
+              return (
+                <li key={e.id}>
+                  <button type="button" onClick={() => go(i)} aria-current={on}
+                    className="w-full text-left flex gap-4 sm:gap-5 items-start rounded-2xl p-3 sm:p-4 transition-colors"
+                    style={{ background: on ? 'rgba(255,255,255,0.07)' : 'transparent', boxShadow: on ? 'inset 0 0 0 1px rgba(255,255,255,0.14)' : 'none' }}
+                  >
+                    <img src={e.cover ?? sh.art} alt="" loading="lazy" className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover flex-none" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-xs mb-1" style={{ color: on ? GOLD : 'rgba(255,255,255,0.45)' }}>
+                        {sh.name} · {e.label === 'S3 · E2' ? 'Season 3, episode 2' : `Episode ${e.label.replace('Ep ', '')}`} · {mins(e.length)} · {e.date}
+                        {on && playing ? ' · Playing' : ''}
+                      </span>
+                      <span className="block text-white font-semibold text-base sm:text-lg leading-snug">{e.title}</span>
+                      {e.note && <span className="block text-white/50 text-sm leading-relaxed mt-1">{e.note}</span>}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      </div>
+    );
+  }
 
   /* A · hero: the turntable takes the portrait's place beside the headline */
   if (variant === 'hero') {
