@@ -1,4 +1,3 @@
-import { ArrowUpRight } from 'lucide-react';
 import { PodcastDeck } from './PodcastDeck';
 import { motion, useInView } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
@@ -384,7 +383,7 @@ export function ProofOfPresence({ onOpenPodcastPage }: { onOpenPodcastPage?: () 
     <section
       id="proof-of-presence-section-lock"
       className="proof-of-presence-locked bg-[#0A0A0A] relative"
-      style={{ paddingTop: 112, paddingBottom: 112 }}
+      style={{ paddingTop: placement === 'a' ? 72 : 112, paddingBottom: 112 }}
     >
       {/* Ambient warm glow */}
       <div
@@ -407,28 +406,10 @@ export function ProofOfPresence({ onOpenPodcastPage }: { onOpenPodcastPage?: () 
         style={{ paddingLeft: 40, paddingRight: 40, zIndex: 1 }}
       >
         {placement === 'a' ? (
-          /* the podcast player lives on its own page now (/podcast); the
-             section keeps its headline and points there */
-          <div className="pop-lead max-w-3xl mx-auto text-center flex flex-col items-center" style={{ marginBottom: 96 }}>
-            <style>{`.pop-lead > * { margin-left: auto !important; margin-right: auto !important } .pop-lead > div { justify-content: center }`}</style>
-            {headline}
-            <a
-              href="/podcast"
-              onClick={(e) => {
-                if (!onOpenPodcastPage) return;
-                e.preventDefault();
-                onOpenPodcastPage();
-              }}
-              className="mt-10 inline-flex items-center gap-3 rounded-full border border-white/15 hover:border-white/40 bg-white/[0.04] hover:bg-white/[0.08] pl-2 pr-5 py-2 transition-colors"
-            >
-              <img src="/images/podcasts/blueprint-show.webp" alt="" className="w-10 h-10 rounded-full object-cover" />
-              <span className="text-left">
-                <span className="block text-white text-sm font-semibold">{tr('Listen to the podcast', 'استمع إلى البودكاست')}</span>
-                <span className="block text-white/50 text-xs">{tr('Blueprint and Ask Designer · 6 episodes', 'Blueprint وAsk Designer · ٦ حلقات')}</span>
-              </span>
-              <ArrowUpRight className="w-4 h-4 text-white/60" aria-hidden />
-            </a>
-          </div>
+          /* the headline and the podcast link were removed: the podcast
+             has its own page (/podcast) and the collage now opens the
+             section on its own */
+          null
         ) : (
           <>
         {/* ═══════════════════════════════════════════════════════
@@ -469,8 +450,8 @@ export function ProofOfPresence({ onOpenPodcastPage }: { onOpenPodcastPage?: () 
         {placement === 'b' && <PodcastDeck variant="band" />}
 
         <div dir="ltr">
-        {/* Horizontal dateline rule */}
-        <motion.div
+        {/* Horizontal dateline rule (only under the old header placements) */}
+        {placement !== 'a' && <motion.div
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
           viewport={{ once: true }}
@@ -482,7 +463,7 @@ export function ProofOfPresence({ onOpenPodcastPage }: { onOpenPodcastPage?: () 
               'linear-gradient(90deg, transparent, rgba(220,190,140,0.22) 20%, rgba(220,190,140,0.22) 80%, transparent)',
             transformOrigin: 'left',
           }}
-        />
+        />}
 
         {/* ═══════════════════════════════════════════════════════
              ROW A — [Quote] [Speaking landscape 4:3] [Workshop portrait 3:4]
