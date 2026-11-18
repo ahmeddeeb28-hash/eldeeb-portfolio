@@ -2,7 +2,7 @@ import { motion } from 'motion/react';
 import type { ReactNode } from 'react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
-import { CaseIntro, MyPart } from './_shared/CaseLayout';
+import { CaseIntro, MyPart, Learnings } from './_shared/CaseLayout';
 import { Eyebrow as BaseEyebrow, reveal } from './_shared/CaseBits';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 import { ConversionTiles, Funnel, HeatReel } from './report/ReportUI';
@@ -190,6 +190,13 @@ export function SaryReportCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
             instead of skimmed. Here is what it was, and what it is now.
           </motion.p>
           <BuildStory />
+          <Learnings accent={ACCENT}>
+            <p>
+              A report only matters if it changes what the team does next. The numbers showed where shoppers left and the
+              heatmaps showed why; putting the two side by side is what turned a quarterly deck into a list of fixes. Rebuilding
+              it as a live page taught me the same thing again: people act on what they can explore, not on what they skim once.
+            </p>
+          </Learnings>
           <p className="text-white/35 text-xs mt-16">Figures are from Sary’s Q4 2022 report. Heatmaps and screens are from the original board.</p>
         </section>
       </div>

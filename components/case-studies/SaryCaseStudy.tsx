@@ -1,6 +1,6 @@
 import { motion, useInView, useMotionValue, useReducedMotion, useSpring, useTransform } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
-import { CaseIntro, LeadStats, Takeaway, MyPart } from './_shared/CaseLayout';
+import { CaseIntro, LeadStats, Takeaway, MyPart, Learnings } from './_shared/CaseLayout';
 import { ChevronsLeftRight, MousePointerClick } from 'lucide-react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
@@ -527,6 +527,13 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         <ChapterTitle chapter={CHAPTERS[6]} />
         <section id="impact" className="mb-16 scroll-mt-24">
           <LeadStats lead={RESULTS[0]} note="The number this project was built to move." rest={RESULTS.slice(1)} accent={ACCENT} />
+          <Learnings accent={ACCENT}>
+            <p>
+              Order history turned out to be the clearest research we had: the same stores, ordering the same basket, week
+              after week. Since then I look at what people repeat before I design for what they might discover. Taking steps
+              out of a routine people already have is often worth more than a new feature.
+            </p>
+          </Learnings>
           <Takeaway
             accent={ACCENT}
             deep="#1D368D"

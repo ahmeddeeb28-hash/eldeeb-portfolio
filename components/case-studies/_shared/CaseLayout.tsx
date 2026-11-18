@@ -107,6 +107,22 @@ export function Takeaway({ accent, deep, label = 'What I carry forward', childre
   );
 }
 
+/* ── Learnings ──
+   One reflective paragraph per case: what the project taught me that
+   I take to the next one. Plain on purpose, a label and a paragraph
+   under a hairline, so it reads as a thought rather than another card.
+   It sits before the closing takeaway and says something different. */
+export function Learnings({ accent, children }: { accent: string; children: ReactNode }) {
+  return (
+    <motion.div {...reveal} className="grid md:grid-cols-[180px_minmax(0,1fr)] gap-3 md:gap-10 border-t border-white/10 pt-8 md:pt-10 mt-20 mb-16 md:mb-20">
+      <p className="text-sm font-medium" style={{ color: accent }}>
+        Learnings
+      </p>
+      <div className="text-white/80 text-lg md:text-[22px] leading-[1.6] tracking-[-0.005em] max-w-3xl space-y-4">{children}</div>
+    </motion.div>
+  );
+}
+
 /* ── My part ──
    What I actually did on the project and the design calls I made, each
    with the reason behind it and, where the case says so, what it

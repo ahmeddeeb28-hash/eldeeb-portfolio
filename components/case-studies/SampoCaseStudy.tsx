@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useState, type ReactNode } from 'react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
-import { CaseIntro, Takeaway, MyPart } from './_shared/CaseLayout';
+import { CaseIntro, Takeaway, MyPart, Learnings } from './_shared/CaseLayout';
 import { CaseFilm, reveal } from './_shared/CaseBits';
 import { ScrollSteps } from './_shared/ScrollSteps';
 import { AgreedVisual, DiagnosisVisual, FixesVisual, PrototypeVisual, RulesVisual } from './sampo/ProcessVisuals';
@@ -599,6 +599,13 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
             ))}
           </div>
 
+          <Learnings accent={ACCENT}>
+            <p>
+              Most of the work was agreement, not screens. Once product, data and engineering shared one plan and one way to
+              measure it, each design decision could be tested against the same goal instead of argued from taste. With an AI
+              that touches people’s prices, that shared definition of success mattered as much as the interface.
+            </p>
+          </Learnings>
           <Takeaway accent={ACCENT} deep="#2A1C8F" label="What held it together" note="All figures are sample data from the design boards.">
             <span style={{ color: ACCENT }}>Explain before you ask.</span> Show ranges, not promises. Make leaving cheap. Let
             status travel.
