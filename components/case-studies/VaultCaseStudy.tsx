@@ -4,7 +4,7 @@ import { ArrowRight, Check } from 'lucide-react';
 import { VAULT_STEPS, VaultPlay, type VaultStage } from './vault/VaultPlay';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
-import { CaseIntro, MyPart, Takeaway } from './_shared/CaseLayout';
+import { CaseIntro, MyPart, Takeaway, Learnings } from './_shared/CaseLayout';
 import { CaseFilm, reveal } from './_shared/CaseBits';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 
@@ -680,6 +680,13 @@ export function VaultCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
               </div>
             ))}
           </div>
+          <Learnings accent={LIME}>
+            <p>
+              Reading what shoppers wrote changed where I looked. The complaints were rarely about paying in parts. They were
+              about a plan, an approval or a fee changing at the last step, after people had already committed. That moved the
+              work from the checkout to the product page, where people still decide.
+            </p>
+          </Learnings>
           <Takeaway accent={LIME} deep={DEEP} label="What I carry forward">
             Trust in payments is about timing. Show the real number where people decide, give one sentence of why, and always
             offer a way forward.

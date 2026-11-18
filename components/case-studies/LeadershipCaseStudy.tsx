@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'rea
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
-import { CaseIntro, Takeaway } from './_shared/CaseLayout';
+import { CaseIntro, Takeaway, Learnings } from './_shared/CaseLayout';
 import { reveal } from './_shared/CaseBits';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 
@@ -724,6 +724,13 @@ export function LeadershipCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
           </div>
         </Section>
 
+        <Learnings accent={ACCENT}>
+          <p>
+            I learned to treat the way a team works as a design problem. The same habits apply: find where people get stuck,
+            make the next step obvious, and write the rules down where everyone can see them. Writing the bar down is what made
+            reviews and hiring feel fair, because nobody had to guess what good looked like.
+          </p>
+        </Learnings>
         <Takeaway
           accent={ACCENT}
           deep={DEEP}

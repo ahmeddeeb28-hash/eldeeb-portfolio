@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
-import { CaseIntro, LeadStats, Takeaway, MyPart } from './_shared/CaseLayout';
+import { CaseIntro, LeadStats, Takeaway, MyPart, Learnings } from './_shared/CaseLayout';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 import { FreshPhone, LoopingPhone, type PhoneState } from './fresh/FreshPhone';
 import { FreshPlay } from './fresh/FreshPlay';
@@ -498,6 +498,13 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
             ))}
           </motion.div>
 
+          <Learnings accent={ACCENT}>
+            <p>
+              The moments people wait through are design space too. Right after Pay, people are already looking at the screen,
+              and it is easy to treat it as a loading state. I now ask what someone might still want to change at that point,
+              and give them the control before the change gets expensive.
+            </p>
+          </Learnings>
           <Takeaway
             accent={ACCENT}
             deep="#103F2D"
