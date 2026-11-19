@@ -362,6 +362,7 @@ export function VaultCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
               ['Market', 'Saudi Arabia and the GCC'],
               ['Year', '2026 · independent concept'],
             ]}
+            glance={{ problem: "Buy now, pay later shows the real plan only after the shopper commits.", role: "Lead Product Designer, end to end (independent concept)", result: "The real first payment, and why, on the product page. A working prototype." }}
             title="See your real plan before you buy."
           >
             <p>

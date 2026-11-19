@@ -268,6 +268,7 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
                 ['Role', 'Product Designer (Freelance)'],
                 ['Year', 'Now'],
               ]}
+              glance={{ problem: "After Pay, apps show a spinner while a wrong address or wrong items are still cheap to fix.", role: "Product Designer (Freelance)", result: "A five-second window to fix both, then straight to tracking. Pilot running." }}
               title="The five seconds after Pay."
             >
               <p>Most delivery apps show a spinner after you pay.</p>

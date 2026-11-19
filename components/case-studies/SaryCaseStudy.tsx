@@ -372,6 +372,7 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
                 ['Role', 'Product Design Lead'],
                 ['Year', '2023'],
               ]}
+              glance={{ problem: "Store owners tapped 39 times to restock the same 18 items every week.", role: "Product Design Lead", result: "+28% repeat purchases and +27% order value." }}
               title="Restock in 3 taps, not 39."
             >
               <p>
