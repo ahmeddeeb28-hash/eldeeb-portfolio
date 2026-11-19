@@ -18,7 +18,11 @@ import { CountUp } from './CountUp';
    MyPart: my role, what I did, and the design calls I made with
    the reason for each. */
 
-export function CaseIntro({ meta, title, children }: { meta: [string, string][]; title: ReactNode; children: ReactNode }) {
+/* The first-scroll answer a reviewer looks for: the problem, my role
+   and the result, in one line each, right under the title. */
+export type Glance = { problem: string; role: string; result: string };
+
+export function CaseIntro({ meta, title, glance, children }: { meta: [string, string][]; title: ReactNode; glance?: Glance; children: ReactNode }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -38,6 +42,22 @@ export function CaseIntro({ meta, title, children }: { meta: [string, string][];
       </dl>
       <div className="order-1 md:order-2">
         <h1 className="text-white text-5xl md:text-7xl font-semibold mb-8 leading-[0.95] tracking-[-0.04em]">{title}</h1>
+        {glance && (
+          <dl className="grid sm:grid-cols-3 gap-x-8 gap-y-4 py-5 mb-8 border-y border-white/10">
+            {(
+              [
+                ['Problem', glance.problem],
+                ['My role', glance.role],
+                ['Result', glance.result],
+              ] as const
+            ).map(([k, v], i) => (
+              <div key={k}>
+                <dt className="text-white/40 text-xs mb-1.5">{k}</dt>
+                <dd className={`text-[15px] leading-snug ${i === 2 ? 'text-white font-semibold' : 'text-white/80'}`}>{v}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
         <div className="grid gap-6 text-lg md:text-xl leading-relaxed text-white/55 [&>p:first-child]:text-white/75">{children}</div>
       </div>
     </motion.div>

@@ -620,6 +620,7 @@ export function LeadershipCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
               ['Teams', 'Sary, Lobah'],
               ['Years', '2021 – now'],
             ]}
+            glance={{ problem: "Keeping a growing design team aligned across several product streams.", role: "Product Design Lead at Sary, Lead Game Product Designer at Lobah", result: "+40% design velocity at Sary, with 8 designers across 3 streams." }}
             title="How I lead design teams."
           >
             <p>Five principles and a weekly rhythm I’ve used to run design teams, from a B2B marketplace to a games studio.</p>

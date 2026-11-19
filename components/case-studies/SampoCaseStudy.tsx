@@ -434,6 +434,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
                 ['Role', 'Product Design Consultant (Contract)'],
                 ['Year', 'Nov 2024 – Dec 2025'],
               ]}
+              glance={{ problem: "Merchants wouldn’t hand their prices to an AI they couldn’t see into.", role: "Design consultant, leading the design team", result: "Five flows, a dashboard and a prototype tested with the team, handed to engineering." }}
               title="AI pricing merchants can trust, test and undo."
             >
               <p>

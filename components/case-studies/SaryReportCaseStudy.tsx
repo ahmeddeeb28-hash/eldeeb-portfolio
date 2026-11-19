@@ -58,6 +58,7 @@ export function SaryReportCaseStudy({ onBack, onNext }: CaseStudyComponentProps)
                 ['Role', 'Senior Product Designer · Experience Design'],
                 ['Year', 'Q4 2022'],
               ]}
+              glance={{ problem: "34,860 shoppers opened the catalogue. Only 3,357 reached Discover.", role: "Senior Product Designer, Experience Design", result: "A quarterly fix list from funnels and heatmaps, now rebuilt as a live page." }}
               title="Only 9.63% of shoppers reached Discover."
             >
               <p>
