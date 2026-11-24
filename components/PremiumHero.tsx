@@ -33,21 +33,12 @@ export function PremiumHero() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.18 }}
-            className="text-white/70 text-lg md:text-xl leading-relaxed max-w-2xl mb-8"
+            className="text-white/70 text-lg md:text-xl leading-relaxed max-w-2xl mb-10"
           >
             {tr(
               'Ten years across e-commerce, fintech, SaaS, AI and gaming. At Sary I led 8 designers across 3 squads, and our Buy Again work lifted repeat purchases by 28%. Since then I designed AI pricing at Sampo and now lead game UI at Lobah.',
               'عشر سنوات بين التجارة الإلكترونية والتقنية المالية ومنصات الأعمال والذكاء الاصطناعي والألعاب.',
             )}
-          </motion.p>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex items-center gap-2.5 text-white/60 text-[15px] mb-10"
-          >
-            <span className="w-2 h-2 rounded-full bg-[#34D399]" aria-hidden />
-            {tr('Open to remote or relocation. Based in Egypt.', 'جاهز للعمل عن بُعد أو الانتقال. من مصر.')}
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
