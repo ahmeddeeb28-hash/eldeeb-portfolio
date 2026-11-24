@@ -7,6 +7,7 @@ import { ChapterTitle } from './_shared/ChapterTitle';
 import { CaseFilm, Eyebrow as BaseEyebrow, UseCaseExplorer, reveal, type UseCase as BaseUseCase } from './_shared/CaseBits';
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 import { MarqueeGallery, type Screen } from './_shared/MarqueeGallery';
+import { SaryCover } from './sary/SaryCover';
 import { SaryAddAllLoop, SaryAddAllPlay, SaryPhone, type SaryState } from './sary/SaryPhone';
 
 /* ── Sary · Buy Again Hub ────────────────────────────
@@ -358,6 +359,7 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
       pillId="sary-tab-pill"
     >
       <div className="max-w-5xl mx-auto px-6 pt-16">
+        <SaryCover />
         {/* ── 01 OVERVIEW ── */}
         <ChapterTitle chapter={CHAPTERS[0]} />
         <section id="overview" className="mb-32 scroll-mt-24">
