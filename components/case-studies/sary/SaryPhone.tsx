@@ -67,9 +67,11 @@ export const S = {
   tonal: '#EAF0FB',
 };
 
-const e1 = '0 1px 2px rgba(16,33,46,.05),0 6px 18px -6px rgba(16,33,46,.08)';
-const e2 = '0 1px 3px rgba(16,33,46,.06),0 8px 20px -6px rgba(16,33,46,.16)';
-const esheet = '0 -8px 28px -6px rgba(16,33,46,.12)';
+// no drop shadows: surfaces are separated by a soft grey stroke instead
+const STROKE = '#E5E8EC';
+const e1 = `0 0 0 1px ${STROKE}`;
+const e2 = `0 0 0 1px ${STROKE}`;
+const esheet = `0 0 0 1px ${STROKE}`;
 
 const P = {
   milk: { n: 'Almarai Low-fat Milk 2 L', k: '6 x 2 L', p: 'SAR 58.50' },
@@ -135,7 +137,7 @@ export function SaryPhone({
           fontFamily: ui,
           fontSize: 14,
           lineHeight: 1.4,
-          boxShadow: '0 0 0 12px #0B0F14, 0 0 0 13px #2a3038, 0 40px 80px -30px rgba(0,0,0,.6)',
+          boxShadow: '0 0 0 12px #0B0F14, 0 0 0 13px #2a3038',
           isolation: 'isolate',
         }}
       >
@@ -237,8 +239,8 @@ function Btn({
   style?: CSSProperties;
 }) {
   const k: Record<string, CSSProperties> = {
-    p: { background: S.navy, color: '#fff', boxShadow: '0 8px 18px -8px rgba(29,54,141,.45)' },
-    ok: { background: S.ok, color: '#fff', boxShadow: '0 8px 18px -8px rgba(14,138,95,.45)' },
+    p: { background: S.navy, color: '#fff', boxShadow: 'none' },
+    ok: { background: S.ok, color: '#fff', boxShadow: 'none' },
     sec: { background: '#fff', color: S.navy, boxShadow: e1 },
     ghost: { background: '#F3F4F6', color: S.sub },
     tonal: { background: S.tonal, color: S.navy },
@@ -527,7 +529,9 @@ function Hero({ home, pressed, added }: { home?: boolean; pressed?: boolean; add
     <div
       style={{
         margin: '0 16px',
-        background: S.mint,
+        background:
+          'radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 55%), linear-gradient(160deg, #F6FBEE 0%, #E7F4D4 55%, #D6EDB8 100%)',
+        boxShadow: 'inset 0 0 0 1px rgba(79,122,22,.16)',
         borderRadius: 22,
         padding: 18,
         display: 'flex',
@@ -709,7 +713,7 @@ function Flyers() {
               background: '#fff',
               display: 'grid',
               placeItems: 'center',
-              boxShadow: '0 6px 12px rgba(16,33,46,.18)',
+              boxShadow: `0 0 0 1px ${STROKE}`,
               zIndex: 80,
             }}
           >
@@ -1157,7 +1161,7 @@ function AddedSheet({ show, routineOn }: { show: boolean; routineOn: boolean }) 
                 height: 20,
                 borderRadius: '50%',
                 background: '#fff',
-                boxShadow: '0 1px 3px rgba(0,0,0,.2)',
+                boxShadow: `0 0 0 1px ${STROKE}`,
               }}
             />
           </span>
@@ -1193,7 +1197,7 @@ function Toast({ show }: { show: boolean }) {
             ...row,
             gap: 10,
             zIndex: 95,
-            boxShadow: '0 10px 22px -6px rgba(16,33,46,.35)',
+            boxShadow: 'none',
           }}
         >
           <CheckCircle2 size={20} color="#5FE0A2" />
