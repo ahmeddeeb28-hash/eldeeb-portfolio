@@ -194,64 +194,6 @@ export function SectionHeader({
         )}
       </motion.div>
 
-      {/* ── Cyan-dot closer rule (the visual signature) ──────────────── */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={ds.motion.viewport}
-        transition={{ duration: 0.6, delay: 0.25, ease: ds.motion.ease as any }}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: isCenter ? 'center' : 'flex-start',
-          gap: 12,
-          position: 'relative',
-          zIndex: 1,
-        }}
-      >
-        <motion.span
-          initial={{ scaleX: 0 }}
-          whileInView={{ scaleX: 1 }}
-          viewport={ds.motion.viewport}
-          transition={{ duration: 1.1, delay: 0.3, ease: ds.motion.ease as any }}
-          style={{
-            width: 80,
-            height: 1,
-            background:
-              'linear-gradient(to right, transparent, rgba(255,255,255,0.22))',
-            transformOrigin: 'right',
-            display: 'inline-block',
-          }}
-        />
-        <motion.span
-          initial={{ scale: 0, opacity: 0 }}
-          whileInView={{ scale: 1, opacity: 1 }}
-          viewport={ds.motion.viewport}
-          transition={{ duration: 0.5, delay: 0.55, ease: ds.motion.ease as any }}
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: ds.shape.radius.round,
-            background: ds.color.accent,
-            boxShadow: `0 0 14px ${ds.color.accentGlow}`,
-            display: 'inline-block',
-          }}
-        />
-        <motion.span
-          initial={{ scaleX: 0 }}
-          whileInView={{ scaleX: 1 }}
-          viewport={ds.motion.viewport}
-          transition={{ duration: 1.1, delay: 0.3, ease: ds.motion.ease as any }}
-          style={{
-            width: 80,
-            height: 1,
-            background:
-              'linear-gradient(to left, transparent, rgba(255,255,255,0.22))',
-            transformOrigin: 'left',
-            display: 'inline-block',
-          }}
-        />
-      </motion.div>
     </div>
   );
 }
