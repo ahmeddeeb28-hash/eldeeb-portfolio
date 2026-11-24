@@ -61,7 +61,7 @@ const ARTICLES_AR = [
 export function Articles() {
   const { tr, isAr } = useLang();
   return (
-    <section id="articles-activities" className="bg-[#0A0A0A] py-[88px] border-t border-white/[0.03]">
+    <section id="articles-activities" className="bg-black py-[88px] border-t border-white/[0.03]">
       <div className="container mx-auto px-10 max-w-[1560px]">
         <SectionHeader
           eyebrow={tr("Perspectives", "أكتب لأفكّر")}
