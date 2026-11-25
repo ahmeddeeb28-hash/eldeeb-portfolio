@@ -1,5 +1,6 @@
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'motion/react';
 import { useEffect, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react';
+import { BANNERS, bannerSrc, type Banner } from './banners';
 import {
   ArrowDown,
   ArrowLeft,
@@ -37,7 +38,8 @@ export type SaryState =
   | 'review'
   | 'order'
   | 'added'
-  | 'routine';
+  | 'routine'
+  | 'deals';
 
 const IMG = '/images/case-studies/sary';
 const W = 390;
@@ -100,6 +102,7 @@ export function SaryPhone({
   sheet,
   routineOn,
   toast,
+  slide = 0,
 }: {
   state: SaryState;
   width?: number;
@@ -112,6 +115,8 @@ export function SaryPhone({
   sheet?: boolean;
   routineOn?: boolean;
   toast?: boolean;
+  /* deals screen: which banner the carousel shows */
+  slide?: number;
 }) {
   const scale = width / W;
   const isSheet = sheet ?? (state === 'added' || state === 'routine');
@@ -148,6 +153,12 @@ export function SaryPhone({
         )}
         {state === 'review' && <ReviewScreen />}
         {state === 'order' && <OrderScreen />}
+        {state === 'deals' && (
+          <>
+            <DealsScreen slide={slide} badge={count} />
+            <Nav on="Discover" />
+          </>
+        )}
         {(state === 'home' || state === 'hub' || state === 'added' || state === 'routine') && (
           <>
             <CartBar show={cartBar ?? isAdded} added={isAdded} />
@@ -181,6 +192,7 @@ const LABELS: Record<SaryState, string> = {
   order: 'Past order: pick items to reorder at today’s prices',
   added: 'Usual basket added to cart, with savings and a weekly reminder option',
   routine: 'Weekly reminder turned on for Sundays',
+  deals: 'Discover tab: a carousel of campaign banners, categories and this week’s deals',
 };
 
 function StatusBar() {
@@ -1371,6 +1383,145 @@ export function SaryAddAllPlay({ width = 300 }: { width?: number }) {
           </button>
         )}
       </div>
+    </div>
+  );
+}
+
+/* ── Discover: the catalogue around Buy Again ──
+   The English banners in the app's own carousel: one wide slot that
+   advances on its own, a category grid built from the same product
+   shots, and a row of smaller deal banners below the fold. */
+export const DEALS_SLIDES: Banner[] = [BANNERS.fresh, BANNERS.veg, BANNERS.cashback, BANNERS.coke, BANNERS.school, BANNERS.eid];
+const DEAL_ROW: Banner[] = [BANNERS.second, BANNERS.pulses, BANNERS.flash];
+const CATS: [string, Sku][] = [
+  ['Dairy', 'milk'],
+  ['Soft drinks', 'coke'],
+  ['Tea & coffee', 'tea'],
+  ['Cleaning', 'fairy'],
+  ['Cooking oil', 'oil'],
+  ['Noodles', 'indo'],
+  ['Water', 'water'],
+  ['Juice', 'sun'],
+];
+const SLIDE_W = 358;
+
+function DealsScreen({ slide, badge }: { slide: number; badge: number }) {
+  const i = ((slide % DEALS_SLIDES.length) + DEALS_SLIDES.length) % DEALS_SLIDES.length;
+  return (
+    <div style={{ paddingTop: 50 }}>
+      <div style={{ ...row, gap: 12, padding: '8px 16px 12px' }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ font: `500 12px/16px ${ui}`, color: '#9E9E9E' }}>Deliver to</div>
+          <div style={{ ...row, gap: 4, font: `700 14px/20px ${ui}` }}>
+            Al Amana Grocery · Riyadh <ChevronDown size={14} />
+          </div>
+        </div>
+        <CartIcon n={badge} />
+      </div>
+      <div
+        style={{
+          margin: '0 16px 16px',
+          height: 48,
+          borderRadius: 14,
+          background: '#F8F8F9',
+          ...row,
+          padding: '0 14px',
+          color: S.meta,
+          fontWeight: 500,
+        }}
+      >
+        <Search size={20} strokeWidth={1.5} />
+        Search 4,000+ products
+      </div>
+
+      {/* carousel: clipped at the left margin, so only the next banner peeks in (from the right) */}
+      <div style={{ overflow: 'hidden', marginLeft: 16 }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: 10,
+            transform: `translate3d(${-i * (SLIDE_W + 10)}px,0,0)`,
+            transition: 'transform .7s cubic-bezier(.22,1,.36,1)',
+          }}
+        >
+          {DEALS_SLIDES.map((b) => (
+            <img
+              key={b.id}
+              src={bannerSrc(b)}
+              alt={b.alt}
+              draggable={false}
+              style={{ flex: 'none', width: SLIDE_W, height: SLIDE_W * (540 / 1140), borderRadius: 16, boxShadow: e1, display: 'block' }}
+            />
+          ))}
+        </div>
+      </div>
+      <div style={{ ...row, justifyContent: 'center', gap: 5, padding: '12px 0 20px' }}>
+        {DEALS_SLIDES.map((b, k) => (
+          <span
+            key={b.id}
+            style={{
+              width: k === i ? 18 : 6,
+              height: 6,
+              borderRadius: 3,
+              background: k === i ? S.navy : '#D5D9DF',
+              transition: 'width .4s ease, background .4s ease',
+            }}
+          />
+        ))}
+      </div>
+
+      <SecHead t="Shop by category" s="Picked for grocery stores" />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px 10px', padding: '14px 16px 22px' }}>
+        {CATS.map(([l, id]) => (
+          <div key={l} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+            <span
+              style={{
+                width: 72,
+                height: 72,
+                borderRadius: 20,
+                background: S.surf,
+                boxShadow: e1,
+                display: 'grid',
+                placeItems: 'center',
+              }}
+            >
+              <img src={`${IMG}/${id}.webp`} alt="" style={{ maxWidth: 50, maxHeight: 50, objectFit: 'contain' }} />
+            </span>
+            <span style={{ font: `600 12px/16px ${ui}`, color: S.txt, textAlign: 'center', whiteSpace: 'nowrap' }}>{l}</span>
+          </div>
+        ))}
+      </div>
+
+      <SecHead t="This week’s deals" s="Ends Sunday" />
+      <div style={{ display: 'flex', gap: 10, padding: '14px 16px 0', overflow: 'hidden' }}>
+        {DEAL_ROW.map((b) => (
+          <img
+            key={b.id}
+            src={bannerSrc(b)}
+            alt={b.alt}
+            style={{ flex: 'none', width: 220, height: 220 * (540 / 1140), borderRadius: 12, boxShadow: e1, display: 'block' }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* the Discover screen with its carousel advancing on its own; it
+   holds still off screen and for reduced motion */
+export function SaryDealsLoop({ width = 300 }: { width?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { margin: '-10% 0px' });
+  const reduced = useReducedMotion();
+  const [slide, setSlide] = useState(0);
+  useEffect(() => {
+    if (!inView || reduced) return;
+    const t = setInterval(() => setSlide((n) => n + 1), 2800);
+    return () => clearInterval(t);
+  }, [inView, reduced]);
+  return (
+    <div ref={ref}>
+      <SaryPhone state="deals" width={width} slide={slide} />
     </div>
   );
 }

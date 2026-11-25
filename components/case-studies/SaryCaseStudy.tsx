@@ -8,6 +8,7 @@ import { CaseFilm, Eyebrow as BaseEyebrow, UseCaseExplorer, reveal, type UseCase
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 import { MarqueeGallery, type Screen } from './_shared/MarqueeGallery';
 import { SaryCover } from './sary/SaryCover';
+import { BannerWall, CampaignStage } from './sary/SaryCampaigns';
 import { SaryAddAllLoop, SaryAddAllPlay, SaryPhone, type SaryState } from './sary/SaryPhone';
 
 /* ── Sary · Buy Again Hub ────────────────────────────
@@ -33,7 +34,8 @@ const CHAPTERS: Chapter[] = [
   { id: 'screens', num: '04', roman: 'IV', label: 'Screens', beat: 'Every screen, side by side.' },
   { id: 'cases', num: '05', roman: 'V', label: 'Use Cases', beat: 'Each case and its design.' },
   { id: 'motion', num: '06', roman: 'VI', label: 'Motion', beat: 'Try Add all yourself.' },
-  { id: 'impact', num: '07', roman: 'VII', label: 'Impact', beat: 'What changed.' },
+  { id: 'campaigns', num: '07', roman: 'VII', label: 'Campaigns', beat: 'The banner system around it.' },
+  { id: 'impact', num: '08', roman: 'VIII', label: 'Impact', beat: 'What changed.' },
 ];
 
 const SIGNALS = [
@@ -526,8 +528,24 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           </motion.div>
         </section>
 
-        {/* ── 07 IMPACT ── */}
+        {/* ── 07 CAMPAIGNS ── */}
         <ChapterTitle chapter={CHAPTERS[6]} />
+        <section id="campaigns" className="scroll-mt-24">
+          <motion.p {...reveal} className="max-w-2xl text-white/70 text-lg leading-relaxed mb-10">
+            Buy Again sits inside Sary’s catalogue, and the catalogue runs on banners: brand launches, seasonal deals, cashback,
+            coupons. These are twelve of them, rebuilt in English from the original Arabic files with the same art and grid.
+          </motion.p>
+          <motion.div {...reveal}>
+            <CampaignStage />
+          </motion.div>
+        </section>
+      </div>
+      <div className="mt-10 mb-32">
+        <BannerWall />
+      </div>
+      <div className="max-w-5xl mx-auto px-6 pb-24">
+        {/* ── 08 IMPACT ── */}
+        <ChapterTitle chapter={CHAPTERS[7]} />
         <section id="impact" className="mb-16 scroll-mt-24">
           <LeadStats lead={RESULTS[0]} note="The number this project was built to move." rest={RESULTS.slice(1)} accent={ACCENT} />
           <Learnings accent={ACCENT}>
