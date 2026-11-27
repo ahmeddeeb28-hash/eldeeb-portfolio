@@ -27,7 +27,7 @@ export function PremiumHero() {
             className="text-white font-semibold tracking-[-0.035em] leading-[1.06] mb-7"
             style={{ fontSize: 'clamp(2.3rem, 4.6vw, 4.1rem)' }}
           >
-            {tr('I lead design teams, and I still design the hard parts myself.', 'أقود فرق التصميم، ولا أترك القلم حين تصعب المهمة.')}
+            {tr('I don’t design screens. I design what makes people buy.', 'أقود فرق التصميم، ولا أترك القلم حين تصعب المهمة.')}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 14 }}
