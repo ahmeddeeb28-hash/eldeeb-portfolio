@@ -48,7 +48,6 @@ export function SaryCover() {
       >
         <div className="absolute inset-x-0 top-6 md:top-9 z-10 flex flex-col items-center text-center">
           <img src="/images/brands/image 8.png" alt="Sary" className="h-6 md:h-8 w-auto brightness-0 invert" />
-          <p className="hidden sm:block text-white/70 text-sm md:text-base mt-2">Buy Again · 2023</p>
         </div>
         {w > 0 &&
           phones.map((p) => (
