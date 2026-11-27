@@ -49,13 +49,13 @@ const BEFORE_AFTER = [
   {
     n: '1',
     t: 'Where a returning store lands',
-    before: 'A discount banner, category shortcuts and brand rails. The same for every store, every visit.',
+    before: 'A campaign carousel, shop by business and sponsored products. The same for every store, every visit.',
     after: 'A Welcome back card with the usual basket, one tap Add all, and what’s running low this week.',
   },
   {
     n: '2',
     t: 'Rebuilding the weekly basket',
-    before: 'Search or browse the category rails and add the same items one by one, every week.',
+    before: 'Browse the aisles or search, and add the same items one by one, every week.',
     after: 'A hub built from the store’s own orders, with reorder timing on each item: due today, in 2 days, later.',
   },
 ];
@@ -144,10 +144,10 @@ const Eyebrow = ({ children, tone = ACCENT }: { children: React.ReactNode; tone?
    on top and is clipped at a seam you can drag (pointer, touch or
    arrow keys); it wipes in once on arrival. Pick the case with the
    tabs. */
-const CMP = '/images/case-studies/sary/compare';
-const PAIRS = [
-  ['before-home', 'after-home'],
-  ['before-catalogue', 'after-hub'],
+// before: the discovery screens a returning store landed on; after: Buy Again (all coded, in English)
+const PAIRS: [SaryState, SaryState][] = [
+  ['deals', 'home'],
+  ['supermarket', 'hub'],
 ];
 
 function ScreenCompare() {
@@ -164,6 +164,14 @@ function ScreenCompare() {
   const afterOp = useTransform(smooth, [0, 50, 100], [1, 1, 0.45]);
   const inView = useInView(box, { once: true, margin: '-20% 0px' });
   const reduced = useReducedMotion();
+  const [bw, setBw] = useState(0);
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([e]) => setBw(Math.round(e.contentRect.width)));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!inView || reduced) return;
@@ -179,12 +187,12 @@ function ScreenCompare() {
   const b = BEFORE_AFTER[i];
 
   return (
-    <div className="grid md:grid-cols-[300px_minmax(0,1fr)] gap-10 md:gap-16 items-center">
+    <div className="flex flex-col items-center gap-10">
       <div className="mx-auto w-[260px] md:w-[300px]">
         <div
           ref={box}
           className="relative select-none cursor-ew-resize rounded-[38px] overflow-hidden bg-white"
-          style={{ aspectRatio: '414 / 924', touchAction: 'pan-y', boxShadow: '0 0 0 10px #0B0F14, 0 0 0 11px #2a3038, 0 40px 80px -30px rgba(0,0,0,.6)' }}
+          style={{ aspectRatio: '390 / 844', touchAction: 'pan-y', boxShadow: '0 0 0 10px #0B0F14, 0 0 0 11px #2a3038, 0 40px 80px -30px rgba(0,0,0,.6)' }}
           onPointerDown={(e) => {
             drag.current = true;
             e.currentTarget.setPointerCapture(e.pointerId);
@@ -195,16 +203,17 @@ function ScreenCompare() {
           onPointerUp={() => (drag.current = false)}
           onPointerCancel={() => (drag.current = false)}
         >
-          <img src={`${CMP}/${PAIRS[i][1]}.webp`} alt={`After: ${b.after}`} width={414} height={924} draggable={false} className="absolute inset-0 w-full h-full" />
-          <motion.img
-            src={`${CMP}/${PAIRS[i][0]}.webp`}
-            alt={`Before: ${b.before}`}
-            width={414}
-            height={924}
-            draggable={false}
-            className="absolute inset-0 w-full h-full"
+          <div className="absolute inset-0 pointer-events-none" role="img" aria-label={`After: ${b.after}`}>
+            {bw > 0 && <SaryPhone state={PAIRS[i][1]} width={bw} bare />}
+          </div>
+          <motion.div
+            className="absolute inset-0 pointer-events-none"
+            role="img"
+            aria-label={`Before: ${b.before}`}
             style={{ clipPath: clip }}
-          />
+          >
+            {bw > 0 && <SaryPhone state={PAIRS[i][0]} width={bw} bare />}
+          </motion.div>
           {/* the seam: a line with a round knob, and a tag on each side that rides along it */}
           <motion.div data-handle className="absolute inset-y-0 w-10 -ml-5 cursor-ew-resize" style={{ left }}>
             <span className="absolute inset-y-0 left-1/2 w-[2px] -ml-px bg-white shadow-[0_0_10px_rgba(0,0,0,0.25)]" />
@@ -239,8 +248,8 @@ function ScreenCompare() {
         </div>
       </div>
 
-      <div>
-        <div className="flex flex-wrap gap-2 mb-8" role="tablist" aria-label="Before and after cases">
+      <div className="w-full max-w-2xl text-center">
+        <div className="flex flex-wrap justify-center gap-2 mb-8" role="tablist" aria-label="Before and after cases">
           {BEFORE_AFTER.map((x, k) => (
             <button
               key={x.n}
@@ -257,7 +266,8 @@ function ScreenCompare() {
             </button>
           ))}
         </div>
-        <motion.div style={{ opacity: beforeOp }} className="mb-6">
+        <div className="grid sm:grid-cols-2 gap-6 text-left">
+        <motion.div style={{ opacity: beforeOp }}>
           <p className="text-xs font-semibold mb-1.5 text-[#FF8A8A]">Before</p>
           <p className="text-white/80 text-base md:text-lg leading-relaxed">{b.before}</p>
         </motion.div>
@@ -267,7 +277,8 @@ function ScreenCompare() {
           </p>
           <p className="text-white text-base md:text-lg leading-relaxed">{b.after}</p>
         </motion.div>
-        <p className="text-white/35 text-sm mt-8">Drag the handle on the phone to compare. Screens from the design board.</p>
+        </div>
+        <p className="text-white/35 text-sm mt-8">Drag the handle on the phone to compare.</p>
       </div>
     </div>
   );
@@ -277,22 +288,13 @@ function ScreenCompare() {
    columns start on different screens; "Add all" plays live in two. */
 const ph = (state: SaryState, slide?: number): Screen => (w) => <SaryPhone state={state} width={w} slide={slide} />;
 const live: Screen = (w, on) => <SaryAddAllLoop width={w} playing={on} />;
-// the real catalogue screens from the Main Catalogue file, framed like the coded ones
-const shot = (src: string, pos = 0): Screen => (w) => (
-  <div
-    style={{ width: w, aspectRatio: '390 / 844', borderRadius: w * 0.123, overflow: 'hidden', background: '#fff', boxShadow: `0 0 0 ${w * 0.031}px #0B0F14, 0 0 0 ${w * 0.033}px #2a3038` }}
-  >
-    <img src={src} alt="" loading="lazy" className="w-full h-full object-cover" style={{ objectPosition: `50% ${pos}%` }} />
-  </div>
-);
-const CAT = '/images/case-studies/sary/before';
 const SCREENS: Screen[][] = [
-  [ph('home'), ph('offers'), shot(`${CAT}/slider.webp`)],
-  [ph('deals', 0), ph('hub'), live, ph('review')],
-  [shot(`${CAT}/market.webp`, 30), ph('added'), ph('deals', 3)],
-  [live, ph('offers'), ph('routine'), shot(`${CAT}/grid.webp`)],
-  [ph('order'), ph('deals', 4), ph('home')],
-  [shot(`${CAT}/tworow.webp`), ph('review'), ph('offers'), ph('hub')],
+  [ph('home'), ph('supermarket'), ph('review')],
+  [ph('deals', 0), ph('hub'), live],
+  [ph('routine'), ph('deals', 3), ph('order')],
+  [live, ph('added'), ph('supermarket')],
+  [ph('supermarket'), ph('home'), ph('deals', 4)],
+  [ph('review'), ph('deals', 2), ph('hub')],
 ];
 
 export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
@@ -431,7 +433,7 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         <ChapterTitle chapter={CHAPTERS[2]} />
       </div>
       <section id="screens" className="mb-32 scroll-mt-24">
-        <MarqueeGallery columns={SCREENS} aspect={390 / 844} label="Sary screens in columns: Buy Again, Discover, offers and the catalogue" />
+        <MarqueeGallery columns={SCREENS} aspect={390 / 844} label="Sary screens in columns: Buy Again, Discover and the Supermarket aisle" />
       </section>
       <div className="max-w-5xl mx-auto px-6 pb-24">
         {/* ── 04 USE CASES ── */}

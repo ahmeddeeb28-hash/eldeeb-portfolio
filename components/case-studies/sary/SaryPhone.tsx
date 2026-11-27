@@ -40,7 +40,8 @@ export type SaryState =
   | 'added'
   | 'routine'
   | 'deals'
-  | 'offers';
+  | 'offers'
+  | 'supermarket';
 
 const IMG = '/images/case-studies/sary';
 const W = 390;
@@ -104,7 +105,10 @@ export function SaryPhone({
   routineOn,
   toast,
   slide = 0,
+  bare,
 }: {
+  /* no bezel or corner radius: for slots that draw their own frame */
+  bare?: boolean;
   state: SaryState;
   width?: number;
   /* animation knobs used by the looping sequence */
@@ -136,14 +140,15 @@ export function SaryPhone({
           height: H,
           transform: `scale(${scale})`,
           transformOrigin: '0 0',
-          borderRadius: 48,
+          borderRadius: bare ? 0 : 56,
           overflow: 'hidden',
           background: '#fff',
           color: S.ink,
           fontFamily: ui,
           fontSize: 14,
           lineHeight: 1.4,
-          boxShadow: '0 0 0 12px #0B0F14, 0 0 0 13px #2a3038',
+          // black bezel, then a thin titanium band, like a current Pro Max
+          boxShadow: bare ? 'none' : '0 0 0 11px #07090C, 0 0 0 12.5px #6E7177, 0 0 0 14px #2B2E33',
           isolation: 'isolate',
         }}
       >
@@ -154,6 +159,12 @@ export function SaryPhone({
         )}
         {state === 'review' && <ReviewScreen />}
         {state === 'order' && <OrderScreen />}
+        {state === 'supermarket' && (
+          <>
+            <SupermarketScreen />
+            <Nav on="Discover" />
+          </>
+        )}
         {state === 'offers' && (
           <>
             <OffersScreen />
@@ -199,8 +210,9 @@ const LABELS: Record<SaryState, string> = {
   order: 'Past order: pick items to reorder at today’s prices',
   added: 'Usual basket added to cart, with savings and a weekly reminder option',
   routine: 'Weekly reminder turned on for Sundays',
+  supermarket: 'Supermarket aisle: brands, favourite aisles and two running offers',
   offers: 'Offers: cashback, brand launches, seasonal deals and coupon codes, filtered by type',
-  deals: 'Discover tab: a carousel of campaign banners, categories and this week’s deals',
+  deals: 'Discover tab: a campaign carousel, shop by business, and sponsored products for cafés',
 };
 
 function StatusBar() {
@@ -1412,6 +1424,122 @@ const CATS: [string, Sku][] = [
   ['Juice', 'sun'],
 ];
 const SLIDE_W = 358;
+const CAT = `${IMG}/cat`;
+const BUSINESS: [string, string][] = [
+  ['Cafés', `${CAT}/coffee.webp`],
+  ['Restaurants', `${CAT}/fried-chicken.webp`],
+  ['Grills', `${CAT}/grills.webp`],
+  ['Shawarma', `${CAT}/shawarma.webp`],
+  ['Packaging', `${CAT}/packaging.webp`],
+];
+type CatP = { img: string; n: string; k: string; p: string; was?: string; off?: string };
+const SPONSORED: CatP[] = [
+  { img: `${CAT}/monin-caramel.webp`, n: 'Monin Caramel Syrup', k: '700 ml', p: 'SAR 41.40', was: 'SAR 51.75', off: '20%' },
+  { img: `${CAT}/monin-mint.webp`, n: 'Monin Mojito Mint', k: '700 ml', p: 'SAR 41.40', was: 'SAR 51.75', off: '20%' },
+  { img: `${CAT}/pepsi.webp`, n: 'Pepsi Can 330 ml', k: '30 cans', p: 'SAR 54.00' },
+];
+/* a product card from the catalogue: image tile with discount and
+   save, then name, pack and price with an add button */
+function CatCard({ img, n, k, p, was, off, w = 116 }: CatP & { w?: number }) {
+  return (
+    <div style={{ flex: 'none', width: w }}>
+      <div style={{ position: 'relative', height: w, borderRadius: 16, background: S.surf, boxShadow: e1, display: 'grid', placeItems: 'center' }}>
+        <img src={img} alt="" style={{ maxWidth: w * 0.62, maxHeight: w * 0.7, objectFit: 'contain' }} />
+        {off && (
+          <span style={{ position: 'absolute', top: 8, left: 8, font: `800 11px/1 ${ui}`, color: '#fff', background: S.red, borderRadius: 6, padding: '4px 6px' }}>
+            -{off}
+          </span>
+        )}
+        <span style={{ position: 'absolute', bottom: 8, right: 8, width: 28, height: 28, borderRadius: 9, background: '#fff', boxShadow: e1, display: 'grid', placeItems: 'center', color: S.navy }}>
+          <Plus size={16} strokeWidth={2.5} />
+        </span>
+      </div>
+      <div style={{ font: `600 13px/17px ${ui}`, color: S.txt, marginTop: 8, height: 34, overflow: 'hidden' }}>{n}</div>
+      <div style={{ font: `500 12px/16px ${ui}`, color: S.meta }}>{k}</div>
+      <div style={{ ...row, gap: 6, marginTop: 2 }}>
+        <b style={{ font: `800 13px/18px ${ui}`, color: S.ink }}>{p}</b>
+        {was && <s style={{ font: `500 11px/16px ${ui}`, color: S.faint }}>{was}</s>}
+      </div>
+    </div>
+  );
+}
+
+/* ── Supermarket: one aisle, as the catalogue lays it out ── */
+const BRANDS: [string, string][] = [
+  ['Al Taie', `${CAT}/brand-altaie.webp`],
+  ['Aljawad', `${CAT}/brand-aljawad.webp`],
+  ['Binzagr', `${CAT}/brand-binzagr.webp`],
+  ['Al Alali', `${CAT}/brand-alalali.webp`],
+  ['Monin', `${CAT}/monin-caramel.webp`],
+];
+const AISLES: [string, string][] = [
+  ['Soft drinks', `${CAT}/pepsi.webp`],
+  ['Sauces', `${CAT}/tabasco.webp`],
+  ['Syrups', `${CAT}/monin-mint.webp`],
+  ['Pulses', `${CAT}/pulses.webp`],
+  ['Rice', `${CAT}/rice.webp`],
+  ['Canned', `${CAT}/tomato-paste.webp`],
+];
+function SupermarketScreen() {
+  return (
+    <div>
+      <div style={{ position: 'relative', height: 236, background: 'linear-gradient(160deg, #EEF5FD 0%, #DDEBFA 100%)', overflow: 'hidden' }}>
+        <div style={{ ...row, position: 'absolute', top: 58, left: 16, right: 16, justifyContent: 'space-between' }}>
+          <ArrowLeft size={24} strokeWidth={1.5} />
+          <span style={{ ...row, gap: 14 }}>
+            <Search size={22} strokeWidth={1.5} />
+            <CartIcon n={3} />
+          </span>
+        </div>
+        <div style={{ position: 'absolute', left: 16, bottom: 26 }}>
+          <h3 style={{ font: `800 28px/1.1 ${display}`, margin: 0, letterSpacing: '-0.02em' }}>Supermarket</h3>
+          <p style={{ margin: '4px 0 0', color: S.sub, font: `500 14px/20px ${ui}` }}>570 products · 29 brands</p>
+        </div>
+        {/* a little shelf of what's inside */}
+        <img src={`${CAT}/pepsi.webp`} alt="" style={{ position: 'absolute', right: 112, bottom: -6, height: 118, transform: 'rotate(-6deg)' }} />
+        <img src={`${IMG}/coke.webp`} alt="" style={{ position: 'absolute', right: 58, bottom: 6, height: 132 }} />
+        <img src={`${CAT}/tomato-paste.webp`} alt="" style={{ position: 'absolute', right: 8, bottom: -4, height: 104, transform: 'rotate(7deg)' }} />
+      </div>
+
+      <div style={{ padding: '18px 0 0' }}>
+        <SecHead t="Shop by brand" s="29 brands in this aisle" />
+        <div style={{ display: 'flex', gap: 12, padding: '14px 16px 18px', overflow: 'hidden' }}>
+          {BRANDS.map(([l, src]) => (
+            <div key={l} style={{ flex: 'none', width: 62, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 62, height: 62, borderRadius: '50%', background: '#fff', boxShadow: e1, display: 'grid', placeItems: 'center', overflow: 'hidden' }}>
+                <img src={src} alt="" style={{ width: 46, height: 46, objectFit: 'contain' }} />
+              </span>
+              <span style={{ font: `600 12px/16px ${ui}`, color: S.txt, whiteSpace: 'nowrap' }}>{l}</span>
+            </div>
+          ))}
+        </div>
+
+        <SecHead t="Your favourite aisles" s="Based on what you buy" />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, padding: '14px 16px 18px' }}>
+          {AISLES.map(([l, src]) => (
+            <div key={l} style={{ height: 104, borderRadius: 16, background: S.surf, boxShadow: e1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', padding: '0 0 10px', gap: 6 }}>
+              <img src={src} alt="" style={{ height: 58, maxWidth: 80, objectFit: 'contain' }} />
+              <span style={{ font: `600 12px/16px ${ui}`, color: S.txt }}>{l}</span>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', gap: 10, padding: '0 16px' }}>
+          {[
+            { t: '22% off', s: 'Packaging supplies', img: `${CAT}/packaging.webp`, bg: '#FDF1E2' },
+            { t: '35% off', s: 'All pulses', img: `${CAT}/pulses.webp`, bg: '#F1ECFA' },
+          ].map((c) => (
+            <div key={c.t} style={{ position: 'relative', flex: 1, height: 92, borderRadius: 16, background: c.bg, boxShadow: e1, padding: 12, overflow: 'hidden' }}>
+              <b style={{ display: 'block', font: `800 18px/1.1 ${display}` }}>{c.t}</b>
+              <span style={{ font: `500 12px/16px ${ui}`, color: S.sub }}>{c.s}</span>
+              <img src={c.img} alt="" style={{ position: 'absolute', right: -6, bottom: -6, height: 58 }} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function DealsScreen({ slide, badge }: { slide: number; badge: number }) {
   const i = ((slide % DEALS_SLIDES.length) + DEALS_SLIDES.length) % DEALS_SLIDES.length;
@@ -1478,37 +1606,25 @@ function DealsScreen({ slide, badge }: { slide: number; badge: number }) {
         ))}
       </div>
 
-      <SecHead t="Shop by category" s="Picked for grocery stores" />
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px 10px', padding: '14px 16px 22px' }}>
-        {CATS.map(([l, id]) => (
-          <div key={l} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-            <span
-              style={{
-                width: 72,
-                height: 72,
-                borderRadius: 20,
-                background: S.surf,
-                boxShadow: e1,
-                display: 'grid',
-                placeItems: 'center',
-              }}
-            >
-              <img src={`${IMG}/${id}.webp`} alt="" style={{ maxWidth: 50, maxHeight: 50, objectFit: 'contain' }} />
+      <SecHead t="Shop by business" s="Picked for what you sell" />
+      <div style={{ display: 'flex', gap: 14, padding: '14px 16px 20px', overflow: 'hidden' }}>
+        {BUSINESS.map(([l, src]) => (
+          <div key={l} style={{ flex: 'none', width: 64, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+            <span style={{ width: 64, height: 64, borderRadius: '50%', background: S.surf, boxShadow: e1, display: 'grid', placeItems: 'center', overflow: 'hidden' }}>
+              <img src={src} alt="" style={{ width: 50, height: 50, objectFit: 'contain' }} />
             </span>
-            <span style={{ font: `600 12px/16px ${ui}`, color: S.txt, textAlign: 'center', whiteSpace: 'nowrap' }}>{l}</span>
+            <span style={{ font: `600 12px/16px ${ui}`, color: S.txt, whiteSpace: 'nowrap' }}>{l}</span>
           </div>
         ))}
       </div>
 
-      <SecHead t="This week’s deals" s="Ends Sunday" />
-      <div style={{ display: 'flex', gap: 10, padding: '14px 16px 0', overflow: 'hidden' }}>
-        {DEAL_ROW.map((b) => (
-          <img
-            key={b.id}
-            src={bannerSrc(b)}
-            alt={b.alt}
-            style={{ flex: 'none', width: 220, height: 220 * (540 / 1140), borderRadius: 12, boxShadow: e1, display: 'block' }}
-          />
+      <div style={{ ...row, gap: 8, padding: '0 16px' }}>
+        <h4 style={{ font: `700 19px/1.25 ${display}`, margin: 0, flex: 1 }}>Picked for cafés</h4>
+        <span style={{ font: `700 11px/1 ${ui}`, color: S.meta, background: '#F3F4F6', borderRadius: 6, padding: '5px 7px' }}>Sponsored</span>
+      </div>
+      <div style={{ display: 'flex', gap: 10, padding: '12px 16px 0', overflow: 'hidden' }}>
+        {SPONSORED.map((p) => (
+          <CatCard key={p.n} {...p} />
         ))}
       </div>
     </div>
