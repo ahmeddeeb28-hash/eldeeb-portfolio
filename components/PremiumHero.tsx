@@ -36,7 +36,7 @@ export function PremiumHero() {
             className="text-white/70 text-lg md:text-xl leading-relaxed max-w-2xl mb-10"
           >
             {tr(
-              'Ten years across e-commerce, fintech, SaaS, AI and gaming. At Sary I led 8 designers across 3 squads, and our Buy Again work lifted repeat purchases by 28%. Since then I designed AI pricing at Sampo and now lead game UI at Lobah.',
+              'Ten years across e-commerce, fintech, SaaS, AI and gaming. I’ve led 8 designers across 3 squads, lifted repeat purchases by 28%, and turned AI pricing into something merchants trust. I still design the hard parts myself.',
               'عشر سنوات بين التجارة الإلكترونية والتقنية المالية ومنصات الأعمال والذكاء الاصطناعي والألعاب.',
             )}
           </motion.p>
