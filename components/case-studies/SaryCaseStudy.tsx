@@ -29,36 +29,19 @@ const POSTER = '/images/case-studies/sary/film-poster.webp';
 
 const CHAPTERS: Chapter[] = [
   { id: 'overview', num: '01', roman: 'I', label: 'Overview', beat: 'A home for stores that come back.' },
-  { id: 'problem', num: '02', roman: 'II', label: 'Problem', beat: 'Where we saw it.' },
-  { id: 'insight', num: '03', roman: 'III', label: 'Insights', beat: 'What we learned.' },
-  { id: 'screens', num: '04', roman: 'IV', label: 'Screens', beat: 'Every screen, side by side.' },
-  { id: 'cases', num: '05', roman: 'V', label: 'Use Cases', beat: 'Each case and its design.' },
-  { id: 'motion', num: '06', roman: 'VI', label: 'Motion', beat: 'Try Add all yourself.' },
-  { id: 'campaigns', num: '07', roman: 'VII', label: 'Campaigns', beat: 'The banner system around it.' },
-  { id: 'impact', num: '08', roman: 'VIII', label: 'Impact', beat: 'What changed.' },
+  { id: 'problem', num: '02', roman: 'II', label: 'Problem', beat: 'What was in the way.' },
+  { id: 'screens', num: '03', roman: 'III', label: 'Screens', beat: 'Every screen, side by side.' },
+  { id: 'cases', num: '04', roman: 'IV', label: 'Use Cases', beat: 'Each case and its design.' },
+  { id: 'motion', num: '05', roman: 'V', label: 'Motion', beat: 'Try Add all yourself.' },
+  { id: 'campaigns', num: '06', roman: 'VI', label: 'Campaigns', beat: 'The banner system around it.' },
+  { id: 'impact', num: '07', roman: 'VII', label: 'Impact', beat: 'What changed.' },
 ];
 
 const SIGNALS = [
-  {
-    k: 'Analytics',
-    t: 'Buyers left after checkout',
-    d: '85% of buyers left right after Confirm Order. The generic “You might also like” sidebar went unseen.',
-  },
-  {
-    k: 'Session replays',
-    t: 'Suggestions didn’t fit',
-    d: 'Owners hovered over suggestions and then closed the app. The products didn’t match their kind of store.',
-  },
-  {
-    k: 'Segments',
-    t: 'Wrong shelf',
-    d: 'Café owners had the most room to grow, but 60% of what they were shown was irrelevant to them.',
-  },
-  {
-    k: 'Order history',
-    t: 'Same basket every week',
-    d: 'Stores reorder the same few dozen products, usually on the same day of the week.',
-  },
+  { k: 'Analytics', t: '85% left after Confirm Order', d: 'The “You might also like” sidebar went unseen.' },
+  { k: 'Session replays', t: 'Suggestions didn’t fit', d: 'Owners hovered over them, then closed the app.' },
+  { k: 'Segments', t: '60% irrelevant', d: 'Most of what café owners were shown didn’t apply to them.' },
+  { k: 'Order history', t: 'Same basket every week', d: 'The same few dozen products, usually on the same weekday.' },
 ];
 
 const BEFORE_AFTER = [
@@ -76,28 +59,6 @@ const BEFORE_AFTER = [
   },
 ];
 
-const INSIGHTS = [
-  {
-    n: '01',
-    t: 'Returning stores aren’t browsing.',
-    d: 'They come back for the same products. Banners and category rails slow them down.',
-  },
-  {
-    n: '02',
-    t: 'Owners trust what they can see.',
-    d: 'Adding 18 items at once only feels safe when they watch their own products go into the cart.',
-  },
-  {
-    n: '03',
-    t: 'Timing matters as much as products.',
-    d: 'Stores restock on a cycle, often the same weekday. A reminder on that day turns one order into a habit.',
-  },
-  {
-    n: '04',
-    t: 'Relevance beats volume.',
-    d: 'Suggestions only work when they come from what this store already buys.',
-  },
-];
 
 type UseCase = BaseUseCase & { state: SaryState; live?: boolean };
 
@@ -311,28 +272,31 @@ function ScreenCompare() {
   );
 }
 
-/* 39 taps vs 3, drawn as dots. */
+/* 39 taps vs 3, drawn as dots: sits inside the problem statement. */
 function TapCount() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <div className="space-y-5">
       {[
-        { label: 'Before', n: 39, steps: 'Open app · search · add · × 18 items · cart · checkout', tone: '#FF5F5F' },
-        { label: 'After', n: 3, steps: 'Open app · Add all · checkout', tone: ACCENT },
+        { label: 'Before', n: 39, tone: '#FF5F5F' },
+        { label: 'After', n: 3, tone: ACCENT },
       ].map((b) => (
-        <motion.div key={b.label} {...reveal} className="rounded-[24px] border border-white/5 bg-[#0D0D0D] p-6 md:p-7">
-          <p className="text-xs font-semibold mb-4" style={{ color: b.tone }}>
-            {b.label}
+        <div key={b.label}>
+          <p className="flex items-baseline justify-between mb-2">
+            <span className="text-xs font-semibold" style={{ color: b.tone }}>
+              {b.label}
+            </span>
+            <span className="text-white text-2xl font-semibold tracking-[-0.03em] tabular-nums">≈ {b.n} taps</span>
           </p>
-          <p className="text-white text-5xl font-semibold tracking-[-0.04em] mb-1">≈ {b.n}</p>
-          <p className="text-white/45 text-sm mb-5">taps to restock 18 usual items</p>
-          <div className="flex flex-wrap gap-1.5 mb-5" aria-hidden>
+          <div className="flex flex-wrap gap-1" aria-hidden>
             {Array.from({ length: b.n }, (_, i) => (
-              <span key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: b.tone, opacity: 0.85 }} />
+              <span key={i} className="w-2 h-2 rounded-full" style={{ background: b.tone, opacity: 0.85 }} />
             ))}
           </div>
-          <p className="text-white/50 text-xs leading-relaxed">{b.steps}</p>
-        </motion.div>
+        </div>
       ))}
+      <p className="text-white/40 text-xs leading-relaxed">
+        To restock 18 usual items. Estimated from the two flows, not measured.
+      </p>
     </div>
   );
 }
@@ -364,7 +328,7 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         <SaryCover />
         {/* ── 01 OVERVIEW ── */}
         <ChapterTitle chapter={CHAPTERS[0]} />
-        <section id="overview" className="mb-32 scroll-mt-24">
+        <section id="overview" className="mb-24 scroll-mt-24">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -380,18 +344,15 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
               title="Restock in 3 taps, not 39."
             >
               <p>
-                Sary is a B2B grocery marketplace in Saudi Arabia. Store owners use it to restock their shelves, and most of
-                them buy the same few dozen products every week.
-              </p>
-              <p>
-                I designed a Buy Again hub that turns that routine into one tap, flags what’s running low before the shelf is
-                empty, and suggests the next order on the store’s own restock day.
+                Sary is a B2B grocery marketplace in Saudi Arabia. Most store owners buy the same few dozen products every
+                week, so I designed a Buy Again hub that turns that routine into one tap.
               </p>
             </CaseIntro>
 
             <CaseFilm
               src={FILM}
               poster={POSTER}
+              vertical={{ src: FILM.replace('.mp4', '-vertical.mp4'), poster: POSTER.replace('.webp', '-vertical.webp') }}
               length="1:00"
               accent={ACCENT}
               buttonTint="#1D368D"
@@ -401,98 +362,76 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
               ticker={['Restock in one tap', 'Running low', 'Weekly routine', 'Sary', 'Al Amana Grocery · Riyadh']}
             />
           </motion.div>
-          <MyPart
-            accent={ACCENT}
-            role="Product Design Lead at Sary, 2023"
-            did={<p>I designed a Buy Again hub that turns that routine into one tap, flags what’s running low before the shelf is empty, and suggests the next order on the store’s own restock day.</p>}
-            calls={[
-              { call: 'Make the usual basket the first screen', why: 'Returning stores aren’t browsing. Reordering should start on the first screen, not after a search.', instead: 'A discount banner, category shortcuts and brand rails, the same for every store, every visit.' },
-              { call: 'Let owners watch their own products go into the cart', why: 'Owners trust what they can see. Adding 18 items at once only feels safe when they watch their own products go in.' },
-              { call: 'Say when to reorder, not only what', why: 'Running out costs a store sales. The app knows the cycle, so it should say when.', instead: 'Searching the category rails and adding the same items one by one, every week.' },
-            ]}
-          />
         </section>
 
         {/* ── 02 PROBLEM ── */}
         <ChapterTitle chapter={CHAPTERS[1]} tone="red" />
-        <section id="problem" className="mb-32 scroll-mt-24">
+        <section id="problem" className="mb-24 scroll-mt-24">
+          {/* the whole problem in one view: statement on the left, the cost in taps on the right */}
           <motion.div
             {...reveal}
-            className="relative rounded-[36px] border border-[#FF5F5F]/15 bg-gradient-to-b from-[#FF5F5F]/[0.04] to-transparent p-8 md:p-14 mb-16"
+            className="grid gap-8 md:gap-12 md:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] rounded-[28px] border border-[#FF5F5F]/15 bg-[#FF5F5F]/[0.03] p-7 md:p-10 mb-4"
           >
-            <div className="flex items-center gap-2 mb-8">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#FF5F5F] animate-pulse" />
-              <span className="text-[#FF5F5F]/70 text-xs font-semibold">Problem statement</span>
+            <div>
+              <p className="text-[#FF8A8A] text-xs font-semibold mb-4">Problem statement</p>
+              <p className="text-white text-2xl md:text-[34px] font-bold leading-[1.15] tracking-tight mb-4">
+                Stores that order the same basket every week had to build it from scratch every time.
+              </p>
+              <p className="text-white/55 leading-relaxed">
+                The first screen was built for discovery. Last Sunday’s 18 item order wasn’t on it, and most buyers ordered once
+                and didn’t come back.
+              </p>
             </div>
-            <p className="text-white text-2xl md:text-4xl font-bold leading-[1.15] tracking-tight max-w-3xl mb-8">
-              Stores that order the same basket every week had to build it from scratch every time.
-            </p>
-            <p className="text-white/55 text-base md:text-lg leading-relaxed max-w-2xl">
-              The app was built for discovery: banners, categories and search. A returning store saw the same discount
-              banner as everyone else, and last Sunday’s 18 item order wasn’t visible anywhere on the first screen. Most
-              buyers ordered once and didn’t come back.
-            </p>
+            <div className="md:border-l md:border-white/[0.07] md:pl-10 flex flex-col justify-center">
+              <TapCount />
+            </div>
           </motion.div>
 
-          <Eyebrow tone="#FF5F5F">How we found it</Eyebrow>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-20">
-            {SIGNALS.map((s, i) => (
-              <motion.div
-                key={s.k}
-                {...reveal}
-                transition={{ ...reveal.transition, delay: i * 0.06 }}
-                className="rounded-[24px] border border-white/5 bg-[#0D0D0D] p-7"
-              >
-                <p className="text-white/35 text-xs font-semibold mb-4">{s.k}</p>
-                <p className="text-white text-xl font-bold tracking-tight mb-2">{s.t}</p>
-                <p className="text-white/50 text-sm leading-relaxed">{s.d}</p>
-              </motion.div>
+          {/* the evidence, one line each */}
+          <motion.dl
+            {...reveal}
+            className="grid grid-cols-2 md:grid-cols-4 gap-px overflow-hidden rounded-[20px] border border-white/[0.06] bg-white/[0.06] mb-20"
+          >
+            {SIGNALS.map((x) => (
+              <div key={x.k} className="bg-[#0B0B0C] p-5">
+                <dt className="text-white/35 text-xs font-semibold mb-2">{x.k}</dt>
+                <dd className="text-white font-semibold leading-snug">{x.t}</dd>
+                <dd className="text-white/45 text-sm leading-snug mt-1">{x.d}</dd>
+              </div>
             ))}
-          </div>
+          </motion.dl>
 
           <Eyebrow tone="#FF5F5F">Before and after</Eyebrow>
-          <div className="mb-10">
-            <ScreenCompare />
-          </div>
-          <TapCount />
-          <p className="text-white/35 text-xs mt-4 max-w-xl">
-            Estimated from the two flows, not measured. Reviewing the basket adds 1 to 3 taps.
-          </p>
-        </section>
-
-        {/* ── 03 INSIGHTS ── */}
-        <ChapterTitle chapter={CHAPTERS[2]} tone="teal" />
-        <section id="insight" className="mb-32 scroll-mt-24">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
-            {INSIGHTS.map((it, i) => (
-              <motion.div key={it.n} {...reveal} transition={{ ...reveal.transition, delay: i * 0.06 }}>
-                <span className="block text-5xl font-semibold tracking-[-0.03em] mb-4" style={{ color: ACCENT, opacity: 0.4 }}>
-                  {it.n}
-                </span>
-                <p className="text-white text-2xl font-bold tracking-tight mb-3">{it.t}</p>
-                <p className="text-white/50 leading-relaxed">{it.d}</p>
-              </motion.div>
-            ))}
-          </div>
+          <ScreenCompare />
 
           <motion.blockquote
             {...reveal}
-            className="mt-20 border-l-2 pl-6 md:pl-8 text-white text-2xl md:text-3xl font-bold leading-snug tracking-tight max-w-3xl"
+            className="mt-16 border-l-2 pl-6 md:pl-8 text-white text-xl md:text-2xl font-semibold leading-snug tracking-tight max-w-3xl"
             style={{ borderColor: ACCENT }}
           >
             The goal: make the repeat order the starting point, not something owners rebuild by hand.
           </motion.blockquote>
+          <MyPart
+            accent={ACCENT}
+            role="Product Design Lead at Sary, 2023"
+            did={<p>I designed the hub around that routine: the usual basket, running-low flags and a reminder on the store’s restock day.</p>}
+            calls={[
+              { call: 'Make the usual basket the first screen', why: 'Returning stores aren’t browsing. Reordering should start on the first screen, not after a search.' },
+              { call: 'Let owners watch their own products go into the cart', why: 'Owners trust what they can see. Adding 18 items at once only feels safe when they watch their own products go in.' },
+              { call: 'Say when to reorder, not only what', why: 'Running out costs a store sales. The app knows the cycle, so it should say when.' },
+            ]}
+          />
         </section>
 
-        {/* ── 04 SCREENS ── */}
-        <ChapterTitle chapter={CHAPTERS[3]} />
+        {/* ── 03 SCREENS ── */}
+        <ChapterTitle chapter={CHAPTERS[2]} />
       </div>
       <section id="screens" className="mb-32 scroll-mt-24">
         <MarqueeGallery columns={SCREENS} aspect={390 / 844} label="All the Buy Again screens, scrolling in columns" />
       </section>
       <div className="max-w-5xl mx-auto px-6 pb-24">
-        {/* ── 05 USE CASES ── */}
-        <ChapterTitle chapter={CHAPTERS[4]} />
+        {/* ── 04 USE CASES ── */}
+        <ChapterTitle chapter={CHAPTERS[3]} />
         <section id="cases" className="mb-32 scroll-mt-24">
           <UseCaseExplorer
             cases={USE_CASES}
@@ -501,8 +440,8 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           />
         </section>
 
-        {/* ── 06 MOTION ── */}
-        <ChapterTitle chapter={CHAPTERS[5]} />
+        {/* ── 05 MOTION ── */}
+        <ChapterTitle chapter={CHAPTERS[4]} />
         <section id="motion" className="mb-32 scroll-mt-24">
           {/* framed as a playground, so it reads as something to try before anyone taps */}
           <motion.div
@@ -528,8 +467,8 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           </motion.div>
         </section>
 
-        {/* ── 07 CAMPAIGNS ── */}
-        <ChapterTitle chapter={CHAPTERS[6]} />
+        {/* ── 06 CAMPAIGNS ── */}
+        <ChapterTitle chapter={CHAPTERS[5]} />
         <section id="campaigns" className="scroll-mt-24">
           <motion.p {...reveal} className="max-w-2xl text-white/70 text-lg leading-relaxed mb-10">
             Buy Again sits inside Sary’s catalogue, and the catalogue runs on banners: brand launches, seasonal deals, cashback,
@@ -544,8 +483,8 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         <BannerWall />
       </div>
       <div className="max-w-5xl mx-auto px-6 pb-24">
-        {/* ── 08 IMPACT ── */}
-        <ChapterTitle chapter={CHAPTERS[7]} />
+        {/* ── 07 IMPACT ── */}
+        <ChapterTitle chapter={CHAPTERS[6]} />
         <section id="impact" className="mb-16 scroll-mt-24">
           <LeadStats lead={RESULTS[0]} note="The number this project was built to move." rest={RESULTS.slice(1)} accent={ACCENT} />
           <Learnings accent={ACCENT}>

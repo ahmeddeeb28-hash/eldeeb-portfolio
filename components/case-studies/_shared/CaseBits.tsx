@@ -26,7 +26,22 @@ export function Eyebrow({ children, tone }: { children: ReactNode; tone: string 
    button that restarts it with sound. If the file is missing,
    `fallback` (a live phone sequence) plays centre stage instead,
    lit like a film still, over large `decor` lettering and a
-   slow ticker of `ticker` phrases. */
+   slow ticker of `ticker` phrases.
+   On phones, `vertical` swaps in a 9:16 cut of the same film so it
+   fills the screen upright instead of sitting in a thin 16:9 strip. */
+
+const PHONE_MQ = '(max-width: 767px)';
+function useIsPhone() {
+  const [phone, setPhone] = useState(() => typeof window !== 'undefined' && window.matchMedia(PHONE_MQ).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(PHONE_MQ);
+    const on = () => setPhone(mq.matches);
+    on();
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, []);
+  return phone;
+}
 export function CaseFilm({
   src,
   poster,
@@ -37,7 +52,9 @@ export function CaseFilm({
   fallback,
   decor,
   ticker,
+  vertical,
 }: {
+  vertical?: { src: string; poster?: string };
   src: string;
   poster?: string;
   length: string;
@@ -51,6 +68,9 @@ export function CaseFilm({
   const ref = useRef<HTMLVideoElement>(null);
   const [hasFilm, setHasFilm] = useState(true);
   const [playing, setPlaying] = useState(false);
+  const upright = useIsPhone() && !!vertical;
+  const file = upright ? vertical!.src : src;
+  const still = upright ? vertical!.poster ?? poster : poster;
 
   // A missing file can fail before React attaches onError; `v.error` is
   // already set then, so check it once on mount. Don't read networkState:
@@ -67,7 +87,8 @@ export function CaseFilm({
     }
     v.muted = true;
     void v.play().catch(() => {});
-  }, []);
+    setPlaying(false);
+  }, [file]);
 
   const play = () => {
     const v = ref.current;
@@ -80,13 +101,18 @@ export function CaseFilm({
   };
 
   return (
-    <div className="relative aspect-[16/9] rounded-[32px] overflow-hidden border border-white/5" style={{ background }}>
+    <div
+      className={`relative overflow-hidden border border-white/5 ${upright ? 'aspect-[9/16] mx-auto rounded-[28px]' : 'aspect-[16/9] rounded-[32px]'}`}
+      // upright: never taller than most of the screen, so the button stays in view
+      style={{ background, width: upright ? 'min(100%, calc(80svh * 9 / 16))' : undefined }}
+    >
       {hasFilm ? (
         <>
           <video
+            key={file}
             ref={ref}
-            src={src}
-            poster={poster}
+            src={file}
+            poster={still}
             muted
             loop={!playing}
             autoPlay

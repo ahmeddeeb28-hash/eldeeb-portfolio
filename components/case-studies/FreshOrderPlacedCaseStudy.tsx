@@ -281,6 +281,7 @@ export function FreshOrderPlacedCaseStudy({ onBack, onNext }: CaseStudyComponent
             <CaseFilm
               src={FILM}
               poster={POSTER}
+              vertical={{ src: FILM.replace('.mp4', '-vertical.mp4'), poster: POSTER.replace('.webp', '-vertical.webp') }}
               length="0:47"
               accent={ACCENT}
               buttonTint="#103F2D"

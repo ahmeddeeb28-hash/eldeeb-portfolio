@@ -462,6 +462,7 @@ export function SampoCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
             <CaseFilm
               src={FILM}
               poster={POSTER}
+              vertical={{ src: FILM.replace('.mp4', '-vertical.mp4'), poster: POSTER.replace('.webp', '-vertical.webp') }}
               length="1:12"
               accent={ACCENT}
               buttonTint="#4338CA"
