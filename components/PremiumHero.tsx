@@ -36,7 +36,7 @@ export function PremiumHero() {
             className="text-white/70 text-lg md:text-xl leading-relaxed max-w-2xl mb-10"
           >
             {tr(
-              'Ten years across e-commerce, fintech, SaaS, AI and gaming. I’ve led 8 designers across 3 squads, lifted repeat purchases by 28%, and turned AI pricing into something merchants trust. I still design the hard parts myself.',
+              'E-commerce, fintech, SaaS, AI and games. I lead design teams, I still design the hard parts myself, and I make products people come back to and pay for. If that’s what your product needs, I can help.',
               'عشر سنوات بين التجارة الإلكترونية والتقنية المالية ومنصات الأعمال والذكاء الاصطناعي والألعاب.',
             )}
           </motion.p>
