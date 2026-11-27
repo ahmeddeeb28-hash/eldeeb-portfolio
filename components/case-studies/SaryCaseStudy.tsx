@@ -1,7 +1,7 @@
 import { motion, useInView, useMotionValue, useReducedMotion, useSpring, useTransform } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { CaseIntro, LeadStats, Takeaway, MyPart, Learnings } from './_shared/CaseLayout';
-import { ChevronsLeftRight, MousePointerClick } from 'lucide-react';
+import { BarChart3, ChevronsLeftRight, History, MousePointerClick, MonitorPlay, Store, Users, Building2 } from 'lucide-react';
 import { CaseShell } from './_shared/CaseShell';
 import { ChapterTitle } from './_shared/ChapterTitle';
 import { CaseFilm, Eyebrow as BaseEyebrow, UseCaseExplorer, reveal, type UseCase as BaseUseCase } from './_shared/CaseBits';
@@ -39,10 +39,10 @@ const CHAPTERS: Chapter[] = [
 ];
 
 const SIGNALS = [
-  { k: 'Analytics', t: '85% left after Confirm Order', d: 'The “You might also like” sidebar went unseen.' },
-  { k: 'Session replays', t: 'Suggestions didn’t fit', d: 'Owners hovered over them, then closed the app.' },
-  { k: 'Segments', t: '60% irrelevant', d: 'Most of what café owners were shown didn’t apply to them.' },
-  { k: 'Order history', t: 'Same basket every week', d: 'The same few dozen products, usually on the same weekday.' },
+  { k: 'Analytics', icon: BarChart3, t: '85% left after Confirm Order', d: 'The “You might also like” sidebar went unseen.' },
+  { k: 'Session replays', icon: MonitorPlay, t: 'Suggestions didn’t fit', d: 'Owners hovered over them, then closed the app.' },
+  { k: 'Segments', icon: Users, t: '60% irrelevant', d: 'Most of what café owners were shown didn’t apply to them.' },
+  { k: 'Order history', icon: History, t: 'Same basket every week', d: 'The same few dozen products, usually on the same weekday.' },
 ];
 
 const BEFORE_AFTER = [
@@ -275,15 +275,24 @@ function ScreenCompare() {
 
 /* All the Buy Again screens for the marquee gallery. Neighbouring
    columns start on different screens; "Add all" plays live in two. */
-const ph = (state: SaryState): Screen => (w) => <SaryPhone state={state} width={w} />;
+const ph = (state: SaryState, slide?: number): Screen => (w) => <SaryPhone state={state} width={w} slide={slide} />;
 const live: Screen = (w, on) => <SaryAddAllLoop width={w} playing={on} />;
+// the real catalogue screens from the Main Catalogue file, framed like the coded ones
+const shot = (src: string, pos = 0): Screen => (w) => (
+  <div
+    style={{ width: w, aspectRatio: '390 / 844', borderRadius: w * 0.123, overflow: 'hidden', background: '#fff', boxShadow: `0 0 0 ${w * 0.031}px #0B0F14, 0 0 0 ${w * 0.033}px #2a3038` }}
+  >
+    <img src={src} alt="" loading="lazy" className="w-full h-full object-cover" style={{ objectPosition: `50% ${pos}%` }} />
+  </div>
+);
+const CAT = '/images/case-studies/sary/before';
 const SCREENS: Screen[][] = [
-  [ph('home'), ph('review'), ph('routine')],
-  [ph('hub'), ph('order'), live],
-  [ph('added'), ph('home'), ph('review')],
-  [live, ph('routine'), ph('hub')],
-  [ph('order'), ph('added'), ph('home')],
-  [ph('review'), ph('hub'), ph('added')],
+  [ph('home'), ph('offers'), shot(`${CAT}/slider.webp`)],
+  [ph('deals', 0), ph('hub'), live, ph('review')],
+  [shot(`${CAT}/market.webp`, 30), ph('added'), ph('deals', 3)],
+  [live, ph('offers'), ph('routine'), shot(`${CAT}/grid.webp`)],
+  [ph('order'), ph('deals', 4), ph('home')],
+  [shot(`${CAT}/tworow.webp`), ph('review'), ph('offers'), ph('hub')],
 ];
 
 export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
@@ -347,15 +356,30 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
                 Stores that order the same basket every week had to build it from scratch every time.
               </p>
               <p className="text-white/55 leading-relaxed">
-                The first screen was built for discovery. Last Sunday’s 18 item order wasn’t on it, and most buyers ordered once
-                and didn’t come back.
+                The first screen was built for discovery. Last Sunday’s 18 item order wasn’t on it.
               </p>
-              <p className="mt-6 flex items-baseline gap-3 text-white/45 text-sm">
-                <span className="text-white text-xl font-semibold tabular-nums">≈ 39 taps</span> before
-                <span className="text-white/25">→</span>
-                <span className="text-xl font-semibold tabular-nums" style={{ color: ACCENT }}>3</span> after
-              </p>
-              <p className="text-white/30 text-xs mt-1">Estimated from the two flows, for 18 usual items.</p>
+              {/* why it's a problem, for each side */}
+              <p className="mt-8 mb-3 text-white/45 text-xs font-semibold">Why it’s a problem</p>
+              <ul className="space-y-3">
+                <li className="flex gap-3.5">
+                  <span className="shrink-0 grid place-items-center w-9 h-9 rounded-xl bg-white/[0.06] text-white/80">
+                    <Store className="w-4 h-4" strokeWidth={2} />
+                  </span>
+                  <span className="text-white/60 text-[15px] leading-snug">
+                    <b className="block text-white font-semibold">For the store owner</b>
+                    A weekly chore rebuilt from memory: about 39 taps for 18 items they already know.
+                  </span>
+                </li>
+                <li className="flex gap-3.5">
+                  <span className="shrink-0 grid place-items-center w-9 h-9 rounded-xl bg-white/[0.06] text-white/80">
+                    <Building2 className="w-4 h-4" strokeWidth={2} />
+                  </span>
+                  <span className="text-white/60 text-[15px] leading-snug">
+                    <b className="block text-white font-semibold">For Sary</b>
+                    Repeat orders were the business, and most buyers ordered once and didn’t come back.
+                  </span>
+                </li>
+              </ul>
             </div>
             <div className="w-full max-w-[380px] mx-auto md:mx-0 md:justify-self-end">
               <ProblemFilm />
@@ -369,7 +393,12 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
           >
             {SIGNALS.map((x) => (
               <div key={x.k} className="bg-[#0B0B0C] p-5">
-                <dt className="text-white/35 text-xs font-semibold mb-2">{x.k}</dt>
+                <dt className="flex items-center gap-2 text-white/40 text-xs font-semibold mb-3">
+                  <span className="grid place-items-center w-7 h-7 rounded-lg bg-white/[0.06] text-white/75">
+                    <x.icon className="w-3.5 h-3.5" strokeWidth={2} />
+                  </span>
+                  {x.k}
+                </dt>
                 <dd className="text-white font-semibold leading-snug">{x.t}</dd>
                 <dd className="text-white/45 text-sm leading-snug mt-1">{x.d}</dd>
               </div>
@@ -402,7 +431,7 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         <ChapterTitle chapter={CHAPTERS[2]} />
       </div>
       <section id="screens" className="mb-32 scroll-mt-24">
-        <MarqueeGallery columns={SCREENS} aspect={390 / 844} label="All the Buy Again screens, scrolling in columns" />
+        <MarqueeGallery columns={SCREENS} aspect={390 / 844} label="Sary screens in columns: Buy Again, Discover, offers and the catalogue" />
       </section>
       <div className="max-w-5xl mx-auto px-6 pb-24">
         {/* ── 04 USE CASES ── */}

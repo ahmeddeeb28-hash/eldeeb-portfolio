@@ -39,7 +39,8 @@ export type SaryState =
   | 'order'
   | 'added'
   | 'routine'
-  | 'deals';
+  | 'deals'
+  | 'offers';
 
 const IMG = '/images/case-studies/sary';
 const W = 390;
@@ -153,6 +154,12 @@ export function SaryPhone({
         )}
         {state === 'review' && <ReviewScreen />}
         {state === 'order' && <OrderScreen />}
+        {state === 'offers' && (
+          <>
+            <OffersScreen />
+            <Nav on="Discover" />
+          </>
+        )}
         {state === 'deals' && (
           <>
             <DealsScreen slide={slide} badge={count} />
@@ -192,6 +199,7 @@ const LABELS: Record<SaryState, string> = {
   order: 'Past order: pick items to reorder at today’s prices',
   added: 'Usual basket added to cart, with savings and a weekly reminder option',
   routine: 'Weekly reminder turned on for Sundays',
+  offers: 'Offers: cashback, brand launches, seasonal deals and coupon codes, filtered by type',
   deals: 'Discover tab: a carousel of campaign banners, categories and this week’s deals',
 };
 
@@ -1522,6 +1530,50 @@ export function SaryDealsLoop({ width = 300 }: { width?: number }) {
   return (
     <div ref={ref}>
       <SaryPhone state="deals" width={width} slide={slide} />
+    </div>
+  );
+}
+
+/* ── Offers: every running campaign in one list, filterable ── */
+const OFFERS: Banner[] = [BANNERS.cashback, BANNERS.coke, BANNERS.eid, BANNERS.pulses, BANNERS.unilever];
+function OffersScreen() {
+  return (
+    <div style={{ paddingTop: 50 }}>
+      <div style={{ ...row, gap: 12, padding: '8px 16px 12px' }}>
+        <h3 style={{ font: `700 22px/1.2 ${display}`, margin: 0, flex: 1 }}>Offers</h3>
+        <CartIcon n={3} />
+      </div>
+      <div style={{ ...row, gap: 8, padding: '0 16px 14px', overflow: 'hidden' }}>
+        {['All 24', 'Cashback', 'Brands', 'Seasonal', 'Coupons'].map((c, i) => (
+          <span
+            key={c}
+            style={{
+              flex: 'none',
+              height: 34,
+              padding: '0 14px',
+              borderRadius: 999,
+              display: 'grid',
+              placeItems: 'center',
+              font: `700 13px ${ui}`,
+              background: i ? '#fff' : S.navy,
+              color: i ? S.sub : '#fff',
+              boxShadow: i ? e1 : 'none',
+            }}
+          >
+            {c}
+          </span>
+        ))}
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 16px' }}>
+        {OFFERS.map((b) => (
+          <img
+            key={b.id}
+            src={bannerSrc(b)}
+            alt={b.alt}
+            style={{ width: SLIDE_W, height: SLIDE_W * (540 / 1140), borderRadius: 16, boxShadow: e1, display: 'block' }}
+          />
+        ))}
+      </div>
     </div>
   );
 }
