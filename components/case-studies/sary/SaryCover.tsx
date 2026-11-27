@@ -46,7 +46,7 @@ export function SaryCover() {
         className="relative overflow-hidden rounded-[28px] md:rounded-[36px]"
         style={{ background: NAVY, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12)', height: w ? height : 560 }}
       >
-        <div className="absolute left-6 top-6 md:left-10 md:top-9 z-10">
+        <div className="absolute inset-x-0 top-6 md:top-9 z-10 flex flex-col items-center text-center">
           <img src="/images/brands/image 8.png" alt="Sary" className="h-6 md:h-8 w-auto brightness-0 invert" />
           <p className="hidden sm:block text-white/70 text-sm md:text-base mt-2">Buy Again · 2023</p>
         </div>
