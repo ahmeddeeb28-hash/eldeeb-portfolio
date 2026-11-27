@@ -155,7 +155,7 @@ export default function App() {
   };
 
   return (
-    <div ref={containerRef} className="relative min-h-screen bg-[#0A0A0A] selection:bg-[#4AF2E5] selection:text-[#0A0A0A]" style={{ position: 'relative', overflowX: 'clip' }}>
+    <div ref={containerRef} className="relative min-h-screen bg-black selection:bg-[#4AF2E5] selection:text-[#0A0A0A]" style={{ position: 'relative', overflowX: 'clip' }}>
       {/* A case study sits outside AnimatePresence on purpose. It owns
           dozens of motion children, so the exit orchestration never
           finished: the outgoing overlay stayed mounted at opacity 0 while
@@ -186,7 +186,7 @@ export default function App() {
         className="fixed inset-0 pointer-events-none z-0"
         style={{
           background:
-            'radial-gradient(ellipse 45% 40% at 20% 10%, rgba(74,242,229,0.035) 0%, transparent 70%), radial-gradient(ellipse 40% 35% at 90% 65%, rgba(74,242,229,0.02) 0%, transparent 70%)',
+            'none',
         }}
       />
 

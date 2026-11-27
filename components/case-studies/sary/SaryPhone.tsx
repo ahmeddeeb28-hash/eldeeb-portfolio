@@ -1,5 +1,6 @@
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'motion/react';
 import { useEffect, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react';
+import { BANNERS, bannerSrc, type Banner } from './banners';
 import {
   ArrowDown,
   ArrowLeft,
@@ -37,7 +38,10 @@ export type SaryState =
   | 'review'
   | 'order'
   | 'added'
-  | 'routine';
+  | 'routine'
+  | 'deals'
+  | 'offers'
+  | 'supermarket';
 
 const IMG = '/images/case-studies/sary';
 const W = 390;
@@ -67,9 +71,11 @@ export const S = {
   tonal: '#EAF0FB',
 };
 
-const e1 = '0 1px 2px rgba(16,33,46,.05),0 6px 18px -6px rgba(16,33,46,.08)';
-const e2 = '0 1px 3px rgba(16,33,46,.06),0 8px 20px -6px rgba(16,33,46,.16)';
-const esheet = '0 -8px 28px -6px rgba(16,33,46,.12)';
+// no drop shadows: surfaces are separated by a soft grey stroke instead
+const STROKE = '#E5E8EC';
+const e1 = `0 0 0 1px ${STROKE}`;
+const e2 = `0 0 0 1px ${STROKE}`;
+const esheet = `0 0 0 1px ${STROKE}`;
 
 const P = {
   milk: { n: 'Almarai Low-fat Milk 2 L', k: '6 x 2 L', p: 'SAR 58.50' },
@@ -98,7 +104,11 @@ export function SaryPhone({
   sheet,
   routineOn,
   toast,
+  slide = 0,
+  bare,
 }: {
+  /* no bezel or corner radius: for slots that draw their own frame */
+  bare?: boolean;
   state: SaryState;
   width?: number;
   /* animation knobs used by the looping sequence */
@@ -110,6 +120,8 @@ export function SaryPhone({
   sheet?: boolean;
   routineOn?: boolean;
   toast?: boolean;
+  /* deals screen: which banner the carousel shows */
+  slide?: number;
 }) {
   const scale = width / W;
   const isSheet = sheet ?? (state === 'added' || state === 'routine');
@@ -128,14 +140,15 @@ export function SaryPhone({
           height: H,
           transform: `scale(${scale})`,
           transformOrigin: '0 0',
-          borderRadius: 48,
+          borderRadius: bare ? 0 : 56,
           overflow: 'hidden',
           background: '#fff',
           color: S.ink,
           fontFamily: ui,
           fontSize: 14,
           lineHeight: 1.4,
-          boxShadow: '0 0 0 12px #0B0F14, 0 0 0 13px #2a3038, 0 40px 80px -30px rgba(0,0,0,.6)',
+          // black bezel, then a thin titanium band, like a current Pro Max
+          boxShadow: bare ? 'none' : '0 0 0 11px #07090C, 0 0 0 12.5px #6E7177, 0 0 0 14px #2B2E33',
           isolation: 'isolate',
         }}
       >
@@ -146,6 +159,24 @@ export function SaryPhone({
         )}
         {state === 'review' && <ReviewScreen />}
         {state === 'order' && <OrderScreen />}
+        {state === 'supermarket' && (
+          <>
+            <SupermarketScreen />
+            <Nav on="Discover" />
+          </>
+        )}
+        {state === 'offers' && (
+          <>
+            <OffersScreen />
+            <Nav on="Discover" />
+          </>
+        )}
+        {state === 'deals' && (
+          <>
+            <DealsScreen slide={slide} badge={count} />
+            <Nav on="Discover" />
+          </>
+        )}
         {(state === 'home' || state === 'hub' || state === 'added' || state === 'routine') && (
           <>
             <CartBar show={cartBar ?? isAdded} added={isAdded} />
@@ -179,6 +210,9 @@ const LABELS: Record<SaryState, string> = {
   order: 'Past order: pick items to reorder at today’s prices',
   added: 'Usual basket added to cart, with savings and a weekly reminder option',
   routine: 'Weekly reminder turned on for Sundays',
+  supermarket: 'Supermarket aisle: brands, favourite aisles and two running offers',
+  offers: 'Offers: cashback, brand launches, seasonal deals and coupon codes, filtered by type',
+  deals: 'Discover tab: a campaign carousel, shop by business, and sponsored products for cafés',
 };
 
 function StatusBar() {
@@ -237,8 +271,8 @@ function Btn({
   style?: CSSProperties;
 }) {
   const k: Record<string, CSSProperties> = {
-    p: { background: S.navy, color: '#fff', boxShadow: '0 8px 18px -8px rgba(29,54,141,.45)' },
-    ok: { background: S.ok, color: '#fff', boxShadow: '0 8px 18px -8px rgba(14,138,95,.45)' },
+    p: { background: S.navy, color: '#fff', boxShadow: 'none' },
+    ok: { background: S.ok, color: '#fff', boxShadow: 'none' },
     sec: { background: '#fff', color: S.navy, boxShadow: e1 },
     ghost: { background: '#F3F4F6', color: S.sub },
     tonal: { background: S.tonal, color: S.navy },
@@ -527,7 +561,9 @@ function Hero({ home, pressed, added }: { home?: boolean; pressed?: boolean; add
     <div
       style={{
         margin: '0 16px',
-        background: S.mint,
+        background:
+          'radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 55%), linear-gradient(160deg, #F6FBEE 0%, #E7F4D4 55%, #D6EDB8 100%)',
+        boxShadow: 'inset 0 0 0 1px rgba(79,122,22,.16)',
         borderRadius: 22,
         padding: 18,
         display: 'flex',
@@ -709,7 +745,7 @@ function Flyers() {
               background: '#fff',
               display: 'grid',
               placeItems: 'center',
-              boxShadow: '0 6px 12px rgba(16,33,46,.18)',
+              boxShadow: `0 0 0 1px ${STROKE}`,
               zIndex: 80,
             }}
           >
@@ -1157,7 +1193,7 @@ function AddedSheet({ show, routineOn }: { show: boolean; routineOn: boolean }) 
                 height: 20,
                 borderRadius: '50%',
                 background: '#fff',
-                boxShadow: '0 1px 3px rgba(0,0,0,.2)',
+                boxShadow: `0 0 0 1px ${STROKE}`,
               }}
             />
           </span>
@@ -1193,7 +1229,7 @@ function Toast({ show }: { show: boolean }) {
             ...row,
             gap: 10,
             zIndex: 95,
-            boxShadow: '0 10px 22px -6px rgba(16,33,46,.35)',
+            boxShadow: 'none',
           }}
         >
           <CheckCircle2 size={20} color="#5FE0A2" />
@@ -1366,6 +1402,293 @@ export function SaryAddAllPlay({ width = 300 }: { width?: number }) {
             Start over
           </button>
         )}
+      </div>
+    </div>
+  );
+}
+
+/* ── Discover: the catalogue around Buy Again ──
+   The English banners in the app's own carousel: one wide slot that
+   advances on its own, a category grid built from the same product
+   shots, and a row of smaller deal banners below the fold. */
+export const DEALS_SLIDES: Banner[] = [BANNERS.fresh, BANNERS.veg, BANNERS.cashback, BANNERS.coke, BANNERS.school, BANNERS.eid];
+const DEAL_ROW: Banner[] = [BANNERS.second, BANNERS.pulses, BANNERS.flash];
+const CATS: [string, Sku][] = [
+  ['Dairy', 'milk'],
+  ['Soft drinks', 'coke'],
+  ['Tea & coffee', 'tea'],
+  ['Cleaning', 'fairy'],
+  ['Cooking oil', 'oil'],
+  ['Noodles', 'indo'],
+  ['Water', 'water'],
+  ['Juice', 'sun'],
+];
+const SLIDE_W = 358;
+const CAT = `${IMG}/cat`;
+const BUSINESS: [string, string][] = [
+  ['Cafés', `${CAT}/coffee.webp`],
+  ['Restaurants', `${CAT}/fried-chicken.webp`],
+  ['Grills', `${CAT}/grills.webp`],
+  ['Shawarma', `${CAT}/shawarma.webp`],
+  ['Packaging', `${CAT}/packaging.webp`],
+];
+type CatP = { img: string; n: string; k: string; p: string; was?: string; off?: string };
+const SPONSORED: CatP[] = [
+  { img: `${CAT}/monin-caramel.webp`, n: 'Monin Caramel Syrup', k: '700 ml', p: 'SAR 41.40', was: 'SAR 51.75', off: '20%' },
+  { img: `${CAT}/monin-mint.webp`, n: 'Monin Mojito Mint', k: '700 ml', p: 'SAR 41.40', was: 'SAR 51.75', off: '20%' },
+  { img: `${CAT}/pepsi.webp`, n: 'Pepsi Can 330 ml', k: '30 cans', p: 'SAR 54.00' },
+];
+/* a product card from the catalogue: image tile with discount and
+   save, then name, pack and price with an add button */
+function CatCard({ img, n, k, p, was, off, w = 116 }: CatP & { w?: number }) {
+  return (
+    <div style={{ flex: 'none', width: w }}>
+      <div style={{ position: 'relative', height: w, borderRadius: 16, background: S.surf, boxShadow: e1, display: 'grid', placeItems: 'center' }}>
+        <img src={img} alt="" style={{ maxWidth: w * 0.62, maxHeight: w * 0.7, objectFit: 'contain' }} />
+        {off && (
+          <span style={{ position: 'absolute', top: 8, left: 8, font: `800 11px/1 ${ui}`, color: '#fff', background: S.red, borderRadius: 6, padding: '4px 6px' }}>
+            -{off}
+          </span>
+        )}
+        <span style={{ position: 'absolute', bottom: 8, right: 8, width: 28, height: 28, borderRadius: 9, background: '#fff', boxShadow: e1, display: 'grid', placeItems: 'center', color: S.navy }}>
+          <Plus size={16} strokeWidth={2.5} />
+        </span>
+      </div>
+      <div style={{ font: `600 13px/17px ${ui}`, color: S.txt, marginTop: 8, height: 34, overflow: 'hidden' }}>{n}</div>
+      <div style={{ font: `500 12px/16px ${ui}`, color: S.meta }}>{k}</div>
+      <div style={{ ...row, gap: 6, marginTop: 2 }}>
+        <b style={{ font: `800 13px/18px ${ui}`, color: S.ink }}>{p}</b>
+        {was && <s style={{ font: `500 11px/16px ${ui}`, color: S.faint }}>{was}</s>}
+      </div>
+    </div>
+  );
+}
+
+/* ── Supermarket: one aisle, as the catalogue lays it out ── */
+const BRANDS: [string, string][] = [
+  ['Al Taie', `${CAT}/brand-altaie.webp`],
+  ['Aljawad', `${CAT}/brand-aljawad.webp`],
+  ['Binzagr', `${CAT}/brand-binzagr.webp`],
+  ['Al Alali', `${CAT}/brand-alalali.webp`],
+  ['Monin', `${CAT}/monin-caramel.webp`],
+];
+const AISLES: [string, string][] = [
+  ['Soft drinks', `${CAT}/pepsi.webp`],
+  ['Sauces', `${CAT}/tabasco.webp`],
+  ['Syrups', `${CAT}/monin-mint.webp`],
+  ['Pulses', `${CAT}/pulses.webp`],
+  ['Rice', `${CAT}/rice.webp`],
+  ['Canned', `${CAT}/tomato-paste.webp`],
+];
+function SupermarketScreen() {
+  return (
+    <div>
+      <div style={{ position: 'relative', height: 236, background: 'linear-gradient(160deg, #EEF5FD 0%, #DDEBFA 100%)', overflow: 'hidden' }}>
+        <div style={{ ...row, position: 'absolute', top: 58, left: 16, right: 16, justifyContent: 'space-between' }}>
+          <ArrowLeft size={24} strokeWidth={1.5} />
+          <span style={{ ...row, gap: 14 }}>
+            <Search size={22} strokeWidth={1.5} />
+            <CartIcon n={3} />
+          </span>
+        </div>
+        <div style={{ position: 'absolute', left: 16, bottom: 26 }}>
+          <h3 style={{ font: `800 28px/1.1 ${display}`, margin: 0, letterSpacing: '-0.02em' }}>Supermarket</h3>
+          <p style={{ margin: '4px 0 0', color: S.sub, font: `500 14px/20px ${ui}` }}>570 products · 29 brands</p>
+        </div>
+        {/* a little shelf of what's inside */}
+        <img src={`${CAT}/pepsi.webp`} alt="" style={{ position: 'absolute', right: 112, bottom: -6, height: 118, transform: 'rotate(-6deg)' }} />
+        <img src={`${IMG}/coke.webp`} alt="" style={{ position: 'absolute', right: 58, bottom: 6, height: 132 }} />
+        <img src={`${CAT}/tomato-paste.webp`} alt="" style={{ position: 'absolute', right: 8, bottom: -4, height: 104, transform: 'rotate(7deg)' }} />
+      </div>
+
+      <div style={{ padding: '18px 0 0' }}>
+        <SecHead t="Shop by brand" s="29 brands in this aisle" />
+        <div style={{ display: 'flex', gap: 12, padding: '14px 16px 18px', overflow: 'hidden' }}>
+          {BRANDS.map(([l, src]) => (
+            <div key={l} style={{ flex: 'none', width: 62, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 62, height: 62, borderRadius: '50%', background: '#fff', boxShadow: e1, display: 'grid', placeItems: 'center', overflow: 'hidden' }}>
+                <img src={src} alt="" style={{ width: 46, height: 46, objectFit: 'contain' }} />
+              </span>
+              <span style={{ font: `600 12px/16px ${ui}`, color: S.txt, whiteSpace: 'nowrap' }}>{l}</span>
+            </div>
+          ))}
+        </div>
+
+        <SecHead t="Your favourite aisles" s="Based on what you buy" />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, padding: '14px 16px 18px' }}>
+          {AISLES.map(([l, src]) => (
+            <div key={l} style={{ height: 104, borderRadius: 16, background: S.surf, boxShadow: e1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', padding: '0 0 10px', gap: 6 }}>
+              <img src={src} alt="" style={{ height: 58, maxWidth: 80, objectFit: 'contain' }} />
+              <span style={{ font: `600 12px/16px ${ui}`, color: S.txt }}>{l}</span>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', gap: 10, padding: '0 16px' }}>
+          {[
+            { t: '22% off', s: 'Packaging supplies', img: `${CAT}/packaging.webp`, bg: '#FDF1E2' },
+            { t: '35% off', s: 'All pulses', img: `${CAT}/pulses.webp`, bg: '#F1ECFA' },
+          ].map((c) => (
+            <div key={c.t} style={{ position: 'relative', flex: 1, height: 92, borderRadius: 16, background: c.bg, boxShadow: e1, padding: 12, overflow: 'hidden' }}>
+              <b style={{ display: 'block', font: `800 18px/1.1 ${display}` }}>{c.t}</b>
+              <span style={{ font: `500 12px/16px ${ui}`, color: S.sub }}>{c.s}</span>
+              <img src={c.img} alt="" style={{ position: 'absolute', right: -6, bottom: -6, height: 58 }} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DealsScreen({ slide, badge }: { slide: number; badge: number }) {
+  const i = ((slide % DEALS_SLIDES.length) + DEALS_SLIDES.length) % DEALS_SLIDES.length;
+  return (
+    <div style={{ paddingTop: 50 }}>
+      <div style={{ ...row, gap: 12, padding: '8px 16px 12px' }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ font: `500 12px/16px ${ui}`, color: '#9E9E9E' }}>Deliver to</div>
+          <div style={{ ...row, gap: 4, font: `700 14px/20px ${ui}` }}>
+            Al Amana Grocery · Riyadh <ChevronDown size={14} />
+          </div>
+        </div>
+        <CartIcon n={badge} />
+      </div>
+      <div
+        style={{
+          margin: '0 16px 16px',
+          height: 48,
+          borderRadius: 14,
+          background: '#F8F8F9',
+          ...row,
+          padding: '0 14px',
+          color: S.meta,
+          fontWeight: 500,
+        }}
+      >
+        <Search size={20} strokeWidth={1.5} />
+        Search 4,000+ products
+      </div>
+
+      {/* carousel: clipped at the left margin, so only the next banner peeks in (from the right) */}
+      <div style={{ overflow: 'hidden', marginLeft: 16 }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: 10,
+            transform: `translate3d(${-i * (SLIDE_W + 10)}px,0,0)`,
+            transition: 'transform .7s cubic-bezier(.22,1,.36,1)',
+          }}
+        >
+          {DEALS_SLIDES.map((b) => (
+            <img
+              key={b.id}
+              src={bannerSrc(b)}
+              alt={b.alt}
+              draggable={false}
+              style={{ flex: 'none', width: SLIDE_W, height: SLIDE_W * (540 / 1140), borderRadius: 16, boxShadow: e1, display: 'block' }}
+            />
+          ))}
+        </div>
+      </div>
+      <div style={{ ...row, justifyContent: 'center', gap: 5, padding: '12px 0 20px' }}>
+        {DEALS_SLIDES.map((b, k) => (
+          <span
+            key={b.id}
+            style={{
+              width: k === i ? 18 : 6,
+              height: 6,
+              borderRadius: 3,
+              background: k === i ? S.navy : '#D5D9DF',
+              transition: 'width .4s ease, background .4s ease',
+            }}
+          />
+        ))}
+      </div>
+
+      <SecHead t="Shop by business" s="Picked for what you sell" />
+      <div style={{ display: 'flex', gap: 14, padding: '14px 16px 20px', overflow: 'hidden' }}>
+        {BUSINESS.map(([l, src]) => (
+          <div key={l} style={{ flex: 'none', width: 64, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+            <span style={{ width: 64, height: 64, borderRadius: '50%', background: S.surf, boxShadow: e1, display: 'grid', placeItems: 'center', overflow: 'hidden' }}>
+              <img src={src} alt="" style={{ width: 50, height: 50, objectFit: 'contain' }} />
+            </span>
+            <span style={{ font: `600 12px/16px ${ui}`, color: S.txt, whiteSpace: 'nowrap' }}>{l}</span>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ ...row, gap: 8, padding: '0 16px' }}>
+        <h4 style={{ font: `700 19px/1.25 ${display}`, margin: 0, flex: 1 }}>Picked for cafés</h4>
+        <span style={{ font: `700 11px/1 ${ui}`, color: S.meta, background: '#F3F4F6', borderRadius: 6, padding: '5px 7px' }}>Sponsored</span>
+      </div>
+      <div style={{ display: 'flex', gap: 10, padding: '12px 16px 0', overflow: 'hidden' }}>
+        {SPONSORED.map((p) => (
+          <CatCard key={p.n} {...p} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* the Discover screen with its carousel advancing on its own; it
+   holds still off screen and for reduced motion */
+export function SaryDealsLoop({ width = 300 }: { width?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { margin: '-10% 0px' });
+  const reduced = useReducedMotion();
+  const [slide, setSlide] = useState(0);
+  useEffect(() => {
+    if (!inView || reduced) return;
+    const t = setInterval(() => setSlide((n) => n + 1), 2800);
+    return () => clearInterval(t);
+  }, [inView, reduced]);
+  return (
+    <div ref={ref}>
+      <SaryPhone state="deals" width={width} slide={slide} />
+    </div>
+  );
+}
+
+/* ── Offers: every running campaign in one list, filterable ── */
+const OFFERS: Banner[] = [BANNERS.cashback, BANNERS.coke, BANNERS.eid, BANNERS.pulses, BANNERS.unilever];
+function OffersScreen() {
+  return (
+    <div style={{ paddingTop: 50 }}>
+      <div style={{ ...row, gap: 12, padding: '8px 16px 12px' }}>
+        <h3 style={{ font: `700 22px/1.2 ${display}`, margin: 0, flex: 1 }}>Offers</h3>
+        <CartIcon n={3} />
+      </div>
+      <div style={{ ...row, gap: 8, padding: '0 16px 14px', overflow: 'hidden' }}>
+        {['All 24', 'Cashback', 'Brands', 'Seasonal', 'Coupons'].map((c, i) => (
+          <span
+            key={c}
+            style={{
+              flex: 'none',
+              height: 34,
+              padding: '0 14px',
+              borderRadius: 999,
+              display: 'grid',
+              placeItems: 'center',
+              font: `700 13px ${ui}`,
+              background: i ? '#fff' : S.navy,
+              color: i ? S.sub : '#fff',
+              boxShadow: i ? e1 : 'none',
+            }}
+          >
+            {c}
+          </span>
+        ))}
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 16px' }}>
+        {OFFERS.map((b) => (
+          <img
+            key={b.id}
+            src={bannerSrc(b)}
+            alt={b.alt}
+            style={{ width: SLIDE_W, height: SLIDE_W * (540 / 1140), borderRadius: 16, boxShadow: e1, display: 'block' }}
+          />
+        ))}
       </div>
     </div>
   );

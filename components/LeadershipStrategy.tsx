@@ -109,7 +109,7 @@ function AreaImage({ area, featured }: { area: Area; featured?: boolean }) {
       <span
         aria-hidden="true"
         className="absolute bottom-3 right-3 flex h-8 items-center gap-1.5 overflow-hidden rounded-full px-[9px] text-[12px] font-semibold transition-all duration-300"
-        style={{ background: 'rgba(10,10,10,0.78)', border: '1px solid rgba(220,190,140,0.45)', backdropFilter: 'blur(8px)', color: GOLD }}
+        style={{ background: 'rgba(0,0,0,0.78)', border: '1px solid rgba(220,190,140,0.45)', backdropFilter: 'blur(8px)', color: GOLD }}
       >
         <Lock className="h-3.5 w-3.5 shrink-0" />
         <span className="max-w-0 opacity-0 transition-all duration-300 group-hover:max-w-[60px] group-hover:opacity-100 group-focus-visible:max-w-[60px] group-focus-visible:opacity-100">
@@ -297,7 +297,7 @@ function AccessDialog({
 
               <Dialog.Close
                 className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full text-white transition-colors hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4AF2E5]"
-                style={{ background: 'rgba(10,10,10,0.7)', backdropFilter: 'blur(8px)' }}
+                style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
                 aria-label="Close"
               >
                 <X className="h-4 w-4" />

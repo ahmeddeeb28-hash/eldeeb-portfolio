@@ -194,7 +194,7 @@ export function BrandsStats() {
     <section
       className="relative px-6"
       style={{
-        background: "#0A0A0A",
+        background: "#000000",
         paddingTop: "120px",
         paddingBottom: "120px",
       }}

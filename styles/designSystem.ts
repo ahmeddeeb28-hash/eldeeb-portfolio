@@ -130,5 +130,5 @@ export const titleGradientFill = {
 };
 
 /* The signature radial glow behind every section title. */
-export const titleGlowBackground =
-  'radial-gradient(ellipse 60% 80% at 50% 50%, rgba(74,242,229,0.06) 0%, rgba(74,242,229,0.02) 40%, transparent 70%)';
+// the page is plain black now; kept as a no-op so headers need no change
+export const titleGlowBackground = 'none';

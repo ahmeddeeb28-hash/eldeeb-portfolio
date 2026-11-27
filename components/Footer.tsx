@@ -41,7 +41,7 @@ function GlowingOrb() {
         width: '500px',
         height: '500px',
         borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(200,140,70,0.06) 0%, rgba(200,140,70,0.02) 40%, transparent 70%)',
+        background: 'none',
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
@@ -153,7 +153,7 @@ export function Footer({ onOpenAboutPage, onOpenPodcastPage }: FooterProps) {
     <footer
       id="footer-section-lock"
       data-track-area="footer"
-      className="footer-locked relative overflow-hidden bg-[#0A0A0A]"
+      className="footer-locked relative overflow-hidden bg-black"
       style={{ paddingTop: '88px', paddingBottom: '0' }}
     >
       <GlowingOrb />

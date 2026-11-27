@@ -377,6 +377,7 @@ export function VaultCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
             <CaseFilm
               src={FILM}
               poster={POSTER}
+              vertical={{ src: FILM.replace('.mp4', '-vertical.mp4'), poster: POSTER.replace('.webp', '-vertical.webp') }}
               length="0:30"
               accent={LIME}
               buttonTint={DEEP}

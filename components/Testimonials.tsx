@@ -101,7 +101,7 @@ export function Testimonials() {
   };
 
   return (
-    <section id="recommendations" aria-labelledby="recommendations-title" className="relative bg-[#0A0A0A] py-24 md:py-32 overflow-hidden">
+    <section id="recommendations" aria-labelledby="recommendations-title" className="relative bg-black py-24 md:py-32 overflow-hidden">
       <div className="mx-auto max-w-[1440px] px-4 md:px-6">
         <div className="flex flex-wrap items-end justify-between gap-6 mb-10 md:mb-14">
           <div className="max-w-2xl">

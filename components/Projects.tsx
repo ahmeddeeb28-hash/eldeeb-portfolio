@@ -279,7 +279,7 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
   return (
     <section
       id="selected-work-section-lock"
-      className="bg-[#0A0A0A] relative"
+      className="bg-black relative"
       style={{ paddingTop: '96px' }}
     >
       {/* Atmospheric top fade */}
@@ -291,7 +291,7 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
           right: 0,
           height: '120px',
           background:
-            'linear-gradient(to bottom, rgba(10,10,10,0.6) 0%, transparent 100%)',
+            'linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%)',
         }}
       />
 
@@ -316,7 +316,7 @@ export function Projects({ onProjectClick, paused = false }: ProjectsProps) {
             inset: '-60px -40px',
             pointerEvents: 'none',
             background:
-              'radial-gradient(ellipse 42% 70% at 28% 55%, rgba(200,140,70,0.09) 0%, transparent 65%)',
+              'none',
             filter: 'blur(4px)',
             zIndex: 0,
           }}
@@ -608,7 +608,7 @@ function ProjectRow({
                 position: 'absolute',
                 inset: 0,
                 background:
-                  'linear-gradient(180deg, rgba(10,10,10,0.28) 0%, transparent 22%, transparent 78%, rgba(10,10,10,0.28) 100%)',
+                  'linear-gradient(180deg, rgba(0,0,0,0.28) 0%, transparent 22%, transparent 78%, rgba(0,0,0,0.28) 100%)',
                 pointerEvents: 'none',
               }}
             />

@@ -167,7 +167,7 @@ function PhotoTile({
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              'linear-gradient(to top, rgba(10,10,10,0.42) 0%, rgba(10,10,10,0.05) 30%, transparent 55%)',
+              'linear-gradient(to top, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.05) 30%, transparent 55%)',
           }}
         />
 
@@ -195,7 +195,7 @@ function PhotoTile({
               borderColor: hovered
                 ? 'rgba(220,190,140,0.35)'
                 : 'rgba(255,255,255,0.18)',
-              background: 'rgba(10,10,10,0.55)',
+              background: 'rgba(0,0,0,0.55)',
               backdropFilter: 'blur(8px)',
               transition: 'color 500ms, border-color 500ms',
             }}
@@ -382,7 +382,7 @@ export function ProofOfPresence({ onOpenPodcastPage }: { onOpenPodcastPage?: () 
   return (
     <section
       id="proof-of-presence-section-lock"
-      className="proof-of-presence-locked bg-[#0A0A0A] relative"
+      className="proof-of-presence-locked bg-black relative"
       style={{ paddingTop: placement === 'a' ? 72 : 112, paddingBottom: 112 }}
     >
       {/* Ambient warm glow */}
@@ -395,7 +395,7 @@ export function ProofOfPresence({ onOpenPodcastPage }: { onOpenPodcastPage?: () 
           width: '55%',
           height: '55%',
           background:
-            'radial-gradient(closest-side, rgba(220,190,140,0.06) 0%, transparent 70%)',
+            'none',
           pointerEvents: 'none',
           zIndex: 0,
         }}
