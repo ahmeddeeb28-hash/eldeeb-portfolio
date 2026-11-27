@@ -50,10 +50,6 @@ export function SaryCover() {
           <img src="/images/brands/image 8.png" alt="Sary" className="h-6 md:h-8 w-auto brightness-0 invert" />
           <p className="hidden sm:block text-white/70 text-sm md:text-base mt-2">Buy Again · 2023</p>
         </div>
-        <p className="absolute right-6 top-6 md:right-10 md:top-9 z-10 text-white text-sm md:text-base text-right leading-snug">
-          <span className="block text-xl sm:text-2xl md:text-4xl font-semibold tracking-[-0.03em]">+28%</span>
-          <span className="text-white/70 text-xs sm:text-sm md:text-base">repeat purchases</span>
-        </p>
         {w > 0 &&
           phones.map((p) => (
             <motion.div
