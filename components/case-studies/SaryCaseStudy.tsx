@@ -8,6 +8,7 @@ import { CaseFilm, Eyebrow as BaseEyebrow, UseCaseExplorer, reveal, type UseCase
 import type { Chapter, CaseStudyComponentProps } from './_shared/types';
 import { MarqueeGallery, type Screen } from './_shared/MarqueeGallery';
 import { SaryCover } from './sary/SaryCover';
+import { ProblemFilm } from './sary/ProblemFilm';
 import { BannerWall, CampaignStage } from './sary/SaryCampaigns';
 import { SaryAddAllLoop, SaryAddAllPlay, SaryPhone, type SaryState } from './sary/SaryPhone';
 
@@ -272,35 +273,6 @@ function ScreenCompare() {
   );
 }
 
-/* 39 taps vs 3, drawn as dots: sits inside the problem statement. */
-function TapCount() {
-  return (
-    <div className="space-y-5">
-      {[
-        { label: 'Before', n: 39, tone: '#FF5F5F' },
-        { label: 'After', n: 3, tone: ACCENT },
-      ].map((b) => (
-        <div key={b.label}>
-          <p className="flex items-baseline justify-between mb-2">
-            <span className="text-xs font-semibold" style={{ color: b.tone }}>
-              {b.label}
-            </span>
-            <span className="text-white text-2xl font-semibold tracking-[-0.03em] tabular-nums">≈ {b.n} taps</span>
-          </p>
-          <div className="flex flex-wrap gap-1" aria-hidden>
-            {Array.from({ length: b.n }, (_, i) => (
-              <span key={i} className="w-2 h-2 rounded-full" style={{ background: b.tone, opacity: 0.85 }} />
-            ))}
-          </div>
-        </div>
-      ))}
-      <p className="text-white/40 text-xs leading-relaxed">
-        To restock 18 usual items. Estimated from the two flows, not measured.
-      </p>
-    </div>
-  );
-}
-
 /* All the Buy Again screens for the marquee gallery. Neighbouring
    columns start on different screens; "Add all" plays live in two. */
 const ph = (state: SaryState): Screen => (w) => <SaryPhone state={state} width={w} />;
@@ -367,11 +339,8 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
         {/* ── 02 PROBLEM ── */}
         <ChapterTitle chapter={CHAPTERS[1]} tone="red" />
         <section id="problem" className="mb-24 scroll-mt-24">
-          {/* the whole problem in one view: statement on the left, the cost in taps on the right */}
-          <motion.div
-            {...reveal}
-            className="grid gap-8 md:gap-12 md:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] rounded-[28px] border border-[#FF5F5F]/15 bg-[#FF5F5F]/[0.03] p-7 md:p-10 mb-4"
-          >
+          {/* the whole problem in one view: the statement, and beside it the scene it describes */}
+          <motion.div {...reveal} className="grid gap-8 md:gap-14 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] items-center mb-10">
             <div>
               <p className="text-[#FF8A8A] text-xs font-semibold mb-4">Problem statement</p>
               <p className="text-white text-2xl md:text-[34px] font-bold leading-[1.15] tracking-tight mb-4">
@@ -381,9 +350,15 @@ export function SaryCaseStudy({ onBack, onNext }: CaseStudyComponentProps) {
                 The first screen was built for discovery. Last Sunday’s 18 item order wasn’t on it, and most buyers ordered once
                 and didn’t come back.
               </p>
+              <p className="mt-6 flex items-baseline gap-3 text-white/45 text-sm">
+                <span className="text-white text-xl font-semibold tabular-nums">≈ 39 taps</span> before
+                <span className="text-white/25">→</span>
+                <span className="text-xl font-semibold tabular-nums" style={{ color: ACCENT }}>3</span> after
+              </p>
+              <p className="text-white/30 text-xs mt-1">Estimated from the two flows, for 18 usual items.</p>
             </div>
-            <div className="md:border-l md:border-white/[0.07] md:pl-10 flex flex-col justify-center">
-              <TapCount />
+            <div className="w-full max-w-[380px] mx-auto md:mx-0 md:justify-self-end">
+              <ProblemFilm />
             </div>
           </motion.div>
 

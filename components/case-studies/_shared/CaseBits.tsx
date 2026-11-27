@@ -161,6 +161,25 @@ function CinemaStage({
   ticker: string[];
 }) {
   const reduced = useReducedMotion();
+  const stage = useRef<HTMLDivElement>(null);
+  const actor = useRef<HTMLDivElement>(null);
+  const [fit, setFit] = useState(1);
+  useEffect(() => {
+    const s = stage.current;
+    const a = actor.current;
+    if (!s || !a) return;
+    const measure = () => {
+      const w = a.offsetWidth;
+      const h = a.offsetHeight;
+      if (!w || !h) return;
+      setFit(Math.min((s.clientWidth * 0.8) / w, (s.clientHeight * 0.8) / h));
+    };
+    const ro = new ResizeObserver(measure);
+    ro.observe(s);
+    ro.observe(a);
+    measure();
+    return () => ro.disconnect();
+  }, []);
   const line = Array.from({ length: 4 }, () => ticker.join('   ·   ')).join('   ·   ');
   const tickerRow = (dir: 1 | -1, top: string) => (
     <div className="absolute left-0 right-0 overflow-hidden whitespace-nowrap pointer-events-none" style={{ top }} aria-hidden>
@@ -205,9 +224,9 @@ function CinemaStage({
         className="absolute left-1/2 -translate-x-1/2 bottom-[4%] w-[46%] h-[16%] rounded-[50%] blur-2xl"
         style={{ background: `${accent}40` }}
       />
-      {/* the phone, centre stage */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="scale-[0.4] sm:scale-75 md:scale-90 lg:scale-100 origin-center">
+      {/* the phone, centre stage, scaled to fill most of the frame's height */}
+      <div ref={stage} className="absolute inset-0 flex items-center justify-center">
+        <div ref={actor} className="origin-center" style={{ transform: `scale(${fit})` }}>
           <motion.div
             style={{ filter: 'drop-shadow(0 40px 60px rgba(0,0,0,.65))' }}
             animate={reduced ? undefined : { y: [0, -8, 0] }}
